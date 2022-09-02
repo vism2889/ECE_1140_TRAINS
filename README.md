@@ -17,6 +17,7 @@ Instructions for using this repository:
 |----|----|
 | Team Member | Role |
 | Morgan Visnesky | UNKOWN |
+| Nathaniel Mallick | UNKNOWN |
 | Sushmit Acharya | UNKNOWN |
 
 ## Resources
