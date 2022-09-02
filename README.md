@@ -9,12 +9,16 @@ Instructions for using this repository:
 - Make your changes.
 - Push it back to your repo.
 - Click the Compare & pull request button.
-- Click Create pull request to open a new pull request
+- Click Create pull request to open a new pull request.
+- Please choose 3 people minimum to review the merge request you make.
+- After all approvals are complete merge your own branch into master.
 
 |    |    |
 |----|----|
 | Team Member | Role |
 | Morgan Visnesky | UNKOWN |
 | Nathaniel Mallick | UNKNOWN |
+| Sushmit Acharya | UNKNOWN |
+
 ## Resources
 Put any important development resrouces here.
