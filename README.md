@@ -17,6 +17,7 @@ Instructions for using this repository:
 |----|----|
 | Team Member | Role |
 | Morgan Visnesky | UNKOWN |
+| Sushmit Acharya | UNKNOWN |
 
 ## Resources
 Put any important development resrouces here.
