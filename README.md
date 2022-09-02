@@ -19,6 +19,7 @@ Instructions for using this repository:
 | Morgan Visnesky | UNKOWN |
 | Nathaniel Mallick | UNKNOWN |
 | Sushmit Acharya | UNKNOWN |
+| Gwen Litwak | UNKNOWN |
 
 ## Resources
 Put any important development resrouces here.
