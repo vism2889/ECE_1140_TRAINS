@@ -15,6 +15,6 @@ Instructions for using this repository:
 |----|----|
 | Team Member | Role |
 | Morgan Visnesky | UNKOWN |
-
+| Nathaniel Mallick | UNKNOWN |
 ## Resources
 Put any important development resrouces here.
