@@ -19,6 +19,8 @@ Instructions for using this repository:
 | Morgan Visnesky | UNKOWN |
 | Nathaniel Mallick | UNKNOWN |
 | Sushmit Acharya | UNKNOWN |
+| Juin Sommer | UNKNOWN |
+| Garrett Marcinak | UKNOWN | 
 | Gwen Litwak | UNKNOWN |
 
 ## Resources
