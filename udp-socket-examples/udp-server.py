@@ -12,10 +12,30 @@
 
 
 #IMPORTS
-import socket
+import socket, sys
 
 def process():
-    return 42
+    UDP_PORT   = 5005 # Port to listen for messages on
+    bufferSize = 1024 # should reflect size of messages to be received
+
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        print("socket created")
+    except socket.error:
+        print("failed to create socket. Error code:")
+        sys.exit()
+
+    try:
+        s.bind(("", port))
+        print("bind socket complete")
+    except socket.error:
+        print("bind failed")
+        sys.exit()
+
+    while True:
+        message, addr = s.recvfrom(bufferSize)
+        message = str(message)
+        print(message)
 
 if __name__ == '__main__':
     process()
