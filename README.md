@@ -16,12 +16,12 @@ Instructions for using this repository:
 |    |    |
 |----|----|
 | Team Member | Role |
-| Morgan Visnesky | UNKNOWN |
-| Nathaniel Mallick | UNKNOWN |
-| Sushmit Acharya | UNKNOWN |
-| Juin Sommer | UNKNOWN |
-| Garrett Marcinak | UNKNOWN | 
-| Gwen Litwak | UNKNOWN |
+| Morgan Visnesky | Track Model |
+| Nathaniel Mallick | Track Controller |
+| Sushmit Acharya | Train Model |
+| Juin Sommer | Train Controller (HW) |
+| Garrett Marcinak | CTC Office | 
+| Gwen Litwak | Train Controller (SW) |
 
 ## Resources
 Put any important development resrouces here.
