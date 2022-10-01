@@ -26,7 +26,7 @@ def process():
         sys.exit()
 
     try:
-        s.bind(("", port))
+        s.bind(("", UDP_PORT))
         print("bind socket complete")
     except socket.error:
         print("bind failed")
