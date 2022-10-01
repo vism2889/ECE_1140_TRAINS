@@ -1,0 +1,2 @@
+### This contains example code to reference when setting up a pipe to connect processes between python applications.
+### This will probably be used for inter-communication between all software modules.
