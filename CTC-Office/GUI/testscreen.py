@@ -144,7 +144,6 @@ class Ui_testWindow(object):
         blockIndex = redLineLookup[selectedBlock]
         redLine[blockIndex].toggleFaultState()
 
-
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
@@ -152,10 +151,10 @@ if __name__ == "__main__":
     testWindow = QtWidgets.QWidget()
     ui = Ui_testWindow()
     ui.setupUi(testWindow)
-    testWindow.show()
     mainUi = Ui_MainWindow()
     mainUi.setupUi(MainWindow)
     MainWindow.show()
+    testWindow.show()
     
     sys.exit(app.exec_())
 
