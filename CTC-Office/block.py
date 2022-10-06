@@ -1,12 +1,12 @@
 import sys
 
 class block:
+    occupancy = False
+    faultState = False
+    maintenanceState = False
 
     def __init__(self, name):
         self.name = name
-        self.occupancy = False
-        self.faultState = False
-        self.maintenanceState = False
 
     def getOccupancy(self):
         if self.occupancy:
@@ -34,6 +34,4 @@ class block:
 
     def toggleMaintenanceState(self):
         self.maintenanceState ^= True
-
-
 

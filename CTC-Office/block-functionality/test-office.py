@@ -1,5 +1,7 @@
 import sys
-from lines import *
+from block import *
+
+redLine[0].toggleOccupancy()
 
 for line in redLine:
     print("\nRed Line Block:", line.name)
