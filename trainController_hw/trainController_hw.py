@@ -1,5 +1,6 @@
 import RPi.GPIO as GPIO
 from time import sleep
+from simple_pid import PID
 
 GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BOARD)
@@ -35,6 +36,9 @@ class Control():
         self.speed = speed
         print(self.speed)
 
+    def getSpeed(self):
+        return self.speed
+
     def setTemperature(self, temperature):
         self.temperature = temperature
         print(self.temperature)
@@ -45,3 +49,13 @@ class Control():
     def deployEbrake(self):
         self.speed = 0
     
+    def limitSpeed(self):
+        if(self.getSpeed(self) > self.getSuggestedSpeed(self)):
+            self.setSpeed(self.getSuggestedSpeed(self))
+            print("called: ", self.getSpeed(self))
+
+    def getPowerOutput(k_p, k_i, k_d, self):
+        pid = PID(k_p, k_i, k_d, setpoint = self.speed)
+        pid.outer_limits = (0, 120000) # clamp at max power output specified in datasheet 120kW
+
+        return pid(self.speed)

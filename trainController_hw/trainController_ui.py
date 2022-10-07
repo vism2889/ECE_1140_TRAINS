@@ -7,9 +7,11 @@
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtCore import pyqtSlot, QTimer, pyqtSignal
 from trainController_hw import Control as c
 
 class Ui_DriverTestUI(object):
+    trigger = pyqtSignal()
     def __init__(self):
         c.__init__(c)
         self.suggested_speed = 0
@@ -17,7 +19,7 @@ class Ui_DriverTestUI(object):
         self.lights_external_state = False
         self.left_door_state = False
         self.right_door_state = False
-        
+       
     def setupUi(self, DriverTestUI):
         DriverTestUI.setObjectName("DriverTestUI")
         DriverTestUI.resize(1120, 600)
@@ -368,7 +370,7 @@ class Ui_DriverTestUI(object):
         c.setRightDoor(self.right_door_state)
 
     def setSpeed(self):
-        c.setSpeed(c,self.speed_slider.value())
+        c.setSpeed(c, self.speed_slider.value())
 
     def setTemperature(self):
         c.setTemperature(c, self.temperature_box.value())
@@ -376,13 +378,17 @@ class Ui_DriverTestUI(object):
     def deployEbrake(self):
         self.speed_slider.setValue(0)
         c.deployEbrake(c)
-    
+
     def displaySuggestedSpeed(self):
         self.suggested_speed = c.getSuggestedSpeed(c)
         self.lcd_suggested.display(self.suggested_speed)
 
     def getSuggestedSpeed(self):
         return self.suggested_speed
+
+    def limitSpeed(self):
+        c.limitSpeed(c)
+        self.speed_slider.setValue(c.getSpeed(c))
 
     def connect(self, DriverTestUI):
         self.lights_internal_button.clicked.connect(self.toggle_lights_internal)
@@ -392,6 +398,8 @@ class Ui_DriverTestUI(object):
         self.speed_slider.valueChanged['int'].connect(self.setSpeed)
         self.temperature_box.valueChanged['double'].connect(self.setTemperature)
         self.e_brake_button.clicked.connect(self.deployEbrake)
+        self.trigger.connect(self.displaySuggestedSpeed)
+        self.trigger.emit()
        
 
 if __name__ == "__main__":
@@ -402,6 +410,4 @@ if __name__ == "__main__":
     ui.setupUi(DriverTestUI)
     ui.connect(DriverTestUI)
     DriverTestUI.show()
-    ui.displaySuggestedSpeed()
-    
     sys.exit(app.exec_())
