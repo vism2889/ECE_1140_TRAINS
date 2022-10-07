@@ -11,7 +11,7 @@ from PyQt5.QtCore import pyqtSlot, QTimer, pyqtSignal
 from trainController_hw import Control as c
 
 class Ui_DriverTestUI(object):
-    trigger = pyqtSignal()
+    trigger = pyqtSignal(int)
     def __init__(self):
         c.__init__(c)
         self.suggested_speed = 0
@@ -19,6 +19,11 @@ class Ui_DriverTestUI(object):
         self.lights_external_state = False
         self.left_door_state = False
         self.right_door_state = False
+        self.kp = 5
+        self.ki = .01
+        self.power = 0
+        self.timer = QtCore.QTimer()
+        
        
     def setupUi(self, DriverTestUI):
         DriverTestUI.setObjectName("DriverTestUI")
@@ -389,6 +394,18 @@ class Ui_DriverTestUI(object):
     def limitSpeed(self):
         c.limitSpeed(c)
         self.speed_slider.setValue(c.getSpeed(c))
+    
+    def get_kp_ki(self):
+        return self.kp, self.ki
+    
+    def set_kp_ki(self, val1, val2):
+        self.kp, = val1
+        self.ki = val2
+    
+    def calculatePower(self):
+        self.power = c.getPowerOutput(self.kp, self.ki, c)
+        self.lcd_power.display(self.power)
+        
 
     def connect(self, DriverTestUI):
         self.lights_internal_button.clicked.connect(self.toggle_lights_internal)
@@ -398,9 +415,13 @@ class Ui_DriverTestUI(object):
         self.speed_slider.valueChanged['int'].connect(self.setSpeed)
         self.temperature_box.valueChanged['double'].connect(self.setTemperature)
         self.e_brake_button.clicked.connect(self.deployEbrake)
-        self.trigger.connect(self.displaySuggestedSpeed)
-        self.trigger.emit()
-       
+        self.timer.timeout.connect(self.limitSpeed)
+        self.timer.timeout.connect(self.displaySuggestedSpeed)
+        self.timer.timeout.connect(self.calculatePower)
+
+        # connect set_kp_ki() to switch box
+
+        self.timer.start(100)
 
 if __name__ == "__main__":
     import sys
