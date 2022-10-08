@@ -17,19 +17,19 @@ from BlockModel import BlockModel
 class LayoutParser:
     
     def __init__(self, pLayoutFile):
-        self.filename = pLayoutFile
-        self.fields   = [] # Column Names
-        self.rows     = [] # Data Rows / Block Information
-        self.lineNames = []
-        self.lines = []
+        self.filename  = pLayoutFile
+        self.fields    = [] # Column Names
+        self.rows      = [] # Data Rows / Block Information
+        self.lineNames = [] # Names of all lines for a layout EX: [RED, GREEN]
+        self.lines     = [] # List of list's len of self.lineNames, holding BlockModel objects for each line
 
     def process(self):
-        print("\n\tPITTSBURGH LIGHT RAIL TRACK-LAYOUT TEST PARSER")
+        print("\n\tPITTSBURGH LIGHT RAIL TRACK-LAYOUT PARSER")
         print("\t*****************************************")
         with open(self.filename, 'r') as csvfile:
             print("\tParsing Track Layout File: ", self.filename)
-            csvreader = csv.reader(csvfile)
-            self.fields    = next(csvreader)
+            csvreader   = csv.reader(csvfile)
+            self.fields = next(csvreader)
             for row in csvreader:
                 self.rows.append(row)
             print("\tFile Parsing Complete\n")
@@ -49,22 +49,19 @@ class LayoutParser:
         print("\t\t\t-> Lines:", self.lineNames)
 
         blockCountPerLine = [0]*len(self.lineNames)
+        self.lines        = []
 
-        self.lines = []
         for i in range(len(self.lineNames)):
             self.lines.append([])
 
         for row in self.rows:
             for i in range(len(self.lineNames)):
                 if row[0] == self.lineNames[i]:
-                    block = BlockModel(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10])
+                    block = BlockModel(row[0], row[1], row[2], row[3], 
+                                        row[4], row[5], row[6], row[7], 
+                                        row[8], row[9], row[10])
                     self.lines[i].append(block)
                     blockCountPerLine[i]+=1
-        #print(self.lines[0])
-
-        # print(len(self.lines[0]))
-        # for i in range(len(self.lines[1])):
-        #     print(self.lines[0][i].line)
 
         for i in range(len(self.lineNames)):
             print("\t\tThe", self.lineNames[i], "line has", blockCountPerLine[i], "blocks.")
@@ -96,14 +93,15 @@ class LayoutParser:
                 self.rows[0][9],
                 "\n\t\t\tSeconds to Traverse Block: ",
                 self.rows[0][10])
-
-        print("\n\tTEST PARSER FINSIHED")
+        print("\n\tLAYOUT PARSER FINSIHED")
 
 def main():
     vLayout = "Track_Layout_PGH_Light_Rail.csv"
     parser = LayoutParser(vLayout)
     lines = parser.process()
+    parser.printExampleBlock()
     #print("\nLINE 1:\n",lines[0])
     #print("\nLINE 2:\n",lines[1])
 
-#main()
+if __name__ == "__main__":
+    main()
