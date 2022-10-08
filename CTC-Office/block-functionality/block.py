@@ -2,8 +2,10 @@ import sys
 
 class block:
 
-    def __init__(self, name):
+    def __init__(self, name, length, speedLimit):
         self.name = name
+        self.length = length
+        self.speedLimit = speedLimit
         self.occupancy = False
         self.faultState = False
         self.maintenanceState = False

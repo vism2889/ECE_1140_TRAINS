@@ -4,16 +4,14 @@ from block import block
 redLine = []
 blueLine = []
 
-redLine.append( block('A') )
-redLine.append( block('B') )
-redLine.append( block('C') )
+# Create red line
+for blockNumber in range(1,6):
+    redLine.append( block(blockNumber, 50, 40) )
 
-blueLine.append( block('A') )
-blueLine.append( block('B') )
-blueLine.append( block('C') )
+for blockNumber in range(7,12):
+    redLine.append( block(blockNumber, 75, 40) )
 
-redLineLookup = {
-    'Block A': 0,
-    'Block B': 1,
-    'Block C': 2
-}
+redLineLookup = dict()
+
+for blockName in range(1,12):
+    redLineLookup["Block " + str(blockName)] = blockName-1
