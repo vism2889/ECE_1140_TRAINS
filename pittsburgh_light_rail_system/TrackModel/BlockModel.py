@@ -9,50 +9,29 @@
 #
 ##############################################################################
 
+# Questions:
+# How to determine where crossings are.  Is there one at every station that is not underground?
+
 class BlockModel:
-    vBlockNumber      = ''
-    vSwitchPresence   = ''
-    vSwitchState      = ''
-    vStation          = ''
-    vCrossingPresence = ''
-    vGrade            = ''
-    vLineName         = ''
-    vSignalPresence   = ''
-    vSignalState      = ''
+    def __init__(self, pLine, pSection, pBlockNumber, pBlockLength,
+                pGrade, pSpeedLimit, pInfrastructure, pStationSide, 
+                pElevation,  pCumulativeElevation, pSecsToTraverseBlock):
+        self.line                = pLine
+        self.section             = pSection
+        self.blockNumber         = pBlockNumber
+        self.blockLength         = pBlockLength
+        self.grade               = pGrade
+        self.speedLimit          = pSpeedLimit
+        self.infrastructure      = pInfrastructure
+        self.stationSide         = pStationSide      # set  to None if a station does not exist
+        self.elevation           = pElevation
+        self.cumulativeElevation = pCumulativeElevation
+        self.secsToTraverseBlock = pSecsToTraverseBlock
 
-    def __init__(self, pBlockNumber, pSwitchPresence, pStation, pCrossingPresence, pGrade):
-        vBlockNumber      = pBlockNumber
-        vSwitchPresence   = pSwitchPresence
-        vStation          = pStation
-        vCrossingPresence = pCrossingPresence
-        vGrade            = pGrade
-
-    def setBlockNumber(self, pBlockNumber):
-        vBlockNumber = pBlockNumber
-
-    def getBlockNumber(self):
-        return vBlockNumber
-
-    def setSwitchPresence(self, pSwitchPresence):
-        vSwitchPresence = pSwitchPresence
-
-    def getSwitchPresence(self):
-        return vSwitchPresence
-
-    def setStation(self, pStation):
-        vStation = pStation
-
-    def getStation(self):
-        return vStation
-
-    def setCrossingPresence(self, pCrossingPresence):
-        vCrossingPresence = pCrossingPresence
-
-    def getCrossingPresence(self):
-        return vCrossingPresence
-
-    def setGrade(self, pGrade):
-        vGrade = pGrade 
-
-    def getGrade(self):
-        return vGrade
+        # values needed for Wayside and Train Model
+        # self.vSwitchPresence   = None #gets set based on infrastructure
+        # self.vSwitchState      = None #gets set based on infrastructure
+        # self.vStation          = None #gets set based on infrastructure
+        # self.vCrossingPresence = None #unknown: maybe is present at every above ground station
+        # self.vSignalPresence   = None #unknown
+        # self.vSignalState      = None #unknown
