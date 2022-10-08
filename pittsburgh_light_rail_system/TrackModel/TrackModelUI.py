@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import QApplication, QWidget, QInputDialog, QLineEdit, QFil
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5 import QtCore
 from LayoutParser import LayoutParser
+from TrackModelTestInterfaceUI import TestUI
 
 class App(QWidget):
     def __init__(self):
@@ -16,9 +17,18 @@ class App(QWidget):
         self.lines = []
         self.currLineIndex = None
         self.layoutFile = None
+
+        self.testUI = TestUI()
         self.initUI()
+        
+        #self.mainWindow.show_new_window()
 
     def initLayout(self):
+        ''' 
+            Calls LayoutParser.py which will return a list of track-line names, 
+            and a 2D list of BlockModel objects, the columns are the track-lines, 
+            and the rows are the blocks for that line
+        '''
         parser = LayoutParser(self.layoutFile)
         self.lineNames, self.lines = parser.process()
         print(self.lineNames)
@@ -32,6 +42,12 @@ class App(QWidget):
         # self.bt1.setStyleSheet("background-color: rgb(175, 225, 175); color: black; border-radius: 5px")
         self.bt1.resize(self.width, 30)
         self.bt1.clicked.connect(self.openFileNameDialog)
+
+        self.launchTestUIBt = QPushButton("TEST INTERFACE",self)
+        # self.bt1.setStyleSheet("background-color: rgb(175, 225, 175); color: black; border-radius: 5px")
+        self.launchTestUIBt.resize(130, 30)
+        self.launchTestUIBt.move(self.width-150,50)
+        self.launchTestUIBt.clicked.connect(self.testUI.show)
 
         #self.loadBlockImage()
         self.loadFaults()
@@ -161,6 +177,8 @@ class App(QWidget):
             print(fileName)
             self.layoutFile = fileName
             self.initLayout()
+
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

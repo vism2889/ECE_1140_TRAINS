@@ -5,8 +5,8 @@
 # DATE:     10/01/2022
 # FILENAME: LayoutParserTest.py
 # DESCRIPTION:
-#       Code to test parsing a rail system track layout file and storing the information
-#   in variables. 
+#       Code parse a rail system track layout file and storing the information
+#   in BlockModel objects that can be passed to the TrackModelUI.py file.
 #
 ##############################################################################
 
