@@ -15,8 +15,9 @@ rail line   = a list of BlockModel objects
 
 
 FILES:
-- layoutParserTest.py - loads a track layout from a csv file and prints block information to the terminal
-- infraParser.py - parses the infrastructure columns of a track layout file for stations and switches
-- (TODO) switchParser.py - parses switches for correct block connections 
+- LayoutParserTest.py - loads a track layout from a csv file and prints block information to the terminal
+- InfraParser.py - parses the infrastructure columns of a track layout file for stations and switches
+- (TODO) switchParser.py - parses switches for correct block connections (doesnt  need to be a file, but functionality is needed somewhere)
 - BlockModel.py - object to hold the information for a single block
 - TrackModel.py - holds all the information for a given track (track layout)
+- TrackModelUI.py - holds all the logic to generate  a UI and  populate with information
