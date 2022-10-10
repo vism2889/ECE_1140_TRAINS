@@ -9,6 +9,26 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
+def makeBlockWidget(prefix, parent):
+        blockbox = QtWidgets.QGroupBox(parent)
+        blockbox.setObjectName(prefix + "_blockbox")
+        verticalLayout_4 = QtWidgets.QVBoxLayout(blockbox)
+        verticalLayout_4.setObjectName(prefix + "_verticalLayout")
+        block_table = QtWidgets.QTableWidget(blockbox)
+        block_table.setObjectName(prefix + "_block_table")
+        block_table.setColumnCount(3)
+        block_table.setRowCount(0)
+        item = QtWidgets.QTableWidgetItem()
+        block_table.setHorizontalHeaderItem(0, item)
+        item = QtWidgets.QTableWidgetItem()
+        block_table.setHorizontalHeaderItem(1, item)
+        item = QtWidgets.QTableWidgetItem()
+        block_table.setHorizontalHeaderItem(2, item)
+        block_table.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+        block_table.verticalHeader().hide()
+        verticalLayout_4.addWidget(block_table)
+        return verticalLayout_4
+
 
 class Ui_main_window(object):
     def setupUi(self, main_window):
@@ -40,26 +60,25 @@ class Ui_main_window(object):
         self.gridLayout.setObjectName("gridLayout")
 
         ## redline block occupancy table ##
-        # self.blockbox = QtWidgets.QGroupBox(self.tab)
-        # self.blockbox.setObjectName("blockbox")
-        # self.verticalLayout_4 = QtWidgets.QVBoxLayout(self.blockbox)
-        # self.verticalLayout_4.setObjectName("verticalLayout_4")
-        # self.block_table = QtWidgets.QTableWidget(self.blockbox)
-        # self.block_table.setObjectName("block_table")
-        # self.block_table.setColumnCount(3)
-        # self.block_table.setRowCount(0)
-        # item = QtWidgets.QTableWidgetItem()
-        # self.block_table.setHorizontalHeaderItem(0, item)
-        # item = QtWidgets.QTableWidgetItem()
-        # self.block_table.setHorizontalHeaderItem(1, item)
-        # item = QtWidgets.QTableWidgetItem()
-        # self.block_table.setHorizontalHeaderItem(2, item)
-        # self.block_table.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
-        # self.block_table.verticalHeader().hide()
-        # self.verticalLayout_4.addWidget(self.block_table)
+        self.blockbox = QtWidgets.QGroupBox(self.tab)
+        self.blockbox.setObjectName("blockbox")
+        self.verticalLayout_4 = QtWidgets.QVBoxLayout(self.blockbox)
+        self.verticalLayout_4.setObjectName("verticalLayout_4")
+        self.block_table = QtWidgets.QTableWidget(self.blockbox)
+        self.block_table.setObjectName("block_table")
+        self.block_table.setColumnCount(3)
+        self.block_table.setRowCount(0)
+        item = QtWidgets.QTableWidgetItem()
+        self.block_table.setHorizontalHeaderItem(0, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.block_table.setHorizontalHeaderItem(1, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.block_table.setHorizontalHeaderItem(2, item)
+        self.block_table.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+        self.block_table.verticalHeader().hide()
+        self.verticalLayout_4.addWidget(self.block_table)
 
-        # self.gridLayout.addWidget(self.blockbox, 0, 0, 1, 1)
-        self.gridLayout.addWidget(self.makeBlockWidget("red_line", self.tab), 0, 0, 1, 1)
+        self.gridLayout.addWidget(self.blockbox, 0, 0, 1, 1)
 
         ## Switch Status table ##
         self.switch_block = QtWidgets.QGroupBox(self.tab)
@@ -183,26 +202,6 @@ class Ui_main_window(object):
         self.toolBox.setCurrentIndex(0)
         self.redline_controllers.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(main_window)
-
-    def makeBlockWidget(self, prefix, parent):
-        blockbox = QtWidgets.QGroupBox(parent)
-        blockbox.setObjectName(prefix + "_blockbox")
-        verticalLayout_4 = QtWidgets.QVBoxLayout(blockbox)
-        verticalLayout_4.setObjectName(prefix + "_verticalLayout")
-        block_table = QtWidgets.QTableWidget(blockbox)
-        block_table.setObjectName(prefix + "_block_table")
-        block_table.setColumnCount(3)
-        block_table.setRowCount(0)
-        item = QtWidgets.QTableWidgetItem()
-        block_table.setHorizontalHeaderItem(0, item)
-        item = QtWidgets.QTableWidgetItem()
-        block_table.setHorizontalHeaderItem(1, item)
-        item = QtWidgets.QTableWidgetItem()
-        block_table.setHorizontalHeaderItem(2, item)
-        block_table.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
-        block_table.verticalHeader().hide()
-        verticalLayout_4.addWidget(block_table)
-        return verticalLayout_4
 
     def retranslateUi(self, main_window):
         _translate = QtCore.QCoreApplication.translate
