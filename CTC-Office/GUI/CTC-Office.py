@@ -104,6 +104,11 @@ class Ui_MainWindow(object):
         self.listWidget_2 = QtWidgets.QListWidget(self.centralwidget)
         self.listWidget_2.setGeometry(QtCore.QRect(330, 50, 181, 331))
         self.listWidget_2.setObjectName("listWidget_2")
+        self.comboBox = QtWidgets.QComboBox(self.centralwidget)
+        self.comboBox.setGeometry(QtCore.QRect(620, 480, 79, 23))
+        self.comboBox.setObjectName("comboBox")
+        self.comboBox.addItem("")
+        self.comboBox.addItem("")
         MainWindow.setCentralWidget(self.centralwidget)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
@@ -143,6 +148,8 @@ class Ui_MainWindow(object):
         self.setAuthority.setText(_translate("MainWindow", "Set Authority"))
         self.authority.setText(_translate("MainWindow", "Authority: 28 mi"))
         self.commandedSpeed.setText(_translate("MainWindow", "Comm. Speed: 25 mph"))
+        self.comboBox.setItemText(0, _translate("MainWindow", "Red Line"))
+        self.comboBox.setItemText(1, _translate("MainWindow", "Green Line"))
 
 
 if __name__ == "__main__":

@@ -1,6 +1,5 @@
 import sys
 
-# populate station dictionaries
 redLineStations = dict()
 greenLineStations = dict()
 

@@ -2,10 +2,12 @@
 
 import sys
 sys.path.append('/home/garrett/git/ECE_1140_TRAINS/CTC-Office/block-functionality/')
+sys.path.append('/home/garrett/git/ECE_1140_TRAINS/CTC-Office/train-functionality/')
 from PyQt5 import QtCore, QtGui, QtWidgets, QtWidgets
-from PyQt5.QtWidgets import QAbstractItemView
+from PyQt5.QtWidgets import QAbstractItemView, QDialog
 from PyQt5.QtCore import Qt
 from lines import redLine, redLineLookup, greenLine, greenLineLookup
+#from trains import redLineTrains, greenLineTrains
 
 class Ui_MainWindow(object):
 
@@ -21,6 +23,16 @@ class Ui_MainWindow(object):
         self.centralwidget.setEnabled(True)
         self.centralwidget.setAutoFillBackground(False)
         self.centralwidget.setObjectName("centralwidget")
+
+        # create dispatch button
+        self.dispatchTrain = QtWidgets.QPushButton(self.centralwidget)
+        self.dispatchTrain.setGeometry(QtCore.QRect(620, 50, 131, 31))
+        self.dispatchTrain.setObjectName("dispatchTrain")
+        self.dispatchTrain.clicked.connect(self.launchDispatchPopUp)
+
+        # create dispatch pop up widget
+        self.dispatchWidget = QtWidgets.QWidget()
+        self.dispatchPopUp = dispatchPopUp()
 
         # create redLine block list
         self.redLineBlockList = QtWidgets.QListWidget(self.centralwidget)
@@ -73,6 +85,13 @@ class Ui_MainWindow(object):
         font.setPointSize(13)
         self.startMaintenance.setFont(font)
         self.startMaintenance.setObjectName("startMaintenance")
+
+        # create train list
+        self.trainList = QtWidgets.QListWidget(self.centralwidget)
+        self.trainList.setGeometry(QtCore.QRect(620, 200, 131, 101))
+        self.trainList.setMouseTracking(True)
+        self.trainList.setSelectionRectVisible(True)
+        self.trainList.setObjectName("trainList")
 
         # create train information chart 
         self.trainInfo = QtWidgets.QLabel(self.centralwidget)
@@ -130,6 +149,7 @@ class Ui_MainWindow(object):
         __sortingEnabled = self.redLineBlockList.isSortingEnabled()
         self.redLineBlockList.setSortingEnabled(False)
         self.greenLineBlockList.setSortingEnabled(False)
+        self.dispatchTrain.setText(_translate("MainWindow", "Dispatch Train"))
 
         # set red line block names
         for i in range(0,10):
@@ -212,6 +232,10 @@ class Ui_MainWindow(object):
         elif (blockLineText == "Line: Green"):
             self.greenSelectionChanged()
 
+    def launchDispatchPopUp(self):
+        self.dispatchPopUp.setupUi(self.dispatchWidget)
+        self.dispatchWidget.show()
+
 
 class Ui_testWindow(object):
 
@@ -282,6 +306,42 @@ class Ui_testWindow(object):
         selectedBlock = self.redLineBlockList.currentItem().text()
         blockIndex = redLineLookup[selectedBlock]
         redLine[blockIndex].toggleMaintenanceState()
+
+class dispatchPopUp(object):
+    def setupUi(self, dispatchPopUp):
+        dispatchPopUp.setObjectName("dispatchPopUp")
+        dispatchPopUp.resize(200, 300)
+        self.comboBox = QtWidgets.QComboBox(dispatchPopUp)
+        self.comboBox.setGeometry(QtCore.QRect(40, 40, 100, 23))
+        self.comboBox.setObjectName("comboBox")
+        self.comboBox.addItem("")
+        self.comboBox.addItem("")
+        self.destinationList = QtWidgets.QListWidget(dispatchPopUp)
+        self.destinationList.setGeometry(QtCore.QRect(40, 70, 111, 71))
+        self.destinationList.setMouseTracking(True)
+        self.destinationList.setSelectionRectVisible(True)
+        self.destinationList.setObjectName("destinationList")
+        self.destinationList.setSelectionMode(QAbstractItemView.MultiSelection)
+        item = QtWidgets.QListWidgetItem()
+        self.destinationList.addItem(item)
+        self.dispatch = QtWidgets.QPushButton(dispatchPopUp)
+        self.dispatch.setGeometry(QtCore.QRect(40, 150, 100, 31))
+        self.dispatch.setObjectName("dispatchTrain")
+
+        self.retranslateUi(dispatchPopUp)
+        QtCore.QMetaObject.connectSlotsByName(dispatchPopUp)
+
+    def retranslateUi(self, dispatchPopUp):
+        _translate = QtCore.QCoreApplication.translate
+        self.comboBox.setItemText(0, _translate("MainWindow", "Red Line"))
+        self.comboBox.setItemText(1, _translate("MainWindow", "Green Line"))
+        __sortingEnabled = self.destinationList.isSortingEnabled()
+        self.destinationList.setSortingEnabled(False)
+        item = self.destinationList.item(0)
+        item.setText(_translate("MainWindow", "Station A"))
+        self.destinationList.setSortingEnabled(__sortingEnabled)
+        self.dispatch.setText(_translate("MainWindow", "Dispatch"))
+
 
 if __name__ == "__main__":
     import sys
