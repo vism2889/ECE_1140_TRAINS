@@ -9,10 +9,9 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from lines import redLine, redLineLookup
+
 
 class Ui_MainWindow(object):
-
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(800, 600)
@@ -21,18 +20,12 @@ class Ui_MainWindow(object):
         self.centralwidget.setEnabled(True)
         self.centralwidget.setAutoFillBackground(False)
         self.centralwidget.setObjectName("centralwidget")
-
-        ## Dispatch train button
         self.dispatchTrain = QtWidgets.QPushButton(self.centralwidget)
         self.dispatchTrain.setGeometry(QtCore.QRect(620, 50, 131, 31))
         self.dispatchTrain.setObjectName("dispatchTrain")
-
-        ## Upload schedule button
         self.uploadSchedule = QtWidgets.QPushButton(self.centralwidget)
         self.uploadSchedule.setGeometry(QtCore.QRect(620, 120, 131, 31))
         self.uploadSchedule.setObjectName("uploadSchedule")
-
-        ## Train list
         self.trainList = QtWidgets.QListWidget(self.centralwidget)
         self.trainList.setGeometry(QtCore.QRect(620, 200, 131, 101))
         self.trainList.setMouseTracking(True)
@@ -40,24 +33,26 @@ class Ui_MainWindow(object):
         self.trainList.setObjectName("trainList")
         item = QtWidgets.QListWidgetItem()
         self.trainList.addItem(item)
-
-        ## Block list
         self.blockList = QtWidgets.QListWidget(self.centralwidget)
         self.blockList.setGeometry(QtCore.QRect(620, 340, 131, 111))
         self.blockList.setMouseTracking(True)
-        self.blockList.setSelectionRectVisible(True)
+        self.blockList.setFocusPolicy(QtCore.Qt.ClickFocus)
+        self.blockList.setSelectionRectVisible(False)
         self.blockList.setObjectName("blockList")
-        self.blockList.itemActivated.connect(self.selectionChanged)
         item = QtWidgets.QListWidgetItem()
         self.blockList.addItem(item)
-
-        ## Block information
         self.blockInfo = QtWidgets.QLabel(self.centralwidget)
-        self.blockInfo.setGeometry(QtCore.QRect(350, 430, 221, 21))
+        self.blockInfo.setGeometry(QtCore.QRect(350, 430, 231, 21))
         font = QtGui.QFont()
         font.setPointSize(13)
         self.blockInfo.setFont(font)
         self.blockInfo.setObjectName("blockInfo")
+        self.trainInfo = QtWidgets.QLabel(self.centralwidget)
+        self.trainInfo.setGeometry(QtCore.QRect(30, 430, 201, 21))
+        font = QtGui.QFont()
+        font.setPointSize(13)
+        self.trainInfo.setFont(font)
+        self.trainInfo.setObjectName("trainInfo")
         self.occupancy = QtWidgets.QLabel(self.centralwidget)
         self.occupancy.setGeometry(QtCore.QRect(350, 460, 101, 17))
         self.occupancy.setObjectName("occupancy")
@@ -68,22 +63,16 @@ class Ui_MainWindow(object):
         self.maintenanceState.setGeometry(QtCore.QRect(350, 500, 171, 17))
         self.maintenanceState.setObjectName("maintenanceState")
         self.startMaintenance = QtWidgets.QPushButton(self.centralwidget)
-        self.startMaintenance.setGeometry(QtCore.QRect(350, 520, 151, 31))
+        self.startMaintenance.setGeometry(QtCore.QRect(350, 520, 181, 31))
         font = QtGui.QFont()
         font.setPointSize(13)
         self.startMaintenance.setFont(font)
         self.startMaintenance.setObjectName("startMaintenance")
-
-        ## Train information
-        self.trainInfo = QtWidgets.QLabel(self.centralwidget)
-        self.trainInfo.setGeometry(QtCore.QRect(30, 430, 201, 21))
-        font = QtGui.QFont()
-        font.setPointSize(13)
-        self.trainInfo.setFont(font)
-        self.trainInfo.setObjectName("trainInfo")
         self.destinationList = QtWidgets.QListWidget(self.centralwidget)
         self.destinationList.setGeometry(QtCore.QRect(200, 480, 111, 71))
         self.destinationList.setMouseTracking(True)
+        self.destinationList.setFocusPolicy(QtCore.Qt.NoFocus)
+        self.destinationList.setEditTriggers(QtWidgets.QAbstractItemView.DoubleClicked|QtWidgets.QAbstractItemView.EditKeyPressed)
         self.destinationList.setSelectionRectVisible(True)
         self.destinationList.setObjectName("destinationList")
         item = QtWidgets.QListWidgetItem()
@@ -109,8 +98,12 @@ class Ui_MainWindow(object):
         self.commandedSpeed = QtWidgets.QLabel(self.centralwidget)
         self.commandedSpeed.setGeometry(QtCore.QRect(30, 470, 161, 17))
         self.commandedSpeed.setObjectName("commandedSpeed")
-
-    
+        self.listWidget = QtWidgets.QListWidget(self.centralwidget)
+        self.listWidget.setGeometry(QtCore.QRect(80, 50, 181, 331))
+        self.listWidget.setObjectName("listWidget")
+        self.listWidget_2 = QtWidgets.QListWidget(self.centralwidget)
+        self.listWidget_2.setGeometry(QtCore.QRect(330, 50, 181, 331))
+        self.listWidget_2.setObjectName("listWidget_2")
         MainWindow.setCentralWidget(self.centralwidget)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
@@ -150,13 +143,6 @@ class Ui_MainWindow(object):
         self.setAuthority.setText(_translate("MainWindow", "Set Authority"))
         self.authority.setText(_translate("MainWindow", "Authority: 28 mi"))
         self.commandedSpeed.setText(_translate("MainWindow", "Comm. Speed: 25 mph"))
-
-    def selectionChanged(self):
-        selectedBlock = self.blockList.currentItem().text()
-        self.blockInfo.setText("Block Information: " + selectedBlock)
-
-        blockIndex = redLineLookup[selectedBlock]
-        self.occupancy.setText("Occupied: " + redLine[blockIndex].getOccupancy())
 
 
 if __name__ == "__main__":

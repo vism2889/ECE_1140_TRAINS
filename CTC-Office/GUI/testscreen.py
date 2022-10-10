@@ -2,7 +2,8 @@
 
 import sys
 sys.path.append('/home/garrett/git/ECE_1140_TRAINS/CTC-Office/block-functionality/')
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtCore, QtGui, QtWidgets, QtWidgets
+from PyQt5.QtWidgets import QAbstractItemView
 from PyQt5.QtCore import Qt
 from lines import redLine, redLineLookup, greenLine, greenLineLookup
 
@@ -37,7 +38,7 @@ class Ui_MainWindow(object):
 
         # create greenLine block list
         self.greenLineBlockList = QtWidgets.QListWidget(self.centralwidget)
-        self.greenLineBlockList.setGeometry(QtCore.QRect(120, 50, 181, 331))
+        self.greenLineBlockList.setGeometry(QtCore.QRect(90, 50, 181, 331))
         self.greenLineBlockList.setMouseTracking(True)
         self.greenLineBlockList.setSelectionRectVisible(True)
         self.greenLineBlockList.setObjectName("greenLineBlockList")
@@ -73,6 +74,43 @@ class Ui_MainWindow(object):
         self.startMaintenance.setFont(font)
         self.startMaintenance.setObjectName("startMaintenance")
 
+        # create train information chart 
+        self.trainInfo = QtWidgets.QLabel(self.centralwidget)
+        self.trainInfo.setGeometry(QtCore.QRect(30, 435, 231, 21))
+        font = QtGui.QFont()
+        font.setPointSize(13)
+        self.trainInfo.setFont(font)
+        self.trainInfo.setObjectName("trainInfo")
+        self.commandedSpeed = QtWidgets.QLabel(self.centralwidget)
+        self.commandedSpeed.setGeometry(QtCore.QRect(30, 470, 161, 17))
+        self.commandedSpeed.setObjectName("commandedSpeed")
+        self.authority = QtWidgets.QLabel(self.centralwidget)
+        self.authority.setGeometry(QtCore.QRect(30, 490, 161, 17))
+        self.authority.setObjectName("authority")
+        self.destinationList = QtWidgets.QListWidget(self.centralwidget)
+        self.destinationList.setGeometry(QtCore.QRect(200, 480, 111, 71))
+        self.destinationList.setMouseTracking(True)
+        self.destinationList.setSelectionRectVisible(True)
+        self.destinationList.setObjectName("destinationList")
+        self.destinationList.setSelectionMode(QAbstractItemView.MultiSelection)
+        item = QtWidgets.QListWidgetItem()
+        self.destinationList.addItem(item)
+        self.setCommandedSpeedValue = QtWidgets.QLineEdit(self.centralwidget)
+        self.setCommandedSpeedValue.setGeometry(QtCore.QRect(30, 510, 31, 21))
+        self.setCommandedSpeedValue.setObjectName("setCommandedSpeedValue")
+        self.setAuthorityValue = QtWidgets.QLineEdit(self.centralwidget)
+        self.setAuthorityValue.setGeometry(QtCore.QRect(30, 530, 31, 21))
+        self.setAuthorityValue.setObjectName("setAuthorityValue")
+        self.setCommandedSpeed = QtWidgets.QPushButton(self.centralwidget)
+        self.setCommandedSpeed.setGeometry(QtCore.QRect(60, 510, 131, 21))
+        self.setCommandedSpeed.setObjectName("setCommandedSpeed")
+        self.setAuthority = QtWidgets.QPushButton(self.centralwidget)
+        self.setAuthority.setGeometry(QtCore.QRect(60, 530, 131, 21))
+        self.setAuthority.setObjectName("setAuthority")
+        self.destinations = QtWidgets.QLabel(self.centralwidget)
+        self.destinations.setGeometry(QtCore.QRect(200, 460, 91, 17))
+        self.destinations.setObjectName("destinations")
+
         MainWindow.setCentralWidget(self.centralwidget)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
@@ -103,6 +141,7 @@ class Ui_MainWindow(object):
             item = self.greenLineBlockList.item(i)
             item.setText(_translate("MainWindow", "Block " + str(greenLine[i].name)))
 
+        # set block info text
         self.redLineBlockList.setSortingEnabled(__sortingEnabled)
         self.greenLineBlockList.setSortingEnabled(__sortingEnabled)
         self.blockLine.setText(_translate("MainWindow", "Line: Red"))
@@ -111,6 +150,19 @@ class Ui_MainWindow(object):
         self.faultState.setText(_translate("MainWindow", "Track Fault: no"))
         self.maintenanceState.setText(_translate("MainWindow", "Under Maintenance: no"))
         self.startMaintenance.setText(_translate("MainWindow", "Start Maintenance"))
+
+        # set train info test
+        self.trainInfo.setText(_translate("MainWindow", "Train Information: Train A"))
+        self.commandedSpeed.setText(_translate("MainWindow", "Comm. Speed (mph): 25"))
+        self.authority.setText(_translate("MainWindow", "Authority (mi): 28"))
+        self.setCommandedSpeed.setText(_translate("MainWindow", "Command Speed"))
+        self.setAuthority.setText(_translate("MainWindow", "Set Authority"))
+        self.destinations.setText(_translate("MainWindow", "Destinations"))
+        __sortingEnabled = self.destinationList.isSortingEnabled()
+        self.destinationList.setSortingEnabled(False)
+        item = self.destinationList.item(0)
+        item.setText(_translate("MainWindow", "Station A"))
+        self.destinationList.setSortingEnabled(__sortingEnabled)
 
 #################################################################
 # End UI generation, start functions
@@ -154,11 +206,11 @@ class Ui_MainWindow(object):
                 item.setBackground(Qt.white)
 
     def updateBlockInfo(self):
-        blockLine = self.blockLine.text()
-        if (blockLine == "Line: Red"):
-            self.redSelectionChanged
-        elif (blockLine == "Line: Green"):
-            self.greenSelectionChanged
+        blockLineText = self.blockLine.text()
+        if (blockLineText == "Line: Red"):
+            self.redSelectionChanged()
+        elif (blockLineText == "Line: Green"):
+            self.greenSelectionChanged()
 
 
 class Ui_testWindow(object):
