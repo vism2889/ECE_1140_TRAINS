@@ -59,11 +59,11 @@ class Ui_main_window(object):
 
         for controller in redline_view_layout:
             ## Creating a view tab
-            self.addTab("redline_view", self.redline_controllers, controller, redline_view_layout, True)
+            self.addTab("redline_view", self.redline_controllers, controller, redline_view_layout, self.redline_reference['view'], True)
 
         for controller in redline_layout:
             ## Creating a tab
-            self.addTab("re", self.redline_controllers, controller, redline_layout)
+            self.addTab("redline", self.redline_controllers, controller, redline_layout, self.redline_reference['controllers'])
 
         self.verticalLayout_2.addWidget(self.redline_controllers)
         self.toolBox.addItem(self.redline_tab, "")
@@ -82,11 +82,11 @@ class Ui_main_window(object):
 
         for controller in greenline_view_layout:
             ## Creating a view tab
-            self.addTab("greenline_view", self.greenline_controllers, controller, greenline_view_layout, True)
+            self.addTab("greenline_view", self.greenline_controllers, controller, greenline_view_layout, self.greenline_reference['view'], True)
 
         for controller in greenline_layout:
             ## Creating a controller tab
-            self.addTab("greenline", self.greenline_controllers, controller, greenline_layout)
+            self.addTab("greenline", self.greenline_controllers, controller, greenline_layout, self.greenline_reference['controllers'])
 
         self.verticalLayout_7.addWidget(self.greenline_controllers)
         self.toolBox.addItem(self.greenline_tab, "")
@@ -106,7 +106,10 @@ class Ui_main_window(object):
            file , check = QtWidgets.QFileDialog.getOpenFileName(None, "QFileDialog.getOpenFileName()",
                                                "", "All Files (*);;Python Files (*.py);;Text Files (*.txt)")
 
-    def addTab(self, prefix, controllers, controller, layout, isView=False):
+    def addTab(self, prefix, controllers, controller, layout, reference, isView=False):
+        ## Dictionary information for reference
+        info = {}
+
         tab = QtWidgets.QWidget()
         tab.setObjectName(f"{prefix}_controller_tab_{layout.index(controller)}")
         gridLayout = QtWidgets.QGridLayout(tab)
@@ -163,6 +166,8 @@ class Ui_main_window(object):
                 if isView:
                     item = QtWidgets.QTableWidgetItem(str(int(int(block_table.item(row_idx, 0).text())/self.numBlocksPerController)))
                     block_table.setItem(row_idx, 3, item)
+
+        info['block-table'] = block_table
 
         verticalLayout_4.addWidget(block_table)
         gridLayout.addWidget(blockbox, 0, 0, 1, 1)
@@ -227,6 +232,8 @@ class Ui_main_window(object):
                     item = QtWidgets.QTableWidgetItem(str(int(int(switch_table.item(row_idx, 0).text())/self.numBlocksPerController)))
                     switch_table.setItem(row_idx, 3, item)
 
+            info['switch-table'] = switch_table
+
             verticalLayout_8.addWidget(switch_table)
             gridLayout.addWidget(switch_block, 0, 1, 1, 1)
 
@@ -277,6 +284,8 @@ class Ui_main_window(object):
             fault_table.setHorizontalHeaderItem(3, item)
 
         fault_table.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+
+        info['fault-table'] = fault_table
 
         verticalLayout_5.addWidget(fault_table)
         verticalLayout_3.addWidget(fault_box)
@@ -345,6 +354,8 @@ class Ui_main_window(object):
                         item = QtWidgets.QTableWidgetItem(str(int(int(crossing_table.item(row_idx, 0).text())/self.numBlocksPerController)))
                         crossing_table.setItem(row_idx, 3, item)
 
+            info['crossing-table'] = crossing_table
+
             verticalLayout_6.addWidget(crossing_table)
             verticalLayout_3.addWidget(crossing_box)
 
@@ -366,6 +377,8 @@ class Ui_main_window(object):
             controllers.addTab(tab, f"View")
         else:
             controllers.addTab(tab, f"Controller {layout.index(controller)}")
+
+        reference.append(info)
 
     ## LOOKING TO GET RID OF THIS STUPID FUNCTION
     def retranslateUi(self, main_window):
