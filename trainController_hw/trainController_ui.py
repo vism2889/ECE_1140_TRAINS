@@ -417,10 +417,10 @@ class Ui_DriverTestUI(object):
         c.setTemperature(c, self.temperature_box.value())
 
     def announceStation(self):
-        c.announceStation(c, True)
+        c.announceStation(c, True, 1)
 
     def stopAnnounce(self):
-        c.announceStation(c, False)
+        c.announceStation(c, False, 1)
 
     def deployEbrake(self):
         self.speed_slider.setValue(0)

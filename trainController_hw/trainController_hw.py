@@ -2,7 +2,6 @@
 # from time import sleep
 from simple_pid import PID
 from pygame import mixer
-import pygame
 
 # GPIO.setwarnings(False)
 # GPIO.setmode(GPIO.BOARD)
@@ -11,7 +10,6 @@ import pygame
 # GPIO.setup(16, GPIO.OUT, initial=GPIO.LOW)
 # GPIO.setup(18, GPIO.OUT, initial=GPIO.LOW)
 
-pygame.init()
 mixer.init()
 
 class Control():
@@ -26,6 +24,10 @@ class Control():
         self.pid = PID(self.k_p, self.k_i, 0.1, setpoint=self.commanded_speed) # initialize pid with fixed values
         self.pid.outer_limits = (0, 120000) # clamp at max power output specified in datasheet 120kW
         self.power = 0
+        self.station_audio = ["shadyside_herron.mp3", "herron_swissvale.mp3", 
+                              "swissvale_penn.mp3", "penn_steelplaza.mp3", 
+                              "steelplaza_first.mp3","first_stationSquare.mp3", 
+                              "stationSquare_southHills.mp3"]
         
     def initializePID(self, kp_val, ki_val):
         self.k_p = kp_val
@@ -69,11 +71,11 @@ class Control():
     def setSuggestedSpeed(self, suggested_speed):
         self.suggested_speed = suggested_speed
 
-    def announceStation(self, start):
-        mixer.music.load("shadyside_herron.mp3")
+    def announceStation(self, start, file_idx):
+        mixer.music.load(self.station_audio[file_idx])
         if(start) : mixer.music.play()
         if(not start) : mixer.music.stop()
-       
+
     def deployEbrake(self):
         # may have to consider case where if in auto mode and ebrake is deployed, stop taking in power data 
         self.commanded_speed = 0
