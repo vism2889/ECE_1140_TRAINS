@@ -1,9 +1,5 @@
-from ast import parse
 from copy import deepcopy
 import csv
-import pandas as pd
-
-
 
 def parseTrackLayout(path, size=15):
 
@@ -21,22 +17,28 @@ def parseTrackLayout(path, size=15):
     TOTAL_BLOCKS = 0
 
     with open(path, mode='r') as file:
-            ## Read Header
-            track_layout = csv.DictReader(file)
+        ## Read Header
+        getRank = csv.DictReader(file)
+        if size == 0:
+            numBlocksPerController = sum(1 for row in getRank)
 
-            ## Check for required headers
-            for header in REQUIRED_FIELDS:
-                if header not in track_layout.fieldnames:
-                    print(f"{header} not found in file...")
-                    print('exiting')
-                    exit(1)
+        ## Return to the top of the file - is there a better solution?
+        file.seek(0)
+        track_layout = csv.DictReader(file)
 
-            ## Populate data in to line
-            for row in track_layout:
+        ## Check for required headers
+        for header in REQUIRED_FIELDS:
+            if header not in track_layout.fieldnames:
+                print(f"{header} not found in file...")
+                print('exiting')
+                exit(1)
 
-                TOTAL_BLOCKS += 1
+        ## Populate data in to line
+        for row in track_layout:
 
-                ## Adding a new controller
+            TOTAL_BLOCKS += 1
+            ## Adding a new controller
+            if size > 0:
                 if TOTAL_BLOCKS % numBlocksPerController == 0:
                     CONTROLLERS.append(deepcopy(controller))
                     controller['block-occupancy'].clear()
@@ -44,21 +46,24 @@ def parseTrackLayout(path, size=15):
                     controller['switch-state'].clear()
                     controller['total-blocks'] = 0
 
-                ## Increment the number of blocks assigned
-                ## to that controller
-                controller['total-blocks'] += 1
+            ## Increment the number of blocks assigned
+            ## to that controller
+            controller['total-blocks'] += 1
 
-                ## populate block-occupancy
-                controller['block-occupancy'].append((row['Block Number'], row['Section'], False))
+            ## populate block-occupancy
+            controller['block-occupancy'].append((row['Block Number'], row['Section'], False))
 
-                ## populate switch-state
-                if row['Infrastructure'] != None and "SWITCH" in row['Infrastructure']:
-                    controller['switch-state'].append((row['Block Number'], row['Section'], False))
+            ## populate switch-state
+            if row['Infrastructure'] != None and "SWITCH" in row['Infrastructure']:
+                controller['switch-state'].append((row['Block Number'], row['Section'], False))
 
-                ## populate crossing-state
-                if row['Infrastructure'] != None and "CROSSING" in row['Infrastructure']:
-                    controller['crossing-state'].append((row['Block Number'], row['Section'], False))
+            ## populate crossing-state
+            if row['Infrastructure'] != None and "CROSSING" in row['Infrastructure']:
+                controller['crossing-state'].append((row['Block Number'], row['Section'], False))
 
+        CONTROLLERS.append(deepcopy(controller))
+
+        file.close()
     return CONTROLLERS
 
 if __name__ == '__main__':
