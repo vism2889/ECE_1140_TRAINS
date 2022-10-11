@@ -2,8 +2,8 @@ import sys
 
 class block:
 
-    def __init__(self, name, length, speedLimit):
-        self.name = name
+    def __init__(self, number, length, speedLimit):
+        self.number = number
         self.length = length
         self.speedLimit = speedLimit
         self.occupancy = False

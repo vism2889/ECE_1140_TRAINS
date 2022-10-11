@@ -6,7 +6,7 @@ sys.path.append('/home/garrett/git/ECE_1140_TRAINS/CTC-Office/train-functionalit
 from PyQt5 import QtCore, QtGui, QtWidgets, QtWidgets
 from PyQt5.QtWidgets import QAbstractItemView, QDialog
 from PyQt5.QtCore import Qt
-from lines import redLine, redLineLookup, greenLine, greenLineLookup
+from lines import redLineBlocks, greenLineBlocks
 #from trains import redLineTrains, greenLineTrains
 
 class Ui_MainWindow(object):
@@ -42,7 +42,8 @@ class Ui_MainWindow(object):
         self.redLineBlockList.setObjectName("redLineBlockList")
         self.redLineBlockList.itemActivated.connect(self.redSelectionChanged)
 
-        for i in range(0,10):
+        self.redLineBlocksKeys = redLineBlocks.keys()
+        for key in self.redLineBlocksKeys:
             item = QtWidgets.QListWidgetItem()
             self.redLineBlockList.addItem(item)
 
@@ -56,7 +57,8 @@ class Ui_MainWindow(object):
         self.greenLineBlockList.setObjectName("greenLineBlockList")
         self.greenLineBlockList.itemActivated.connect(self.greenSelectionChanged)
         
-        for i in range(0,10):
+        self.greenLineBlocksKeys = greenLineBlocks.keys()
+        for key in self.greenLineBlocksKeys:
             item = QtWidgets.QListWidgetItem()
             self.greenLineBlockList.addItem(item)
 
@@ -152,14 +154,14 @@ class Ui_MainWindow(object):
         self.dispatchTrain.setText(_translate("MainWindow", "Dispatch Train"))
 
         # set red line block names
-        for i in range(0,10):
-            item = self.redLineBlockList.item(i)
-            item.setText(_translate("MainWindow", "Block " + str(redLine[i].name)))
+        for key in self.redLineBlocksKeys:
+            item = self.redLineBlockList.item(redLineBlocks[key].number-1)
+            item.setText(_translate("MainWindow", key))
 
         # set green line block names
-        for i in range(0,10):
-            item = self.greenLineBlockList.item(i)
-            item.setText(_translate("MainWindow", "Block " + str(greenLine[i].name)))
+        for key in self.greenLineBlocksKeys:
+            item = self.greenLineBlockList.item(greenLineBlocks[key].number-1)
+            item.setText(_translate("MainWindow", key))
 
         # set block info text
         self.redLineBlockList.setSortingEnabled(__sortingEnabled)
@@ -193,10 +195,9 @@ class Ui_MainWindow(object):
         selectedBlock = self.redLineBlockList.currentItem().text()
         self.blockInfo.setText("Block Information: " + selectedBlock)
 
-        blockIndex = redLineLookup[selectedBlock]
-        self.occupancy.setText("Occupied: " + redLine[blockIndex].getOccupancy())
-        self.faultState.setText("Track Fault: " + redLine[blockIndex].getFaultState())
-        self.maintenanceState.setText("Under Maintenance: " + redLine[blockIndex].getMaintenanceState())
+        self.occupancy.setText("Occupied: " + redLineBlocks[selectedBlock].getOccupancy())
+        self.faultState.setText("Track Fault: " + redLineBlocks[selectedBlock].getFaultState())
+        self.maintenanceState.setText("Under Maintenance: " + redLineBlocks[selectedBlock].getMaintenanceState())
         self.blockLine.setText("Line: Red")
 
     def greenSelectionChanged(self):
@@ -204,23 +205,21 @@ class Ui_MainWindow(object):
         selectedBlock = self.greenLineBlockList.currentItem().text()
         self.blockInfo.setText("Block Information: " + selectedBlock)
 
-        blockIndex = greenLineLookup[selectedBlock]
-        self.occupancy.setText("Occupied: " + greenLine[blockIndex].getOccupancy())
-        self.faultState.setText("Track Fault: " + greenLine[blockIndex].getFaultState())
-        self.maintenanceState.setText("Under Maintenance: " + greenLine[blockIndex].getMaintenanceState())
+        self.occupancy.setText("Occupied: " + greenLineBlocks[selectedBlock].getOccupancy())
+        self.faultState.setText("Track Fault: " + greenLineBlocks[selectedBlock].getFaultState())
+        self.maintenanceState.setText("Under Maintenance: " + greenLineBlocks[selectedBlock].getMaintenanceState())
         self.blockLine.setText("Line: Green")
 
     def updateRedLineBlockList(self):
         for i in range(0,9):
             item = self.redLineBlockList.item(i)
             selectedBlock = item.text()
-            blockIndex = redLineLookup[selectedBlock]
 
-            if (redLine[blockIndex].getMaintenanceState() == "yes"):
+            if (redLineBlocks[selectedBlock].getMaintenanceState() == "yes"):
                 item.setBackground(Qt.yellow)
-            elif (redLine[blockIndex].getFaultState() == "yes"):
+            elif (redLineBlocks[selectedBlock].getFaultState() == "yes"):
                 item.setBackground(Qt.red)
-            elif (redLine[blockIndex].getOccupancy() == "yes"):
+            elif (redLineBlocks[selectedBlock].getOccupancy() == "yes"):
                 item.setBackground(Qt.green)
             else:
                 item.setBackground(Qt.white)
@@ -265,7 +264,8 @@ class Ui_testWindow(object):
         self.redLineBlockList.setObjectName("redLineBlockList")
 
         # create redLine block list
-        for i in range(0,10):
+        self.redLineBlocksKeys = redLineBlocks.keys()
+        for key in self.redLineBlocksKeys:
             item = QtWidgets.QListWidgetItem()
             self.redLineBlockList.addItem(item)
 
@@ -282,9 +282,10 @@ class Ui_testWindow(object):
         self.redLineBlockList.setSortingEnabled(False)
 
         # set red line block names
-        for blockIndex in range(0,10):
-            item = self.redLineBlockList.item(blockIndex)
-            item.setText(_translate("MainWindow", "Block " + str(redLine[blockIndex].name)))
+        self.redLineBlocksKeys = redLineBlocks.keys()
+        for key in self.redLineBlocksKeys:
+            item = self.redLineBlockList.item(redLineBlocks[key].number-1)
+            item.setText(_translate("testWindow", key))
 
         self.redLineBlockList.setSortingEnabled(__sortingEnabled)
 
