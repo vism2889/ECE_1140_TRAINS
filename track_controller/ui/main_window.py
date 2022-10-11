@@ -7,7 +7,10 @@
 # WARNING! All changes made in this file will be lost!
 
 
+from copy import deepcopy
+from tkinter import dialog
 from PyQt5 import QtCore, QtGui, QtWidgets
+from track_layout import extract_layout
 
 def makeBlockWidget(prefix, parent):
         blockbox = QtWidgets.QGroupBox(parent)
@@ -31,6 +34,15 @@ def makeBlockWidget(prefix, parent):
 
 
 class Ui_main_window(object):
+    def __init__(self):
+        self.maintenance_mode = False
+
+    def dialog(self, line, id):
+        print(f"PLC upload to {line}line, controller {id}")
+        if self.maintenance_mode:
+           file , check = QtWidgets.QFileDialog.getOpenFileName(None, "QFileDialog.getOpenFileName()",
+                                               "", "All Files (*);;Python Files (*.py);;Text Files (*.txt)")
+
     def setupUi(self, main_window):
         main_window.setObjectName("main_window")
         main_window.resize(800, 600)
@@ -46,6 +58,8 @@ class Ui_main_window(object):
         self.toolBox = QtWidgets.QToolBox(main_window)
         self.toolBox.setObjectName("toolBox")
 
+        redline_layout = extract_layout.parseTrackLayout("track_layout/Track Layout & Vehicle Data vF.xlsx - Red Line.csv", 15)
+
         ######## Red Line ########
         self.redline_tab = QtWidgets.QWidget()
         self.redline_tab.setGeometry(QtCore.QRect(0, 0, 782, 520))
@@ -54,148 +68,439 @@ class Ui_main_window(object):
         self.verticalLayout_2.setObjectName("verticalLayout_2")
         self.redline_controllers = QtWidgets.QTabWidget(self.redline_tab)
         self.redline_controllers.setObjectName("redline_controllers")
-        self.tab = QtWidgets.QWidget()
-        self.tab.setObjectName("tab")
-        self.gridLayout = QtWidgets.QGridLayout(self.tab)
-        self.gridLayout.setObjectName("gridLayout")
 
-        ## redline block occupancy table ##
-        self.blockbox = QtWidgets.QGroupBox(self.tab)
-        self.blockbox.setObjectName("blockbox")
-        self.verticalLayout_4 = QtWidgets.QVBoxLayout(self.blockbox)
-        self.verticalLayout_4.setObjectName("verticalLayout_4")
-        self.block_table = QtWidgets.QTableWidget(self.blockbox)
-        self.block_table.setObjectName("block_table")
-        self.block_table.setColumnCount(3)
-        self.block_table.setRowCount(0)
-        item = QtWidgets.QTableWidgetItem()
-        self.block_table.setHorizontalHeaderItem(0, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.block_table.setHorizontalHeaderItem(1, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.block_table.setHorizontalHeaderItem(2, item)
-        self.block_table.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
-        self.block_table.verticalHeader().hide()
-        self.verticalLayout_4.addWidget(self.block_table)
+        for controller in redline_layout:
+            controller_idx = redline_layout.index(controller)
+            ## Creating a controller tab
+            tab = QtWidgets.QWidget()
+            tab.setObjectName(f"controller_tab_{redline_layout.index(controller)}")
+            gridLayout = QtWidgets.QGridLayout(tab)
+            gridLayout.setObjectName("gridLayout")
 
-        self.gridLayout.addWidget(self.blockbox, 0, 0, 1, 1)
+            ## redline block occupancy table ##
+            blockbox = QtWidgets.QGroupBox(tab)
+            blockbox.setObjectName("blockbox")
+            blockbox.setTitle("Block Occupancy")
 
-        ## Switch Status table ##
-        self.switch_block = QtWidgets.QGroupBox(self.tab)
-        self.switch_block.setMinimumSize(QtCore.QSize(0, 180))
-        self.switch_block.setObjectName("switch_block")
-        self.verticalLayout_8 = QtWidgets.QVBoxLayout(self.switch_block)
-        self.verticalLayout_8.setObjectName("verticalLayout_8")
-        self.switch_table = QtWidgets.QTableWidget(self.switch_block)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.switch_table.sizePolicy().hasHeightForWidth())
-        self.switch_table.setSizePolicy(sizePolicy)
-        self.switch_table.setMinimumSize(QtCore.QSize(0, 40))
-        self.switch_table.setObjectName("switch_table")
-        self.switch_table.setColumnCount(3)
-        self.switch_table.setRowCount(0)
-        item = QtWidgets.QTableWidgetItem()
-        self.switch_table.setHorizontalHeaderItem(0, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.switch_table.setHorizontalHeaderItem(1, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.switch_table.setHorizontalHeaderItem(2, item)
-        self.switch_table.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
-        self.switch_table.verticalHeader().hide()
+            verticalLayout_4 = QtWidgets.QVBoxLayout(blockbox)
+            verticalLayout_4.setObjectName("verticalLayout_4")
+            block_table = QtWidgets.QTableWidget(blockbox)
+            block_table.setObjectName("block_table")
+            block_table.setColumnCount(3)
+            block_table.setRowCount(len(controller['block-occupancy']))
 
-        self.verticalLayout_8.addWidget(self.switch_table)
-        self.gridLayout.addWidget(self.switch_block, 0, 1, 1, 1)
+            item = QtWidgets.QTableWidgetItem()
+            item.setText("Block Number")
+            block_table.setHorizontalHeaderItem(0, item)
 
-        ## Red line bottom half ##
-        self.bottom_half = QtWidgets.QWidget(self.tab)
-        self.bottom_half.setObjectName("bottom_half")
-        self.verticalLayout_3 = QtWidgets.QVBoxLayout(self.bottom_half)
-        self.verticalLayout_3.setObjectName("verticalLayout_3")
+            item = QtWidgets.QTableWidgetItem()
+            item.setText("Section")
+            block_table.setHorizontalHeaderItem(1, item)
 
-        ## Fault table ##
-        self.fault_box = QtWidgets.QGroupBox(self.bottom_half)
-        self.fault_box.setMinimumSize(QtCore.QSize(0, 140))
-        self.fault_box.setObjectName("fault_box")
-        self.verticalLayout_5 = QtWidgets.QVBoxLayout(self.fault_box)
-        self.verticalLayout_5.setObjectName("verticalLayout_5")
-        self.fault_table = QtWidgets.QTableWidget(self.fault_box)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.fault_table.sizePolicy().hasHeightForWidth())
-        self.fault_table.setSizePolicy(sizePolicy)
-        self.fault_table.setMinimumSize(QtCore.QSize(0, 60))
-        self.fault_table.setObjectName("fault_table")
-        self.fault_table.setColumnCount(4)
-        self.fault_table.setRowCount(0)
-        item = QtWidgets.QTableWidgetItem()
-        self.fault_table.setHorizontalHeaderItem(0, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.fault_table.setHorizontalHeaderItem(1, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.fault_table.setHorizontalHeaderItem(2, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.fault_table.setHorizontalHeaderItem(3, item)
-        self.fault_table.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
-        self.verticalLayout_5.addWidget(self.fault_table)
-        self.verticalLayout_3.addWidget(self.fault_box)
+            item = QtWidgets.QTableWidgetItem()
+            item.setText("Block State")
+            block_table.setHorizontalHeaderItem(2, item)
 
-        ## Crossing status table ##
-        self.crossing_box = QtWidgets.QGroupBox(self.bottom_half)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Minimum)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.crossing_box.sizePolicy().hasHeightForWidth())
-        self.crossing_box.setSizePolicy(sizePolicy)
-        self.crossing_box.setMinimumSize(QtCore.QSize(0, 10))
-        self.crossing_box.setObjectName("crossing_box")
-        self.verticalLayout_6 = QtWidgets.QVBoxLayout(self.crossing_box)
-        self.verticalLayout_6.setObjectName("verticalLayout_6")
-        self.crossing_table = QtWidgets.QTableWidget(self.crossing_box)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.crossing_table.sizePolicy().hasHeightForWidth())
-        self.crossing_table.setSizePolicy(sizePolicy)
-        self.crossing_table.setMinimumSize(QtCore.QSize(0, 40))
-        self.crossing_table.setObjectName("crossing_table")
-        self.crossing_table.setColumnCount(3)
-        self.crossing_table.setRowCount(0)
-        item = QtWidgets.QTableWidgetItem()
-        self.crossing_table.setHorizontalHeaderItem(0, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.crossing_table.setHorizontalHeaderItem(1, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.crossing_table.setHorizontalHeaderItem(2, item)
-        self.crossing_table.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
-        self.verticalLayout_6.addWidget(self.crossing_table)
-        self.verticalLayout_3.addWidget(self.crossing_box)
-        self.gridLayout.addWidget(self.bottom_half, 1, 0, 1, 2)
+            block_table.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+            block_table.verticalHeader().hide()
+            block_table.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
 
-        ## Configure Button ##
-        self.configure_button = QtWidgets.QToolButton(self.tab)
-        self.configure_button.setMinimumSize(QtCore.QSize(10, 18))
-        self.configure_button.setIconSize(QtCore.QSize(14, 14))
-        self.configure_button.setObjectName("configure_button")
-        self.gridLayout.addWidget(self.configure_button, 2, 0, 1, 1)
-        self.redline_controllers.addTab(self.tab, "")
+            ## Set the items in the table ##
+            for i in controller['block-occupancy']:
+                for j in i:
+                    item = QtWidgets.QTableWidgetItem(str(j))
+                    if i.index(j) == 2:
+                        if not j:
+                            item.setBackground(QtGui.QColor(0xbf, 0xe3, 0xb4))
+                        else:
+                            item.setBackground(QtGui.QColor(0xf4, 0x71, 0x74))
 
-        ## Tab 2
-        self.tab_2 = QtWidgets.QWidget()
-        self.tab_2.setObjectName("tab_2")
-        self.redline_controllers.addTab(self.tab_2, "")
+                    block_table.setItem(controller['block-occupancy'].index(i), i.index(j), item)
+
+            verticalLayout_4.addWidget(block_table)
+            gridLayout.addWidget(blockbox, 0, 0, 1, 1)
+
+            if len(controller['switch-state']):
+                ## Switch Status table ##
+                switch_block = QtWidgets.QGroupBox(tab)
+                switch_block.setMinimumSize(QtCore.QSize(0, 180))
+                switch_block.setObjectName("switch_block")
+                switch_block.setTitle("Switch States")
+
+                verticalLayout_8 = QtWidgets.QVBoxLayout(switch_block)
+                verticalLayout_8.setObjectName("verticalLayout_8")
+                switch_table = QtWidgets.QTableWidget(switch_block)
+                sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
+                sizePolicy.setHorizontalStretch(0)
+                sizePolicy.setVerticalStretch(0)
+                sizePolicy.setHeightForWidth(switch_table.sizePolicy().hasHeightForWidth())
+                switch_table.setSizePolicy(sizePolicy)
+                switch_table.setMinimumSize(QtCore.QSize(0, 40))
+                switch_table.setObjectName("switch_table")
+                switch_table.setColumnCount(3)
+                switch_table.setRowCount(len(controller['switch-state']))
+
+                item = QtWidgets.QTableWidgetItem()
+                item.setText("Block Number")
+                switch_table.setHorizontalHeaderItem(0, item)
+
+                item = QtWidgets.QTableWidgetItem()
+                item.setText("Section")
+                switch_table.setHorizontalHeaderItem(1, item)
+
+                item = QtWidgets.QTableWidgetItem()
+                item.setText("Switch State")
+                switch_table.setHorizontalHeaderItem(2, item)
+
+                switch_table.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+                switch_table.verticalHeader().hide()
+                switch_table.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
+
+                ## Set the items in the table ##
+                for i in controller['switch-state']:
+                    for j in i:
+                        item = QtWidgets.QTableWidgetItem(str(j))
+                        if i.index(j) == 2:
+                            if not j:
+                                item.setBackground(QtGui.QColor(0xbf, 0xe3, 0xb4))
+                            else:
+                                item.setBackground(QtGui.QColor(0xf4, 0x71, 0x74))
+
+                        switch_table.setItem(controller['switch-state'].index(i), i.index(j), item)
+
+                verticalLayout_8.addWidget(switch_table)
+                gridLayout.addWidget(switch_block, 0, 1, 1, 1)
+
+            ## Red line bottom half ##
+            bottom_half = QtWidgets.QWidget(tab)
+            bottom_half.setObjectName("bottom_half")
+            verticalLayout_3 = QtWidgets.QVBoxLayout(bottom_half)
+            verticalLayout_3.setObjectName("verticalLayout_3")
+
+            ## Fault table ##
+            fault_box = QtWidgets.QGroupBox(bottom_half)
+            fault_box.setMinimumSize(QtCore.QSize(0, 140))
+            fault_box.setObjectName("fault_box")
+            fault_box.setTitle("Faults")
+
+            verticalLayout_5 = QtWidgets.QVBoxLayout(fault_box)
+            verticalLayout_5.setObjectName("verticalLayout_5")
+            fault_table = QtWidgets.QTableWidget(fault_box)
+            sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
+            sizePolicy.setHorizontalStretch(0)
+            sizePolicy.setVerticalStretch(0)
+            sizePolicy.setHeightForWidth(fault_table.sizePolicy().hasHeightForWidth())
+            fault_table.setSizePolicy(sizePolicy)
+            fault_table.setMinimumSize(QtCore.QSize(0, 60))
+            fault_table.setObjectName(f"redline_controller_{redline_layout.index(controller)}_fault_table")
+            fault_table.setColumnCount(3)
+            fault_table.setRowCount(0)
+
+            item = QtWidgets.QTableWidgetItem()
+            item.setText("Block Number")
+            fault_table.setHorizontalHeaderItem(0, item)
+
+            item = QtWidgets.QTableWidgetItem()
+            item.setText("Section")
+            fault_table.setHorizontalHeaderItem(1, item)
+
+            item = QtWidgets.QTableWidgetItem()
+            item.setText("Fault Message")
+            fault_table.setHorizontalHeaderItem(2, item)
+
+            fault_table.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+            verticalLayout_5.addWidget(fault_table)
+            verticalLayout_3.addWidget(fault_box)
+
+            ## Crossing status table ##
+            if len(controller['crossing-state']):
+                crossing_box = QtWidgets.QGroupBox(bottom_half)
+                sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Minimum)
+                sizePolicy.setHorizontalStretch(0)
+                sizePolicy.setVerticalStretch(0)
+                sizePolicy.setHeightForWidth(crossing_box.sizePolicy().hasHeightForWidth())
+                crossing_box.setSizePolicy(sizePolicy)
+                crossing_box.setMinimumSize(QtCore.QSize(0, 10))
+                crossing_box.setObjectName("crossing_box")
+                crossing_box.setTitle("Crossing State")
+                verticalLayout_6 = QtWidgets.QVBoxLayout(crossing_box)
+                verticalLayout_6.setObjectName("verticalLayout_6")
+                crossing_table = QtWidgets.QTableWidget(crossing_box)
+                sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+                sizePolicy.setHorizontalStretch(0)
+                sizePolicy.setVerticalStretch(0)
+                sizePolicy.setHeightForWidth(crossing_table.sizePolicy().hasHeightForWidth())
+                crossing_table.setSizePolicy(sizePolicy)
+                crossing_table.setMinimumSize(QtCore.QSize(0, 40))
+                crossing_table.setObjectName("crossing_table")
+                crossing_table.setColumnCount(3)
+                crossing_table.setRowCount(len(controller['crossing-state']))
+
+                item = QtWidgets.QTableWidgetItem()
+                item.setText("Block Number")
+                crossing_table.setHorizontalHeaderItem(0, item)
+
+                item = QtWidgets.QTableWidgetItem()
+                crossing_table.setHorizontalHeaderItem(1, item)
+                item.setText("Section")
+
+                item = QtWidgets.QTableWidgetItem()
+                crossing_table.setHorizontalHeaderItem(2, item)
+                item.setText("Crossing State")
+
+                crossing_table.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+                crossing_table.verticalHeader().hide()
+
+                for i in controller['crossing-state']:
+                    for j in i:
+                        item = QtWidgets.QTableWidgetItem(str(j))
+                        if i.index(j) == 2:
+                            if not j:
+                                item.setBackground(QtGui.QColor(0xbf, 0xe3, 0xb4))
+                            else:
+                                item.setBackground(QtGui.QColor(0xf4, 0x71, 0x74))
+
+                        crossing_table.setItem(controller['crossing-state'].index(i), i.index(j), item)
+
+                verticalLayout_6.addWidget(crossing_table)
+                verticalLayout_3.addWidget(crossing_box)
+
+            gridLayout.addWidget(bottom_half, 1, 0, 1, 2)
+
+            ## Configure Button ##
+            configure_button = QtWidgets.QToolButton(tab)
+            configure_button.setMinimumSize(QtCore.QSize(10, 18))
+            configure_button.setIconSize(QtCore.QSize(14, 14))
+            configure_button.setObjectName(f"redline_controller_{redline_layout.index(controller)}_configure_button")
+            configure_button.setText("Configure Controller")
+            configure_button.clicked.connect(lambda: self.dialog("red", deepcopy(controller_idx))) ## Set Button Click Signal
+
+            gridLayout.addWidget(configure_button, 2, 0, 1, 1)
+            self.redline_controllers.addTab(tab, f"Controller {redline_layout.index(controller)}")
+
         self.verticalLayout_2.addWidget(self.redline_controllers)
         self.toolBox.addItem(self.redline_tab, "")
 
         ######## Green Line ########
+        greenline_layout = extract_layout.parseTrackLayout("track_layout/Track Layout & Vehicle Data vF.xlsx - Green Line.csv", 15)
+
         self.greenline_tab = QtWidgets.QWidget()
         self.greenline_tab.setGeometry(QtCore.QRect(0, 0, 782, 520))
         self.greenline_tab.setObjectName("greenline_tab")
         self.verticalLayout_7 = QtWidgets.QVBoxLayout(self.greenline_tab)
         self.verticalLayout_7.setObjectName("verticalLayout_7")
+        self.greenline_controllers = QtWidgets.QTabWidget(self.greenline_tab)
+        self.greenline_controllers.setObjectName("greenline_controllers")
+
+        for controller in greenline_layout:
+            ## Creating a controller tab
+            tab = QtWidgets.QWidget()
+            tab.setObjectName(f"controller_tab_{greenline_layout.index(controller)}")
+            gridLayout = QtWidgets.QGridLayout(tab)
+            gridLayout.setObjectName("gridLayout")
+
+            ## redline block occupancy table ##
+            blockbox = QtWidgets.QGroupBox(tab)
+            blockbox.setObjectName("blockbox")
+            blockbox.setTitle("Block Occupancy")
+
+            verticalLayout_4 = QtWidgets.QVBoxLayout(blockbox)
+            verticalLayout_4.setObjectName("verticalLayout_4")
+            block_table = QtWidgets.QTableWidget(blockbox)
+            block_table.setObjectName("block_table")
+            block_table.setColumnCount(3)
+            block_table.setRowCount(len(controller['block-occupancy']))
+
+            item = QtWidgets.QTableWidgetItem()
+            item.setText("Block Number")
+            block_table.setHorizontalHeaderItem(0, item)
+
+            item = QtWidgets.QTableWidgetItem()
+            item.setText("Section")
+            block_table.setHorizontalHeaderItem(1, item)
+
+            item = QtWidgets.QTableWidgetItem()
+            item.setText("Block State")
+            block_table.setHorizontalHeaderItem(2, item)
+
+            block_table.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+            block_table.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
+            block_table.verticalHeader().hide()
+
+            for i in controller['block-occupancy']:
+                for j in i:
+                    item = QtWidgets.QTableWidgetItem(str(j))
+                    if i.index(j) == 2:
+                        if not j:
+                            item.setBackground(QtGui.QColor(0xbf, 0xe3, 0xb4))
+                        else:
+                            item.setBackground(QtGui.QColor(0xf4, 0x71, 0x74))
+
+                    block_table.setItem(controller['block-occupancy'].index(i), i.index(j), item)
+
+            verticalLayout_4.addWidget(block_table)
+            gridLayout.addWidget(blockbox, 0, 0, 1, 1)
+
+            ## Switch Status table ##
+            if len(controller['switch-state']):
+                switch_block = QtWidgets.QGroupBox(tab)
+                switch_block.setMinimumSize(QtCore.QSize(0, 180))
+                switch_block.setObjectName("switch_block")
+                switch_block.setTitle("Switch States")
+
+                verticalLayout_8 = QtWidgets.QVBoxLayout(switch_block)
+                verticalLayout_8.setObjectName("verticalLayout_8")
+                switch_table = QtWidgets.QTableWidget(switch_block)
+                sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
+                sizePolicy.setHorizontalStretch(0)
+                sizePolicy.setVerticalStretch(0)
+                sizePolicy.setHeightForWidth(switch_table.sizePolicy().hasHeightForWidth())
+                switch_table.setSizePolicy(sizePolicy)
+                switch_table.setMinimumSize(QtCore.QSize(0, 40))
+                switch_table.setObjectName("switch_table")
+                switch_table.setColumnCount(3)
+                switch_table.setRowCount(len(controller['switch-state']))
+
+                item = QtWidgets.QTableWidgetItem()
+                item.setText("Block Number")
+                switch_table.setHorizontalHeaderItem(0, item)
+
+                item = QtWidgets.QTableWidgetItem()
+                item.setText("Section")
+                switch_table.setHorizontalHeaderItem(1, item)
+
+                item = QtWidgets.QTableWidgetItem()
+                item.setText("Switch State")
+                switch_table.setHorizontalHeaderItem(2, item)
+
+                switch_table.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+                switch_table.verticalHeader().hide()
+
+                for i in controller['switch-state']:
+                    for j in i:
+                        item = QtWidgets.QTableWidgetItem(str(j))
+                        if i.index(j) == 2:
+                            if not j:
+                                item.setBackground(QtGui.QColor(0xbf, 0xe3, 0xb4))
+                            else:
+                                item.setBackground(QtGui.QColor(0xf4, 0x71, 0x74))
+
+                        switch_table.setItem(controller['switch-state'].index(i), i.index(j), item)
+
+                verticalLayout_8.addWidget(switch_table)
+                gridLayout.addWidget(switch_block, 0, 1, 1, 1)
+
+            ## Red line bottom half ##
+            bottom_half = QtWidgets.QWidget(tab)
+            bottom_half.setObjectName("bottom_half")
+            verticalLayout_3 = QtWidgets.QVBoxLayout(bottom_half)
+            verticalLayout_3.setObjectName("verticalLayout_3")
+
+            ## Fault table ##
+            fault_box = QtWidgets.QGroupBox(bottom_half)
+            fault_box.setMinimumSize(QtCore.QSize(0, 140))
+            fault_box.setObjectName("fault_box")
+            fault_box.setTitle("Faults")
+
+            verticalLayout_5 = QtWidgets.QVBoxLayout(fault_box)
+            verticalLayout_5.setObjectName("verticalLayout_5")
+            fault_table = QtWidgets.QTableWidget(fault_box)
+            sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
+            sizePolicy.setHorizontalStretch(0)
+            sizePolicy.setVerticalStretch(0)
+            sizePolicy.setHeightForWidth(fault_table.sizePolicy().hasHeightForWidth())
+            fault_table.setSizePolicy(sizePolicy)
+            fault_table.setMinimumSize(QtCore.QSize(0, 60))
+            fault_table.setObjectName(f"greenline_controller_{greenline_layout.index(controller)}_fault_table")
+            fault_table.setColumnCount(3)
+            fault_table.setRowCount(0)
+
+            item = QtWidgets.QTableWidgetItem()
+            item.setText("Block Number")
+            fault_table.setHorizontalHeaderItem(0, item)
+
+            item = QtWidgets.QTableWidgetItem()
+            item.setText("Section")
+            fault_table.setHorizontalHeaderItem(1, item)
+
+            item = QtWidgets.QTableWidgetItem()
+            item.setText("Fault Message")
+            fault_table.setHorizontalHeaderItem(2, item)
+            fault_table.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+
+
+            verticalLayout_5.addWidget(fault_table)
+            verticalLayout_3.addWidget(fault_box)
+
+            ## Crossing status table ##
+            if len(controller['crossing-state']):
+                crossing_box = QtWidgets.QGroupBox(bottom_half)
+                sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Fixed)
+                sizePolicy.setHorizontalStretch(0)
+                sizePolicy.setVerticalStretch(0)
+                sizePolicy.setHeightForWidth(crossing_box.sizePolicy().hasHeightForWidth())
+                crossing_box.setSizePolicy(sizePolicy)
+                crossing_box.setMinimumSize(QtCore.QSize(0, 20))
+                crossing_box.setObjectName("crossing_box")
+                crossing_box.setTitle("Crossing State")
+                verticalLayout_6 = QtWidgets.QVBoxLayout(crossing_box)
+                verticalLayout_6.setObjectName("verticalLayout_6")
+                crossing_table = QtWidgets.QTableWidget(crossing_box)
+                sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+                sizePolicy.setHorizontalStretch(0)
+                sizePolicy.setVerticalStretch(0)
+                sizePolicy.setHeightForWidth(crossing_table.sizePolicy().hasHeightForWidth())
+                crossing_table.setSizePolicy(sizePolicy)
+                crossing_table.setMinimumSize(QtCore.QSize(0, 40))
+                crossing_table.setObjectName("crossing_table")
+                crossing_table.setColumnCount(3)
+                crossing_table.setRowCount(len(controller['crossing-state']))
+
+                item = QtWidgets.QTableWidgetItem()
+                item.setText("Block Number")
+                crossing_table.setHorizontalHeaderItem(0, item)
+
+                item = QtWidgets.QTableWidgetItem()
+                crossing_table.setHorizontalHeaderItem(1, item)
+                item.setText("Section")
+
+                item = QtWidgets.QTableWidgetItem()
+                crossing_table.setHorizontalHeaderItem(2, item)
+                item.setText("Crossing State")
+
+                crossing_table.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+                crossing_table.verticalHeader().hide()
+
+                for i in controller['crossing-state']:
+                    for j in i:
+                        item = QtWidgets.QTableWidgetItem(str(j))
+                        if i.index(j) == 2:
+                            if not j:
+                                item.setBackground(QtGui.QColor(0xbf, 0xe3, 0xb4))
+                            else:
+                                item.setBackground(QtGui.QColor(0xf4, 0x71, 0x74))
+
+                        crossing_table.setItem(controller['crossing-state'].index(i), i.index(j), item)
+
+                verticalLayout_6.addWidget(crossing_table)
+                verticalLayout_3.addWidget(crossing_box)
+
+            gridLayout.addWidget(bottom_half, 1, 0, 1, 2)
+
+            ## Configure Button ##
+            configure_button = QtWidgets.QToolButton(tab)
+            configure_button.setMinimumSize(QtCore.QSize(10, 18))
+            configure_button.setIconSize(QtCore.QSize(14, 14))
+            configure_button.setObjectName(f"greenline_controller_{greenline_layout.index(controller)}_configure_button")
+            configure_button.setText("Configure Controller")
+            configure_button.clicked.connect(lambda: self.dialog("green", greenline_layout.index(controller))) ## Set Button Click Signal
+
+            gridLayout.addWidget(configure_button, 2, 0, 1, 1)
+            self.greenline_controllers.addTab(tab, f"Controller {greenline_layout.index(controller)}")
+
+        self.verticalLayout_7.addWidget(self.greenline_controllers)
         self.toolBox.addItem(self.greenline_tab, "")
+
         self.verticalLayout.addWidget(self.toolBox)
 
         self.retranslateUi(main_window)
@@ -203,41 +508,10 @@ class Ui_main_window(object):
         self.redline_controllers.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(main_window)
 
+    ## LOOKING TO GET RID OF THIS STUPID FUNCTION
     def retranslateUi(self, main_window):
         _translate = QtCore.QCoreApplication.translate
-        main_window.setWindowTitle(_translate("main_window", "main_window"))
-        self.blockbox.setTitle(_translate("main_window", "Block Occupancy"))
-        item = self.block_table.horizontalHeaderItem(0)
-        item.setText(_translate("main_window", "Block Number"))
-        item = self.block_table.horizontalHeaderItem(1)
-        item.setText(_translate("main_window", "Section"))
-        item = self.block_table.horizontalHeaderItem(2)
-        item.setText(_translate("main_window", "Block State"))
-        self.switch_block.setTitle(_translate("main_window", "Switch States"))
-        item = self.switch_table.horizontalHeaderItem(0)
-        item.setText(_translate("main_window", "Block Number"))
-        item = self.switch_table.horizontalHeaderItem(1)
-        item.setText(_translate("main_window", "Section"))
-        item = self.switch_table.horizontalHeaderItem(2)
-        item.setText(_translate("main_window", "Switch State"))
-        self.fault_box.setTitle(_translate("main_window", "Faults"))
-        item = self.fault_table.horizontalHeaderItem(0)
-        item.setText(_translate("main_window", "New Column"))
-        item = self.fault_table.horizontalHeaderItem(1)
-        item.setText(_translate("main_window", "Section"))
-        item = self.fault_table.horizontalHeaderItem(2)
-        item.setText(_translate("main_window", "Fault Id"))
-        item = self.fault_table.horizontalHeaderItem(3)
-        item.setText(_translate("main_window", "Fault Message"))
-        self.crossing_box.setTitle(_translate("main_window", "Crossing State"))
-        item = self.crossing_table.horizontalHeaderItem(0)
-        item.setText(_translate("main_window", "Block Number"))
-        item = self.crossing_table.horizontalHeaderItem(1)
-        item.setText(_translate("main_window", "Section"))
-        item = self.crossing_table.horizontalHeaderItem(2)
-        item.setText(_translate("main_window", "Crossing State"))
-        self.configure_button.setText(_translate("main_window", "Configure Line"))
-        self.redline_controllers.setTabText(self.redline_controllers.indexOf(self.tab), _translate("main_window", "Tab 1"))
-        # self.redline_controllers.setTabText(self.redline_controllers.indexOf(self.tab_2), _translate("main_window", "Tab 2"))
+        main_window.setWindowTitle(_translate("main_window", "Track Controller"))
+
         self.toolBox.setItemText(self.toolBox.indexOf(self.redline_tab), _translate("main_window", "Red Line"))
         self.toolBox.setItemText(self.toolBox.indexOf(self.greenline_tab), _translate("main_window", "Green Line"))
