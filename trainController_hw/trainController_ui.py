@@ -484,7 +484,7 @@ class Ui_DriverTestUI(object):
 
     def announceStation(self):
         self.station = self.getNextStation()
-        c.announceStation(c, True, self.station)
+         c.announceStation(c, True, self.station)
 
     def stopAnnounce(self):
         self.station = self.getNextStation()
