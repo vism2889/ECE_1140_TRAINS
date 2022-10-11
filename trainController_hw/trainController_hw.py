@@ -1,19 +1,18 @@
-import RPi.GPIO as GPIO
-from time import sleep
+# import RPi.GPIO as GPIO
+# from time import sleep
 from simple_pid import PID
 from pygame import mixer
 import pygame
 
-GPIO.setwarnings(False)
-GPIO.setmode(GPIO.BOARD)
-GPIO.setup(8, GPIO.OUT, initial=GPIO.LOW)
-GPIO.setup(10, GPIO.OUT, initial=GPIO.LOW)
-GPIO.setup(16, GPIO.OUT, initial=GPIO.LOW)
-GPIO.setup(18, GPIO.OUT, initial=GPIO.LOW)
+# GPIO.setwarnings(False)
+# GPIO.setmode(GPIO.BOARD)
+# GPIO.setup(8, GPIO.OUT, initial=GPIO.LOW)
+# GPIO.setup(10, GPIO.OUT, initial=GPIO.LOW)
+# GPIO.setup(16, GPIO.OUT, initial=GPIO.LOW)
+# GPIO.setup(18, GPIO.OUT, initial=GPIO.LOW)
 
-pygame.mixer.pre_init(44100, 16,2,4096)
 pygame.init()
-sound = mixer.Sound("applause-1.wav")
+mixer.init()
 
 class Control():
    
@@ -35,20 +34,24 @@ class Control():
         self.pid.outer_limits = (0, 120000) # clamp at max power output specified in datasheet 120kW
 
     def setInternalLights(light_state):
-        if(light_state): GPIO.output(8, GPIO.HIGH)
-        if(not light_state): GPIO.output(8, GPIO.LOW) 
+        # if(light_state): GPIO.output(8, GPIO.HIGH)
+        # if(not light_state): GPIO.output(8, GPIO.LOW) 
+        return
 
     def setExternalLights(light_state):
-        if(light_state): GPIO.output(10, GPIO.HIGH)
-        if(not light_state): GPIO.output(10, GPIO.LOW)
+        # if(light_state): GPIO.output(10, GPIO.HIGH)
+        # if(not light_state): GPIO.output(10, GPIO.LOW)
+        return
 
     def setLeftDoor(door_state):
-        if(door_state): GPIO.output(16, GPIO.HIGH)
-        if(not door_state): GPIO.output(16, GPIO.LOW)
+        # if(door_state): GPIO.output(16, GPIO.HIGH)
+        # if(not door_state): GPIO.output(16, GPIO.LOW)
+        return
 
     def setRightDoor(door_state):
-        if(door_state): GPIO.output(18, GPIO.HIGH)
-        if(not door_state): GPIO.output(18, GPIO.LOW)  
+        # if(door_state): GPIO.output(18, GPIO.HIGH)
+        # if(not door_state): GPIO.output(18, GPIO.LOW)
+        return  
 
     def setSpeed(self, speed):
         self.commanded_speed = speed
@@ -67,8 +70,9 @@ class Control():
         self.suggested_speed = suggested_speed
 
     def announceStation(self, start):
-        if(start) : sound.play()
-        if(not start) : sound.stop()
+        mixer.music.load("shadyside_herron.mp3")
+        if(start) : mixer.music.play()
+        if(not start) : mixer.music.stop()
        
     def deployEbrake(self):
         # may have to consider case where if in auto mode and ebrake is deployed, stop taking in power data 
