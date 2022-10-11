@@ -7,6 +7,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets, QtWidgets
 from PyQt5.QtWidgets import QAbstractItemView, QDialog
 from PyQt5.QtCore import Qt
 from lines import redLineBlocks, greenLineBlocks
+from trains import redLineTrains, greenLineTrains, redLineStations, greenLineStations
 #from trains import redLineTrains, greenLineTrains
 
 class Ui_MainWindow(object):
@@ -211,7 +212,7 @@ class Ui_MainWindow(object):
         self.blockLine.setText("Line: Green")
 
     def updateRedLineBlockList(self):
-        for i in range(0,9):
+        for i in range(0, len(redLineBlocks)):
             item = self.redLineBlockList.item(i)
             selectedBlock = item.text()
 
@@ -295,53 +296,81 @@ class Ui_testWindow(object):
 
     def toggleFaultState(self):
         selectedBlock = self.redLineBlockList.currentItem().text()
-        blockIndex = redLineLookup[selectedBlock]
-        redLine[blockIndex].toggleFaultState()
+        redLineBlocks[selectedBlock].toggleFaultState()
 
     def toggleOccupancy(self):
         selectedBlock = self.redLineBlockList.currentItem().text()
-        blockIndex = redLineLookup[selectedBlock]
-        redLine[blockIndex].toggleOccupancy()
+        redLineBlocks[selectedBlock].toggleOccupancy()
 
     def toggleMaintenanceState(self):
         selectedBlock = self.redLineBlockList.currentItem().text()
-        blockIndex = redLineLookup[selectedBlock]
-        redLine[blockIndex].toggleMaintenanceState()
+        redLineBlocks[selectedBlock].toggleMaintenanceState()
 
 class dispatchPopUp(object):
     def setupUi(self, dispatchPopUp):
         dispatchPopUp.setObjectName("dispatchPopUp")
         dispatchPopUp.resize(200, 300)
-        self.comboBox = QtWidgets.QComboBox(dispatchPopUp)
-        self.comboBox.setGeometry(QtCore.QRect(40, 40, 100, 23))
-        self.comboBox.setObjectName("comboBox")
-        self.comboBox.addItem("")
-        self.comboBox.addItem("")
-        self.destinationList = QtWidgets.QListWidget(dispatchPopUp)
-        self.destinationList.setGeometry(QtCore.QRect(40, 70, 111, 71))
-        self.destinationList.setMouseTracking(True)
-        self.destinationList.setSelectionRectVisible(True)
-        self.destinationList.setObjectName("destinationList")
-        self.destinationList.setSelectionMode(QAbstractItemView.MultiSelection)
-        item = QtWidgets.QListWidgetItem()
-        self.destinationList.addItem(item)
+        self.lineSelection = QtWidgets.QComboBox(dispatchPopUp)
+        self.lineSelection.setGeometry(QtCore.QRect(40, 40, 100, 23))
+        self.lineSelection.setObjectName("comboBox")
+        self.lineSelection.addItem("")
+        self.lineSelection.addItem("")
+        self.stationList = QtWidgets.QListWidget(dispatchPopUp)
+        self.stationList.setGeometry(QtCore.QRect(40, 70, 111, 71))
+        self.stationList.setMouseTracking(True)
+        self.stationList.setSelectionRectVisible(True)
+        self.stationList.setObjectName("destinationList")
+        self.stationList.setSelectionMode(QAbstractItemView.MultiSelection)
         self.dispatch = QtWidgets.QPushButton(dispatchPopUp)
         self.dispatch.setGeometry(QtCore.QRect(40, 150, 100, 31))
         self.dispatch.setObjectName("dispatchTrain")
+        self.redLineStationsKeys = redLineStations.keys()
+        self.greenLineStationsKeys = greenLineStations.keys()
+        self.lineSelection.activated.connect(self.updateDestinationList)
+
+        # add items to destinationList
+        for key in self.redLineStationsKeys:
+            item = QtWidgets.QListWidgetItem()
+            self.stationList.addItem(item)
 
         self.retranslateUi(dispatchPopUp)
         QtCore.QMetaObject.connectSlotsByName(dispatchPopUp)
 
     def retranslateUi(self, dispatchPopUp):
         _translate = QtCore.QCoreApplication.translate
-        self.comboBox.setItemText(0, _translate("MainWindow", "Red Line"))
-        self.comboBox.setItemText(1, _translate("MainWindow", "Green Line"))
-        __sortingEnabled = self.destinationList.isSortingEnabled()
-        self.destinationList.setSortingEnabled(False)
-        item = self.destinationList.item(0)
-        item.setText(_translate("MainWindow", "Station A"))
-        self.destinationList.setSortingEnabled(__sortingEnabled)
+        self.lineSelection.setItemText(0, _translate("MainWindow", "Red Line"))
+        self.lineSelection.setItemText(1, _translate("MainWindow", "Green Line"))
+        __sortingEnabled = self.stationList.isSortingEnabled()
+        self.stationList.setSortingEnabled(False)
+        self.stationList.setSortingEnabled(__sortingEnabled)
         self.dispatch.setText(_translate("MainWindow", "Dispatch"))
+
+        # set red line destination list
+        self.index = 0
+        for key in self.redLineStationsKeys:
+            item = self.stationList.item(self.index)
+            item.setText(_translate("MainWindow", key))
+            self.index += 1
+
+    def updateDestinationList(self):
+        self.currentLine = self.lineSelection.currentText()
+
+        if (self.currentLine == "Red Line"):
+            self.index = 0
+            for key in self.redLineStationsKeys:
+                item = self.stationList.item(self.index)
+                item.setText(key)
+                self.index += 1
+
+        if (self.currentLine == "Green Line"):
+            self.index = 0
+            for key in self.greenLineStationsKeys:
+                item = self.stationList.item(self.index)
+                item.setText(key)
+                self.index += 1
+
+
+
 
 
 if __name__ == "__main__":
@@ -357,4 +386,3 @@ if __name__ == "__main__":
     testWindow.show()
     
     sys.exit(app.exec_())
-

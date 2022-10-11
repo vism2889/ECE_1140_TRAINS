@@ -12,8 +12,7 @@ greenLineStations["WHITED"] = "no"
 
 class train:
     
-    def __init__(self, name, line):
-        self.name = name
+    def __init__(self, line):
         if line == "red":
             self.destinations = redLineStations
         elif line == "green":
