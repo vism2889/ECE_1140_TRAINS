@@ -30,7 +30,9 @@ class App(QWidget):
         self.currLineIndex = None
         self.layoutFile    = None
         self.testUI        = TestUI()
+        self.testList      = []
         self.initUI()
+        
 
     def initLayout(self):
         ''' 
@@ -45,9 +47,10 @@ class App(QWidget):
         infraParser = InfraParser(self.layoutFile)
         infraParser.parse()
         infraParser.process()
-        
+
         self.loadLines()
         self.loadBlockInfo()
+        # Enable clicking of test UI button once aboove information has been loaded
 
     def initUI(self):
         self.setWindowTitle(self.title)
@@ -61,7 +64,10 @@ class App(QWidget):
         self.launchTestUIBt = QPushButton("TEST INTERFACE",self)
         self.launchTestUIBt.resize(130, 30)
         self.launchTestUIBt.move(self.width-150,50)
-        self.launchTestUIBt.clicked.connect(self.testUI.show)
+        self.launchTestUIBt.clicked.connect(self.getTestVals)
+
+        # testVals = self.testUI.getTestVals()
+        # print(testVals)
 
         #self.loadBlockImage()
         self.loadFaults()
@@ -254,6 +260,62 @@ class App(QWidget):
             print(fileName)
             self.layoutFile = fileName
             self.initLayout()
+        self.initTestUIData()
+
+    def getTestVals(self):
+        self.testUI.submitClicked.connect(self.printVals)
+        self.testUI.occupancySignal.connect(self.updateTestOccupancy)
+        self.testUI.switchStateSignal.connect(self.updateTestSwitchStates)   
+        self.testUI.crossingLightSignal.connect(self.updateTestCrossingLights) 
+        self.testUI.trackHeaterSignal.connect(self.updateTestTrackHeater)   
+        
+        self.testUI.show()
+        self.initTestUIData()
+
+    def updateTestOccupancy(self):
+        print("Updating Occupany from Test UI")
+        return 42
+
+    def updateTestSwitchStates(self):
+        print("Updating Switch States from Test UI")
+        return 42
+
+    def updateTestCrossingLights(self):
+        print("Updating Crossing Lights from Test UI")
+        return 42
+
+    def updateTestTrackHeater(self, heaterVal):
+        self.updateLineInformation(heaterVal)
+        print("Updating Track Heater State from Test UI")
+        return 42
+
+    def updateLineInformation(self, heatVal=''):
+
+        self.lineInfoVallistwidget.clear()
+        self.lineInfoVallistwidget.insertItem(0,"NA")
+        self.lineInfoVallistwidget.item(0).setForeground(QtCore.Qt.gray)
+        self.lineInfoVallistwidget.insertItem(1,"NA")
+        self.lineInfoVallistwidget.item(1).setForeground(QtCore.Qt.gray)
+        self.lineInfoVallistwidget.insertItem(2,"NA")
+        self.lineInfoVallistwidget.item(2).setForeground(QtCore.Qt.gray)
+        self.lineInfoVallistwidget.insertItem(3,"NA")
+        self.lineInfoVallistwidget.item(3).setForeground(QtCore.Qt.gray)
+        self.lineInfoVallistwidget.insertItem(4,"NA")
+        self.lineInfoVallistwidget.item(4).setForeground(QtCore.Qt.gray)
+        self.lineInfoVallistwidget.insertItem(5,str(heatVal))
+        self.lineInfoVallistwidget.item(5).setForeground(QtCore.Qt.green)
+        self.lineInfoVallistwidget.insertItem(6,"NA")
+        self.lineInfoVallistwidget.item(6).setForeground(QtCore.Qt.gray)
+# def on_sub_window_confirm(self, url):  # <-- This is the main window's slot
+#         self.label.setText(f"Current URL: {url}")
+    def printVals(self,testList):
+        self.testVals = testList
+        for i in range(len(self.testVals)):
+            print(self.testVals[i])
+
+
+    def initTestUIData(self):
+        self.testUI.setDataFields(self.lineNames, self.lines, self.infraCounts)
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
