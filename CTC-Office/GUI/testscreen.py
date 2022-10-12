@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
 
 import sys
+
 sys.path.append('/home/garrett/git/ECE_1140_TRAINS/CTC-Office/block-functionality/')
 sys.path.append('/home/garrett/git/ECE_1140_TRAINS/CTC-Office/train-functionality/')
 from PyQt5 import QtCore, QtGui, QtWidgets, QtWidgets
 from PyQt5.QtWidgets import QAbstractItemView, QDialog
 from PyQt5.QtCore import Qt
 from lines import redLineBlocks, greenLineBlocks
-from trains import redLineTrains, greenLineTrains, redLineStations, greenLineStations
-#from trains import redLineTrains, greenLineTrains
+from trains import redLineTrains, greenLineTrains
+from trains import redLineStations, greenLineStations, addRedLineTrain, addGreenLineTrain
 
 class Ui_MainWindow(object):
 
@@ -90,24 +91,42 @@ class Ui_MainWindow(object):
         self.startMaintenance.setObjectName("startMaintenance")
 
         # create train list
-        self.trainList = QtWidgets.QListWidget(self.centralwidget)
-        self.trainList.setGeometry(QtCore.QRect(620, 200, 131, 101))
-        self.trainList.setMouseTracking(True)
-        self.trainList.setSelectionRectVisible(True)
-        self.trainList.setObjectName("trainList")
+        self.redLineTrainList = QtWidgets.QListWidget(self.centralwidget)
+        self.redLineTrainList.setGeometry(QtCore.QRect(620, 200, 131, 101))
+        self.redLineTrainList.setMouseTracking(True)
+        self.redLineTrainList.setSelectionRectVisible(True)
+        self.redLineTrainList.setObjectName("redLineTrainList")
+        self.redLineTrainList.itemActivated.connect(self.redLineTrainSelectionChanged)
+
+        # create green line train list
+        self.greenLineTrainList = QtWidgets.QListWidget(self.centralwidget)
+        self.greenLineTrainList.setGeometry(QtCore.QRect(620, 340, 131, 101))
+        self.greenLineTrainList.setMouseTracking(True)
+        self.greenLineTrainList.setSelectionRectVisible(True)
+        self.greenLineTrainList.setObjectName("greenLineTrainList")
+        self.greenLineTrainList.itemActivated.connect(self.greenLineTrainSelectionChanged)
 
         # create train information chart 
         self.trainInfo = QtWidgets.QLabel(self.centralwidget)
-        self.trainInfo.setGeometry(QtCore.QRect(30, 435, 231, 21))
+        self.trainInfo.setGeometry(QtCore.QRect(20, 435, 160, 21))
         font = QtGui.QFont()
         font.setPointSize(13)
         self.trainInfo.setFont(font)
         self.trainInfo.setObjectName("trainInfo")
+        self.trainName = QtWidgets.QLabel(self.centralwidget)
+        self.trainName.setGeometry(QtCore.QRect(175, 435, 100, 21))
+        font = QtGui.QFont()
+        font.setPointSize(13)
+        self.trainName.setFont(font)
+        self.trainName.setObjectName("trainName")
+        self.trainLine = QtWidgets.QLabel(self.centralwidget)
+        self.trainLine.setGeometry(QtCore.QRect(20, 455, 161, 17))
+        self.trainLine.setObjectName("trainLine")
         self.commandedSpeed = QtWidgets.QLabel(self.centralwidget)
-        self.commandedSpeed.setGeometry(QtCore.QRect(30, 470, 161, 17))
+        self.commandedSpeed.setGeometry(QtCore.QRect(20, 473, 170, 17))
         self.commandedSpeed.setObjectName("commandedSpeed")
         self.authority = QtWidgets.QLabel(self.centralwidget)
-        self.authority.setGeometry(QtCore.QRect(30, 490, 161, 17))
+        self.authority.setGeometry(QtCore.QRect(20, 491, 161, 17))
         self.authority.setObjectName("authority")
         self.destinationList = QtWidgets.QListWidget(self.centralwidget)
         self.destinationList.setGeometry(QtCore.QRect(200, 480, 111, 71))
@@ -118,10 +137,10 @@ class Ui_MainWindow(object):
         item = QtWidgets.QListWidgetItem()
         self.destinationList.addItem(item)
         self.setCommandedSpeedValue = QtWidgets.QLineEdit(self.centralwidget)
-        self.setCommandedSpeedValue.setGeometry(QtCore.QRect(30, 510, 31, 21))
+        self.setCommandedSpeedValue.setGeometry(QtCore.QRect(20, 510, 31, 21))
         self.setCommandedSpeedValue.setObjectName("setCommandedSpeedValue")
         self.setAuthorityValue = QtWidgets.QLineEdit(self.centralwidget)
-        self.setAuthorityValue.setGeometry(QtCore.QRect(30, 530, 31, 21))
+        self.setAuthorityValue.setGeometry(QtCore.QRect(20, 530, 31, 21))
         self.setAuthorityValue.setObjectName("setAuthorityValue")
         self.setCommandedSpeed = QtWidgets.QPushButton(self.centralwidget)
         self.setCommandedSpeed.setGeometry(QtCore.QRect(60, 510, 131, 21))
@@ -143,7 +162,10 @@ class Ui_MainWindow(object):
         # set up timer refresh
         self.timer = QtCore.QTimer()
         self.timer.timeout.connect(self.updateRedLineBlockList)
+        self.timer.timeout.connect(self.updateGreenLineBlockList)
         self.timer.timeout.connect(self.updateBlockInfo)
+        self.timer.timeout.connect(self.updateRedLineTrainList)
+        self.timer.timeout.connect(self.updateGreenLineTrainList)
         self.timer.start(1000)
 
     def retranslateUi(self, MainWindow):
@@ -175,22 +197,25 @@ class Ui_MainWindow(object):
         self.startMaintenance.setText(_translate("MainWindow", "Start Maintenance"))
 
         # set train info test
-        self.trainInfo.setText(_translate("MainWindow", "Train Information: Train A"))
-        self.commandedSpeed.setText(_translate("MainWindow", "Comm. Speed (mph): 25"))
-        self.authority.setText(_translate("MainWindow", "Authority (mi): 28"))
+        self.trainInfo.setText(_translate("MainWindow", "Train Information: "))
+        self.trainName.setText(_translate("MainWindow", "N/A"))
+        self.trainLine.setText(_translate("MainWindow", "Line: N/A"))
+        self.commandedSpeed.setText(_translate("MainWindow", "Comm. Speed (mph): N/A"))
+        self.authority.setText(_translate("MainWindow", "Authority (mi): N/A"))
         self.setCommandedSpeed.setText(_translate("MainWindow", "Command Speed"))
         self.setAuthority.setText(_translate("MainWindow", "Set Authority"))
         self.destinations.setText(_translate("MainWindow", "Destinations"))
         __sortingEnabled = self.destinationList.isSortingEnabled()
         self.destinationList.setSortingEnabled(False)
         item = self.destinationList.item(0)
-        item.setText(_translate("MainWindow", "Station A"))
+        item.setText(_translate("MainWindow", "N/A"))
         self.destinationList.setSortingEnabled(__sortingEnabled)
 
 #################################################################
 # End UI generation, start functions
 #################################################################
 
+# block methods
     def redSelectionChanged(self):
         # update block information
         selectedBlock = self.redLineBlockList.currentItem().text()
@@ -225,6 +250,20 @@ class Ui_MainWindow(object):
             else:
                 item.setBackground(Qt.white)
 
+    def updateGreenLineBlockList(self):
+        for i in range(0, len(greenLineBlocks)):
+            item = self.greenLineBlockList.item(i)
+            selectedBlock = item.text()
+
+            if (greenLineBlocks[selectedBlock].getMaintenanceState() == "yes"):
+                item.setBackground(Qt.yellow)
+            elif (greenLineBlocks[selectedBlock].getFaultState() == "yes"):
+                item.setBackground(Qt.red)
+            elif (greenLineBlocks[selectedBlock].getOccupancy() == "yes"):
+                item.setBackground(Qt.green)
+            else:
+                item.setBackground(Qt.white)
+
     def updateBlockInfo(self):
         blockLineText = self.blockLine.text()
         if (blockLineText == "Line: Red"):
@@ -232,10 +271,77 @@ class Ui_MainWindow(object):
         elif (blockLineText == "Line: Green"):
             self.greenSelectionChanged()
 
+# train methods
     def launchDispatchPopUp(self):
         self.dispatchPopUp.setupUi(self.dispatchWidget)
         self.dispatchWidget.show()
 
+    def updateRedLineTrainList(self):
+        self.redLineTrainsKeys = redLineTrains.keys()
+        self.currentredLineTrainList = dict()
+
+        # checking for removed trains
+        for i in range(self.redLineTrainList.count()):
+            self.currentredLineTrainList[self.redLineTrainList.item(i).text()] = None
+
+            if ((self.redLineTrainList.item(i).text() in redLineTrains) == False):
+                self.redLineTrainList.takeItem(i)
+            
+        # checking for new trains
+        for key in self.redLineTrainsKeys:
+            if ((key in self.currentredLineTrainList) == False):
+                item = QtWidgets.QListWidgetItem()
+                item.setText(key)
+                self.redLineTrainList.addItem(item)
+    
+    def updateGreenLineTrainList(self):
+        self.greenLineTrainsKeys = greenLineTrains.keys()
+        self.currentgreenLineTrainList = dict()
+
+        # checking for removed trains
+        for i in range(self.greenLineTrainList.count()):
+            self.currentgreenLineTrainList[self.greenLineTrainList.item(i).text()] = None
+
+            if ((self.greenLineTrainList.item(i).text() in greenLineTrains) == False):
+                self.greenLineTrainList.takeItem(i)
+            
+        # checking for new trains
+        for key in self.greenLineTrainsKeys:
+            if ((key in self.currentgreenLineTrainList) == False):
+                item = QtWidgets.QListWidgetItem()
+                item.setText(key)
+                self.greenLineTrainList.addItem(item)
+
+
+    def redLineTrainSelectionChanged(self):
+        self.selectedTrain = self.redLineTrainList.currentItem().text()
+        self.trainLine.setText("Line: Red")
+        self.trainName.setText(self.selectedTrain)
+        self.commandedSpeed.setText("Comm. Speed (mph): " + redLineTrains[self.selectedTrain].getCommandedSpeed())
+        self.authority.setText("Authority (mi): " + redLineTrains[self.selectedTrain].getAuthority())
+        
+        self.destinationList.clear()
+        self.currentTrainDestinations = redLineTrains[self.selectedTrain].getDestinations()
+        for key in self.currentTrainDestinations.keys():
+            item = QtWidgets.QListWidgetItem()
+            item.setText(key + ": " + self.currentTrainDestinations[key])
+            self.destinationList.addItem(item)
+
+    def greenLineTrainSelectionChanged(self):
+        self.selectedTrain = self.greenLineTrainList.currentItem().text()
+        self.trainLine.setText("Line: Green")
+        self.trainName.setText(self.selectedTrain)
+        self.commandedSpeed.setText("Comm. Speed (mph): " + greenLineTrains[self.selectedTrain].getCommandedSpeed())
+        self.authority.setText("Authority (mi): " + greenLineTrains[self.selectedTrain].getAuthority())
+        
+        self.destinationList.clear()
+        self.currentTrainDestinations = greenLineTrains[self.selectedTrain].getDestinations()
+        for key in self.currentTrainDestinations.keys():
+            item = QtWidgets.QListWidgetItem()
+            item.setText(key + ": " + self.currentTrainDestinations[key])
+            self.destinationList.addItem(item)
+
+    
 
 class Ui_testWindow(object):
 
@@ -310,6 +416,9 @@ class dispatchPopUp(object):
     def setupUi(self, dispatchPopUp):
         dispatchPopUp.setObjectName("dispatchPopUp")
         dispatchPopUp.resize(200, 300)
+        self.trainNameEntry = QtWidgets.QLineEdit(dispatchPopUp)
+        self.trainNameEntry.setGeometry(QtCore.QRect(40, 10, 100, 21))
+        self.trainNameEntry.setObjectName("trainName")
         self.lineSelection = QtWidgets.QComboBox(dispatchPopUp)
         self.lineSelection.setGeometry(QtCore.QRect(40, 40, 100, 23))
         self.lineSelection.setObjectName("comboBox")
@@ -327,6 +436,7 @@ class dispatchPopUp(object):
         self.redLineStationsKeys = redLineStations.keys()
         self.greenLineStationsKeys = greenLineStations.keys()
         self.lineSelection.activated.connect(self.updateDestinationList)
+        self.dispatch.clicked.connect(self.dispatchTrain)
 
         # add items to destinationList
         for key in self.redLineStationsKeys:
@@ -345,7 +455,7 @@ class dispatchPopUp(object):
         self.stationList.setSortingEnabled(__sortingEnabled)
         self.dispatch.setText(_translate("MainWindow", "Dispatch"))
 
-        # set red line destination list
+        # set red line destination list 
         self.index = 0
         for key in self.redLineStationsKeys:
             item = self.stationList.item(self.index)
@@ -361,16 +471,27 @@ class dispatchPopUp(object):
                 item = self.stationList.item(self.index)
                 item.setText(key)
                 self.index += 1
-
-        if (self.currentLine == "Green Line"):
+        elif (self.currentLine == "Green Line"):
             self.index = 0
             for key in self.greenLineStationsKeys:
                 item = self.stationList.item(self.index)
                 item.setText(key)
                 self.index += 1
 
+    def dispatchTrain(self):
+        self.currentLine = self.lineSelection.currentText()
+        self.destinationList = []
+        self.selectedDestinations = self.stationList.selectedItems()
+        self.trainName = self.trainNameEntry.text()
 
+        # add dispatch destinations to list
+        for destination in self.selectedDestinations:
+            self.destinationList.append(destination.text())
 
+        if (self.currentLine == "Red Line"):
+            addRedLineTrain(self.destinationList, self.trainName)
+        elif (self.currentLine == "Green Line"):
+            addGreenLineTrain(self.destinationList, self.trainName)
 
 
 if __name__ == "__main__":

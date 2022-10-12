@@ -1,28 +1,20 @@
 import train
-from train import redLineStations, greenLineStations
+from train import redLineStations, greenLineStations, train
 
 # populate station dictionaries
 redLineTrains = dict()
 greenLineTrains = dict()
 
-totalRedLineTrains = 0
-totalGreenLineTrains = 0
-
-def addRedLineTrain(destinations):
-    trainName = "Train " + str(totalRedLineTrains+1)
-    redLineTrains[trainName] = train("red")
+def addRedLineTrain(destinations, name):
+    redLineTrains[name] = train("red")
 
     for destination in destinations:
-        redLineTrains[trainName].addDestination(destination)
-    
-    totalRedLineTrains += 1
+        redLineTrains[name].addDestination(destination)
 
-def addGreenLineTrain(destinations):
-    trainName = "Train " + str(totalGreenLineTrains+1)
-    greenLineTrains[trainName] = train("red")
+def addGreenLineTrain(destinations, name):
+    greenLineTrains[name] = train("green")
 
     for destination in destinations:
-        greenLineTrains[trainName].addDestination(destination)
+        greenLineTrains[name].addDestination(destination)
 
-    totalGreenLineTrains += 1
 

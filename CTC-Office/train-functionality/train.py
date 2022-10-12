@@ -13,6 +13,8 @@ greenLineStations["WHITED"] = "no"
 class train:
     
     def __init__(self, line):
+        self.line = line
+        
         if line == "red":
             self.destinations = redLineStations
         elif line == "green":
@@ -33,6 +35,12 @@ class train:
         except:
             return "None"
         return self.authority
+
+    def getDestinations(self):
+        return self.destinations
+
+    def getLine(self):
+        return self.line
 
     def setCommandedSpeed(self, commandedSpeed):
         self.commandedSpeed = commandedSpeed
