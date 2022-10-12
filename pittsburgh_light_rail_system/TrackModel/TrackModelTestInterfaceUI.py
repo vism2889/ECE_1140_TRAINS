@@ -46,6 +46,10 @@ class TestUI(QWidget):
         self.launchTestUIBt.move(self.width-200,50)
         self.launchTestUIBt.clicked.connect(self.confirm)
 
+        self.heaterState = QCheckBox("Heater State", self)
+        self.heaterState.setStyleSheet("background-color: gray; color: white;")
+        self.heaterState.move(self.width-300,82)
+
         self.trackHeaterBtn = QPushButton("Update Track Heater",self)
         self.trackHeaterBtn.setStyleSheet("background-color: cyan; color: black; border-radius: 5px;")
         self.trackHeaterBtn.resize(180, 25)
@@ -118,7 +122,7 @@ class TestUI(QWidget):
         self.crossingLightSignal.emit([])
     
     def updateTrackHeaterState(self):
-        self.trackHeaterSignal.emit(self.fault1.isChecked())
+        self.trackHeaterSignal.emit(self.heaterState.isChecked())
 
     def updateFaultValues(self):
         #self.trackHeaterSignal.emit([])

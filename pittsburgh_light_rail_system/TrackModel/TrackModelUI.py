@@ -26,6 +26,9 @@ class App(QWidget):
         self.height        = 540
         self.lineNames     = []
         self.lines         = []
+        self.stations      = []
+        self.crossings     = []
+        self.switches      = []
         self.infraCounts   = [] # holds the count  for  stations, switches, crossings
         self.currLineIndex = None
         self.layoutFile    = None
@@ -47,6 +50,31 @@ class App(QWidget):
         infraParser = InfraParser(self.layoutFile)
         infraParser.parse()
         infraParser.process()
+        for i in range(len(self.lineNames)):
+            self.stations.append([])
+        for i in range(len(self.lineNames)):
+            for station in infraParser.stations:
+                if station[0] == self.lineNames[i]:
+                    self.stations[i].append(station)
+        print(self.stations)
+        print(len(self.stations[0]))
+
+        for i in range(len(self.lineNames)):
+            self.switches.append([])
+        for i in range(len(self.lineNames)):
+            for switch in infraParser.switches:
+                if switch[0] == self.lineNames[i]:
+                    self.switches[i].append(switch)
+
+        for i in range(len(self.lineNames)):
+            self.crossings.append([])
+        for i in range(len(self.lineNames)):
+            for crossing in infraParser.crossings:
+                if crossing[0] == self.lineNames[i]:
+                    self.crossings[i].append(crossing)
+                
+        #self.stations = infraParser.stations 
+        #self.switches = infraParser.switches
 
         self.loadLines()
         self.loadBlockInfo()
@@ -169,6 +197,7 @@ class App(QWidget):
         currLine = item.text()
         self.currLineIndex = self.lineNames.index(currLine)
         print(currLine, self.currLineIndex)
+        self.updateLineInformation()
         self.loadBlocks()
    
     def loadBlocks(self):
@@ -227,6 +256,8 @@ class App(QWidget):
         self.blockVallistwidget.item(16).setForeground(QtCore.Qt.gray) 
         self.blockVallistwidget.insertItem(17,"NA")
         self.blockVallistwidget.item(17).setForeground(QtCore.Qt.gray) 
+        self.blockVallistwidget.insertItem(18,"NA")
+        self.blockVallistwidget.item(18).setForeground(QtCore.Qt.gray) 
 
     def loadBlockInfo(self):
         self.blockInfolistwidget.insertItem(0,  "Track Line:           ")
@@ -250,6 +281,7 @@ class App(QWidget):
         self.blockInfolistwidget.insertItem(15, "Crossing Presence:    ")
         self.blockInfolistwidget.insertItem(16, "Crossing Lights:      ")
         self.blockInfolistwidget.insertItem(17, "Ticket Sales:         ")
+        self.blockInfolistwidget.insertItem(18, "Fault Presence:       ")
        # self.blockInfolistwidget.insertItem(17," ")
 
     def openFileNameDialog(self):
@@ -292,18 +324,22 @@ class App(QWidget):
     def updateLineInformation(self, heatVal=''):
 
         self.lineInfoVallistwidget.clear()
-        self.lineInfoVallistwidget.insertItem(0,"NA")
-        self.lineInfoVallistwidget.item(0).setForeground(QtCore.Qt.gray)
-        self.lineInfoVallistwidget.insertItem(1,"NA")
-        self.lineInfoVallistwidget.item(1).setForeground(QtCore.Qt.gray)
-        self.lineInfoVallistwidget.insertItem(2,"NA")
-        self.lineInfoVallistwidget.item(2).setForeground(QtCore.Qt.gray)
-        self.lineInfoVallistwidget.insertItem(3,"NA")
-        self.lineInfoVallistwidget.item(3).setForeground(QtCore.Qt.gray)
+        self.lineInfoVallistwidget.insertItem(0,str(len(self.lines[self.currLineIndex])))
+        self.lineInfoVallistwidget.item(0).setForeground(QtCore.Qt.green)
+        self.lineInfoVallistwidget.insertItem(1,str(len(self.stations[self.currLineIndex])))
+        self.lineInfoVallistwidget.item(1).setForeground(QtCore.Qt.green)
+        self.lineInfoVallistwidget.insertItem(2,str(len(self.switches[self.currLineIndex])))
+        self.lineInfoVallistwidget.item(2).setForeground(QtCore.Qt.green)
+        self.lineInfoVallistwidget.insertItem(3,str(len(self.crossings[self.currLineIndex])))
+        self.lineInfoVallistwidget.item(3).setForeground(QtCore.Qt.green)
         self.lineInfoVallistwidget.insertItem(4,"NA")
         self.lineInfoVallistwidget.item(4).setForeground(QtCore.Qt.gray)
-        self.lineInfoVallistwidget.insertItem(5,str(heatVal))
-        self.lineInfoVallistwidget.item(5).setForeground(QtCore.Qt.green)
+        if heatVal != '':
+            self.lineInfoVallistwidget.insertItem(5,str(heatVal))
+            self.lineInfoVallistwidget.item(5).setForeground(QtCore.Qt.green)
+        else:
+            self.lineInfoVallistwidget.insertItem(5,"NA")
+            self.lineInfoVallistwidget.item(5).setForeground(QtCore.Qt.gray)
         self.lineInfoVallistwidget.insertItem(6,"NA")
         self.lineInfoVallistwidget.item(6).setForeground(QtCore.Qt.gray)
 # def on_sub_window_confirm(self, url):  # <-- This is the main window's slot

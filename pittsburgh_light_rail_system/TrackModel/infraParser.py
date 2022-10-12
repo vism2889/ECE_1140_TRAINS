@@ -29,6 +29,8 @@ class InfraParser:
         # list of underground blocks - a list of the blocks that are under ground
         self.underground = []
 
+        self.crossings = []
+
     def parse(self):
         print("\n\tPITTSBURGH LIGHT RAIL TRACK-LAYOUT INFRASTRUCTURE TEST PARSER")
         print("\t*****************************************")
@@ -62,7 +64,12 @@ class InfraParser:
                     else:
                         switch = switch[0]
                     block = row[2]
-                    self.switches.append([switch, block])
+                    line  = row[0]
+                    self.switches.append([line, switch, block])
+                if 'CROSSING' in row[6]:
+                    line = row[0]
+                    block = row[2]
+                    self.crossings.append([line, block])
 
         print("\t\tSTATIONS:")
         for stat in self.stations:
