@@ -14,11 +14,14 @@ class train:
     
     def __init__(self, line):
         self.line = line
+        self.destinations = dict()
         
         if line == "red":
-            self.destinations = redLineStations
+            for key, value in redLineStations.items():
+                self.destinations[key] = value
         elif line == "green":
-            self.destinations = greenLineStations
+            for key, value in greenLineStations.items():
+                self.destinations[key] = value
         else:
             sys.exit("Please input proper line selection (red/green)")
 
@@ -48,11 +51,12 @@ class train:
     def setAuthority(self, authority):
         self.authority = authority
 
-    def addDestination(self, station):
-        self.destinations.update({station:"yes"})
+    def toggleDestination(self, station):
+        if self.destinations[station] == "no":
+            self.destinations.update({station:"yes"})
+        else:
+            self.destinations.update({station:"no"})
 
-    def removeDestination(self, station):
-        self.destinations.update({station:"no"})
 
     
 

@@ -6,8 +6,10 @@ sys.path.append('/home/garrett/git/ECE_1140_TRAINS/CTC-Office/block-functionalit
 sys.path.append('/home/garrett/git/ECE_1140_TRAINS/CTC-Office/train-functionality/')
 from PyQt5 import QtCore, QtGui, QtWidgets, QtWidgets
 from PyQt5.QtWidgets import QAbstractItemView, QDialog
-from PyQt5.QtCore import Qt
-from lines import redLineBlocks, greenLineBlocks
+from PyQt5.QtCore import QTimer, QTime, Qt
+from lines import *
+from trains import *
+from lines import redLineBlocks, greenLineBlocks, redLineSwitches, toggleRedLineSwitch, greenLineSwitches, toggleGreenLineSwitch
 from trains import redLineTrains, greenLineTrains
 from trains import redLineStations, greenLineStations, addRedLineTrain, addGreenLineTrain
 
@@ -19,16 +21,31 @@ class Ui_MainWindow(object):
 
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(800, 613)
+        MainWindow.setGeometry(10, 10, 800, 613)
         MainWindow.setMouseTracking(True)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setEnabled(True)
         self.centralwidget.setAutoFillBackground(False)
         self.centralwidget.setObjectName("centralwidget")
 
+        # throughput label
+        self.throughputLabel = QtWidgets.QLabel(self.centralwidget)
+        self.throughputLabel.setGeometry(QtCore.QRect(620, 10, 101, 20))
+        self.throughputLabel.setObjectName("throughputLabel")
+        font = QtGui.QFont()
+        font.setPointSize(12)
+        self.throughputLabel.setFont(font)
+
+        self.clockLabel = QtWidgets.QLabel(self.centralwidget)
+        self.clockLabel.setGeometry(QtCore.QRect(620, 40, 101, 20))
+        self.clockLabel.setObjectName("clockLabel")
+        font = QtGui.QFont()
+        font.setPointSize(12)
+        self.clockLabel.setFont(font)
+
         # create dispatch button
         self.dispatchTrain = QtWidgets.QPushButton(self.centralwidget)
-        self.dispatchTrain.setGeometry(QtCore.QRect(620, 50, 131, 31))
+        self.dispatchTrain.setGeometry(QtCore.QRect(620, 60, 131, 31))
         self.dispatchTrain.setObjectName("dispatchTrain")
         self.dispatchTrain.clicked.connect(self.launchDispatchPopUp)
 
@@ -37,8 +54,11 @@ class Ui_MainWindow(object):
         self.dispatchPopUp = dispatchPopUp()
 
         # create redLine block list
+        self.redLineBlockListLabel = QtWidgets.QLabel(self.centralwidget)
+        self.redLineBlockListLabel.setGeometry(QtCore.QRect(330, 40, 100, 17))
+        self.redLineBlockListLabel.setObjectName("redLineBlockListLabel")
         self.redLineBlockList = QtWidgets.QListWidget(self.centralwidget)
-        self.redLineBlockList.setGeometry(QtCore.QRect(330, 50, 181, 331))
+        self.redLineBlockList.setGeometry(QtCore.QRect(330, 60, 100, 331))
         self.redLineBlockList.setMouseTracking(True)
         self.redLineBlockList.setSelectionRectVisible(True)
         self.redLineBlockList.setObjectName("redLineBlockList")
@@ -51,9 +71,33 @@ class Ui_MainWindow(object):
 
         self.redLineBlockList.setCurrentRow(0)
 
+        # create redLine switch list
+        self.redLineSwitchListLabel = QtWidgets.QLabel(self.centralwidget)
+        self.redLineSwitchListLabel.setGeometry(QtCore.QRect(440, 60, 100, 20))
+        self.redLineSwitchListLabel.setObjectName("redLineSwitchListLabel")
+        self.redLineSwitchList = QtWidgets.QListWidget(self.centralwidget)
+        self.redLineSwitchList.setGeometry(QtCore.QRect(440, 80, 150, 100))
+        self.redLineSwitchList.setMouseTracking(True)
+        self.redLineSwitchList.setSelectionRectVisible(True)
+        self.redLineSwitchList.setObjectName("redLineSwitchList")
+        self.redLineSwitchList.setSelectionMode(QAbstractItemView.MultiSelection)
+        self.toggleRedLineSwitchButton = QtWidgets.QPushButton(self.centralwidget)
+        self.toggleRedLineSwitchButton.setGeometry(QtCore.QRect(440, 185, 100, 20))
+        self.toggleRedLineSwitchButton.hide()
+        self.toggleRedLineSwitchButton.clicked.connect(self.toggleRedLineSwitchState)
+
+        self.redLineSwitchKeys = redLineSwitches.keys()
+        for key in self.redLineSwitchKeys:
+            item = QtWidgets.QListWidgetItem()
+            item.setText(key + ": " + redLineSwitches[key])
+            self.redLineSwitchList.addItem(item)
+
         # create greenLine block list
+        self.greenLineBlockListLabel = QtWidgets.QLabel(self.centralwidget)
+        self.greenLineBlockListLabel.setGeometry(QtCore.QRect(60, 40, 101, 17))
+        self.greenLineBlockListLabel.setObjectName("greenLineBlockListLabel")
         self.greenLineBlockList = QtWidgets.QListWidget(self.centralwidget)
-        self.greenLineBlockList.setGeometry(QtCore.QRect(90, 50, 181, 331))
+        self.greenLineBlockList.setGeometry(QtCore.QRect(60, 60, 100, 331))
         self.greenLineBlockList.setMouseTracking(True)
         self.greenLineBlockList.setSelectionRectVisible(True)
         self.greenLineBlockList.setObjectName("greenLineBlockList")
@@ -63,6 +107,27 @@ class Ui_MainWindow(object):
         for key in self.greenLineBlocksKeys:
             item = QtWidgets.QListWidgetItem()
             self.greenLineBlockList.addItem(item)
+
+        # create greenLine switch list
+        self.greenLineSwitchListLabel = QtWidgets.QLabel(self.centralwidget)
+        self.greenLineSwitchListLabel.setGeometry(QtCore.QRect(170, 60, 100, 20))
+        self.greenLineSwitchListLabel.setObjectName("greenLineSwitchListLabel")
+        self.greenLineSwitchList = QtWidgets.QListWidget(self.centralwidget)
+        self.greenLineSwitchList.setGeometry(QtCore.QRect(170, 80, 150, 100))
+        self.greenLineSwitchList.setMouseTracking(True)
+        self.greenLineSwitchList.setSelectionRectVisible(True)
+        self.greenLineSwitchList.setObjectName("greenLineSwitchList")
+        self.greenLineSwitchList.setSelectionMode(QAbstractItemView.MultiSelection)
+        self.toggleGreenLineSwitchButton = QtWidgets.QPushButton(self.centralwidget)
+        self.toggleGreenLineSwitchButton.setGeometry(QtCore.QRect(170, 185, 100, 20))
+        self.toggleGreenLineSwitchButton.hide()
+        self.toggleGreenLineSwitchButton.clicked.connect(self.toggleGreenLineSwitchState)
+
+        self.greenLineSwitchKeys = greenLineSwitches.keys()
+        for key in self.greenLineSwitchKeys:
+            item = QtWidgets.QListWidgetItem()
+            item.setText(key + ": " + greenLineSwitches[key])
+            self.greenLineSwitchList.addItem(item)
 
         # creating block information chart
         self.blockInfo = QtWidgets.QLabel(self.centralwidget)
@@ -83,12 +148,13 @@ class Ui_MainWindow(object):
         self.maintenanceState = QtWidgets.QLabel(self.centralwidget)
         self.maintenanceState.setGeometry(QtCore.QRect(350, 520, 171, 17))
         self.maintenanceState.setObjectName("maintenanceState")
-        self.startMaintenance = QtWidgets.QPushButton(self.centralwidget)
-        self.startMaintenance.setGeometry(QtCore.QRect(350, 540, 171, 31))
+        self.startMaintenanceButton = QtWidgets.QPushButton(self.centralwidget)
+        self.startMaintenanceButton.setGeometry(QtCore.QRect(350, 540, 171, 31))
         font = QtGui.QFont()
         font.setPointSize(13)
-        self.startMaintenance.setFont(font)
-        self.startMaintenance.setObjectName("startMaintenance")
+        self.startMaintenanceButton.setFont(font)
+        self.startMaintenanceButton.setObjectName("startMaintenanceButton")
+        self.startMaintenanceButton.clicked.connect(self.toggleMaintenance)
 
         # create train list
         self.redLineTrainList = QtWidgets.QListWidget(self.centralwidget)
@@ -142,12 +208,25 @@ class Ui_MainWindow(object):
         self.setAuthorityValue = QtWidgets.QLineEdit(self.centralwidget)
         self.setAuthorityValue.setGeometry(QtCore.QRect(20, 530, 31, 21))
         self.setAuthorityValue.setObjectName("setAuthorityValue")
-        self.setCommandedSpeed = QtWidgets.QPushButton(self.centralwidget)
-        self.setCommandedSpeed.setGeometry(QtCore.QRect(60, 510, 131, 21))
-        self.setCommandedSpeed.setObjectName("setCommandedSpeed")
-        self.setAuthority = QtWidgets.QPushButton(self.centralwidget)
-        self.setAuthority.setGeometry(QtCore.QRect(60, 530, 131, 21))
-        self.setAuthority.setObjectName("setAuthority")
+
+        # commanded speed button
+        self.setCommandedSpeedButton = QtWidgets.QPushButton(self.centralwidget)
+        self.setCommandedSpeedButton.setGeometry(QtCore.QRect(60, 510, 131, 21))
+        self.setCommandedSpeedButton.setObjectName("setCommandedSpeed")
+        self.setCommandedSpeedButton.clicked.connect(self.setCommandedSpeed)
+
+        # authority button
+        self.setAuthorityButton = QtWidgets.QPushButton(self.centralwidget)
+        self.setAuthorityButton.setGeometry(QtCore.QRect(60, 530, 131, 21))
+        self.setAuthorityButton.setObjectName("setAuthority")
+        self.setAuthorityButton.clicked.connect(self.setAuthority)
+
+        # create dispatch button
+        self.toggleDestinationsButton = QtWidgets.QPushButton(self.centralwidget)
+        self.toggleDestinationsButton.setGeometry(QtCore.QRect(200, 555, 131, 31))
+        self.toggleDestinationsButton.setObjectName("toggleDestinationsButtons")
+        self.toggleDestinationsButton.clicked.connect(self.toggleDestinations)
+
         self.destinations = QtWidgets.QLabel(self.centralwidget)
         self.destinations.setGeometry(QtCore.QRect(200, 460, 91, 17))
         self.destinations.setObjectName("destinations")
@@ -166,7 +245,10 @@ class Ui_MainWindow(object):
         self.timer.timeout.connect(self.updateBlockInfo)
         self.timer.timeout.connect(self.updateRedLineTrainList)
         self.timer.timeout.connect(self.updateGreenLineTrainList)
-        self.timer.start(1000)
+        self.timer.timeout.connect(self.updateRedLineSwitchList)
+        self.timer.timeout.connect(self.updateGreenLineSwitchList)
+        self.timer.timeout.connect(self.showTime)
+        self.timer.start(10)
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
@@ -175,16 +257,25 @@ class Ui_MainWindow(object):
         self.redLineBlockList.setSortingEnabled(False)
         self.greenLineBlockList.setSortingEnabled(False)
         self.dispatchTrain.setText(_translate("MainWindow", "Dispatch Train"))
+        self.throughputLabel.setText(_translate("MainWindow", "ThroughPut: "))
 
         # set red line block names
+        self.redLineBlockListLabel.setText(_translate("MainWindow", "Red Line:"))
         for key in self.redLineBlocksKeys:
             item = self.redLineBlockList.item(redLineBlocks[key].number-1)
             item.setText(_translate("MainWindow", key))
 
+        self.redLineSwitchListLabel.setText(_translate("MainWindow", "Switches:"))
+        self.toggleRedLineSwitchButton.setText(_translate("MainWindow", "Toggle Switches"))
+
         # set green line block names
+        self.greenLineBlockListLabel.setText(_translate("MainWindow", "Green Line:"))
         for key in self.greenLineBlocksKeys:
             item = self.greenLineBlockList.item(greenLineBlocks[key].number-1)
             item.setText(_translate("MainWindow", key))
+
+        self.greenLineSwitchListLabel.setText(_translate("MainWindow", "Switches:"))
+        self.toggleGreenLineSwitchButton.setText(_translate("MainWindow", "Toggle Switches"))
 
         # set block info text
         self.redLineBlockList.setSortingEnabled(__sortingEnabled)
@@ -194,7 +285,7 @@ class Ui_MainWindow(object):
         self.occupancy.setText(_translate("MainWindow", "Occupied: no"))
         self.faultState.setText(_translate("MainWindow", "Track Fault: no"))
         self.maintenanceState.setText(_translate("MainWindow", "Under Maintenance: no"))
-        self.startMaintenance.setText(_translate("MainWindow", "Start Maintenance"))
+        self.startMaintenanceButton.setText(_translate("MainWindow", "Start Maintenance"))
 
         # set train info test
         self.trainInfo.setText(_translate("MainWindow", "Train Information: "))
@@ -202,8 +293,9 @@ class Ui_MainWindow(object):
         self.trainLine.setText(_translate("MainWindow", "Line: N/A"))
         self.commandedSpeed.setText(_translate("MainWindow", "Comm. Speed (mph): N/A"))
         self.authority.setText(_translate("MainWindow", "Authority (mi): N/A"))
-        self.setCommandedSpeed.setText(_translate("MainWindow", "Command Speed"))
-        self.setAuthority.setText(_translate("MainWindow", "Set Authority"))
+        self.setCommandedSpeedButton.setText(_translate("MainWindow", "Command Speed"))
+        self.setAuthorityButton.setText(_translate("MainWindow", "Set Authority"))
+        self.toggleDestinationsButton.setText(_translate("MainWindow", "Toggle Destinations"))
         self.destinations.setText(_translate("MainWindow", "Destinations"))
         __sortingEnabled = self.destinationList.isSortingEnabled()
         self.destinationList.setSortingEnabled(False)
@@ -215,6 +307,11 @@ class Ui_MainWindow(object):
 # End UI generation, start functions
 #################################################################
 
+    def showTime(self):
+        current_time = QTime.currentTime()
+        self.label_time = current_time.toString('hh:mm:ss')
+        self.clockLabel.setText(self.label_time)
+
 # block methods
     def redSelectionChanged(self):
         # update block information
@@ -225,6 +322,10 @@ class Ui_MainWindow(object):
         self.faultState.setText("Track Fault: " + redLineBlocks[selectedBlock].getFaultState())
         self.maintenanceState.setText("Under Maintenance: " + redLineBlocks[selectedBlock].getMaintenanceState())
         self.blockLine.setText("Line: Red")
+        if (redLineBlocks[selectedBlock].getMaintenanceState() == "yes"):
+            self.startMaintenanceButton.setText("Stop Maintenance")
+        elif (redLineBlocks[selectedBlock].getMaintenanceState() == "no"):
+            self.startMaintenanceButton.setText("Start Maintenance")
 
     def greenSelectionChanged(self):
         # update block information
@@ -235,6 +336,10 @@ class Ui_MainWindow(object):
         self.faultState.setText("Track Fault: " + greenLineBlocks[selectedBlock].getFaultState())
         self.maintenanceState.setText("Under Maintenance: " + greenLineBlocks[selectedBlock].getMaintenanceState())
         self.blockLine.setText("Line: Green")
+        if (greenLineBlocks[selectedBlock].getMaintenanceState() == "yes"):
+            self.startMaintenanceButton.setText("Stop Maintenance")
+        elif (greenLineBlocks[selectedBlock].getMaintenanceState() == "no"):
+            self.startMaintenanceButton.setText("Start Maintenance")
 
     def updateRedLineBlockList(self):
         for i in range(0, len(redLineBlocks)):
@@ -249,6 +354,7 @@ class Ui_MainWindow(object):
                 item.setBackground(Qt.green)
             else:
                 item.setBackground(Qt.white)
+
 
     def updateGreenLineBlockList(self):
         for i in range(0, len(greenLineBlocks)):
@@ -265,11 +371,65 @@ class Ui_MainWindow(object):
                 item.setBackground(Qt.white)
 
     def updateBlockInfo(self):
-        blockLineText = self.blockLine.text()
-        if (blockLineText == "Line: Red"):
+        self.blockLineText = self.blockLine.text()
+        if (self.blockLineText == "Line: Red"):
             self.redSelectionChanged()
-        elif (blockLineText == "Line: Green"):
+        elif (self.blockLineText == "Line: Green"):
             self.greenSelectionChanged()
+
+    def toggleMaintenance(self):
+        if (self.blockLineText == "Line: Red"):
+            self.toggleRedLineMaintenance()
+        elif (self.blockLineText == "Line: Green"):
+            self.toggleGreenLineMaintenance()
+
+    def toggleGreenLineMaintenance(self):
+        selectedBlock = self.greenLineBlockList.currentItem().text()
+        greenLineBlocks[selectedBlock].toggleMaintenanceState()
+        self.greenLineMaintenance = False
+        for key in self.greenLineBlocksKeys:
+            if greenLineBlocks[key].getMaintenanceState() == "yes":
+                self.greenLineMaintenance = True
+
+        if self.greenLineMaintenance:
+            self.toggleGreenLineSwitchButton.show()
+        else:
+            self.toggleGreenLineSwitchButton.hide()
+
+    def toggleRedLineMaintenance(self):
+        selectedBlock = self.redLineBlockList.currentItem().text()
+        redLineBlocks[selectedBlock].toggleMaintenanceState()
+        self.redLineMaintenance = False
+        for key in self.redLineBlocksKeys:
+            if redLineBlocks[key].getMaintenanceState() == "yes":
+                self.redLineMaintenance = True
+
+        if self.redLineMaintenance:
+            self.toggleRedLineSwitchButton.show()
+        else:
+            self.toggleRedLineSwitchButton.hide()
+
+    def toggleRedLineSwitchState(self):
+        self.selectedSwitches = self.redLineSwitchList.selectedItems()
+        for switch in self.selectedSwitches:
+            toggleRedLineSwitch(switch.text().split(":")[0])
+
+    def toggleGreenLineSwitchState(self):
+        self.selectedSwitches = self.greenLineSwitchList.selectedItems()
+        for switch in self.selectedSwitches:
+            toggleGreenLineSwitch(switch.text().split(":")[0])
+
+    def updateRedLineSwitchList(self):
+        self.index = 0
+        for key, value in redLineSwitches.items():
+            self.redLineSwitchList.item(self.index).setText(key + ": " + value)
+            self.index += 1
+
+    def updateGreenLineSwitchList(self):
+        self.index = 0
+        for key, value in greenLineSwitches.items():
+            self.greenLineSwitchList.item(self.index).setText(key + ": " + value)
+            self.index += 1
 
 # train methods
     def launchDispatchPopUp(self):
@@ -341,6 +501,45 @@ class Ui_MainWindow(object):
             item.setText(key + ": " + self.currentTrainDestinations[key])
             self.destinationList.addItem(item)
 
+    def setAuthority(self):
+        if self.setAuthorityValue.text() == "":
+            return
+        self.selectedTrain = self.trainName.text()
+
+        if self.trainLine.text() == "Line: Red":
+            redLineTrains[self.selectedTrain].setAuthority(self.setAuthorityValue.text())
+        elif self.trainLine.text() == "Line: Green":
+            greenLineTrains[self.selectedTrain].setAuthority(self.setAuthorityValue.text())
+        self.updateTrainInfo()
+    
+    def setCommandedSpeed(self):
+        if self.setCommandedSpeedValue.text() == "":
+            return
+        self.selectedTrain = self.trainName.text()
+
+        if self.trainLine.text() == "Line: Red":
+            redLineTrains[self.selectedTrain].setCommandedSpeed(self.setCommandedSpeedValue.text())
+        elif self.trainLine.text() == "Line: Green":
+            greenLineTrains[self.selectedTrain].setCommandedSpeed(self.setCommandedSpeedValue.text())
+        self.updateTrainInfo()
+
+    def toggleDestinations(self):
+        self.selectedTrain = self.trainName.text()
+        self.selectedDestinations = self.destinationList.selectedItems()
+
+        if self.trainLine.text() == "Line: Red":
+            for destination in self.selectedDestinations:
+                redLineTrains[self.selectedTrain].toggleDestination(destination.text().split(":")[0])
+        elif self.trainLine.text() == "Line: Green":
+            for destination in self.selectedDestinations:
+                greenLineTrains[self.selectedTrain].toggleDestination(destination.text().split(":")[0])
+        self.updateTrainInfo()
+
+    def updateTrainInfo(self):
+        if self.trainLine.text() == "Line: Red":
+            self.redLineTrainSelectionChanged()
+        elif self.trainLine.text() == "Line: Green":
+            self.greenLineTrainSelectionChanged()
     
 
 class Ui_testWindow(object):
@@ -415,7 +614,7 @@ class Ui_testWindow(object):
 class dispatchPopUp(object):
     def setupUi(self, dispatchPopUp):
         dispatchPopUp.setObjectName("dispatchPopUp")
-        dispatchPopUp.resize(200, 300)
+        dispatchPopUp.setGeometry(602, 50, 200, 300)
         self.trainNameEntry = QtWidgets.QLineEdit(dispatchPopUp)
         self.trainNameEntry.setGeometry(QtCore.QRect(40, 10, 100, 21))
         self.trainNameEntry.setObjectName("trainName")
@@ -492,6 +691,7 @@ class dispatchPopUp(object):
             addRedLineTrain(self.destinationList, self.trainName)
         elif (self.currentLine == "Green Line"):
             addGreenLineTrain(self.destinationList, self.trainName)
+
 
 
 if __name__ == "__main__":
