@@ -1,20 +1,35 @@
-# import RPi.GPIO as GPIO
-# from time import sleep
+import RPi.GPIO as GPIO
+from time import sleep
 from simple_pid import PID
 from pygame import mixer
 
-# GPIO.setwarnings(False)
-# GPIO.setmode(GPIO.BOARD)
-# GPIO.setup(8, GPIO.OUT, initial=GPIO.LOW)
-# GPIO.setup(10, GPIO.OUT, initial=GPIO.LOW)
-# GPIO.setup(16, GPIO.OUT, initial=GPIO.LOW)
-# GPIO.setup(18, GPIO.OUT, initial=GPIO.LOW)
+GPIO.setwarnings(False)
+GPIO.setmode(GPIO.BOARD)
+
+# inputs
+GPIO.setup(22, GPIO.IN, pull_up_down=GPIO.PUD_DOWN) # internal lights
+GPIO.setup(24, GPIO.IN, pull_up_down=GPIO.PUD_DOWN) # external lights
+GPIO.setup(26, GPIO.IN, pull_up_down=GPIO.PUD_DOWN) # left door
+GPIO.setup(36, GPIO.IN, pull_up_down=GPIO.PUD_DOWN) # right door
+GPIO.setup(37, GPIO.IN, pull_up_down=GPIO.PUD_DOWN) # announce
+GPIO.setup(31, GPIO.IN, pull_up_down=GPIO.PUD_DOWN) # stop announce
+
+# outputs
+GPIO.setup(8, GPIO.OUT, initial=GPIO.LOW)
+GPIO.setup(10, GPIO.OUT, initial=GPIO.LOW)
+GPIO.setup(16, GPIO.OUT, initial=GPIO.LOW)
+GPIO.setup(18, GPIO.OUT, initial=GPIO.LOW)
 
 mixer.init()
 
 class Control():
    
     def __init__(self):
+        self.light_state_internal = False
+        self.light_state_external = False
+        self.door_state_left = False
+        self.door_state_right = False
+        self.announce_state = False
         self.commanded_speed = 0
         self.current_speed = 0
         self.suggested_speed = 0
@@ -38,25 +53,49 @@ class Control():
         self.pid = PID(self.k_p, self.k_i, 0.1, setpoint=self.commanded_speed)
         self.pid.outer_limits = (0, 120000) # clamp at max power output specified in datasheet 120kW
 
-    def setInternalLights(light_state):
-        # if(light_state): GPIO.output(8, GPIO.HIGH)
-        # if(not light_state): GPIO.output(8, GPIO.LOW) 
-        return
+    def lightsButton(self):
+        if GPIO.input(22) == GPIO.HIGH:
+            self.light_state_internal = not self.light_state_internal
+            self.setInternalLights(self.light_state_internal)
+            sleep(.5)
 
+        if GPIO.input(24) == GPIO.HIGH:
+            self.light_state_external = not self.light_state_external
+            self.setExternalLights(self.light_state_external)
+            sleep(.5)
+
+    def doorsButton(self):
+        if GPIO.input(26) == GPIO.HIGH:
+            self.door_state_left = not self.door_state_left
+            self.setLeftDoor(self.door_state_left)
+            sleep(.5)
+
+        if GPIO.input(36) == GPIO.HIGH:
+            self.door_state_right = not self.door_state_right
+            self.setRightDoor(self.door_state_right)
+            sleep(.5)
+
+    def announceButton(self, station_idx):
+        if GPIO.input(37) == GPIO.HIGH:
+            self.announce_state = not self.announce_state
+            self.announceStation(self, self.announce_state, station_idx)
+            sleep(.5)
+
+    def setInternalLights(light_state):
+        if(light_state): GPIO.output(8, GPIO.HIGH)
+        if(not light_state): GPIO.output(8, GPIO.LOW) 
+        
     def setExternalLights(light_state):
-        # if(light_state): GPIO.output(10, GPIO.HIGH)
-        # if(not light_state): GPIO.output(10, GPIO.LOW)
-        return
+        if(light_state): GPIO.output(10, GPIO.HIGH)
+        if(not light_state): GPIO.output(10, GPIO.LOW)
 
     def setLeftDoor(door_state):
-        # if(door_state): GPIO.output(16, GPIO.HIGH)
-        # if(not door_state): GPIO.output(16, GPIO.LOW)
-        return
+        if(door_state): GPIO.output(16, GPIO.HIGH)
+        if(not door_state): GPIO.output(16, GPIO.LOW)
 
     def setRightDoor(door_state):
-        # if(door_state): GPIO.output(18, GPIO.HIGH)
-        # if(not door_state): GPIO.output(18, GPIO.LOW)
-        return  
+        if(door_state): GPIO.output(18, GPIO.HIGH)
+        if(not door_state): GPIO.output(18, GPIO.LOW)
 
     def setSpeed(self, speed):
         self.commanded_speed = speed
@@ -85,7 +124,7 @@ class Control():
         self.power = 0
     
     def limitSpeed(self):
-        if(self.commanded_speed > self.suggested_speed):
+        if(self.current_speed > self.suggested_speed):
             self.setSpeed(self, self.suggested_speed)
     
     def set_kp_ki(kp_val, ki_val, self):

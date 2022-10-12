@@ -13,13 +13,13 @@ from trainController_hw import Control as c
 class Ui_DriverTestUI(object):
     def __init__(self):
         c.__init__(c)
-
-        self.lights_internal_state = False
-        self.lights_external_state = False
+        self.internal_light_state = False
+        self.external_light_state = False
         self.left_door_state = False
         self.right_door_state = False
         self.station = 0
         self.timer = QtCore.QTimer()
+        self.timer2 = QtCore.QTimer()
         
     def setupUi(self, DriverTestUI):
         DriverTestUI.setObjectName("DriverTestUI")
@@ -453,13 +453,23 @@ class Ui_DriverTestUI(object):
         self.nextStationTable.setSortingEnabled(__sortingEnabled)
         self.label_16.setText(_translate("DriverTestUI", "Next Station"))
 
-    def toggle_lights_internal(self):
-        self.lights_internal_state = not self.lights_internal_state
-        c.setInternalLights(self.lights_internal_state)
+    def toggle_lights_manual(self):
+        c.lightsButton(c)
 
-    def toggle_lights_external(self):
-        self.lights_external_state = not self.lights_external_state
-        c.setExternalLights(self.lights_external_state)
+    def toggle_doors_manual(self):
+        c.doorsButton(c)
+
+    def announceStation_manual(self):
+        self.station = self.getNextStation()
+        c.announceButton(c, self.station)
+
+    def toggle_internal_lights(self):
+        self.internal_light_state = not self.internal_light_state
+        c.setInternalLights(self.internal_light_state)
+
+    def toggle_external_lights(self):
+        self.external_light_state = not self.external_light_state
+        c.setExternalLights(self.external_light_state)
 
     def toggle_left_door(self):
         self.left_door_state = not self.left_door_state
@@ -484,7 +494,7 @@ class Ui_DriverTestUI(object):
 
     def announceStation(self):
         self.station = self.getNextStation()
-         c.announceStation(c, True, self.station)
+        c.announceStation(c, True, self.station)
 
     def stopAnnounce(self):
         self.station = self.getNextStation()
@@ -513,8 +523,8 @@ class Ui_DriverTestUI(object):
         self.lcd_power.display(power)
         
     def connect(self, DriverTestUI):
-        self.lights_internal_button.clicked.connect(self.toggle_lights_internal)
-        self.lights_external_button.clicked.connect(self.toggle_lights_external)
+        self.lights_internal_button.clicked.connect(self.toggle_internal_lights)
+        self.lights_external_button.clicked.connect(self.toggle_external_lights)
         self.doors_left_button.clicked.connect(self.toggle_left_door)
         self.doors_right_button.clicked.connect(self.toggle_right_door)
         self.speed_slider.valueChanged['int'].connect(self.setSpeed)
@@ -529,7 +539,9 @@ class Ui_DriverTestUI(object):
         self.announce_start_button.clicked.connect(self.announceStation)
         self.announce_stop_button.clicked.connect(self.stopAnnounce)
         self.nextStationTable.clicked.connect(self.getNextStation)
-
+        self.timer.timeout.connect(self.toggle_lights_manual)
+        self.timer.timeout.connect(self.toggle_doors_manual)
+        self.timer.timeout.connect(self.announceStation_manual)
         self.timer.start(100)
 
 if __name__ == "__main__":

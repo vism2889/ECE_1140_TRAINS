@@ -1,31 +1,13 @@
-import RPi.GPIO as GPIO
-import time
+import spidev
 
-GPIO.setwarnings(False)
-GPIO.setmode(GPIO.BCM)
-
-pin_a = 18
-pin_b = 24
-
-def discharge():
-    GPIO.setup(pin_a, GPIO.IN)
-    GPIO.setup(pin_b, GPIO.OUT)
-    GPIO.output(pin_b, False)
-    time.sleep(0.005)
-
-def charge_time():
-    GPIO.setup(pin_b, GPIO.IN)
-    GPIO.setup(pin_a, GPIO.OUT)
-    count = 0
-    GPIO.output(pin_a, True)
-    while not GPIO.input(pin_b):
-        count += 1
-    return count
-
-def analog_read():
-    discharge()
-    return charge_time()
-
-while True:
-    print(analog_read())
-    time.sleep(1)
+while(True):
+    bus, device = 0, 0
+    spi = spidev.SpiDev()
+    spi.open(bus, device)
+    spi.max_speed_hz = 1000000
+    spi.mode = 0
+    msg = [0x00, 0x00]
+    spi.xfer2(msg)
+    res = spi.xfer2(msg)
+    val = (res[0] * 256 + res[1]) >> 6
+    print(val * 3.3 / 1024.0)
