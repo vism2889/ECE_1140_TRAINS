@@ -38,13 +38,6 @@ def parseTrackLayout(path, size=15):
 
             TOTAL_BLOCKS += 1
             ## Adding a new controller
-            if size > 0:
-                if TOTAL_BLOCKS % numBlocksPerController == 0:
-                    CONTROLLERS.append(deepcopy(controller))
-                    controller['block-occupancy'].clear()
-                    controller['crossing-state'].clear()
-                    controller['switch-state'].clear()
-                    controller['total-blocks'] = 0
 
             ## Increment the number of blocks assigned
             ## to that controller
@@ -60,6 +53,14 @@ def parseTrackLayout(path, size=15):
             ## populate crossing-state
             if row['Infrastructure'] != None and "CROSSING" in row['Infrastructure']:
                 controller['crossing-state'].append((row['Block Number'], row['Section'], False))
+
+            if size > 0:
+                if TOTAL_BLOCKS % numBlocksPerController == 0:
+                    CONTROLLERS.append(deepcopy(controller))
+                    controller['block-occupancy'].clear()
+                    controller['crossing-state'].clear()
+                    controller['switch-state'].clear()
+                    controller['total-blocks'] = 0
 
         CONTROLLERS.append(deepcopy(controller))
 

@@ -7,16 +7,17 @@
 # WARNING! All changes made in this file will be lost!
 
 
+from ast import mod
 from copy import deepcopy
 from signal import sigwait
 from tkinter import dialog
 from PyQt5 import QtCore, QtGui, QtWidgets
 from track_layout import extract_layout
 
-class Ui_main_window(object):
+class TrainControllerWindow(object):
     def __init__(self):
-        self.maintenance_mode = False
-        self.numBlocksPerController = 11
+        self.maintenance_mode = True
+        self.numBlocksPerController = 12
 
         self.redline_reference = {
             'controllers': [],
@@ -366,8 +367,6 @@ class Ui_main_window(object):
             configure_button = QtWidgets.QToolButton(tab)
             configure_button.setMinimumSize(QtCore.QSize(10, 18))
             configure_button.setIconSize(QtCore.QSize(14, 14))
-            sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
-
             configure_button.setObjectName(f"{prefix}_{layout.index(controller)}_configure_button")
             configure_button.setText("Configure Controller")
             configure_button.clicked.connect(lambda: self.dialog()) ## Set Button Click Signal
@@ -379,6 +378,88 @@ class Ui_main_window(object):
             controllers.addTab(tab, f"Controller {layout.index(controller)}")
 
         reference.append(info)
+
+        gridLayout.addWidget(blockbox, 0, 0, 1, 1)
+
+
+    def setBlockState(self, line, block_num, value):
+        if block_num <= 0:
+            print("Err: invalid block number")
+
+        controller_idx = int((block_num-1)/self.numBlocksPerController)
+        row_idx = (block_num-1) % self.numBlocksPerController
+        # print(f"block number {block_num} is at controller index {controller_idx}, row {row_idx}")
+
+        item = QtWidgets.QTableWidgetItem(str(value))
+        item2 = QtWidgets.QTableWidgetItem(str(value))
+        if value:
+            item.setBackground(QtGui.QColor(0xf4, 0x71, 0x74))
+            item2.setBackground(QtGui.QColor(0xf4, 0x71, 0x74))
+        else:
+            item.setBackground(QtGui.QColor(0xbf, 0xe3, 0xb4))
+            item2.setBackground(QtGui.QColor(0xf4, 0x71, 0x74))
+
+        if line == 'red':
+            ## Calculate index
+            self.redline_reference['controllers'][controller_idx]['block-table'].setItem(row_idx, 2, item)
+            self.redline_reference['view'][0]['block-table'].setItem(block_num-1, 2, item2)
+
+        if line == 'green':
+            self.greenline_reference['controllers'][controller_idx]['block-table'].setItem(row_idx, 2, item)
+            self.greenline_reference['view'][0]['block-table'].setItem(block_num-1, 2, item2)
+
+
+    def setFaultState(self, line, block_num, value):
+        if block_num <= 0:
+                print("Err: invalid block number")
+
+        controller_idx = int((block_num-1)/self.numBlocksPerController)
+        row_idx = (block_num-1) % self.numBlocksPerController
+        # print(f"block number {block_num} is at controller index {controller_idx}, row {row_idx}")
+
+        item = QtWidgets.QTableWidgetItem(str(value))
+        item2 = QtWidgets.QTableWidgetItem(str(value))
+        if value:
+            item.setBackground(QtGui.QColor(0xf4, 0x71, 0x74))
+            item2.setBackground(QtGui.QColor(0xf4, 0x71, 0x74))
+        else:
+            item.setBackground(QtGui.QColor(0xbf, 0xe3, 0xb4))
+            item2.setBackground(QtGui.QColor(0xf4, 0x71, 0x74))
+
+        if line == 'red':
+            self.redline_reference['controllers'][controller_idx]['fault-table'].setItem(row_idx, 2, item)
+            self.redline_reference['view'][0]['fault-table'].setItem(block_num-1, 2, item2)
+
+        if line == 'green':
+            self.greenline_reference['controllers'][controller_idx]['fault-table'].setItem(row_idx, 2, item)
+            self.greenline_reference['view'][0]['fault-table'].setItem(block_num-1, 2, item2)
+
+
+    def setSwitchState(self, line, block_num, value):
+        controller_idx = int((block_num-1)/self.numBlocksPerController)
+
+        item = QtWidgets.QTableWidgetItem(str(value))
+        item2 = QtWidgets.QTableWidgetItem(str(value))
+
+        if line == 'red':
+            for i in self.redline_reference['controllers'][controller_idx]
+            self.redline_reference['controllers'][controller_idx]['fault-table'].setItem(row_idx, 2, item)
+            self.redline_reference['view'][0]['fault-table'].setItem(block_num-1, 2, item2)
+
+        if line == 'green':
+            self.greenline_reference['controllers'][controller_idx]['fault-table'].setItem(row_idx, 2, item)
+            self.greenline_reference['view'][0]['fault-table'].setItem(block_num-1, 2, item2)
+
+
+
+    def setCrossingState(self, line, block_num):
+
+        return
+
+    def loadTestWindow():
+        ## launch Test Window GUI
+        # TestWindow(self)
+        return
 
     ## LOOKING TO GET RID OF THIS STUPID FUNCTION
     def retranslateUi(self, main_window):
