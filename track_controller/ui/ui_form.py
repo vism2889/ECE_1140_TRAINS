@@ -136,7 +136,7 @@ class Ui_test_window(object):
         if self.line_select.currentText().lower() == 'green':
             for i in range(self.main_window.getNumGreenLineBlocks()):
                 self.block_select.addItem(str(i +1))
-        
+
         self.updateSelections()
 
     def toggleOccupancy(self):
