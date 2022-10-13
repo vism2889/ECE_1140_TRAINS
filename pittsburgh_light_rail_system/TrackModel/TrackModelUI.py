@@ -14,7 +14,7 @@ from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5 import QtCore
 from LayoutParser import LayoutParser
 from TrackModelTestInterfaceUI import TestUI
-from InfraParser import InfraParser
+from infraParser import InfraParser
 
 class App(QWidget):
     def __init__(self):
@@ -244,16 +244,35 @@ class App(QWidget):
 
         self.blockVallistwidget.insertItem(11,"NA")
         self.blockVallistwidget.item(11).setForeground(QtCore.Qt.gray) 
-        self.blockVallistwidget.insertItem(12,"NA")
-        self.blockVallistwidget.item(12).setForeground(QtCore.Qt.gray) 
-        self.blockVallistwidget.insertItem(13,"NA")
-        self.blockVallistwidget.item(13).setForeground(QtCore.Qt.gray) 
+
+        if(currBlock.occupancy == True):
+            self.blockVallistwidget.insertItem(12,str(currBlock.occupancy))
+            self.blockVallistwidget.item(12).setForeground(QtCore.Qt.green)
+        else: 
+            self.blockVallistwidget.insertItem(12,str(currBlock.occupancy))
+            self.blockVallistwidget.item(12).setForeground(QtCore.Qt.red)
+
+        if("SWITCH" in currBlock.infrastructure):
+            self.blockVallistwidget.insertItem(13,str(True))
+            self.blockVallistwidget.item(13).setForeground(QtCore.Qt.green) 
+        else:
+            self.blockVallistwidget.insertItem(13,str(False))
+            self.blockVallistwidget.item(13).setForeground(QtCore.Qt.red) 
         self.blockVallistwidget.insertItem(14,"NA")
         self.blockVallistwidget.item(14).setForeground(QtCore.Qt.gray) 
-        self.blockVallistwidget.insertItem(15,"NA")
-        self.blockVallistwidget.item(15).setForeground(QtCore.Qt.gray) 
-        self.blockVallistwidget.insertItem(16,"NA")
-        self.blockVallistwidget.item(16).setForeground(QtCore.Qt.gray) 
+
+        if ("CROSSING" in currBlock.infrastructure):
+            self.blockVallistwidget.insertItem(15,str(True))
+            self.blockVallistwidget.item(15).setForeground(QtCore.Qt.green)
+        else:
+            self.blockVallistwidget.insertItem(15,str(False))
+            self.blockVallistwidget.item(15).setForeground(QtCore.Qt.red)
+        if ("CROSSING" in currBlock.infrastructure and currBlock.occupancy == True):
+            self.blockVallistwidget.insertItem(16,"ON")
+            self.blockVallistwidget.item(16).setForeground(QtCore.Qt.green)
+        else: 
+            self.blockVallistwidget.insertItem(16,"OFF")
+            self.blockVallistwidget.item(16).setForeground(QtCore.Qt.red)
         self.blockVallistwidget.insertItem(17,"NA")
         self.blockVallistwidget.item(17).setForeground(QtCore.Qt.gray) 
         self.blockVallistwidget.insertItem(18,"NA")
@@ -304,9 +323,17 @@ class App(QWidget):
         self.testUI.show()
         self.initTestUIData()
 
-    def updateTestOccupancy(self):
+    def updateTestOccupancy(self, occupancy):
         print("Updating Occupany from Test UI")
-        return 42
+        blockList = self.lines[0] +self.lines[1]
+        for i in range(len(blockList)):
+            currBlock = blockList[i]
+            if occupancy[i] == 0:
+                currBlock.occupancy = False 
+            else:
+                currBlock.occupancy = True
+
+        print(occupancy)
 
     def updateTestSwitchStates(self):
         print("Updating Switch States from Test UI")

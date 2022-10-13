@@ -28,6 +28,7 @@ class BlockModel:
         self.cumulativeElevation = pCumulativeElevation
         self.secsToTraverseBlock = pSecsToTraverseBlock
 
+        self.occupancy = False
         # values needed for Wayside and Train Model
         # self.vSwitchPresence   = None #gets set based on infrastructure
         # self.vSwitchState      = None #gets set based on infrastructure

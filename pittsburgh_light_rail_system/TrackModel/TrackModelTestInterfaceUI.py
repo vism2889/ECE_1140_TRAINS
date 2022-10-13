@@ -12,6 +12,8 @@ import sys
 from PyQt5.QtWidgets import QVBoxLayout, QMainWindow, QApplication, QWidget, QInputDialog, QLineEdit, QFileDialog, QPushButton, QListWidget, QLabel, QCheckBox
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5 import QtCore
+import numpy as np
+import random
 #from TrackModelUI import *
 
 class TestUI(QWidget):
@@ -40,11 +42,11 @@ class TestUI(QWidget):
         self.testlines   = []
         self.infraCounts = []
 
-        self.launchTestUIBt = QPushButton("PopulateVals",self)
-        self.launchTestUIBt.setStyleSheet("background-color: cyan; color: black; border-radius: 5px;")
-        self.launchTestUIBt.resize(180, 25)
-        self.launchTestUIBt.move(self.width-200,50)
-        self.launchTestUIBt.clicked.connect(self.confirm)
+        # self.launchTestUIBt = QPushButton("PopulateVals",self)
+        # self.launchTestUIBt.setStyleSheet("background-color: cyan; color: black; border-radius: 5px;")
+        # self.launchTestUIBt.resize(180, 25)
+        # self.launchTestUIBt.move(self.width-200,50)
+        # self.launchTestUIBt.clicked.connect(self.confirm)
 
         self.heaterState = QCheckBox("Heater State", self)
         self.heaterState.setStyleSheet("background-color: gray; color: white;")
@@ -113,7 +115,9 @@ class TestUI(QWidget):
 
 
     def updateOccupancyValues(self):
-        self.occupancySignal.emit([])
+        
+        occupancy = self.sendOccupancyMsg()
+        self.occupancySignal.emit(occupancy)
 
     def updateSwitchStateValues(self):
         self.switchStateSignal.emit([])
@@ -136,3 +140,12 @@ class TestUI(QWidget):
         self.infraCounts = pinfraCounts
         #print(plines)
         #print("self.lineNames", self.lineNames)
+
+    def sendOccupancyMsg(self):
+        occupancy = np.zeros((226))
+        for i in range(len(occupancy)):
+            occupancy[i] = random.randint(0,1)
+            occupancy = list(occupancy)
+        print(occupancy)
+        return occupancy
+
