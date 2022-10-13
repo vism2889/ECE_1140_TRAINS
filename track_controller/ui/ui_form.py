@@ -46,6 +46,7 @@ class Ui_test_window(object):
         self.horizontalLayout_4.setObjectName("horizontalLayout_4")
         self.block_select = QtWidgets.QComboBox(self.groupBox_3)
         self.block_select.setObjectName("block_select")
+        self.block_select.activated.connect(lambda: self.updateSelections())
 
         ## TODO Add drop down section for blocks in a line
         if self.line_select.currentText().lower() == "red":
@@ -135,7 +136,8 @@ class Ui_test_window(object):
         if self.line_select.currentText().lower() == 'green':
             for i in range(self.main_window.getNumGreenLineBlocks()):
                 self.block_select.addItem(str(i +1))
-        return
+        
+        self.updateSelections()
 
     def toggleOccupancy(self):
         state = self.toggle_occupancy.isChecked()
@@ -185,3 +187,25 @@ class Ui_test_window(object):
             self.main_window.setFaultState('red', int(block_num), curr_faults)
         if self.line_select.currentText().lower() == 'green':
             self.main_window.setFaultState('green', int(block_num), curr_faults)
+
+    def updateSelections(self):
+        states = self.main_window.getBlockState(self.line_select.currentText().lower(), int(self.block_select.currentText()))
+
+        ## States
+        if len(states['faults']) == 0:
+            self.broken_rail.setChecked(False)
+            self.circuilt_failure.setChecked(False)
+            self.power_failure.setChecked(False)
+        else:
+            for i in states['faults']:
+                if i == 1:
+                    self.broken_rail.setChecked(True)
+                if i == 2:
+                    self.circuilt_failure.setChecked(True)
+                if i == 3:
+                    self.power_failure.setChecked(True)
+
+        self.toggle_occupancy.setChecked(True) if states['block-state'] else self.toggle_occupancy.setChecked(False)
+        self.toggle_switch.setChecked(True) if states['switch-state'] else self.toggle_switch.setChecked(False)
+        self.toggle_crossing.setChecked(True) if states['crossing-state'] else self.toggle_crossing.setChecked(False)
+        self.toggle_maintenance.setChecked(True) if states['maintenance'] else self.toggle_maintenance.setChecked(False)

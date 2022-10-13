@@ -13,5 +13,6 @@ if __name__ == '__main__':
     ui.setFaultState('red', 38, [1,2,3])
     ui.setMaintenance('green', 45, True)
     ui.setCrossingState('red', 47, True)
+    print(ui.getBlockState('green', 149))
     w.show()
     sys.exit(app.exec_())

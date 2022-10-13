@@ -178,7 +178,15 @@ class TrackControllerWindow(object):
             for j in i:
                 item = QtWidgets.QTableWidgetItem(str(j))
                 item.setTextAlignment(4)
+
                 if i.index(j) == 2:
+                    value = ""
+                    if bool(j):
+                        value = 'OCCUPIED'
+                    else:
+                        value = 'VACANT'
+                    item = QtWidgets.QTableWidgetItem(value)
+                    item.setTextAlignment(4)
                     if not j:
                         item.setBackground(QtGui.QColor(0xbf, 0xe3, 0xb4))
                     else:
@@ -321,6 +329,13 @@ class TrackControllerWindow(object):
                     item = QtWidgets.QTableWidgetItem(str(j))
                     item.setTextAlignment(4)
                     if i.index(j) == 2:
+                        value = ""
+                        if bool(j):
+                            value = "ON"
+                        else:
+                            value = "OFF"
+                        item = QtWidgets.QTableWidgetItem(value)
+                        item.setTextAlignment(4)
                         if not j:
                             item.setBackground(QtGui.QColor(0xbf, 0xe3, 0xb4))
                         else:
@@ -393,6 +408,14 @@ class TrackControllerWindow(object):
                     item = QtWidgets.QTableWidgetItem(str(j))
                     item.setTextAlignment(4)
                     if i.index(j) == 2:
+                        value = ""
+                        if bool(j):
+                            value = "ON"
+                        else:
+                            value = "OFF"
+
+                        item = QtWidgets.QTableWidgetItem(value)
+                        item.setTextAlignment(4)
                         if not j:
                             item.setBackground(QtGui.QColor(0xbf, 0xe3, 0xb4))
                         else:
@@ -436,19 +459,25 @@ class TrackControllerWindow(object):
         gridLayout.addWidget(blockbox, 0, 0, 1, 1)
 
 
-    def setBlockState(self, line, block_num, value):
+    def setBlockState(self, line, block_num, state):
         if block_num <= 0:
             print("Err: invalid block number")
 
         controller_idx = int((block_num-1)/self.numBlocksPerController)
         row_idx = (block_num-1) % self.numBlocksPerController
 
+        value = ""
+        if state:
+            value = "OCCUPIED"
+        else:
+            value = "VACANT"
+
         item = QtWidgets.QTableWidgetItem(str(value))
         item.setTextAlignment(4)
         item2 = QtWidgets.QTableWidgetItem(str(value))
         item2.setTextAlignment(4)
 
-        if value:
+        if state:
             item.setBackground(QtGui.QColor(0xf4, 0x71, 0x74))
             item2.setBackground(QtGui.QColor(0xf4, 0x71, 0x74))
         else:
@@ -466,7 +495,6 @@ class TrackControllerWindow(object):
 
 
     def setFaultState(self, line, block_num, fault_ids=[]):
-
         if block_num <= 0:
                 print("Err: invalid block number")
 
@@ -504,8 +532,14 @@ class TrackControllerWindow(object):
             self.greenline_reference['view'][0]['fault-table'].setItem(block_num-1, 2, item2)
 
 
-    def setSwitchState(self, line, block_num, value):
+    def setSwitchState(self, line, block_num, state):
         controller_idx = int((block_num-1)/self.numBlocksPerController)
+
+        value = ""
+        if state:
+            value = "ON"
+        else:
+            value = "OFF"
 
         item = QtWidgets.QTableWidgetItem(str(value))
         item.setTextAlignment(4)
@@ -548,8 +582,14 @@ class TrackControllerWindow(object):
                     view_table.setItem(row, 2, item2)
                     break
 
-    def setCrossingState(self, line, block_num, value):
+    def setCrossingState(self, line, block_num, state):
         controller_idx = int((block_num-1)/self.numBlocksPerController)
+
+        value = ""
+        if state:
+            value = "ON"
+        else:
+            value = "OFF"
 
         item = QtWidgets.QTableWidgetItem(str(value))
         item.setTextAlignment(4)
@@ -598,10 +638,8 @@ class TrackControllerWindow(object):
                     , item2)
                     break
 
-
     def setMaintenance(self, line, block_num, value):
         controller_idx = int((block_num-1)/self.numBlocksPerController)
-        print(f'Setting controller idx {controller_idx}')
         if line == 'red':
             self.redline_reference['maintenance'][controller_idx] = value
             if value:
@@ -621,6 +659,80 @@ class TrackControllerWindow(object):
 
     def getNumGreenLineBlocks(self):
         return self.greenline_reference['total-blocks']
+
+    def getBlockState(self, line, block_num):
+        controller_idx = int((block_num-1)/self.numBlocksPerController)
+
+        if line == 'red':
+            ## Get Maintenance
+            maintenance = self.redline_reference['maintenance'][controller_idx]
+
+            ## Get Block Occupancy
+            block_state = True if self.redline_reference['view'][0]['block-table'].item(block_num-1, 2).text() == "OCCUPIED" else False
+
+            ## Get Switch
+            switch_state = False
+            view_table = self.redline_reference['view'][0]['switch-table']
+            for row in range(view_table.rowCount()):
+                if view_table.item(row, 0).text() == str(block_num):
+                    switch_state = True if view_table.item(row, 2).text() == "ON" else False
+
+            ## Get Crossing
+            crossing_state = False
+            view_table = self.redline_reference['view'][0]['crossing-table']
+            for row in range(view_table.rowCount()):
+                if view_table.item(row, 0).text() == str(block_num):
+                    crossing_state = True if view_table.item(row, 2).text() == "ON" else False
+
+            ## Get Faults
+            row_idx = (block_num-1) % self.numBlocksPerController
+            state_str = self.redline_reference['controllers'][controller_idx]['fault-table'].item(row_idx, 2).text()
+
+            faults = []
+            if self.FAULTS[1] in state_str:
+                faults.append(1)
+            if self.FAULTS[2] in state_str:
+                faults.append(2)
+            if self.FAULTS[3] in state_str:
+                faults.append(3)
+
+            return {'faults': faults, 'crossing-state': crossing_state, 'switch-state': switch_state, 'block-state':block_state, 'maintenance':maintenance}
+
+        if line == 'green':
+            ## Get Maintenance
+            maintenance = self.greenline_reference['maintenance'][controller_idx]
+
+            ## Get Block Occupancy
+            block_state = True if self.greenline_reference['view'][0]['block-table'].item(block_num-1, 2).text() == "OCCUPIED" else False
+
+            ## Get Switch
+            switch_state = False
+            view_table = self.greenline_reference['view'][0]['switch-table']
+            for row in range(view_table.rowCount()):
+                if view_table.item(row, 0).text() == str(block_num):
+                    switch_state = True if view_table.item(row, 2).text() == "ON" else False
+
+            ## Get Crossing
+            crossing_state = False
+            view_table = self.greenline_reference['view'][0]['crossing-table']
+            for row in range(view_table.rowCount()):
+                if view_table.item(row, 0).text() == str(block_num):
+                    crossing_state = True if view_table.item(row, 2).text() == "ON" else False
+
+            ## Get Faults
+            row_idx = (block_num-1) % self.numBlocksPerController
+            state_str = self.greenline_reference['controllers'][controller_idx]['fault-table'].item(row_idx, 2).text()
+
+            faults = []
+            if self.FAULTS[1] in state_str:
+                faults.append(1)
+            if self.FAULTS[2] in state_str:
+                faults.append(2)
+            if self.FAULTS[3] in state_str:
+                faults.append(3)
+
+            return {'faults': faults, 'crossing-state': crossing_state, 'switch-state': switch_state, 'block-state':block_state, 'maintenance':maintenance}
+
 
     ## LOOKING TO GET RID OF THIS STUPID FUNCTION
     def retranslateUi(self, main_window):
