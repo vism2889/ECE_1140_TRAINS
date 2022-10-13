@@ -1,6 +1,12 @@
 import sys
 from block import block
 
+redLineCrossing = dict()
+greenLineCrossing  = dict()
+
+redLineCrossing["47"] = "Red"
+greenLineCrossing["20"] = "Red"
+
 redLineSwitches = dict()
 redLineSwitches["(15-16; 1-16)"]  = "forward"
 redLineSwitches["(27-28; 27-76)"] = "forward"
@@ -12,6 +18,9 @@ redLineSwitches["(52-53; 52-66)"] = "forward"
 greenLineSwitches = dict()
 greenLineSwitches["(15-16; 1-16)"]  = "forward"
 greenLineSwitches["(27-28; 27-76)"] = "forward"
+
+totalPassengers = dict()
+totalPassengers["totalPassengers"] = 0
 
 def toggleRedLineSwitch(name):
     if redLineSwitches[name] == "forward":
