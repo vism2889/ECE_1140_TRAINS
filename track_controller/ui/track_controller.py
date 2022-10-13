@@ -1,12 +1,12 @@
 from  PyQt5 import QtWidgets
-from main_window import TrainControllerWindow
+from main_window import TrackControllerWindow
 
 
 if __name__ == '__main__':
     import sys
     app = QtWidgets.QApplication(sys.argv)
     w = QtWidgets.QWidget()
-    ui = TrainControllerWindow()
+    ui = TrackControllerWindow()
     ui.setupUi(w)
     ui.setBlockState('red', 71, True)
     ui.setSwitchState('red', 38, True)

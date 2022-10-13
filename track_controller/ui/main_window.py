@@ -10,11 +10,13 @@
 from ast import mod
 from copy import deepcopy
 from signal import sigwait
-from tkinter import dialog
+import string
+
 from PyQt5 import QtCore, QtGui, QtWidgets, Qt
+# from PySide6 import QtCore, QtGui, QtWidgets, Qt
 from track_layout import extract_layout
 
-class TrainControllerWindow(object):
+class TrackControllerWindow(object):
     def __init__(self):
         self.redline_maintenance_mode = []
         self.greenline_maintenance_mode = []
@@ -56,6 +58,8 @@ class TrainControllerWindow(object):
         redline_view_layout = extract_layout.parseTrackLayout("track_layout/Track Layout & Vehicle Data vF.xlsx - Red Line.csv", 0)
         redline_layout = extract_layout.parseTrackLayout("track_layout/Track Layout & Vehicle Data vF.xlsx - Red Line.csv", self.numBlocksPerController)
 
+        self.redline_reference['total-blocks'] = redline_view_layout[0]['total-blocks']
+
         ######## Red Line ########
         self.redline_tab = QtWidgets.QWidget()
         self.redline_tab.setGeometry(QtCore.QRect(0, 0, 782, 520))
@@ -79,6 +83,8 @@ class TrainControllerWindow(object):
         ######## Green Line ########
         greenline_view_layout = extract_layout.parseTrackLayout("track_layout/Track Layout & Vehicle Data vF.xlsx - Green Line.csv", 0)
         greenline_layout = extract_layout.parseTrackLayout("track_layout/Track Layout & Vehicle Data vF.xlsx - Green Line.csv", self.numBlocksPerController)
+
+        self.greenline_reference['total-blocks'] = greenline_view_layout[0]['total-blocks']
 
         self.greenline_tab = QtWidgets.QWidget()
         self.greenline_tab.setGeometry(QtCore.QRect(0, 0, 782, 520))
@@ -108,16 +114,16 @@ class TrainControllerWindow(object):
 
     def dialog(self):
         loc = self.main_window_reference.sender()
+        idx = int(''.join(filter(str.isdigit, loc.objectName())))
 
         if "redline" in loc.objectName():
-            if self.redline_reference['maintenance'][int(loc.objectName()[-1])]:
-                print(f"PLC upload request to redline controller {loc.objectName()[-1]}")
+            if self.redline_reference['maintenance'][idx]:
+                print(f"PLC upload request to redline controller {idx}")
                 file , check = QtWidgets.QFileDialog.getOpenFileName(None, "QFileDialog.getOpenFileName()",
                                                     "", "All Files (*);;Python Files (*.py);;Text Files (*.txt)")
         if "greenline" in loc.objectName():
-            print(self.greenline_reference['maintenance'][int(loc.objectName()[-1])])
-            if self.greenline_reference['maintenance'][int(loc.objectName()[-1])]:
-                print(f"PLC upload request to greenline controller {loc.objectName()[-1]}")
+            if self.greenline_reference['maintenance'][int(idx)]:
+                print(f"PLC upload request to greenline controller {idx}")
                 file , check = QtWidgets.QFileDialog.getOpenFileName(None, "QFileDialog.getOpenFileName()",
                                                     "", "All Files (*);;Python Files (*.py);;Text Files (*.txt)")
 
@@ -195,7 +201,6 @@ class TrainControllerWindow(object):
         bottom_half.setObjectName("bottom_half")
         verticalLayout_3 = QtWidgets.QVBoxLayout(bottom_half)
         verticalLayout_3.setObjectName("verticalLayout_3")
-        
 
         ## Fault table ##
 
@@ -330,7 +335,6 @@ class TrainControllerWindow(object):
 
             info['switch-table'] = switch_table
 
-
             verticalLayout_5.addWidget(switch_table)
             verticalLayout_3.addWidget(switch_block)
 
@@ -355,7 +359,6 @@ class TrainControllerWindow(object):
             crossing_table.setSizePolicy(sizePolicy)
             crossing_table.setMinimumSize(QtCore.QSize(0, 40))
             crossing_table.setMaximumHeight(60)
-            # QtCore.QSize(10, )
             crossing_table.setObjectName("crossing_table")
 
             if isView:
@@ -412,7 +415,7 @@ class TrainControllerWindow(object):
         ## Configure Button ##
         if not isView:
             configure_button = QtWidgets.QToolButton(tab)
-            configure_button.setMinimumSize(QtCore.QSize(10, 18))
+            configure_button.setMinimumSize(QtCore.QSize(15, 18))
             configure_button.setIconSize(QtCore.QSize(14, 14))
             configure_button.setObjectName(f"{prefix}_configure_button_{layout.index(controller)}")
             configure_button.setText("Configure Controller")
@@ -439,7 +442,6 @@ class TrainControllerWindow(object):
 
         controller_idx = int((block_num-1)/self.numBlocksPerController)
         row_idx = (block_num-1) % self.numBlocksPerController
-        # print(f"block number {block_num} is at controller index {controller_idx}, row {row_idx}")
 
         item = QtWidgets.QTableWidgetItem(str(value))
         item.setTextAlignment(4)
@@ -463,7 +465,7 @@ class TrainControllerWindow(object):
             self.greenline_reference['view'][0]['block-table'].setItem(block_num-1, 2, item2)
 
 
-    def setFaultState(self, line, block_num, fault_ids=[], add=True):
+    def setFaultState(self, line, block_num, fault_ids=[]):
 
         if block_num <= 0:
                 print("Err: invalid block number")
@@ -486,17 +488,12 @@ class TrainControllerWindow(object):
         item2.setTextAlignment(4)
         item2.setText(text_str)
 
-        if len(fault_ids) > 1:
+        if len(fault_ids) > 0:
             item.setBackground(QtGui.QColor(0xf4, 0x71, 0x74))
             item2.setBackground(QtGui.QColor(0xf4, 0x71, 0x74))
-        elif len(fault_ids) == 1:
-            print("yo?")
-            if self.FAULTS[fault_ids[0]] == "UNDEFINED":
-                item.setBackground(QtGui.QColor(0xee, 0xee, 0x9b))
-                item2.setBackground(QtGui.QColor(0xee, 0xee, 0x9b))
-            elif self.FAULTS[fault_ids[0]] == "OK":
-                item.setBackground(QtGui.QColor(0xbf, 0xe3, 0xb4))
-                item2.setBackground(QtGui.QColor(0xbf, 0xe3, 0xb4))
+        elif len(fault_ids) == 0:
+            item.setBackground(QtGui.QColor(0xbf, 0xe3, 0xb4))
+            item2.setBackground(QtGui.QColor(0xbf, 0xe3, 0xb4))
 
         if line == 'red':
             self.redline_reference['controllers'][controller_idx]['fault-table'].setItem(row_idx, 2, item)
@@ -520,34 +517,35 @@ class TrainControllerWindow(object):
             item2.setBackground(QtGui.QColor(0xf4, 0x71, 0x74))
         else:
             item.setBackground(QtGui.QColor(0xbf, 0xe3, 0xb4))
-            item2.setBackground(QtGui.QColor(0xf4, 0x71, 0x74))
+            item2.setBackground(QtGui.QColor(0xbf, 0xe3, 0xb4))
 
         if line == 'red':
             # for i in self.redline_reference['controllers'][controller_idx]
-            controller_table = self.redline_reference['controllers'][controller_idx]['switch-table']
-            view_table = self.redline_reference['view'][0]['switch-table']
-            for row in range(controller_table.rowCount()):
-                if controller_table.item(row, 0).text() == str(block_num):
-                    controller_table.setItem(row, 2, item)
-                    break
+            controller_table = self.redline_reference['controllers'][controller_idx]
+            if 'switch-table' in controller_table:
+                for row in range(controller_table['switch-table'].rowCount()):
+                    if controller_table['switch-table'].item(row, 0).text() == str(block_num):
+                        controller_table['switch-table'].setItem(row, 2, item)
+                        break
 
+            view_table = self.redline_reference['view'][0]['switch-table']
             for row in range(view_table.rowCount()):
                 if view_table.item(row, 0).text() == str(block_num):
                     view_table.setItem(row, 2, item2)
                     break
 
         if line == 'green':
-            controller_table = self.greenline_reference['controllers'][controller_idx]['switch-table']
+            controller_table = self.greenline_reference['controllers'][controller_idx]
+            if 'switch-table' in controller_table:
+                for row in range(controller_table['switch-table'].rowCount()):
+                    if controller_table['switch-table'].item(row, 0).text() == str(block_num):
+                        controller_table['switch-table'].setItem(row, 2, item)
+                        break
+
             view_table = self.greenline_reference['view'][0]['switch-table']
-
-            for row in range(controller_table.rowCount()):
-                if controller_table.item(row, 0).text() == str(block_num):
-                    controller_table.setItem(row, 3, item)
-                    break
-
             for row in range(view_table.rowCount()):
                 if view_table.item(row, 0).text() == str(block_num):
-                    view_table.setItem(row, 3, item)
+                    view_table.setItem(row, 2, item2)
                     break
 
     def setCrossingState(self, line, block_num, value):
@@ -568,39 +566,42 @@ class TrainControllerWindow(object):
             item2.setBackground(QtGui.QColor(0xf4, 0x71, 0x74))
         else:
             item.setBackground(QtGui.QColor(0xbf, 0xe3, 0xb4))
-            item2.setBackground(QtGui.QColor(0xf4, 0x71, 0x74))
+            item2.setBackground(QtGui.QColor(0xbf, 0xe3, 0xb4))
 
         if line == 'red':
             # for i in self.redline_reference['controllers'][controller_idx]
-            controller_table = self.redline_reference['controllers'][controller_idx]['crossing-table']
-            view_table = self.redline_reference['view'][0]['crossing-table']
-            for row in range(controller_table.rowCount()):
-                if controller_table.item(row, 0).text() == str(block_num):
-                    controller_table.setItem(row, 2, item)
-                    break
+            controller_table = self.redline_reference['controllers'][controller_idx]
+            if 'crossing-table' in controller_table:
+                for row in range(controller_table['crossing-table'].rowCount()):
+                    if controller_table['crossing-table'].item(row, 0).text() == str(block_num):
+                        controller_table['crossing-table'].setItem(row, 2, item)
+                        break
 
+            view_table = self.redline_reference['view'][0]['crossing-table']
             for row in range(view_table.rowCount()):
                 if view_table.item(row, 0).text() == str(block_num):
                     view_table.setItem(row, 2, item2)
                     break
 
         if line == 'green':
-            controller_table = self.greenline_reference['controllers'][controller_idx]['crossing-table']
+            controller_table = self.greenline_reference['controllers'][controller_idx]
+            if 'crossing-table' in controller_table:
+                for row in range(controller_table['crossing-table'].rowCount()):
+                    if controller_table['crossing-table'].item(row, 0).text() == str(block_num):
+                        controller_table['crossing-table'].setItem(row, 2, item)
+                        break
+
             view_table = self.greenline_reference['view'][0]['crossing-table']
-
-            for row in range(controller_table.rowCount()):
-                if controller_table.item(row, 0).text() == str(block_num):
-                    controller_table.setItem(row, 3, item)
-                    break
-
             for row in range(view_table.rowCount()):
                 if view_table.item(row, 0).text() == str(block_num):
-                    view_table.setItem(row, 3, item)
+                    view_table.setItem(row, 2
+                    , item2)
                     break
 
 
     def setMaintenance(self, line, block_num, value):
         controller_idx = int((block_num-1)/self.numBlocksPerController)
+        print(f'Setting controller idx {controller_idx}')
         if line == 'red':
             self.redline_reference['maintenance'][controller_idx] = value
             if value:
@@ -615,10 +616,11 @@ class TrainControllerWindow(object):
             else:
                 self.greenline_controllers.setTabIcon(controller_idx+1, QtGui.QIcon())
 
-    def loadTestWindow():
-        ## launch Test Window GUI
-        # TestWindow(self)
-        return
+    def getNumRedLineBlocks(self):
+        return self.redline_reference['total-blocks']
+
+    def getNumGreenLineBlocks(self):
+        return self.greenline_reference['total-blocks']
 
     ## LOOKING TO GET RID OF THIS STUPID FUNCTION
     def retranslateUi(self, main_window):
