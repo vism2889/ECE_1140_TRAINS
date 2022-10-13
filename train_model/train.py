@@ -47,6 +47,7 @@ class Train():
         self.serv_brake = -1.2
         self.emergency_brake = -2.73
         self.e_brake = 'Off'
+        self.service_brake = 'Off'
 
 
         #Train Current States
@@ -105,6 +106,24 @@ class Train():
 
                 self.prev_time = self.curr_time
                 self.curr_time = time.time()
+    
+    def serv_brake_func(self):
+        print('inside service brake')
+        if self.service_brake == 'On':
+            self.curr_accel = self.serv_brake
+            time_elapsed = self.curr_time - self.prev_time
+            while self.curr_vel > 0:
+                temp_curr_vel = self.curr_vel
+                self.curr_vel = self.prev_vel + (time_elapsed/2)*(self.prev_accel+self.curr_accel)
+                
+                if self.curr_vel < 0:
+                    self.curr_vel = 0
+                    
+                self.prev_accel = self.curr_accel
+                self.prev_vel = temp_curr_vel
+
+                self.prev_time = self.curr_time
+                self.curr_time = time.time()
 
 
 
@@ -145,6 +164,8 @@ class Train():
             #updating current velocity and last velocity
             temp_curr_vel = self.curr_vel
             self.curr_vel = self.prev_vel + (time_elapsed/2)*(self.prev_accel+self.curr_accel)
+            if self.curr_vel < 0:
+                self.curr_vel = 0
 
             #updating position
             if temp_curr_vel > 0:

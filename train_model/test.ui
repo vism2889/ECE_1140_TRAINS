@@ -109,7 +109,7 @@
      <rect>
       <x>370</x>
       <y>590</y>
-      <width>231</width>
+      <width>241</width>
       <height>71</height>
      </rect>
     </property>
@@ -182,7 +182,7 @@
      <rect>
       <x>90</x>
       <y>590</y>
-      <width>221</width>
+      <width>231</width>
       <height>71</height>
      </rect>
     </property>
@@ -272,7 +272,7 @@
     <property name="geometry">
      <rect>
       <x>350</x>
-      <y>200</y>
+      <y>130</y>
       <width>181</width>
       <height>51</height>
      </rect>
@@ -501,7 +501,7 @@
     <property name="geometry">
      <rect>
       <x>800</x>
-      <y>120</y>
+      <y>110</y>
       <width>80</width>
       <height>26</height>
      </rect>
@@ -526,7 +526,7 @@
     <property name="geometry">
      <rect>
       <x>350</x>
-      <y>90</y>
+      <y>50</y>
       <width>191</width>
       <height>71</height>
      </rect>
@@ -825,6 +825,61 @@
     </property>
     <property name="text">
      <string>Emergency Brake</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="serv_brake">
+    <property name="geometry">
+     <rect>
+      <x>330</x>
+      <y>180</y>
+      <width>221</width>
+      <height>71</height>
+     </rect>
+    </property>
+    <property name="palette">
+     <palette>
+      <active>
+       <colorrole role="Button">
+        <brush brushstyle="SolidPattern">
+         <color alpha="255">
+          <red>240</red>
+          <green>62</green>
+          <blue>18</blue>
+         </color>
+        </brush>
+       </colorrole>
+      </active>
+      <inactive>
+       <colorrole role="Button">
+        <brush brushstyle="SolidPattern">
+         <color alpha="255">
+          <red>240</red>
+          <green>240</green>
+          <blue>240</blue>
+         </color>
+        </brush>
+       </colorrole>
+      </inactive>
+      <disabled>
+       <colorrole role="Button">
+        <brush brushstyle="SolidPattern">
+         <color alpha="255">
+          <red>240</red>
+          <green>62</green>
+          <blue>18</blue>
+         </color>
+        </brush>
+       </colorrole>
+      </disabled>
+     </palette>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>15</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Service Brake</string>
     </property>
    </widget>
   </widget>

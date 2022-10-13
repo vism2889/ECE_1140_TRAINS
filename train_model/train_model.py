@@ -10,7 +10,7 @@ class TrainModel(QtWidgets.QMainWindow):
     '''Primary Train Model UI Window that contains all childs/widgets'''
     def __init__(self):
         super(TrainModel, self).__init__()
-        path = os.getcwd()+'\\train\\train.ui'
+        path = os.getcwd()+'\\train.ui'
         uic.loadUi(path, self)
     
         self.t = Train()
@@ -102,6 +102,22 @@ class TrainModel(QtWidgets.QMainWindow):
                     self.ebrake_thread.finished.connect(self.ebrake_thread.deleteLater)
 
                     self.ebrake_thread.start()
+            elif key == 'service_brake':
+                if self.t.service_brake == 'On':
+                    self.t.service_brake = 'Off'
+                else:
+                    print('serv brake on')
+                    self.t.service_brake = 'On'
+                    self.servbrake_thread = QThread()
+                    self.servbrake_worker = ServBrake(self)
+                    self.servbrake_worker.moveToThread(self.servbrake_thread)
+
+                    self.servbrake_thread.started.connect(self.servbrake_worker.run)
+                    self.servbrake_worker.stopped.connect(self.servbrake_thread.quit)
+                    self.servbrake_worker.stopped.connect(self.servbrake_worker.deleteLater)
+                    self.servbrake_thread.finished.connect(self.servbrake_thread.deleteLater)
+
+                    self.servbrake_thread.start()
             else:
                 if key == 'curr_power' and self.t.e_brake == 'On':
                     self.t.curr_power = 0
@@ -112,6 +128,22 @@ class TrainModel(QtWidgets.QMainWindow):
         self.w = TestWindow()
         self.w.test_clicked.connect(self.update_model)
         self.w.show()
+
+
+
+class ServBrake(QObject):
+    stopped = pyqtSignal()
+
+    def __init__(self,qt):
+        super(ServBrake, self).__init__()
+        self.qt = qt
+    
+    def run(self):
+        if self.qt.t.service_brake == 'On' and self.qt.t.curr_vel > 0:
+            self.qt.t.serv_brake_func()
+        
+        print('train stopped')
+        self.stopped.emit()
 
 class Ebrake(QObject):
     stopped = pyqtSignal()
@@ -165,6 +197,7 @@ class DisplayWorker(QObject):
             self.qt.crew_disp.setText(f'{self.qt.t.crew_count}')
 
             #critical info
+            self.qt.serv_brake_disp.setText(f'{self.qt.t.service_brake}')
             self.qt.ebrake_disp.setText(f'{self.qt.t.e_brake}')
             self.qt.auth_disp.setText(f'{self.qt.t.authority}')
             self.qt.grade_disp.setText(f'{self.qt.t.grade} %')
@@ -187,7 +220,7 @@ class TestWindow(QtWidgets.QMainWindow):
     test_clicked = pyqtSignal(dict)
     def __init__(self):
         super(TestWindow, self).__init__()
-        path = os.getcwd()+'\\train\\test.ui'
+        path = os.getcwd()+'\\test.ui'
         uic.loadUi(path, self)
 
         
@@ -199,6 +232,7 @@ class TestWindow(QtWidgets.QMainWindow):
         self.brake_fail.clicked.connect(self.brake_failure)
         self.ebrake.clicked.connect(self.e_brake_trigger)
         self.test_inputs.clicked.connect(self.send_msg)
+        self.serv_brake.clicked.connect(self.serv_brake_trigger)
     
     def send_msg(self):
         self.dict = {'int_lights': self.int_lights_box.currentText(),
@@ -247,6 +281,9 @@ class TestWindow(QtWidgets.QMainWindow):
         self.test_clicked.emit(self.dict)
     def e_brake_trigger(self):
         self.dict = {'e_brake': 'On'}
+        self.test_clicked.emit(self.dict)
+    def serv_brake_trigger(self):
+        self.dict = {'service_brake': 'On'}
         self.test_clicked.emit(self.dict)
      
 
