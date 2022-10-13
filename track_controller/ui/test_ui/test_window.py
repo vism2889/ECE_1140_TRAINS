@@ -7,7 +7,7 @@ from PySide6.QtWidgets import QApplication, QWidget
 # You need to run the following command to generate the ui_form.py file
 #     pyside6-uic form.ui -o ui_form.py, or
 #     pyside2-uic form.ui -o ui_form.py
-from old_uiform import Ui_test_window
+from test_ui.old_uiform import Ui_test_window
 from main_window import TrackControllerWindow
 
 class test_window(QWidget):
