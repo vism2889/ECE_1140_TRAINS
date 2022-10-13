@@ -1,18 +1,14 @@
+# -*- coding: utf-8 -*-
+
+# Form implementation generated from reading ui file 'trainController_testUI_hw.ui'
+#
+# Created by: PyQt5 UI code generator 5.11.3
+#
+# WARNING! All changes made in this file will be lost!
+
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtCore import pyqtSlot, QTimer, pyqtSignal
-from trainController_hw import Control as c
 
 class Ui_DriverTestUI(object):
-    def __init__(self):
-        c.__init__(c)
-        self.internal_light_state = False
-        self.external_light_state = False
-        self.left_door_state = False
-        self.right_door_state = False
-        self.station = 0
-        self.timer = QtCore.QTimer()
-        self.timer2 = QtCore.QTimer()
-        
     def setupUi(self, DriverTestUI):
         DriverTestUI.setObjectName("DriverTestUI")
         DriverTestUI.resize(907, 553)
@@ -69,7 +65,7 @@ class Ui_DriverTestUI(object):
         self.label_4.setAlignment(QtCore.Qt.AlignCenter)
         self.label_4.setObjectName("label_4")
         self.e_brake_button = QtWidgets.QPushButton(self.centralwidget)
-        self.e_brake_button.setGeometry(QtCore.QRect(240, 300, 131, 121))
+        self.e_brake_button.setGeometry(QtCore.QRect(730, 80, 131, 121))
         font = QtGui.QFont()
         font.setBold(True)
         font.setWeight(75)
@@ -77,13 +73,13 @@ class Ui_DriverTestUI(object):
         self.e_brake_button.setAutoFillBackground(False)
         self.e_brake_button.setObjectName("e_brake_button")
         self.announce_start_button = QtWidgets.QPushButton(self.centralwidget)
-        self.announce_start_button.setGeometry(QtCore.QRect(420, 470, 89, 25))
+        self.announce_start_button.setGeometry(QtCore.QRect(410, 470, 89, 25))
         self.announce_start_button.setObjectName("announce_start_button")
         self.announce_stop_button = QtWidgets.QPushButton(self.centralwidget)
-        self.announce_stop_button.setGeometry(QtCore.QRect(420, 500, 89, 25))
+        self.announce_stop_button.setGeometry(QtCore.QRect(410, 500, 89, 25))
         self.announce_stop_button.setObjectName("announce_stop_button")
         self.label_8 = QtWidgets.QLabel(self.centralwidget)
-        self.label_8.setGeometry(QtCore.QRect(420, 440, 81, 20))
+        self.label_8.setGeometry(QtCore.QRect(410, 440, 81, 20))
         font = QtGui.QFont()
         font.setBold(True)
         font.setWeight(75)
@@ -91,19 +87,19 @@ class Ui_DriverTestUI(object):
         self.label_8.setAlignment(QtCore.Qt.AlignCenter)
         self.label_8.setObjectName("label_8")
         self.label_2 = QtWidgets.QLabel(self.centralwidget)
-        self.label_2.setGeometry(QtCore.QRect(430, 90, 91, 41))
+        self.label_2.setGeometry(QtCore.QRect(400, 90, 91, 41))
         font = QtGui.QFont()
         font.setBold(True)
         font.setWeight(75)
         self.label_2.setFont(font)
         self.label_2.setObjectName("label_2")
         self.speed_slider = QtWidgets.QSlider(self.centralwidget)
-        self.speed_slider.setGeometry(QtCore.QRect(430, 200, 71, 201))
+        self.speed_slider.setGeometry(QtCore.QRect(410, 200, 71, 201))
         self.speed_slider.setOrientation(QtCore.Qt.Vertical)
         self.speed_slider.setTickPosition(QtWidgets.QSlider.TicksBothSides)
         self.speed_slider.setObjectName("speed_slider")
         self.lcd_speed = QtWidgets.QLCDNumber(self.centralwidget)
-        self.lcd_speed.setGeometry(QtCore.QRect(420, 130, 101, 61))
+        self.lcd_speed.setGeometry(QtCore.QRect(390, 130, 101, 61))
         font = QtGui.QFont()
         font.setPointSize(14)
         font.setBold(True)
@@ -216,7 +212,7 @@ class Ui_DriverTestUI(object):
         self.line_2.setFrameShadow(QtWidgets.QFrame.Sunken)
         self.line_2.setObjectName("line_2")
         self.label_5 = QtWidgets.QLabel(self.centralwidget)
-        self.label_5.setGeometry(QtCore.QRect(10, 270, 211, 20))
+        self.label_5.setGeometry(QtCore.QRect(70, 270, 211, 20))
         font = QtGui.QFont()
         font.setBold(True)
         font.setWeight(75)
@@ -224,7 +220,7 @@ class Ui_DriverTestUI(object):
         self.label_5.setAlignment(QtCore.Qt.AlignCenter)
         self.label_5.setObjectName("label_5")
         self.nextStationTable = QtWidgets.QTableWidget(self.centralwidget)
-        self.nextStationTable.setGeometry(QtCore.QRect(10, 300, 201, 121))
+        self.nextStationTable.setGeometry(QtCore.QRect(70, 300, 201, 121))
         self.nextStationTable.setObjectName("nextStationTable")
         self.nextStationTable.setColumnCount(1)
         self.nextStationTable.setRowCount(7)
@@ -293,26 +289,6 @@ class Ui_DriverTestUI(object):
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.nextStationTable.setItem(6, 0, item)
-        self.label_16 = QtWidgets.QLabel(self.centralwidget)
-        self.label_16.setGeometry(QtCore.QRect(700, 150, 111, 20))
-        font = QtGui.QFont()
-        font.setBold(True)
-        font.setWeight(75)
-        self.label_16.setFont(font)
-        self.label_16.setAlignment(QtCore.Qt.AlignCenter)
-        self.label_16.setObjectName("label_16")
-        self.authority_spinBox = QtWidgets.QDoubleSpinBox(self.centralwidget)
-        self.authority_spinBox.setGeometry(QtCore.QRect(720, 180, 71, 32))
-        self.authority_spinBox.setProperty("value", 10.0)
-        self.authority_spinBox.setObjectName("authority_spinBox")
-        self.serviceBrake_button = QtWidgets.QPushButton(self.centralwidget)
-        self.serviceBrake_button.setGeometry(QtCore.QRect(240, 450, 131, 61))
-        font = QtGui.QFont()
-        font.setBold(True)
-        font.setWeight(75)
-        self.serviceBrake_button.setFont(font)
-        self.serviceBrake_button.setAutoFillBackground(False)
-        self.serviceBrake_button.setObjectName("serviceBrake_button")
         DriverTestUI.setCentralWidget(self.centralwidget)
         self.statusbar = QtWidgets.QStatusBar(DriverTestUI)
         self.statusbar.setObjectName("statusbar")
@@ -382,117 +358,7 @@ class Ui_DriverTestUI(object):
         item = self.nextStationTable.item(6, 0)
         item.setText(_translate("DriverTestUI", "6"))
         self.nextStationTable.setSortingEnabled(__sortingEnabled)
-        self.label_16.setText(_translate("DriverTestUI", "Authority(Mi)"))
-        self.serviceBrake_button.setText(_translate("DriverTestUI", "Service Brake"))
 
-    def toggle_lights_manual(self):
-        c.lightsButton(c)
-
-    def toggle_doors_manual(self):
-        c.doorsButton(c)
-
-    def announceStation_manual(self):
-        self.station = self.getNextStation()
-        c.announceButton(c, self.station)
-
-    def deploy_ebrake_manual(self):
-        c.ebrake_button(c)
-
-    def setAuthority(self):
-        distance = self.authority_spinBox.value()
-        c.setAuthority(c, distance)
-
-    def toggle_internal_lights(self):
-        self.internal_light_state = not self.internal_light_state
-        c.setInternalLights(self.internal_light_state)
-
-    def toggle_external_lights(self):
-        self.external_light_state = not self.external_light_state
-        c.setExternalLights(self.external_light_state)
-
-    def toggle_left_door(self):
-        self.left_door_state = not self.left_door_state
-        c.setLeftDoor(self.left_door_state)
-
-    def toggle_right_door(self):
-        self.right_door_state = not self.right_door_state
-        c.setRightDoor(self.right_door_state)
-    
-    def getNextStation(self):
-        item = self.nextStationTable.currentItem()
-        return self.nextStationTable.row(item)
-
-    def setSpeed(self):
-        c.setSpeed(c, self.speed_slider.value())
-
-    def setCurrentSpeed(self):
-        c.setCurrentSpeed(c, self.currentSpeed_slider.value())
-
-    def setTemperature(self):
-        c.setTemperature(c, self.temperature_box.value())
-
-    def announceStation(self):
-        self.station = self.getNextStation()
-        c.announceStation(c, True, self.station)
-
-    def stopAnnounce(self):
-        self.station = self.getNextStation()
-        c.announceStation(c, False, self.station)
-
-    def deployEbrake(self):
-        self.speed_slider.setValue(0)
-        c.deployEbrake(c)
-
-    def setSuggestedSpeed(self):
-        suggested_speed = self.suggestedSpeed_spinBox.value()
-        c.setSuggestedSpeed(c, suggested_speed)
-
-    def limitSpeed(self):
-        c.limitSpeed(c)
-        self.speed_slider.setValue(c.getSpeed(c))
-
-    def checkAuthority(self):
-        c.checkAuthority(c)
-
-    def deployServiceBrake(self):
-        c.deployServiceBrake(c)
-    
-    def set_kp_ki(self):
-        kp_val = self.kp_spinBox.value()
-        ki_val = self.ki_spinBox.value()
-        c.set_kp_ki(kp_val, ki_val, c)
-        c.initializePID(c, kp_val, ki_val)
-    
-    def calculatePower(self):
-        power = c.getPowerOutput(c)
-        self.lcd_power.display(power)
-        
-    def connect(self, DriverTestUI):
-        self.lights_internal_button.clicked.connect(self.toggle_internal_lights)
-        self.lights_external_button.clicked.connect(self.toggle_external_lights)
-        self.doors_left_button.clicked.connect(self.toggle_left_door)
-        self.doors_right_button.clicked.connect(self.toggle_right_door)
-        self.speed_slider.valueChanged['int'].connect(self.setSpeed)
-        self.currentSpeed_slider.valueChanged['int'].connect(self.setCurrentSpeed)
-        self.temperature_box.valueChanged['double'].connect(self.setTemperature)
-        self.suggestedSpeed_spinBox.valueChanged.connect(self.setSuggestedSpeed)
-        self.e_brake_button.clicked.connect(self.deployEbrake)
-        self.serviceBrake_button.clicked.connect(self.deployServiceBrake)
-        self.timer.timeout.connect(self.limitSpeed)
-        self.timer.timeout.connect(self.calculatePower)
-        self.kp_spinBox.valueChanged.connect(self.set_kp_ki)
-        self.ki_spinBox.valueChanged.connect(self.set_kp_ki)
-        self.authority_spinBox.valueChanged.connect(self.setAuthority)
-        self.announce_start_button.clicked.connect(self.announceStation)
-        self.announce_stop_button.clicked.connect(self.stopAnnounce)
-        self.nextStationTable.clicked.connect(self.getNextStation)
-        self.timer.timeout.connect(self.toggle_lights_manual)
-        self.timer.timeout.connect(self.toggle_doors_manual)
-        self.timer.timeout.connect(self.announceStation_manual)
-        self.timer.timeout.connect(self.deploy_ebrake_manual)
-        self.timer.timeout.connect(self.checkAuthority)
-        
-        self.timer.start(100)
 
 if __name__ == "__main__":
     import sys
@@ -500,6 +366,6 @@ if __name__ == "__main__":
     DriverTestUI = QtWidgets.QMainWindow()
     ui = Ui_DriverTestUI()
     ui.setupUi(DriverTestUI)
-    ui.connect(DriverTestUI)
     DriverTestUI.show()
     sys.exit(app.exec_())
+

@@ -1,18 +1,14 @@
+# -*- coding: utf-8 -*-
+
+# Form implementation generated from reading ui file 'trainController_testUI_hw.ui'
+#
+# Created by: PyQt5 UI code generator 5.11.3
+#
+# WARNING! All changes made in this file will be lost!
+
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtCore import pyqtSlot, QTimer, pyqtSignal
-from trainController_hw import Control as c
 
 class Ui_DriverTestUI(object):
-    def __init__(self):
-        c.__init__(c)
-        self.internal_light_state = False
-        self.external_light_state = False
-        self.left_door_state = False
-        self.right_door_state = False
-        self.station = 0
-        self.timer = QtCore.QTimer()
-        self.timer2 = QtCore.QTimer()
-        
     def setupUi(self, DriverTestUI):
         DriverTestUI.setObjectName("DriverTestUI")
         DriverTestUI.resize(907, 553)
@@ -385,114 +381,6 @@ class Ui_DriverTestUI(object):
         self.label_16.setText(_translate("DriverTestUI", "Authority(Mi)"))
         self.serviceBrake_button.setText(_translate("DriverTestUI", "Service Brake"))
 
-    def toggle_lights_manual(self):
-        c.lightsButton(c)
-
-    def toggle_doors_manual(self):
-        c.doorsButton(c)
-
-    def announceStation_manual(self):
-        self.station = self.getNextStation()
-        c.announceButton(c, self.station)
-
-    def deploy_ebrake_manual(self):
-        c.ebrake_button(c)
-
-    def setAuthority(self):
-        distance = self.authority_spinBox.value()
-        c.setAuthority(c, distance)
-
-    def toggle_internal_lights(self):
-        self.internal_light_state = not self.internal_light_state
-        c.setInternalLights(self.internal_light_state)
-
-    def toggle_external_lights(self):
-        self.external_light_state = not self.external_light_state
-        c.setExternalLights(self.external_light_state)
-
-    def toggle_left_door(self):
-        self.left_door_state = not self.left_door_state
-        c.setLeftDoor(self.left_door_state)
-
-    def toggle_right_door(self):
-        self.right_door_state = not self.right_door_state
-        c.setRightDoor(self.right_door_state)
-    
-    def getNextStation(self):
-        item = self.nextStationTable.currentItem()
-        return self.nextStationTable.row(item)
-
-    def setSpeed(self):
-        c.setSpeed(c, self.speed_slider.value())
-
-    def setCurrentSpeed(self):
-        c.setCurrentSpeed(c, self.currentSpeed_slider.value())
-
-    def setTemperature(self):
-        c.setTemperature(c, self.temperature_box.value())
-
-    def announceStation(self):
-        self.station = self.getNextStation()
-        c.announceStation(c, True, self.station)
-
-    def stopAnnounce(self):
-        self.station = self.getNextStation()
-        c.announceStation(c, False, self.station)
-
-    def deployEbrake(self):
-        self.speed_slider.setValue(0)
-        c.deployEbrake(c)
-
-    def setSuggestedSpeed(self):
-        suggested_speed = self.suggestedSpeed_spinBox.value()
-        c.setSuggestedSpeed(c, suggested_speed)
-
-    def limitSpeed(self):
-        c.limitSpeed(c)
-        self.speed_slider.setValue(c.getSpeed(c))
-
-    def checkAuthority(self):
-        c.checkAuthority(c)
-
-    def deployServiceBrake(self):
-        c.deployServiceBrake(c)
-    
-    def set_kp_ki(self):
-        kp_val = self.kp_spinBox.value()
-        ki_val = self.ki_spinBox.value()
-        c.set_kp_ki(kp_val, ki_val, c)
-        c.initializePID(c, kp_val, ki_val)
-    
-    def calculatePower(self):
-        power = c.getPowerOutput(c)
-        self.lcd_power.display(power)
-        
-    def connect(self, DriverTestUI):
-        self.lights_internal_button.clicked.connect(self.toggle_internal_lights)
-        self.lights_external_button.clicked.connect(self.toggle_external_lights)
-        self.doors_left_button.clicked.connect(self.toggle_left_door)
-        self.doors_right_button.clicked.connect(self.toggle_right_door)
-        self.speed_slider.valueChanged['int'].connect(self.setSpeed)
-        self.currentSpeed_slider.valueChanged['int'].connect(self.setCurrentSpeed)
-        self.temperature_box.valueChanged['double'].connect(self.setTemperature)
-        self.suggestedSpeed_spinBox.valueChanged.connect(self.setSuggestedSpeed)
-        self.e_brake_button.clicked.connect(self.deployEbrake)
-        self.serviceBrake_button.clicked.connect(self.deployServiceBrake)
-        self.timer.timeout.connect(self.limitSpeed)
-        self.timer.timeout.connect(self.calculatePower)
-        self.kp_spinBox.valueChanged.connect(self.set_kp_ki)
-        self.ki_spinBox.valueChanged.connect(self.set_kp_ki)
-        self.authority_spinBox.valueChanged.connect(self.setAuthority)
-        self.announce_start_button.clicked.connect(self.announceStation)
-        self.announce_stop_button.clicked.connect(self.stopAnnounce)
-        self.nextStationTable.clicked.connect(self.getNextStation)
-        self.timer.timeout.connect(self.toggle_lights_manual)
-        self.timer.timeout.connect(self.toggle_doors_manual)
-        self.timer.timeout.connect(self.announceStation_manual)
-        self.timer.timeout.connect(self.deploy_ebrake_manual)
-        self.timer.timeout.connect(self.checkAuthority)
-        
-        self.timer.start(100)
 
 if __name__ == "__main__":
     import sys
@@ -500,6 +388,6 @@ if __name__ == "__main__":
     DriverTestUI = QtWidgets.QMainWindow()
     ui = Ui_DriverTestUI()
     ui.setupUi(DriverTestUI)
-    ui.connect(DriverTestUI)
     DriverTestUI.show()
     sys.exit(app.exec_())
+
