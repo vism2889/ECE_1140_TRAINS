@@ -6,6 +6,9 @@ greenLineStations = dict()
 redLineStations["HERRON AVE"] = "no"
 redLineStations["SHADYSIDE"] = "no"
 redLineStations["SWISSVALE"] = "no"
+redLineStations["PENN STATION; UNDERGROUND"] = "no"
+redLineStations["STEEL PLAZA; UNDERGROUND"] = "no"
+redLineStations["STATION SQUARE"] = "no"
 greenLineStations["PIONEER"] = "no"
 greenLineStations["EDGEBROOK"] = "no"
 greenLineStations["WHITED"] = "no"
@@ -46,6 +49,8 @@ class train:
         return self.line
 
     def setCommandedSpeed(self, commandedSpeed):
+        if int(commandedSpeed) > 43:
+            commandedSpeed = "43"
         self.commandedSpeed = commandedSpeed
 
     def setAuthority(self, authority):
