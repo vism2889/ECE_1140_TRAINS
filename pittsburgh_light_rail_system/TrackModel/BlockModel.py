@@ -29,6 +29,8 @@ class BlockModel:
         self.secsToTraverseBlock = pSecsToTraverseBlock
 
         self.occupancy = False
+        self.faults = [False, False, False]
+        self.faultsText =  ""
         # values needed for Wayside and Train Model
         # self.vSwitchPresence   = None #gets set based on infrastructure
         # self.vSwitchState      = None #gets set based on infrastructure
