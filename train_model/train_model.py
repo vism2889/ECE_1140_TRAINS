@@ -10,7 +10,7 @@ class TrainModel(QtWidgets.QMainWindow):
     '''Primary Train Model UI Window that contains all childs/widgets'''
     def __init__(self):
         super(TrainModel, self).__init__()
-        path = os.getcwd()+'\\train.ui'
+        path = os.getcwd()+'\\train_model\\train.ui'
         uic.loadUi(path, self)
     
         self.t = Train()
@@ -21,7 +21,13 @@ class TrainModel(QtWidgets.QMainWindow):
         self.show()
 
     def UI(self):
-        #connecting new window
+        if sys.argv[1] == 'user':
+            self.test_win.setVisible(False)
+        else:
+            self.test_win.setVisible(True)
+
+
+    
         self.test_win.clicked.connect(self.test_window)
         #connecting failure buttons to respective slots
         self.sig_fail.clicked.connect(self.sig_failure)
@@ -89,7 +95,6 @@ class TrainModel(QtWidgets.QMainWindow):
                 if self.t.e_brake == 'On':
                     self.t.e_brake = 'Off'
                 else:
-                    print('ebrake on')
                     self.t.e_brake = 'On'
                     self.ebrake_thread = QThread()
                     self.ebrake_worker = Ebrake(self)
@@ -106,14 +111,13 @@ class TrainModel(QtWidgets.QMainWindow):
                 if self.t.service_brake == 'On':
                     self.t.service_brake = 'Off'
                 else:
-                    print('serv brake on')
                     self.t.service_brake = 'On'
                     self.servbrake_thread = QThread()
                     self.servbrake_worker = ServBrake(self)
                     self.servbrake_worker.moveToThread(self.servbrake_thread)
 
                     self.servbrake_thread.started.connect(self.servbrake_worker.run)
-                    self.servbrake_worker.stopped.connect(self.servbrake_thread.quit)
+                    self.servbrake_worker.stopped.connect(self.servUIbrake_thread.quit)
                     self.servbrake_worker.stopped.connect(self.servbrake_worker.deleteLater)
                     self.servbrake_thread.finished.connect(self.servbrake_thread.deleteLater)
 
@@ -208,8 +212,9 @@ class DisplayWorker(QObject):
             self.qt.next_st_disp.setText(f'{self.qt.t.next_station}')
 
             if time.time()-last_update > 5:
-                self.qt.t.set_power(self.qt.t.curr_power)
-                last_update = time.time()
+                if self.qt.t.e_brake == 'Off' and self.qt.t.service_brake == 'Off':
+                    self.qt.t.set_power(self.qt.t.curr_power)
+                    last_update = time.time()
 
 
 
@@ -220,7 +225,7 @@ class TestWindow(QtWidgets.QMainWindow):
     test_clicked = pyqtSignal(dict)
     def __init__(self):
         super(TestWindow, self).__init__()
-        path = os.getcwd()+'\\test.ui'
+        path = os.getcwd()+'\\train_model\\test.ui'
         uic.loadUi(path, self)
 
         

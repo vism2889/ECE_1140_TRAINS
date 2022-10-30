@@ -66,7 +66,6 @@ class Train():
         self.prev_vel = 0
         self.prev_pos = 0
         self.prev_time = 0
-        self.prev_pos = 0
 
         self.int_lights = 'ON'
         self.ext_lights = 'ON'
@@ -95,6 +94,7 @@ class Train():
             self.curr_accel = self.emergency_brake
             time_elapsed = self.curr_time - self.prev_time
             while self.curr_vel > 0:
+                print(f'Ebrake velocity before decleration:{self.curr_vel}')
                 temp_curr_vel = self.curr_vel
                 self.curr_vel = self.prev_vel + (time_elapsed/2)*(self.prev_accel+self.curr_accel)
                 
@@ -106,6 +106,7 @@ class Train():
 
                 self.prev_time = self.curr_time
                 self.curr_time = time.time()
+                print(f'Ebrake decreasing velocity:{self.curr_vel}')
     
     def serv_brake_func(self):
         print('inside service brake')
@@ -124,22 +125,23 @@ class Train():
 
                 self.prev_time = self.curr_time
                 self.curr_time = time.time()
-
-
+                print(f'Service Brake decreasing velocity:{self.curr_vel}')
 
     def dispatch(self):
         self.dispatched = True
-        self.set_power(120000, time.time())
+        self.set_power(self,power =120000, t =time.time())
 
     def set_power(self, power, t = None):
+
         for f in (self.Failures):
             if self.Failures[f]:
-                print("Error {f} failure")
+                print(f"Error {f} failure")
                 return 
         
         if(self.dispatched):
             #time updates
             if self.prev_time == 0:
+                print('Previous time is 0')
                 self.prev_time = t
             else:
                 self.prev_time = self.curr_time
@@ -153,33 +155,39 @@ class Train():
 
             #current force
             if self.curr_force == 0 or self.prev_vel == 0:
+                print('Force or velocity is 0')
                 self.curr_force = self.curr_mass * self.med_accel
             else:
-                self.curr_force = float(self.curr_power)/float(self.prev_vel)
+                self.curr_force = float(self.curr_power)/float(self.curr_vel)
 
             #acceleration
-            temp_curr_accel = self.curr_accel
+            self.prev_accel = self.curr_accel
             self.curr_accel = self.curr_force/self.curr_mass
 
             #updating current velocity and last velocity
-            temp_curr_vel = self.curr_vel
+            self.prev_vel = self.curr_vel
             self.curr_vel = self.prev_vel + (time_elapsed/2)*(self.prev_accel+self.curr_accel)
             if self.curr_vel < 0:
                 self.curr_vel = 0
 
-            #updating position
-            if temp_curr_vel > 0:
-                temp_curr_pos = self.curr_pos
+            #updating positionp
+            if self.curr_vel > 0:
+                self.prev_pos = self.curr_pos
                 self.curr_pos = self.prev_pos + (time_elapsed/2)*(self.prev_vel +self.curr_vel)
-                self.prev_pos = temp_curr_pos
                 # print (f'from module:\n{}')
                 #updating previous states with current states
-                self.prev_vel = temp_curr_vel
-                self.prev_accel = temp_curr_accel
-            else:
-                self.prev_accel = self.curr_accel
-                self.prev_vel = self.curr_vel
-
+            
+            # speed = self.get_speed()
+            # print('\nTrain Model Object Values')
+            # print(f'time_elapsed: {time_elapsed}')
+            # print(f'Current Power: {self.curr_power}')
+            # print(f'Previous Vel:{self.prev_vel}')
+            # print(f'Force: {self.curr_force}')
+            # print(f'Previous Accel:{self.prev_accel}')
+            # print(f'Current Accel:{self.curr_accel}')
+            # print(f'Current_Vel: {self.curr_vel}')
+            # print(f'Current Speed: {speed} mph\n')
+            
                 
             
 
