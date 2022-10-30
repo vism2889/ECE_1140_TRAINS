@@ -61,3 +61,4 @@ def ManualControl(control_object):
     def ebrake_button(self):
         if GPIO.input(29) == GPIO.LOW:
             control_object.deployEbrake(control_object)
+
