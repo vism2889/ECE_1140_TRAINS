@@ -71,7 +71,7 @@ class Control():
         if(not door_state): GPIO.output(18, GPIO.LOW)
 
     def setSpeed(self, speed):
-        if(self.limitSpeed(self)):
+        if(self.limitSpeed(self, speed)):
             self.commanded_speed = speed
 
     def setSpeedLimit(self, speed_limit):
@@ -107,8 +107,8 @@ class Control():
         if not self.brakeCommand:
             print("Brake Command off")
 
-    def limitSpeed(self):
-        if(self.commanded_speed > self.speed_limit):
+    def limitSpeed(self, speed):
+        if(speed > self.speed_limit):
             return False
         
         else: return True
