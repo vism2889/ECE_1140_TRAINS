@@ -1,5 +1,5 @@
 import sys
-from block import block
+from Block import Block
 
 redLineCrossing = dict()
 greenLineCrossing  = dict()
@@ -36,9 +36,9 @@ def toggleGreenLineSwitch(name):
 
 redLineBlocks = dict()
 for blockNumber in range(1,12):
-    redLineBlocks["Block " + str(blockNumber)] = block(blockNumber, 75, 40)
+    redLineBlocks["Block " + str(blockNumber)] = Block(blockNumber, 75, 40)
 
 greenLineBlocks = dict()
 for blockNumber in range(1,12):
-    greenLineBlocks["Block " + str(blockNumber)] = block(blockNumber, 75, 40)
+    greenLineBlocks["Block " + str(blockNumber)] = Block(blockNumber, 75, 40)
 
