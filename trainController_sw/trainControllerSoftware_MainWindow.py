@@ -17,6 +17,13 @@ from simple_pid import PID
 
 class Ui_TrainControllerSW_MainWindow(object):
     def setupUi(self, TrainControllerSW_MainWindow):
+        ##
+        self.speed_limit = 0
+        self.authority_value = 0
+        self.speed_display_value = 0
+        self.power_failure_value = 0
+        ##
+        
         self.commanded_speed = 0
         self.current_speed = 0
         self.kp = 0
@@ -612,6 +619,34 @@ class Ui_TrainControllerSW_MainWindow(object):
         self.timer.timeout.disconnect(self.closeTestWindow)
         self.timer.stop()        
     
+    ##
+    def setAuthorityDisplayValue(self, pValue):
+        self.authority_value = pValue
+        
+    def getAuthorityDisplayValue(self):
+        return self.authority_value
+    
+    def setSpeedLimitDisplayValue(self, pValue):
+        self.speed_limit = pValue
+        
+    def getSpeedLimitDisplayValue(self):
+        return self.speed_limit
+
+    def setSpeedDisplayValue(self, pValue):
+        self.speed_display_value = pValue
+        
+    def getSpeedDisplayValue(self):
+        if(self.speed_display_value > self.speed_limit):
+            return self.speed_limit
+        return self.speed_display_value
+    
+    def setPowerFailureDisplayValue(self, pValue):
+        self.power_failure_value = pValue
+        if(self.power_failure_value == True):
+            self.setSpeedDisplayValue(self, 0)
+        
+    ##
+    
     def AuthorityDisplay(self, pValue):
         self.milesValue = pValue * 0.621371
         self.Authority_lcdDisplay.display(self.milesValue)
@@ -853,6 +888,8 @@ class Ui_TrainControllerSW_MainWindow(object):
         self.setPID(self.kp, self.ki)
         self.power = self.pid(self.Auto_CommandedSpeedDisplay.value() * 0.621371)
         self.PowerOutput_lcdDisplay.display(self.power)
+        
+    
         
 if __name__ == "__main__":
     import sys
