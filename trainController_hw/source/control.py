@@ -3,13 +3,13 @@ from simple_pid import PID
 from pygame import mixer
 
 GPIO.setwarnings(False)
-GPIO.setmode(GPIO.BOARD)
+GPIO.setmode(GPIO.BCM)
 
 # outputs
-GPIO.setup(8, GPIO.OUT, initial=GPIO.LOW)
-GPIO.setup(10, GPIO.OUT, initial=GPIO.LOW)
-GPIO.setup(16, GPIO.OUT, initial=GPIO.LOW)
-GPIO.setup(18, GPIO.OUT, initial=GPIO.LOW)
+GPIO.setup(14, GPIO.OUT, initial=GPIO.LOW) # internal lights
+GPIO.setup(15, GPIO.OUT, initial=GPIO.LOW) # external lights
+GPIO.setup(23, GPIO.OUT, initial=GPIO.LOW) # left door
+GPIO.setup(24, GPIO.OUT, initial=GPIO.LOW) # right door
 
 mixer.init()
 
@@ -26,7 +26,7 @@ class Control():
         self.brakeCommand = False
         self.current_speed = 0
         self.suggested_speed = 0
-        self.speed_limit = 0
+        self.speed_limit = 100
         self.temperature = 0
         self.k_p = 0
         self.k_i = 0
@@ -55,24 +55,24 @@ class Control():
         print(self.authority)
     
     def setInternalLights(light_state):
-        if(light_state): GPIO.output(8, GPIO.HIGH)
-        if(not light_state): GPIO.output(8, GPIO.LOW) 
+        if(light_state): GPIO.output(14, GPIO.HIGH)
+        if(not light_state): GPIO.output(14, GPIO.LOW) 
         
     def setExternalLights(light_state):
-        if(light_state): GPIO.output(10, GPIO.HIGH)
-        if(not light_state): GPIO.output(10, GPIO.LOW)
+        if(light_state): GPIO.output(15, GPIO.HIGH)
+        if(not light_state): GPIO.output(15, GPIO.LOW)
 
     def setLeftDoor(door_state):
-        if(door_state): GPIO.output(16, GPIO.HIGH)
-        if(not door_state): GPIO.output(16, GPIO.LOW)
+        if(door_state): GPIO.output(23, GPIO.HIGH)
+        if(not door_state): GPIO.output(23, GPIO.LOW)
 
     def setRightDoor(door_state):
-        if(door_state): GPIO.output(18, GPIO.HIGH)
-        if(not door_state): GPIO.output(18, GPIO.LOW)
+        if(door_state): GPIO.output(24, GPIO.HIGH)
+        if(not door_state): GPIO.output(24, GPIO.LOW)
 
     def setSpeed(self, speed):
         if(self.limitSpeed(self, speed)):
-            self.commanded_speed = speed
+            self.commanded_speed = speed 
 
     def setSpeedLimit(self, speed_limit):
         self.speed_limit = speed_limit

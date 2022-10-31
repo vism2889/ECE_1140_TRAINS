@@ -4,6 +4,7 @@ from manualControl import ManualControl as mc
 
 class Test_commandedSpeed(unittest.TestCase):
 
+
     def test_speedBelowLimit(self):
         c.__init__(c)
         c.setSpeedLimit(c, 60)

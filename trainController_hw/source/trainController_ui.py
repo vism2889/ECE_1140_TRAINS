@@ -388,17 +388,20 @@ class Ui_DriverTestUI(object):
         self.serviceBrake_button.setText(_translate("DriverTestUI", "Service Brake"))
 
     def toggle_lights_manual(self):
-        mc.lightsButton(mc, c)
+        mc.lightsButton(mc)
 
     def toggle_doors_manual(self):
-        mc.doorsButton(mc, c)
+        mc.doorsButton(mc)
 
     def announceStation_manual(self):
         self.station = self.getNextStation()
-        mc.announceButton(mc, c, self.station)
+        mc.announceButton(mc, self.station)
 
     def deploy_ebrake_manual(self):
-        mc.ebrake_button(mc, c )
+        mc.ebrake_button(mc)
+
+    def driverSetSpeed(self):
+        self.speed_slider.setValue(mc.setCommandedSpeed(mc))
 
     def setAuthority(self):
         distance = self.authority_spinBox.value()
@@ -449,9 +452,9 @@ class Ui_DriverTestUI(object):
         suggested_speed = self.suggestedSpeed_spinBox.value()
         c.setSuggestedSpeed(c, suggested_speed)
 
-    def limitSpeed(self):
-        c.limitSpeed(c)
-        self.speed_slider.setValue(c.getSpeed(c))
+    # def limitSpeed(self, speed_limit):
+    #     c.limitSpeed(c, speed_limit)
+    #     self.speed_slider.setValue(c.getSpeed(c))
 
     def checkAuthority(self):
         c.checkAuthority(c)
@@ -468,9 +471,6 @@ class Ui_DriverTestUI(object):
     def calculatePower(self):
         power = c.getPowerOutput(c)
         self.lcd_power.display(power)
-
-    def toggle_manualMode(self):
-
         
     def connect(self, DriverTestUI):
         self.lights_internal_button.clicked.connect(self.toggle_internal_lights)
@@ -483,7 +483,7 @@ class Ui_DriverTestUI(object):
         self.suggestedSpeed_spinBox.valueChanged.connect(self.setSuggestedSpeed)
         self.e_brake_button.clicked.connect(self.deployEbrake)
         self.serviceBrake_button.clicked.connect(self.deployServiceBrake)
-        self.timer.timeout.connect(self.limitSpeed)
+       # self.timer.timeout.connect(self.limitSpeed)
         self.timer.timeout.connect(self.calculatePower)
         self.kp_spinBox.valueChanged.connect(self.set_kp_ki)
         self.ki_spinBox.valueChanged.connect(self.set_kp_ki)
@@ -496,6 +496,7 @@ class Ui_DriverTestUI(object):
         self.timer.timeout.connect(self.announceStation_manual)
         self.timer.timeout.connect(self.deploy_ebrake_manual)
         self.timer.timeout.connect(self.checkAuthority)
+        self.timer.timeout.connect(self.driverSetSpeed)
         
         self.timer.start(100)
 
