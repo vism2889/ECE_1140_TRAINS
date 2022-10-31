@@ -2,8 +2,7 @@ import RPi.GPIO as GPIO
 from time import sleep
 from pygame import mixer
 from control import Control
-from slider import getSliderValue
-from slider import getSliderValue
+from analogInput import getSpeedValue
 
 GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BCM)
@@ -23,6 +22,7 @@ class ManualControl():
 
     def __init__(self):
         Control.__init__(Control)
+        self.commandedSpeed = 0
         self.ebrake_state = False
         self.light_state_internal = False
         self.light_state_external = False
@@ -36,9 +36,10 @@ class ManualControl():
 
     def setCommandedSpeed(self):
         if self.ebrake_state == False:
-            speed = getSliderValue()
-            Control.setSpeed(Control, speed)
-            return speed
+            self.commandedSpeed = getSpeedValue()
+            Control.setSpeed(Control, self.commandedSpeed)
+            return self.commandedSpeed
+
         else: return 0
 
     def lightsButton(self):
@@ -75,3 +76,5 @@ class ManualControl():
             self.ebrake_state = True
 
         else: self.ebrake_state = False
+
+

@@ -21,7 +21,7 @@ def remap_range(value, left_min, left_max, right_min, right_max):
 
     return int(right_min + (valueScaled * right_span))
 
-def getSliderValue():
+def getSpeedValue():
     set_value = 0
     trim_pot_changed = False
     trim_pot = chan0.value

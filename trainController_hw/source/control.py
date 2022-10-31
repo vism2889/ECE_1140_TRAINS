@@ -90,7 +90,7 @@ class Control():
         self.suggested_speed = suggested_speed
 
     def announceStation(self, start, file_idx):
-        mixer.music.load(self.station_audio[file_idx])
+        mixer.music.load("audio/" + self.station_audio[file_idx])
         if(start) : mixer.music.play()
         if(not start) : mixer.music.stop()
 
