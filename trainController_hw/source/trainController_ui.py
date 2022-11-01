@@ -12,6 +12,8 @@ class Ui_DriverTestUI(object):
         self.left_door_state = False
         self.right_door_state = False
         self.station = 0
+        self.current_speed = 0
+        self.commanded_speed = 0
         self.timer = QtCore.QTimer()
         self.timer2 = QtCore.QTimer()
         
@@ -114,9 +116,6 @@ class Ui_DriverTestUI(object):
         self.lcd_speed.setObjectName("lcd_speed")
         self.temperature_box = QtWidgets.QDoubleSpinBox(self.centralwidget)
         self.temperature_box.setGeometry(QtCore.QRect(820, 360, 71, 32))
-        self.temperature_box.setMinimum(50.0)
-        self.temperature_box.setMaximum(90.0)
-        self.temperature_box.setProperty("value", 72.0)
         self.temperature_box.setObjectName("temperature_box")
         self.label_9 = QtWidgets.QLabel(self.centralwidget)
         self.label_9.setGeometry(QtCore.QRect(820, 330, 71, 22))
@@ -428,13 +427,16 @@ class Ui_DriverTestUI(object):
         return self.nextStationTable.row(item)
 
     def setSpeed(self):
-        c.setSpeed(c, self.speed_slider.value())
+        c.setSpeed(c, self.commanded_speed)
 
     def setCurrentSpeed(self):
-        c.setCurrentSpeed(c, self.currentSpeed_slider.value())
+        c.setCurrentSpeed(c, self.current_speed)
 
     def setTemperature(self):
         c.setTemperature(c, self.temperature_box.value())
+
+    def driverSetTemperature(self):
+        self.temperature_box.setValue(mc.setTemperature(mc))
 
     def announceStation(self):
         self.station = self.getNextStation()
@@ -471,6 +473,9 @@ class Ui_DriverTestUI(object):
     def calculatePower(self):
         power = c.getPowerOutput(c)
         self.lcd_power.display(power)
+
+    def sendData(self):
+        c.publish(c)
         
     def connect(self, DriverTestUI):
         self.lights_internal_button.clicked.connect(self.toggle_internal_lights)
@@ -497,6 +502,10 @@ class Ui_DriverTestUI(object):
         self.timer.timeout.connect(self.deploy_ebrake_manual)
         self.timer.timeout.connect(self.checkAuthority)
         self.timer.timeout.connect(self.driverSetSpeed)
+        self.timer.timeout.connect(self.driverSetTemperature)
+        self.timer.timeout.connect(self.setCurrentSpeed)
+        self.timer.timeout.connect(self.sendData)
+        
         
         self.timer.start(100)
 

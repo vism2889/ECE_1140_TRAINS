@@ -2,8 +2,7 @@ import RPi.GPIO as GPIO
 from time import sleep
 from pygame import mixer
 from control import Control
-from analogInput import getSpeedValue
-
+from analogInput import AnalogIn # class that handles analog input
 GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BCM)
 
@@ -22,6 +21,7 @@ class ManualControl():
 
     def __init__(self):
         Control.__init__(Control)
+        AnalogIn.__init__(AnalogIn)
         self.commandedSpeed = 0
         self.ebrake_state = False
         self.light_state_internal = False
@@ -36,7 +36,7 @@ class ManualControl():
 
     def setCommandedSpeed(self):
         if self.ebrake_state == False:
-            self.commandedSpeed = getSpeedValue()
+            self.commandedSpeed = AnalogIn.getSpeedValue(AnalogIn)
             Control.setSpeed(Control, self.commandedSpeed)
             return self.commandedSpeed
 
@@ -77,4 +77,8 @@ class ManualControl():
 
         else: self.ebrake_state = False
 
+    def setTemperature(self):
+        temp = AnalogIn.getTemperatureValue(AnalogIn)
+        Control.setTemperature(Control, temp)
+        return temp
 

@@ -1,6 +1,7 @@
 import RPi.GPIO as GPIO
 from simple_pid import PID
 from pygame import mixer
+from outputData import OutputData as output
 
 GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BCM)
@@ -16,12 +17,13 @@ mixer.init()
 class Control():
    
     def __init__(self):
+        output.__init__(output)
+        self.authority = [True,True,True,True,True,True]
         self.light_state_internal = False
         self.light_state_external = False
         self.door_state_left = False
         self.door_state_right = False
         self.announce_state = False
-        self.authority = 0
         self.commanded_speed = 0
         self.brakeCommand = False
         self.current_speed = 0
@@ -51,7 +53,7 @@ class Control():
         return self.authority
 
     def setAuthority(self, distance):
-        self.authority = distance
+        self.authority = self.authority
         print(self.authority)
     
     def setInternalLights(light_state):
@@ -72,25 +74,29 @@ class Control():
 
     def setSpeed(self, speed):
         if(self.limitSpeed(self, speed)):
-            self.commanded_speed = speed 
+            self.commanded_speed = speed
+            output.setCommandedSpeed(output, self.commanded_speed)
+            output.setSpeedLimit(output, self.speed_limit)
 
     def setSpeedLimit(self, speed_limit):
         self.speed_limit = speed_limit
+        output.setSpeedLimit(output, self.speed_limit)
 
     def setCurrentSpeed(self, current_speed):
         self.current_speed = current_speed
+        output.setCurrentSpeed(output, self.current_speed)
 
     def getSpeed(self): return self.commanded_speed
 
     def setTemperature(self, temperature):
         self.temperature = temperature
-        print(self.temperature)
 
     def setSuggestedSpeed(self, suggested_speed):
         self.suggested_speed = suggested_speed
 
     def announceStation(self, start, file_idx):
-        mixer.music.load("audio/" + self.station_audio[file_idx])
+        output.setAnnounceState(output, start)
+        mixer.music.load("audio/" +  self.station_audio[file_idx])
         if(start) : mixer.music.play()
         if(not start) : mixer.music.stop()
 
@@ -116,6 +122,7 @@ class Control():
     def checkAuthority(self):
         if self.authority == 0:
             self.deployEbrake(self)
+        output.setAuthority(output, self.authority)
     
     def set_kp_ki(kp_val, ki_val, self):
         self.k_p = kp_val
@@ -133,3 +140,6 @@ class Control():
         else:
             self.power = 0
             return self.power
+
+    def publish(self):
+        output.publish(output)
