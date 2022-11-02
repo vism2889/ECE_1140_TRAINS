@@ -17,7 +17,7 @@ mixer.init()
 class Control():
    
     def __init__(self):
-        output.__init__(output)
+        #output.__init__(output)
         self.authority = [True,True,True,True,True,True]
         self.light_state_internal = False
         self.light_state_external = False
@@ -53,7 +53,7 @@ class Control():
         return self.authority
 
     def setAuthority(self, distance):
-        self.authority = self.authority
+        self.authority = self.authority 
         print(self.authority)
     
     def setInternalLights(light_state):
@@ -75,16 +75,16 @@ class Control():
     def setSpeed(self, speed):
         if(self.limitSpeed(self, speed)):
             self.commanded_speed = speed
-            output.setCommandedSpeed(output, self.commanded_speed)
-            output.setSpeedLimit(output, self.speed_limit)
+            # output.setCommandedSpeed(output, self.commanded_speed)
+            # output.setSpeedLimit(output, self.speed_limit)
 
     def setSpeedLimit(self, speed_limit):
         self.speed_limit = speed_limit
-        output.setSpeedLimit(output, self.speed_limit)
+        # output.setSpeedLimit(output, self.speed_limit)
 
     def setCurrentSpeed(self, current_speed):
         self.current_speed = current_speed
-        output.setCurrentSpeed(output, self.current_speed)
+        # output.setCurrentSpeed(output, self.current_speed)
 
     def getSpeed(self): return self.commanded_speed
 
@@ -95,7 +95,7 @@ class Control():
         self.suggested_speed = suggested_speed
 
     def announceStation(self, start, file_idx):
-        output.setAnnounceState(output, start)
+        # output.setAnnounceState(output, start)
         mixer.music.load("audio/" +  self.station_audio[file_idx])
         if(start) : mixer.music.play()
         if(not start) : mixer.music.stop()
@@ -122,7 +122,7 @@ class Control():
     def checkAuthority(self):
         if self.authority == 0:
             self.deployEbrake(self)
-        output.setAuthority(output, self.authority)
+        # output.setAuthority(output, self.authority)
     
     def set_kp_ki(kp_val, ki_val, self):
         self.k_p = kp_val
@@ -142,4 +142,5 @@ class Control():
             return self.power
 
     def publish(self):
-        output.publish(output)
+        pass
+        # output.publish(output)

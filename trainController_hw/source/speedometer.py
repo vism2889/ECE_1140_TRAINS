@@ -1,12 +1,3 @@
-# -*- coding: utf-8 -*-
-
-# Form implementation generated from reading ui file 'gaugeWidget.ui'
-#
-# Created by: PyQt5 UI code generator 5.14.1
-#
-# WARNING! All changes made in this file will be lost!
-
-
 from PyQt5 import QtCore, QtGui, QtWidgets
 from analoggaugewidget import AnalogGaugeWidget
 from PyQt5.QtCore import pyqtSlot, QTimer, pyqtSignal
@@ -269,10 +260,6 @@ class Ui_MainWindow(object):
     def setSuggestedSpeed(self):
         c.setSuggestedSpeed(c, self.suggested_speed)
 
-    # def limitSpeed(self, speed_limit):
-    #     c.limitSpeed(c, speed_limit)
-    #     self.speed_slider.setValue(c.getSpeed(c))
-
     def checkAuthority(self):
         c.checkAuthority(c)
 
@@ -285,17 +272,16 @@ class Ui_MainWindow(object):
     def sendData(self):
         c.publish(c)
         
-    def connect(self, DriverTestUI):
+    def connect(self, MainWindow):
         
         self.timer.timeout.connect(self.calculatePower)
         self.timer.timeout.connect(self.toggle_lights_manual)
         self.timer.timeout.connect(self.toggle_doors_manual)
-        self.timer.timeout.connect(self.announceStation_manual)
         self.timer.timeout.connect(self.deploy_ebrake_manual)
         self.timer.timeout.connect(self.driverSetSpeed)
-        self.timer.timeout.connect(self.sendData)
+        #self.timer.timeout.connect(self.sendData)
         
-        self.timer.start(50)
+        self.timer.start(10)
 
 
 if __name__ == "__main__":
@@ -304,5 +290,6 @@ if __name__ == "__main__":
     MainWindow = QtWidgets.QMainWindow()
     ui = Ui_MainWindow()
     ui.setupUi(MainWindow)
+    ui.connect(MainWindow)
     MainWindow.show()
     sys.exit(app.exec_())
