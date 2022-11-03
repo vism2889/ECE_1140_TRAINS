@@ -2,6 +2,7 @@ import RPi.GPIO as GPIO
 from simple_pid import PID
 from pygame import mixer
 from outputData import OutputData as output
+from trainData import TrainData as input
 
 GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BCM)
@@ -16,9 +17,12 @@ mixer.init()
 
 class Control():
    
-    def __init__(self):
-        #output.__init__(output)
-        self.authority = [True,True,True,True,True,True]
+    def __init__(self, test=True):
+        if(not test):
+            output.__init__(output)
+            input.__init__(input)
+
+        self.authority = 0
         self.light_state_internal = False
         self.light_state_external = False
         self.door_state_left = False
@@ -52,48 +56,88 @@ class Control():
     def getAuthority(self):
         return self.authority
 
-    def setAuthority(self, distance):
-        self.authority = self.authority 
-        print(self.authority)
+    def setAuthority(self, authority=None):
+        if(authority==None):
+            self.authority = input.getAuthority(input)
+            return
+        
+        self.authority = authority
     
-    def setInternalLights(light_state):
+    def setInternalLights(light_state=None):
+        if(light_state == None):
+            light_state = input.getInternalLightCommand(input)
+            return
+
         if(light_state): GPIO.output(14, GPIO.HIGH)
         if(not light_state): GPIO.output(14, GPIO.LOW) 
         
-    def setExternalLights(light_state):
+    def setExternalLights(light_state=None):
+        if(light_state == None):
+            light_state = input.getInternalLightCommand(input)
+            return
+
         if(light_state): GPIO.output(15, GPIO.HIGH)
         if(not light_state): GPIO.output(15, GPIO.LOW)
 
-    def setLeftDoor(door_state):
+    def setLeftDoor(door_state=None):
+        if(door_state == None):
+            door_state = input.getLeftDoorCommand
+            return
+
         if(door_state): GPIO.output(23, GPIO.HIGH)
         if(not door_state): GPIO.output(23, GPIO.LOW)
 
-    def setRightDoor(door_state):
+    def setRightDoor(door_state=None):
+        if(door_state==None):
+            door_state = input.getRightDoorCommand(input)
+            return
+
         if(door_state): GPIO.output(24, GPIO.HIGH)
         if(not door_state): GPIO.output(24, GPIO.LOW)
 
-    def setSpeed(self, speed):
+    def setSpeed(self, speed=None):
+        if(speed==None):
+            speed = input.getCommandedSpeed(input)
+            return 
+
         if(self.limitSpeed(self, speed)):
             self.commanded_speed = speed
-            # output.setCommandedSpeed(output, self.commanded_speed)
-            # output.setSpeedLimit(output, self.speed_limit)
+            output.setCommandedSpeed(output, self.commanded_speed)
+            output.setSpeedLimit(output, self.speed_limit)
 
-    def setSpeedLimit(self, speed_limit):
+    def setSpeedLimit(self, speed_limit=None):
+        if(speed_limit==None):
+            self.speed_limit = input.getSpeedLimit(input)
+            return
+
         self.speed_limit = speed_limit
-        # output.setSpeedLimit(output, self.speed_limit)
+        output.setSpeedLimit(output, self.speed_limit)
 
-    def setCurrentSpeed(self, current_speed):
+    def setCurrentSpeed(self, current_speed=None):
+        if(current_speed==None):
+            self.current_speed = input.getCurrentSpeed(input)
+            return
+
         self.current_speed = current_speed
-        # output.setCurrentSpeed(output, self.current_speed)
+        output.setCurrentSpeed(output, self.current_speed)
 
     def getSpeed(self): return self.commanded_speed
 
-    def setTemperature(self, temperature):
+    def setTemperature(self, temperature=None):
+        if(temperature == None):
+            self.temperature = input.getTemperature(input)
+            return
+
         self.temperature = temperature
 
-    def setSuggestedSpeed(self, suggested_speed):
+    def setSuggestedSpeed(self, suggested_speed=None):
+        if(suggested_speed == None):
+            self.suggested_speed = input.getSuggestedSpeed(input)
+            return 
+
         self.suggested_speed = suggested_speed
 
+    # need to refactor to take in next station data from train model
     def announceStation(self, start, file_idx):
         # output.setAnnounceState(output, start)
         mixer.music.load("audio/" +  self.station_audio[file_idx])
@@ -122,7 +166,7 @@ class Control():
     def checkAuthority(self):
         if self.authority == 0:
             self.deployEbrake(self)
-        # output.setAuthority(output, self.authority)
+        output.setAuthority(output, self.authority)
     
     def set_kp_ki(kp_val, ki_val, self):
         self.k_p = kp_val
@@ -142,5 +186,4 @@ class Control():
             return self.power
 
     def publish(self):
-        pass
-        # output.publish(output)
+        output.publish(output)

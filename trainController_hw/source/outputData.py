@@ -1,42 +1,53 @@
 import random
 import time
 from winserver import winserver
-from tc_msg import tc_msg
+from out_msg import out_msg
 
 class OutputData():
     def __init__(self):
         self.node = winserver('my_publisher', "192.168.0.15")
-        self.message = tc_msg()
-        self.pub = self.node.advertise('my_topic', tc_msg , 1, "192.168.0.10")
+        self.message = out_msg()
+        self.pub = self.node.advertise('my_topic', out_msg , 1, "192.168.0.10")
 
-    def setCommandedSpeed(self, speed):
-        self.message.commandedSpeed = speed
+    def setPower(self, power):
+        self.message.power = power
 
-    def setCurrentSpeed(self, speed):
-        self.message.currentSpeed = speed
-
-    def setSpeedLimit(self, speed):
-        self.message.speedLimit = speed
+    def setTemperature(self, temp):
+        self.message.temperature = temp
 
     def setAnnounceState(self, state):
-        self.message.announcements = state
+        self.message.announcement_state = state
 
-    def setAuthority(self, authority):
-        self.message.authority.append(authority)
+    def setServiceBrakeState(self, state):
+        self.message.service_brake_command = state
+
+    def setEbrakeState(self, state):
+        self.message.ebrake_command = state
+    def setLeftDoor(self, state):
+        self.message.left_door_state = state
+
+    def setRightDoorState(self, state):
+        self.message.right_door_state = state
+    
+    def setInternalLightState(self, state):
+        self.message.internal_light_state = state
+    
+    def setExternalLightState(self, state):
+        self.message.external_light_state = state
 
     def publish(self):
         self.pub.publish(self.message)
 
     def randomize(self):
-        self.message.announcements = random.choice([True, False])
-
-        self.message.authority.clear()        
-        for i in range(10):
-            self.message.authority.append(random.choice([True, False]))
-
-        self.message.commandedSpeed = random.randint(0,5)
-        self.message.currentSpeed = random.randint(0,5)
-        self.message.speedLimit = random.randint(0,1000)
+        self.message.announcement_states = random.choice([True, False])
+        self.message.power = random.randint(0,5)
+        self.message.service_brake_command = random.choice([True, False])
+        self.message.ebrake_command = random.choice([True, False])
+        self.message.left_door_state = random.choice([True, False])
+        self.message.right_door_state = random.choice([True, False])
+        self.message.internal_light_state = random.choice([True, False])
+        self.message.external_light_state = random.choice([True, False])
+        self.message.temperature = random.randint(0,100)
 
 if __name__ == '__main__':
     
