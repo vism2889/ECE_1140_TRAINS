@@ -2,7 +2,6 @@ import sys
 import pandas as pd
 sys.path.append('/home/garrett/git/ECE_1140_TRAINS/CTC-Office/train-functionality/')
 sys.path.append('/home/garrett/git/ECE_1140_TRAINS/CTC-Office/GUI/')
-from trains import *
 import csv
 
 def readSchedule(scheduleFile):

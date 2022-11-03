@@ -14,7 +14,7 @@
 import csv
 from re import I
 from Block import Block
-from BlockList import BlockList
+from BlockDictionary import BlockDictionary
  
 class LayoutParser:
     
@@ -50,8 +50,8 @@ class LayoutParser:
         print("\t\tThere are", len(self.lineNames), "rail lines in this layout")
         print("\t\t\t-> Lines:", self.lineNames)
 
-        self.redLineBlockList = BlockList()
-        self.greenLineBlockList = BlockList()
+        self.redLineBlockDict = BlockDictionary()
+        self.greenLineBlockDict = BlockDictionary()
 
         for i in range(len(self.lineNames)):
             self.lines.append([])
@@ -60,14 +60,14 @@ class LayoutParser:
             block = Block(row[0], row[1], row[2],  
                             row[3], row[5], row[6])
             if row[0] =="Red":
-                self.redLineBlockList.addBlock(block)
+                self.redLineBlockDict.addBlock(block)
             elif row[0] =="Green":
-                self.greenLineBlockList.addBlock(block)
+                self.greenLineBlockDict.addBlock(block)
 
-        print("\t\tThe Red line has", str(self.redLineBlockList.len()), "blocks.")
-        print("\t\tThe Green line has", str(self.greenLineBlockList.len()), "blocks.")
+        print("\t\tThe Red line has", str(self.redLineBlockDict.len()), "blocks.")
+        print("\t\tThe Green line has", str(self.greenLineBlockDict.len()), "blocks.")
 
-        return self.redLineBlockList, self.greenLineBlockList
+        return self.redLineBlockDict, self.greenLineBlockDict
     
     def printExampleBlock(self):
         # Prints out all information for one the first block
@@ -101,8 +101,7 @@ def main():
     parser = LayoutParser(vLayout)
     lines = parser.process()
     parser.printExampleBlock()
-    #print("\nLINE 1:\n",lines[0])
-    #print("\nLINE 2:\n",lines[1])
+    
 
 if __name__ == "__main__":
     main()
