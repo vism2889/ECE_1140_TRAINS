@@ -40,7 +40,6 @@ class App(QWidget):
         self.testList      = []
         self.initUI()
         
-
     def initLayout(self):
         ''' 
             Calls LayoutParser.py which will return a list of track-line names, 
@@ -239,8 +238,6 @@ class App(QWidget):
 
         self.updateBlockInfo(int(self.currBlock.blockNumber)-1)
 
-
-
     def createTable(self):
         self.table = QTableWidget(self)
         self.table.setColumnCount(2)
@@ -365,7 +362,6 @@ class App(QWidget):
         self.updateBlockInfo(currBlockIndex)
         # self.updateTableData(currBlockIndex)
         
-
     def updateBlockInfo(self, pCurrBlockIndex):
         self.blockVallistwidget.clear()
         currBlock = self.lines[self.currLineIndex][pCurrBlockIndex]
@@ -456,6 +452,10 @@ class App(QWidget):
         self.blockInfolistwidget.insertItem(16, "Crossing Lights:      ")
         self.blockInfolistwidget.insertItem(17, "Ticket Sales:         ")
         self.blockInfolistwidget.insertItem(18, "Fault Presence:       ")
+        self.blockInfolistwidget.insertItem(19, "CIRCUIT FAILURE:      ")
+        #self.blockslistwidget.itemClicked.connect(self.onClickedBlock)
+        #fself.testFaultCheck = QCheckBox("CIRCUIT FAILURE",self)
+        #self.blockInfolistwidget.insertItem(19, self.testFaultCheck)
        # self.blockInfolistwidget.insertItem(17," ")
 
     def openFileNameDialog(self):
@@ -530,7 +530,6 @@ class App(QWidget):
         self.testVals = testList
         for i in range(len(self.testVals)):
             print(self.testVals[i])
-
 
     def initTestUIData(self):
         self.testUI.setDataFields(self.lineNames, self.lines, self.infraCounts)

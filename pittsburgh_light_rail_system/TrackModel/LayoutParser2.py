@@ -42,35 +42,42 @@ class LayoutParser:
         # print("\t\tThe number of Track Blocks are: ", len(self.rows))
         # print("\t\tExample data:")
         # print("\t\t\t-> Row1 = ", self.rows[0])
-
+        print(self.rows[0])
         for row in self.rows:
-            if row[0] not in self.trackLines:
-                currTrackLine = TrackLine(row[0])
-                
-                currSection   = TrackSection(row[1])
-                currBlock     = BlockModel(row[0], row[1], row[2], row[3], 
+            currTrackLine = None
+
+            currTrackLine = TrackLine(row[0])
+            if row[0] not in self.trackLineNames:
+                self.trackLineNames.append(row[0])
+                self.trackLines.append(currTrackLine)
+                print(row[0])
+        
+
+            currSection   = TrackSection(row[1])
+            if row[1] not in currTrackLine
+            currBlock     = BlockModel(row[0], row[1], row[2], row[3], 
                                           row[4], row[5], row[6], row[7], 
                                           row[8], row[9], row[10]
                                           )
-                currSection.blocks.append(currBlock)
-                currTrackLine.sections.append(currSection)
-                self.trackLines.append(currTrackLine)
-                currTrackLine.sections.append(currSection)
-                curr
-        self.trackLineNames = set()
-        for row in self.rows:
-            self.trackLineNames.add(row[0])
-        self.trackLineNames = sorted(list(self.trackLineNames))
-        print("\t\tThere are", len(self.trackLineNames), "rail lines in this layout")
-        print("\t\t\t-> Lines:", self.trackLineNames)
+            currSection.blocks.append(currBlock)
+            currTrackLine.sections.append(currSection)
+        print(self.trackLines[0].sections)
+            #curr
+        #print(self.trackLines)
+        # self.trackLineNames = set()
+        # for row in self.rows:
+        #     self.trackLineNames.add(row[0])
+        # self.trackLineNames = sorted(list(self.trackLineNames))
+        #print("\t\tThere are", len(self.trackLineNames), "rail lines in this layout")
+        #print("\t\t\t-> Lines:", self.trackLineNames)
 
 
         # Creates a list of TrackLine objects
-        for line in self.trackLineNames:
-            currTrackLine =  TrackLine(line)
-            self.trackLines.append(currTrackLine)
+        # for line in self.trackLineNames:
+        #     currTrackLine =  TrackLine(line)
+        #     self.trackLines.append(currTrackLine)
 
-        print(self.trackLineNames, self.trackLines)
+        #print(self.trackLineNames, self.trackLines)
 
         #print(self.rows[0])
         for i in range(len(self.trackLines)):
@@ -80,7 +87,7 @@ class LayoutParser:
                     sections.append(row[1])
                     currSection = TrackSection(row[1])
                     self.trackLines[i].sections.append(currSection)
-            print(sections)
+            #print(sections)
                 
         # for line in self.trackLines:
         #     for sec in line.sections:
@@ -96,8 +103,8 @@ class LayoutParser:
                                         )
                         sec.blocks.append(currBlock)
 
-        for line in self.trackLines:
-            print(len(line.sections))
+        # for line in self.trackLines:
+        #     print(len(line.sections))
             # for sec in line.sections:
             #     print("section:", sec.name, "\n", len(sec.blocks))
 
@@ -115,32 +122,6 @@ class LayoutParser:
 
     #     return self.lineNames, self.lines
     
-    # def printExampleBlock(self):
-    #     # Prints out all information for one the first block
-    #     print("\t\tExample Block from Row1:",
-    #             "\n\t\t\tLine: ", 
-    #             self.rows[0][0], 
-    #             "\n\t\t\tSection: ",
-    #             self.rows[0][1],
-    #             "\n\t\t\tBlock Number: ",
-    #             self.rows[0][2],
-    #             "\n\t\t\tBlock Length: ",
-    #             self.rows[0][3],
-    #             "\n\t\t\tBlock Grade: ",
-    #             self.rows[0][4],
-    #             "\n\t\t\tSpeed Limit: ",
-    #             self.rows[0][5],
-    #             "\n\t\t\tInfrastructure: ",
-    #             self.rows[0][6],
-    #             "\n\t\t\tStation Side: ",
-    #             self.rows[0][7],
-    #             "\n\t\t\tElevation: ",
-    #             self.rows[0][8],
-    #             "\n\t\t\tCummulative Elevation: ",
-    #             self.rows[0][9],
-    #             "\n\t\t\tSeconds to Traverse Block: ",
-    #             self.rows[0][10])
-    #     print("\n\tLAYOUT PARSER FINSIHED")
 
 def main():
     vLayout = "Track_Layout_PGH_Light_Rail.csv"
