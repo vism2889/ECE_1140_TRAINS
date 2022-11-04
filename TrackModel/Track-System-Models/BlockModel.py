@@ -9,13 +9,10 @@
 #
 ##############################################################################
 
-# Questions:
-# How to determine where crossings are.  Is there one at every station that is not underground?
-
 class BlockModel:
-    def __init__(self, pLine, pSection, pBlockNumber, pBlockLength,
-                pGrade, pSpeedLimit, pInfrastructure, pStationSide, 
-                pElevation,  pCumulativeElevation, pSecsToTraverseBlock):
+    def __init__(self, pLine='', pSection='', pBlockNumber='', pBlockLength='',
+                pGrade='', pSpeedLimit='', pInfrastructure='', pStationSide='', 
+                pElevation='',  pCumulativeElevation='', pSecsToTraverseBlock=''):
         self.line                = pLine
         self.section             = pSection
         self.blockNumber         = pBlockNumber
@@ -38,5 +35,10 @@ class BlockModel:
         self.crossingSignalState    = False
         self.underground            = False
 
+
+
         # values needed to receive for Wayside Controller
         # values needed to send to Train Model
+
+    def __str__(self):
+        return "Block Number: " + str(self.blockNumber) + " in section " + str(self.section) + " of the " + str(self.line) + " line."

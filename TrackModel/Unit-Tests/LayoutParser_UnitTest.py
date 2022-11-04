@@ -9,6 +9,10 @@
 #
 ##############################################################################
 
+
+import sys
+# tell interpreter where to look for model files
+sys.path.insert(0,"../Parsers")
 from LayoutParser import LayoutParser as LP
 import unittest
 import time
