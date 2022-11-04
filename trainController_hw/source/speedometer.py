@@ -223,6 +223,9 @@ class Ui_MainWindow(object):
 
     def driverSetSpeed(self):
         self.speedometer.update_value(mc.setCommandedSpeed(mc))
+    
+    def setCurrentSpeed(self):
+        self.speedometer.update_value(c.setCurrentSpeed(c))
 
     def toggle_internal_lights(self):
         self.internal_light_state = not self.internal_light_state
@@ -271,6 +274,9 @@ class Ui_MainWindow(object):
 
     def sendData(self):
         c.publish(c)
+
+    def subscribe(self):
+        c.subscribe(c)
         
     def connect(self, MainWindow):
         
@@ -279,6 +285,8 @@ class Ui_MainWindow(object):
         self.timer.timeout.connect(self.toggle_doors_manual)
         self.timer.timeout.connect(self.deploy_ebrake_manual)
         self.timer.timeout.connect(self.driverSetSpeed)
+        self.timer.timeout.connect(self.setCurrentSpeed)
+        self.timer.timeout.connect(self.subscribe)
         #self.timer.timeout.connect(self.sendData)
         
         self.timer.start(10)

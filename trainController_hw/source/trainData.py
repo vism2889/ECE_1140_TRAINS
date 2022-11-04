@@ -1,9 +1,11 @@
 from winserver import winserver
 from in_msg import in_msg
+import random 
+import time
 
 class TrainData:
     def __init__(self):
-        self.node = winserver('my_subscriber')
+        self.node = winserver('my_subscriber', "192.168.0.15")
         self.sub = self.node.subscribe('my_topic', in_msg, self.my_callback, 1)
         self.current_speed = None
         self.commanded_speed = None
@@ -77,4 +79,8 @@ class TrainData:
         self.node.spin()
     
     def spinOnce(self):
-        self.node.spinOnce()        
+        self.node.spinOnce()
+
+if __name__ == '__main__':
+    input = TrainData()
+    input.spin()

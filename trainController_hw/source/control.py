@@ -17,7 +17,7 @@ mixer.init()
 
 class Control():
    
-    def __init__(self, test=True):
+    def __init__(self, test=False):
         if(not test):
             output.__init__(output)
             input.__init__(input)
@@ -119,7 +119,6 @@ class Control():
             return
 
         self.current_speed = current_speed
-        output.setCurrentSpeed(output, self.current_speed)
 
     def getSpeed(self): return self.commanded_speed
 
@@ -139,7 +138,7 @@ class Control():
 
     # need to refactor to take in next station data from train model
     def announceStation(self, start, file_idx):
-        # output.setAnnounceState(output, start)
+        output.setAnnounceState(output, start)
         mixer.music.load("audio/" +  self.station_audio[file_idx])
         if(start) : mixer.music.play()
         if(not start) : mixer.music.stop()
@@ -187,3 +186,6 @@ class Control():
 
     def publish(self):
         output.publish(output)
+
+    def subscribe(self):
+        input.spinOnce(input)

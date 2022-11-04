@@ -3,7 +3,7 @@ int commanded_speed
 int speed_limit
 int suggested_speed
 int temperature_command
-bool authority[]
+bool[] authority
 bool left_door_command
 bool right_door_command
 bool internal_light_command
