@@ -17,10 +17,9 @@ mixer.init()
 
 class Control():
    
-    def __init__(self, test=False):
-        if(not test):
-            output.__init__(output)
-            input.__init__(input)
+    def __init__(self):
+        output.__init__(output)
+        input.__init__(input)
 
         self.authority = 0
         self.light_state_internal = False
@@ -55,7 +54,8 @@ class Control():
 
     def getAuthority(self):
         return self.authority
-
+    
+    # need to confirm what data type authority will be
     def setAuthority(self, authority=None):
         if(authority==None):
             self.authority = input.getAuthority(input)
@@ -63,48 +63,58 @@ class Control():
         
         self.authority = authority
     
-    def setInternalLights(light_state=None):
+    def setInternalLights(self, light_state=None):
         if(light_state == None):
-            light_state = input.getInternalLightCommand(input)
-            return
+            self.light_state_internal = input.getInternalLightCommand(input)
 
-        if(light_state): GPIO.output(14, GPIO.HIGH)
-        if(not light_state): GPIO.output(14, GPIO.LOW) 
+        else: self.light_state_internal = light_state
+
+        if(self.light_state_internal): GPIO.output(14, GPIO.HIGH)
+        if(not self.light_state_internal): GPIO.output(14, GPIO.LOW)
+
+        output.setInternalLightState(output, self.light_state_internal)
         
-    def setExternalLights(light_state=None):
+    def setExternalLights(self, light_state=None):
         if(light_state == None):
-            light_state = input.getInternalLightCommand(input)
-            return
+            self.light_state_external = input.getInternalLightCommand(input)
 
-        if(light_state): GPIO.output(15, GPIO.HIGH)
-        if(not light_state): GPIO.output(15, GPIO.LOW)
+        else: self.light_state_external = light_state
 
-    def setLeftDoor(door_state=None):
+        if(self.light_state_external): GPIO.output(15, GPIO.HIGH)
+        if(not self.light_state_external): GPIO.output(15, GPIO.LOW)
+
+        output.setExternalLightState(output, self.light_state_external)
+
+    def setLeftDoor(self, door_state=None):
         if(door_state == None):
-            door_state = input.getLeftDoorCommand
-            return
+            self.door_state_left = input.getLeftDoorCommand(input)
 
-        if(door_state): GPIO.output(23, GPIO.HIGH)
-        if(not door_state): GPIO.output(23, GPIO.LOW)
+        else: self.door_state_left = door_state
 
-    def setRightDoor(door_state=None):
+        if(self.door_state_left): GPIO.output(23, GPIO.HIGH)
+        if(not self.door_state_left): GPIO.output(23, GPIO.LOW)
+
+        output.setLeftDoor(output, self.door_state_left)
+
+    def setRightDoor(self, door_state=None):
         if(door_state==None):
-            door_state = input.getRightDoorCommand(input)
-            return
+            self.door_state_right = input.getRightDoorCommand(input)
 
-        if(door_state): GPIO.output(24, GPIO.HIGH)
-        if(not door_state): GPIO.output(24, GPIO.LOW)
+        else: self.door_state_right = door_state
+
+        if(self.door_state_right): GPIO.output(24, GPIO.HIGH)
+        if(not self.door_state_right): GPIO.output(24, GPIO.LOW)
+
+        output.setRightDoorState(output, self.door_state_right)
 
     def setSpeed(self, speed=None):
         if(speed==None):
             speed = input.getCommandedSpeed(input)
-            return 
 
         if(self.limitSpeed(self, speed)):
-            self.commanded_speed = speed
-            output.setCommandedSpeed(output, self.commanded_speed)
-            output.setSpeedLimit(output, self.speed_limit)
+            self.getPowerOutput(speed, input.getCurrentSpeed(input)) # function sends power data out
 
+    # can remove after testing
     def setSpeedLimit(self, speed_limit=None):
         if(speed_limit==None):
             self.speed_limit = input.getSpeedLimit(input)
@@ -113,6 +123,7 @@ class Control():
         self.speed_limit = speed_limit
         output.setSpeedLimit(output, self.speed_limit)
 
+    # can remove after testing
     def setCurrentSpeed(self, current_speed=None):
         if(current_speed==None):
             self.current_speed = input.getCurrentSpeed(input)
@@ -120,14 +131,16 @@ class Control():
 
         self.current_speed = current_speed
 
+    # can remove after testing
     def getSpeed(self): return self.commanded_speed
 
     def setTemperature(self, temperature=None):
         if(temperature == None):
             self.temperature = input.getTemperature(input)
-            return
 
-        self.temperature = temperature
+        else: self.temperature = temperature
+
+        output.setTemperature(self.setTemperature)
 
     def setSuggestedSpeed(self, suggested_speed=None):
         if(suggested_speed == None):
@@ -145,8 +158,8 @@ class Control():
 
     def deployEbrake(self):
         # may have to consider case where if in auto mode and ebrake is deployed, stop taking in commanded speed data 
-        self.commanded_speed = 0
-        self.power = 0
+        output.setEbrakeState(output, True)
+        output.setPower(output, 0)
 
     def deployServiceBrake(self):
         self.brakeCommand = not self.brakeCommand
@@ -157,7 +170,8 @@ class Control():
             print("Brake Command off")
 
     def limitSpeed(self, speed):
-        if(speed > self.speed_limit):
+        speed_limit = input.getSpeedLimit(input)
+        if(speed > speed_limit):
             return False
         
         else: return True
@@ -174,15 +188,15 @@ class Control():
     def get_kp_ki(self):
         return self.k_p, self.k_i
 
-    def getPowerOutput(self):
-        self.pid.setpoint = self.commanded_speed
-        self.power = self.pid(self.current_speed)
+    def getPowerOutput(self, commanded_speed, current_speed):
+        self.pid.setpoint = commanded_speed
+        self.power = self.pid(current_speed)
         if self.power > 0:
-            return self.power
+            output.setPower(output, self.power)
         
         else:
             self.power = 0
-            return self.power
+            output.setPower(output, self.power)
 
     def publish(self):
         output.publish(output)

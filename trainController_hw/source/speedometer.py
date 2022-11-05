@@ -268,9 +268,6 @@ class Ui_MainWindow(object):
 
     def deployServiceBrake(self):
         c.deployServiceBrake(c)
-    
-    def calculatePower(self):
-        power = c.getPowerOutput(c)
 
     def sendData(self):
         c.publish(c)
@@ -279,14 +276,14 @@ class Ui_MainWindow(object):
         c.subscribe(c)
         
     def connect(self, MainWindow):
-        
-        self.timer.timeout.connect(self.calculatePower)
+        self.timer.timeout.connect(self.subscribe)
         self.timer.timeout.connect(self.toggle_lights_manual)
         self.timer.timeout.connect(self.toggle_doors_manual)
         self.timer.timeout.connect(self.deploy_ebrake_manual)
         self.timer.timeout.connect(self.driverSetSpeed)
         self.timer.timeout.connect(self.setCurrentSpeed)
-        self.timer.timeout.connect(self.subscribe)
+        self.timer.timeout.connect(self.announceStation)
+        
         #self.timer.timeout.connect(self.sendData)
         
         self.timer.start(10)
