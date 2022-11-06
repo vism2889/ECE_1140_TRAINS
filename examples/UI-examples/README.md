@@ -1,1 +1,0 @@
-#### This contains example code to reference when creating a UI in python and using a stylesheet to maintain a consistent style across multiple UI modules.
