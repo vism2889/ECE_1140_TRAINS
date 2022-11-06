@@ -33,14 +33,16 @@ class BlockDictionary:
                 self.crossingList[newBlock.number] = "red"
 
     def toggleOccupancy(self, blockNum):
-        self.blockList[blockNum].occupancy ^= self.blockList[blockNum].occupancy
+        self.blockList[blockNum].occupancy = not self.blockList[blockNum].occupancy
 
-    def toggleMaintenaceState(self, blockNum):
-        self.blockList[blockNum].maintenanceState ^= self.blockList[blockNum].maintenanceState
+    def toggleMaintenanceState(self, blockNum):
+        self.blockList[blockNum].maintenanceState = not self.blockList[blockNum].maintenanceState
 
     def toggleFaultState(self, blockNum):
-        self.blockList[blockNum].faultState ^= self.blockList[blockNum].faultState
+        self.blockList[blockNum].faultState = not self.blockList[blockNum].faultState
 
+    def getLine(self, blockNum):
+        return self.blockList[blockNum].line
     
     def getOccupancy(self, blockNum):
         if self.blockList[blockNum].occupancy:

@@ -7,7 +7,7 @@ from TrainDictionary import TrainDictionary
 from scheduleParser import readSchedule
 
 class DispatchPopUp(object):
-    def setupUi(self, dispatchPopUp, redLineStations, greenLineStations):
+    def setupUi(self, dispatchPopUp, redLineStations, greenLineStations, redLineTrains, greenLineTrains):
         dispatchPopUp.setObjectName("dispatchPopUp")
         dispatchPopUp.setGeometry(602, 50, 200, 300)
         self.trainNameEntry = QtWidgets.QLineEdit(dispatchPopUp)
@@ -31,6 +31,9 @@ class DispatchPopUp(object):
         self.greenLineStationsKeys = greenLineStations.keys()
         self.lineSelection.activated.connect(self.updateDestinationList)
         self.dispatch.clicked.connect(self.dispatchTrain)
+        self.redLineTrains = redLineTrains
+        self.greenLineTrains = greenLineTrains
+
 
         # add items to destinationList
         for key in self.redLineStationsKeys:
@@ -79,9 +82,10 @@ class DispatchPopUp(object):
 
         # add dispatch destinations to list
         for destination in self.selectedDestinations:
+            # TODO make this a dictionary and make it all work
             self.destinationList.append(destination.text())
 
         if (self.currentLine == "Red Line"):
-            addRedLineTrain(self.destinationList, self.trainName)
+            self.redLineTrains.addTrain(self.trainName, self.destinationList, 0, 0)
         elif (self.currentLine == "Green Line"):
-            addGreenLineTrain(self.destinationList, self.trainName)
+            self.greenLineTrains.addTrain(self.trainName, self.destinationList, 0, 0)

@@ -10,7 +10,10 @@ class TrainDictionary:
         self.trainList[name] = Train(destinations, commandedSpeed, authority)
 
     def addScheduledTrain(self, name, destinations, commandedSpeed, authority):
-        self.trainList[name] = Train(destinations, commandedSpeed, authority)
+        self.backLog[name] = Train(destinations, commandedSpeed, authority)
+
+    def keys(self):
+        return self.trainList.keys()
 
     def getCommandedSpeed(self, name):
         return self.trainList[name].commandedSpeed
@@ -18,8 +21,8 @@ class TrainDictionary:
     def getAuthority(self, name):
         return self.trainList[name].authority
 
-    def getDestinations(self, name):
+    def getDestination(self, name):
         return self.trainList[name].destinations
 
     def toggleDestination(self, name, destination):
-        self.trainList[name].destinations[destination] ^= self.trainList[name].destinations[destination]
+        self.trainList[name].destinations[destination] = not self.trainList[name].destinations[destination]
