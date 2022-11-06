@@ -1,2 +1,8 @@
-CTC-Office/__pycache__
-CTC-Office/block-functionality/__pycache__/*
+## vscode config
+.vscode/
+
+
+## Pycache
+**__pycache__/
+# CTC-Office/__pycache__
+# CTC-Office/block-functionality/__pycache__/*
