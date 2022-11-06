@@ -23,6 +23,7 @@ class OutputData():
 
     def setEbrakeState(self, state):
         self.message.ebrake_command = state
+        
     def setLeftDoor(self, state):
         self.message.left_door_state = state
 

@@ -37,7 +37,7 @@ class Control():
         self.k_i = 0
         self.pid = PID(self.k_p, self.k_i, 0, setpoint=self.commanded_speed) # initialize pid with fixed values
         self.pid.outer_limits = (0, 120000) # clamp at max power output specified in datasheet 120kW
-        self.power = 0
+        self.power = 0.0
         self.station_audio = ["shadyside_herron.mp3", "herron_swissvale.mp3", 
                               "swissvale_penn.mp3", "penn_steelplaza.mp3", 
                               "steelplaza_first.mp3","first_stationSquare.mp3", 
@@ -110,9 +110,12 @@ class Control():
     def setSpeed(self, speed=None):
         if(speed==None):
             speed = input.getCommandedSpeed(input)
+            self.getPowerOutput(self, speed, input.getCurrentSpeed(input)) # function sends power data out
 
-            if(self.limitSpeed(self, speed)):
-                self.getPowerOutput(speed, input.getCurrentSpeed(input)) # function sends power data out
+        else:
+            currentSpeed = input.getCurrentSpeed(input)
+            self.getPowerOutput(self, speed, currentSpeed)
+
 
     # can remove after testing
     def setSpeedLimit(self, speed_limit=None):
@@ -187,14 +190,15 @@ class Control():
         return self.k_p, self.k_i
 
     def getPowerOutput(self, commanded_speed, current_speed):
-        self.pid.setpoint = commanded_speed
-        self.power = self.pid(current_speed)
+        self.pid.setpoint = self.commanded_speed
+        self.power = self.pid(self.current_speed)
         if self.power > 0:
             output.setPower(output, self.power)
         
         else:
-            self.power = 0
+            self.power = 0.0
             output.setPower(output, self.power)
+
 
     def publish(self):
         output.publish(output)
