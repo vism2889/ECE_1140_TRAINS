@@ -23,16 +23,20 @@ class BlockModel:
         self.grade               = pGrade
         self.speedLimit          = pSpeedLimit
         self.infrastructure      = pInfrastructure
-        self.stationSide         = pStationSide      # set  to None if a station does not exist
+        self.stationSide         = pStationSide         # set  to None if a station does not exist
         self.elevation           = pElevation
         self.cumulativeElevation = pCumulativeElevation
         self.secsToTraverseBlock = pSecsToTraverseBlock
 
         self.occupancy = False
-        # values needed for Wayside and Train Model
+        self.faults = [False, False, False]
+        self.faultsText =  ""
+        # values needed to receive for Wayside Controller
         # self.vSwitchPresence   = None #gets set based on infrastructure
         # self.vSwitchState      = None #gets set based on infrastructure
         # self.vStation          = None #gets set based on infrastructure
         # self.vCrossingPresence = None #unknown: maybe is present at every above ground station
         # self.vSignalPresence   = None #unknown
         # self.vSignalState      = None #unknown
+        
+        # values needed to send to Train Model
