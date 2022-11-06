@@ -247,10 +247,10 @@ class Ui_MainWindow(object):
         c.setSpeed(c, self.commanded_speed)
 
     def setCurrentSpeed(self):
-        c.setCurrentSpeed(c, self.current_speed)
+        c.setCurrentSpeed(c)
 
     def announceStation(self):
-        self.station = self.getNextStation()
+        #self.station = self.getNextStation()
         c.announceStation(c, True, self.station)
 
     def stopAnnounce(self):
@@ -277,16 +277,16 @@ class Ui_MainWindow(object):
         
     def connect(self, MainWindow):
         self.timer.timeout.connect(self.subscribe)
-        self.timer.timeout.connect(self.toggle_lights_manual)
-        self.timer.timeout.connect(self.toggle_doors_manual)
-        self.timer.timeout.connect(self.deploy_ebrake_manual)
-        self.timer.timeout.connect(self.driverSetSpeed)
+       # self.timer.timeout.connect(self.toggle_lights_manual)
+       # self.timer.timeout.connect(self.toggle_doors_manual)
+        #self.timer.timeout.connect(self.deploy_ebrake_manual)
+        #self.timer.timeout.connect(self.driverSetSpeed)
         self.timer.timeout.connect(self.setCurrentSpeed)
-        self.timer.timeout.connect(self.announceStation)
+        #self.timer.timeout.connect(self.announceStation)
         
         #self.timer.timeout.connect(self.sendData)
         
-        self.timer.start(10)
+        self.timer.start(500)
 
 
 if __name__ == "__main__":

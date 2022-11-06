@@ -21,7 +21,7 @@ class TrainData:
         self.service_brake_command = None
         self.ebrake_command = None
 
-    def my_callback(self, msg):
+    def my_callback(self, msg): 
         self.current_speed = msg.current_speed
         self.commanded_speed = msg.commanded_speed
         self.suggested_speed = msg.suggested_speed
@@ -83,4 +83,8 @@ class TrainData:
 
 if __name__ == '__main__':
     input = TrainData()
-    input.spin()
+    while True:
+        input.spinOnce()
+        print("Speed Limit: ",input.getSpeedLimit())
+        print("Current Speed: ", input.getCurrentSpeed())
+        time.sleep(.5)

@@ -111,8 +111,8 @@ class Control():
         if(speed==None):
             speed = input.getCommandedSpeed(input)
 
-        if(self.limitSpeed(self, speed)):
-            self.getPowerOutput(speed, input.getCurrentSpeed(input)) # function sends power data out
+            if(self.limitSpeed(self, speed)):
+                self.getPowerOutput(speed, input.getCurrentSpeed(input)) # function sends power data out
 
     # can remove after testing
     def setSpeedLimit(self, speed_limit=None):
@@ -127,9 +127,7 @@ class Control():
     def setCurrentSpeed(self, current_speed=None):
         if(current_speed==None):
             self.current_speed = input.getCurrentSpeed(input)
-            return
-
-        self.current_speed = current_speed
+            print(self.current_speed)
 
     # can remove after testing
     def getSpeed(self): return self.commanded_speed
