@@ -133,7 +133,7 @@ class TrackControllerWindow(object):
             if self.greenline_reference['maintenance'][int(idx)]:
                 print(f"PLC upload request to greenline controller {idx}")
                 file , check = QtWidgets.QFileDialog.getOpenFileName(None, "Select PLC Script",
-                                                    "", "All Files (*);;Python Files (*.py);;Text Files (*.txt)")
+                                                    "", "PLC Files (*.plc)")
                 if os.path.exists(file):
                     with open(file) as f:
                         print(f.readline())
