@@ -1,5 +1,5 @@
 from PyQt5 import QtCore, QtGui, QtWidgets, Qt
-import os.path
+import os
 from track_layout import extract_layout
 
 class TrackControllerWindow(object):
@@ -43,8 +43,16 @@ class TrackControllerWindow(object):
         self.toolBox.setObjectName("toolBox")
         self.toolBox.setFont(QtGui.QFont())
 
-        redline_view_layout = extract_layout.parseTrackLayout("track_layout/Track Layout & Vehicle Data vF.xlsx - Red Line.csv", 0)
-        redline_layout = extract_layout.parseTrackLayout("track_layout/Track Layout & Vehicle Data vF.xlsx - Red Line.csv", self.numBlocksPerController)
+        # redline_view_layout = extract_layout.parseTrackLayout("track_layout/Track Layout & Vehicle Data vF.xlsx - Red Line.csv", 0)
+        # os.get
+        path = os.getcwd()
+        if os.name == 'nt':
+            path += "\\track_layout\\Track Layout & Vehicle Data vF.xlsx - Red Line.csv"
+        elif os.name == 'posix':
+            path += "/track_layout/Track Layout & Vehicle Data vF.xlsx - Red Line.csv"
+
+        redline_view_layout = extract_layout.parseTrackLayout(path, 0)
+        redline_layout = extract_layout.parseTrackLayout(path, self.numBlocksPerController)
 
         self.redline_reference['total-blocks'] = redline_view_layout[0]['total-blocks']
 
@@ -69,8 +77,15 @@ class TrackControllerWindow(object):
         self.toolBox.addItem(self.redline_tab, "")
 
         ######## Green Line ########
-        greenline_view_layout = extract_layout.parseTrackLayout("track_layout/Track Layout & Vehicle Data vF.xlsx - Green Line.csv", 0)
-        greenline_layout = extract_layout.parseTrackLayout("track_layout/Track Layout & Vehicle Data vF.xlsx - Green Line.csv", self.numBlocksPerController)
+        path = os.getcwd()
+
+        if os.name == 'nt':
+            path += "\\track_layout\\Track Layout & Vehicle Data vF.xlsx - Green Line.csv"
+        elif os.name == 'posix':
+            path += "/track_layout/Track Layout & Vehicle Data vF.xlsx - Green Line.csv"
+
+        greenline_view_layout = extract_layout.parseTrackLayout(path, 0)
+        greenline_layout = extract_layout.parseTrackLayout(path, self.numBlocksPerController)
 
         self.greenline_reference['total-blocks'] = greenline_view_layout[0]['total-blocks']
 
@@ -705,8 +720,8 @@ class TrackControllerWindow(object):
 
     def checkMaintenance(self, line, block_num):
         controller_idx = int((block_num-1)/self.numBlocksPerController)
-        value = self.redline_reference['maintenance'][controller_idx]
         if line == 'red':
+            value = self.redline_reference['maintenance'][controller_idx]
             if value:
                 self.redline_reference['view'][0]['block-table'].item(block_num-1, 0).setIcon(QtGui.QIcon("alert.png"))
                 self.redline_controllers.setTabIcon(controller_idx+1, QtGui.QIcon("alert.png"))
@@ -715,6 +730,7 @@ class TrackControllerWindow(object):
                 self.redline_controllers.setTabIcon(controller_idx+1, QtGui.QIcon())
 
         if line == 'green':
+            value = self.greenline_reference['maintenance'][controller_idx]
             if value:
                 self.greenline_reference['view'][0]['block-table'].item(block_num-1, 0).setIcon(QtGui.QIcon("alert.png"))
                 self.greenline_controllers.setTabIcon(controller_idx+1, QtGui.QIcon("alert.png"))

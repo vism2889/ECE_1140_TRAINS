@@ -1,5 +1,5 @@
 from  PyQt5 import QtWidgets
-from main_window import TrackControllerWindow
+from WaysideUI import TrackControllerWindow
 
 
 if __name__ == '__main__':

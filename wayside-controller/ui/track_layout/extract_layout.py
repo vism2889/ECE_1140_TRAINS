@@ -1,4 +1,5 @@
 from copy import deepcopy
+import os
 import csv
 
 def parseTrackLayout(path, size=15):
