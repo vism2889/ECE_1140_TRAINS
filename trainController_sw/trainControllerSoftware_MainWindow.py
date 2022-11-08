@@ -9,14 +9,25 @@
 
 
 import sys
+
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import QTimer
+from functools import partial
 from trainControllerSoftware_TestSecondWindow import Ui_Test_SecondWindow
+from manualControl import ManualControl as ms
+from Control import Control as c
 from simple_pid import PID
 
 
-class Ui_TrainControllerSW_MainWindow(object):
+class Ui_TrainControllerSW_MainWindow(object): 
     def setupUi(self, TrainControllerSW_MainWindow):
+        ##
+        self.speed_limit = 0
+        self.authority_value = 0
+        self.speed_display_value = 0
+        self.power_failure_value = 0
+        ##
+        
         self.commanded_speed = 0
         self.current_speed = 0
         self.kp = 0
@@ -310,7 +321,7 @@ class Ui_TrainControllerSW_MainWindow(object):
         self.label_9.setFont(font)
         self.label_9.setAlignment(QtCore.Qt.AlignCenter)
         self.label_9.setObjectName("label_9")
-        self.ManuLebrake_button = QtWidgets.QPushButton(self.Manual_Frame, clicked = lambda: self.ActivateEmergencyBrake())
+        self.ManuLebrake_button = QtWidgets.QPushButton(self.Manual_Frame)
         self.ManuLebrake_button.setGeometry(QtCore.QRect(50, 200, 141, 91))
         font = QtGui.QFont()
         font.setBold(True)
@@ -341,7 +352,7 @@ class Ui_TrainControllerSW_MainWindow(object):
         self.PowerOutput_lcdDisplay.setFont(font)
         self.PowerOutput_lcdDisplay.setObjectName("PowerOutput_lcdDisplay")
         
-        self.setKp_Box = QtWidgets.QDoubleSpinBox(self.EngineerMode_Frame, valueChanged = lambda: self.setKpValue())
+        self.setKp_Box = QtWidgets.QDoubleSpinBox(self.EngineerMode_Frame)
         self.setKp_Box.setGeometry(QtCore.QRect(90, 30, 91, 32))
         self.setKp_Box.setMinimum(0.0)
         self.setKp_Box.setMaximum(90.0)
@@ -350,17 +361,17 @@ class Ui_TrainControllerSW_MainWindow(object):
         self.label = QtWidgets.QLabel(self.EngineerMode_Frame)
         self.label.setGeometry(QtCore.QRect(30, 40, 63, 20))
         self.label.setObjectName("label")
-        self.setKi_Box = QtWidgets.QDoubleSpinBox(self.EngineerMode_Frame, valueChanged = lambda: self.setKiValue())
+        self.setKi_Box = QtWidgets.QDoubleSpinBox(self.EngineerMode_Frame)
         self.setKi_Box.setGeometry(QtCore.QRect(250, 30, 91, 32))
         self.setKi_Box.setMinimum(00.0)
         self.setKi_Box.setMaximum(90.0)
         self.setKi_Box.setProperty("value", 0.0)
         self.setKi_Box.setObjectName("setKi_Box")
         self.TabWigets.addTab(self.tab_3, "")
-        self.OpenTestUI = QtWidgets.QPushButton(self.centralwidget, clicked = lambda: self.openTestWindow())        
+        self.OpenTestUI = QtWidgets.QPushButton(self.centralwidget)        
         self.OpenTestUI.setGeometry(QtCore.QRect(720, 320, 93, 29))
         self.OpenTestUI.setObjectName("OpenTestUI")
-        self.ImportTestData = QtWidgets.QPushButton(self.centralwidget, clicked = lambda: self.openTestWindow())
+        self.ImportTestData = QtWidgets.QPushButton(self.centralwidget)
         self.ImportTestData.setGeometry(QtCore.QRect(720, 360, 93, 29))
         self.ImportTestData.setObjectName("ImportTestData")
         
@@ -489,7 +500,7 @@ class Ui_TrainControllerSW_MainWindow(object):
         self.statusbar = QtWidgets.QStatusBar(TrainControllerSW_MainWindow)
         self.statusbar.setObjectName("statusbar")
         TrainControllerSW_MainWindow.setStatusBar(self.statusbar)
-        self.DisplayPower = QtWidgets.QPushButton(self.centralwidget, clicked = lambda: self.DisplayPowerOutput())
+        self.DisplayPower = QtWidgets.QPushButton(self.centralwidget)
         self.DisplayPower.setGeometry(QtCore.QRect(720, 280, 93, 29))
         self.DisplayPower.setObjectName("DisplayPower")
 
@@ -567,6 +578,106 @@ class Ui_TrainControllerSW_MainWindow(object):
         self.DisplayPower.setText(_translate("TrainControllerSW_MainWindow", "Display Power"))
         self.label_33.setText(_translate("TrainControllerSW_MainWindow", "Emergency Brake"))
 
+
+ ###### Fake Test Cases lab
+    def setAuthorityDisplayValue(self, pValue):
+        self.authority_value = pValue
+        
+    def getAuthorityDisplayValue(self):
+        return self.authority_value
+    
+    def setSpeedLimitDisplayValue(self, pValue):
+        self.speed_limit = pValue
+        
+    def getSpeedLimitDisplayValue(self):
+        return self.speed_limit
+
+    def setSpeedDisplayValue(self, pValue):
+        self.speed_display_value = pValue
+        
+    def getSpeedDisplayValue(self):
+        if(self.speed_display_value > self.speed_limit):
+            return self.speed_limit
+        return self.speed_display_value
+    
+    def setPowerFailureDisplayValue(self, pValue):
+        self.power_failure_value = pValue
+        if(self.power_failure_value == True):
+            self.setSpeedDisplayValue(self, 0)
+        
+##
+    
+####### Set Automatic/Main Displays
+####### Input = trainData
+####### Output = outputData
+    def AuthorityDisplay(self, pValue):
+        #self.milesValue = pValue * 0.621371
+        self.Authority_lcdDisplay.display(c.getAuthority)
+    
+    def AutoSpeed(self, pValue):
+        #self.milesValue = pValue * 0.621371
+        self.Auto_SpeedDisplay.display(c.getSpeed)
+        
+    def AutoCommandedSpeed(self, pValue):
+        #self.milesValue = pValue * 0.621371
+        self.Auto_CommandedSpeedDisplay.display(c.getCommandedSpeed)    
+
+    def AutoBraking(self, pValue):
+        self.Auto_BrakingDisplay.display(c.getServiceBrake)
+        
+    def AutoInternalLights(self, pValue):
+        self.InternalLights_DisplayBox.setCheckState(c.getInternalLights)
+    
+    def AutoExternalLights(self, pValue):
+        self.ExternalLights_DisplayBox.setCheckState(c.getExternalLights)
+    
+    def AutoLeftDoors(self, pValue):
+        self.LeftDoors_DisplayBox.setCheckState(c.getLeftDoor)
+    
+    def AutoRightDoors(self, pValue):
+        self.RightDoors_DisplayBox.setCheckState(c.getRightDoor)
+
+    def AutoAdvertisements(self, pValue):
+        self.Advertisements_DisplayBox.setCheckState(c.getAdvertisements)
+    
+    def AutoAnnouncements(self, pValue):
+        self.Announcements_DisplayBox.setCheckState(c.getAnnouncements)
+    
+    def AutoTemperature(self, pValue):
+        self.Temperature_DisplayBox.display(c.getTemperature)
+    
+    def AutoEngineFault(self, pValue):
+        self.EngineFault_DisplayBox.setCheckable(True)
+        self.EngineFault_DisplayBox.setCheckState(pValue)  
+        self.ActivateEmergencyBrake()
+        
+    def AutoPowerFault(self, pValue):
+        self.PowerFault_DisplayBox.setCheckable(True)
+        self.PowerFault_DisplayBox.setCheckState(pValue)
+        self.ActivateEmergencyBrake()
+        
+    def AutoCircuitFault(self, pValue):
+        self.CircuitFault_DisplayBox.setCheckable(True)
+        self.CircuitFault_DisplayBox.setCheckState(pValue)
+        self.ActivateEmergencyBrake()
+        
+    def AutoTrackFault(self, pValue):
+        self.TrackFault_DisplayBox.setCheckable(True)
+        self.TrackFault_DisplayBox.setCheckState(pValue)
+        
+    def EmergencyBrakeDisplay(self, pValue):
+        self.EmergencyBrakeDisplayBox.setCheckable(True)
+        self.EmergencyBrakeDisplayBox.setCheckState(pValue)
+    
+    def CurrentSpeed(self, pValue):
+        #self.milesValue = pValue * 0.621371
+        self.currentSpeed_lcdDisplay.display(c.getCurrentSpeed)
+    
+    def NextStation(self, pValue):
+        #self.next_station_label.setText(c.getNextStation)
+        pass   
+
+#########  Test Input Data  
     def openTestWindow(self):
         self.timer.timeout.connect(self.getTestSpeed)
         self.timer.timeout.connect(self.getTestCommandedSpeed)
@@ -585,8 +696,8 @@ class Ui_TrainControllerSW_MainWindow(object):
         self.timer.timeout.connect(self.getTestNextStation)
         self.timer.timeout.connect(self.getEmergencyBrake)
         self.timer.timeout.connect(self.closeTestWindow)
-        self.timer.timeout.connect(self.getKpValue)
-        self.timer.timeout.connect(self.getKiValue)
+        #self.timer.timeout.connect(self.getKpValue)
+        #self.timer.timeout.connect(self.getKiValue)
         self.timer.start(1)
         self.TestWindow.show()
     
@@ -607,193 +718,65 @@ class Ui_TrainControllerSW_MainWindow(object):
         self.timer.timeout.disconnect(self.getTestCurrentSpeed)
         self.timer.timeout.disconnect(self.getTestNextStation)
         self.timer.timeout.connect(self.getEmergencyBrake)
-        self.timer.timeout.connect(self.getKpValue)
-        self.timer.timeout.connect(self.getKiValue)
         self.timer.timeout.disconnect(self.closeTestWindow)
         self.timer.stop()        
-    
-    def AuthorityDisplay(self, pValue):
-        self.milesValue = pValue * 0.621371
-        self.Authority_lcdDisplay.display(self.milesValue)
-    
-    def AutoSpeed(self, pValue):
-        self.milesValue = pValue * 0.621371
-        self.Auto_SpeedDisplay.display(self.milesValue)
-        
-    def AutoCommandedSpeed(self, pValue):
-        self.milesValue = pValue * 0.621371
-        self.Auto_CommandedSpeedDisplay.display(self.milesValue)    
-
-    def AutoBraking(self, pValue):
-        self.Auto_BrakingDisplay.display(pValue)
-        
-    def AutoInternalLights(self, pValue):
-        self.InternalLights_DisplayBox.setCheckState(pValue)
-    
-    def AutoExternalLights(self, pValue):
-        self.ExternalLights_DisplayBox.setCheckState(pValue)
-    
-    def AutoLeftDoors(self, pValue):
-        self.LeftDoors_DisplayBox.setCheckState(pValue)
-    
-    def AutoRightDoors(self, pValue):
-        self.RightDoors_DisplayBox.setCheckState(pValue)
-
-    def AutoAdvertisements(self, pValue):
-        self.Advertisements_DisplayBox.setCheckState(pValue)
-    
-    def AutoAnnouncements(self, pValue):
-        self.Announcements_DisplayBox.setCheckState(pValue)
-    
-    def AutoTemperature(self, pValue):
-        self.Temperature_DisplayBox.display(pValue)
-    
-    def AutoEngineFault(self, pValue):
-        self.EngineFault_DisplayBox.setCheckable(True)
-        self.EngineFault_DisplayBox.setCheckState(pValue)  
-        self.ActivateEmergencyBrake()
-        
-    def AutoPowerFault(self, pValue):
-        self.PowerFault_DisplayBox.setCheckable(True)
-        self.PowerFault_DisplayBox.setCheckState(pValue)
-        self.ActivateEmergencyBrake()
-        
-    def AutoCircuitFault(self, pValue):
-        self.CircuitFault_DisplayBox.setCheckable(True)
-        self.CircuitFault_DisplayBox.setCheckState(pValue)
-        self.ActivateEmergencyBrake()
-        
-    def AutoTrackFault(self, pValue):
-        self.TrackFault_DisplayBox.setCheckable(True)
-        self.TrackFault_DisplayBox.setCheckState(pValue)
-    
-    def ActivateEmergencyBrake(self):
-        self.currentSpeed_lcdDisplay.display(0)
-        self.speed_Slider.setValue(0)
-        self.Manual_CommandedSpeed_lcdDisplay.display(0)
-        
-    def EmergencyBrakeDisplay(self, pValue):
-        self.EmergencyBrakeDisplayBox.setCheckable(True)
-        self.EmergencyBrakeDisplayBox.setCheckState(pValue)
-    
-    def CurrentSpeed(self, pValue):
-        self.milesValue = pValue * 0.621371
-        self.currentSpeed_lcdDisplay.display(self.milesValue)
-    
-    def NextStation(self, pValue):
-        self.next_station_label.setText(pValue)
-    
-######### Manual
-    def ManualCommandedSpeed(self, pValue):
-        self.milesValue = pValue * 0.621371
-        self.Manual_CommandedSpeed_lcdDisplay.display(self.milesValue)
-        self.speed_Slider.setValue(int(self.milesValue))
-    
-    def ManualBraking(self, pValue):
-        #self.Manual_Braking_lcdDisplay.display(pValue)
-        #self.braking_Slider.setValue(int(pValue))
-        pass
-    
-    def ManualTemperature(self, pValue):
-        self.Manual_temperature_box.setValue(pValue)
-    
-    def ManualLights(self, pValue):
-        self.Manual_lights_ComboBox.setCurrentIndex(pValue)
-    
-    def ManualDoors(self, pValue):
-        self.Manual_doors_ComboBox.setCurrentIndex(pValue)
-    
-    def ManualAdvertisements(self, pValue):
-        self.Manual_Advertisements_CheckBox.setCheckState(pValue)
-    
-    def ManualAnnouncements(self, pValue):
-        self.Manual_Annoucements_CheckBox.setCheckState(pValue)
-    
-######## Engineer Mode
-    def setKpBoxValue(self, pValue):
-        self.setKp_Box.setValue(pValue)
-    
-    def setKiBoxValue(self, pValue):
-        self.setKi_Box.setValue(pValue)        
-
-######### Get Test Input Data       
+         
     def getTestSpeed(self):
         self.AutoSpeed(self.ui.setSpeed())
     
     def getTestCommandedSpeed(self):
         self.AutoCommandedSpeed(self.ui.setCommandedSpeed())
-        self.ManualCommandedSpeed(self.ui.setCommandedSpeed())
     
     def getTestBraking(self):
        self.AutoBraking(self.ui.setBraking())
-       self.ManualBraking(self.ui.setBraking())
     
     def getTestAuthority(self):
         self.AuthorityDisplay(self.ui.setAuthority())
     
-    # Lights:
-    # 0 - Off
-    # 1 - Internal
-    # 2 - External
-    # 3 - Both
+    # Lights: 0 - Off, 1 - Internal, 2 - External, 3 - Both
     def getTestLights(self):
         if(self.ui.setLights() == 1):
             self.AutoInternalLights(True)
             self.AutoExternalLights(False)
-            self.ManualLights(self.ui.setLights())
             
         elif(self.ui.setLights() == 2):
             self.AutoExternalLights(True)
             self.AutoInternalLights(False)
-            self.ManualLights(self.ui.setLights())
             
         elif(self.ui.setLights() == 3):
             self.AutoInternalLights(True)
             self.AutoExternalLights(True)
-            self.ManualLights(self.ui.setLights())
             
         else:
             self.AutoInternalLights(False)
             self.AutoExternalLights(False)
-            self.ManualLights(self.ui.setLights())
    
-    # Doors:
-    # 0 - Closed
-    # 1 - Left
-    # 2 - Right
-    # 3 - Both
+    # Doors: 0 - Closed, 1 - Left, 2 - Right, 3 - Both
     def getTestDoors(self):
         if(self.ui.setDoors() == 1):
             self.AutoLeftDoors(True)
             self.AutoRightDoors(False)
-            self.ManualDoors(self.ui.setDoors())
             
         elif(self.ui.setDoors() == 2):
             self.AutoRightDoors(True)
             self.AutoLeftDoors(False)
-            self.ManualDoors(self.ui.setDoors())
             
         elif(self.ui.setDoors() == 3):
             self.AutoLeftDoors(True)
             self.AutoRightDoors(True)
-            self.ManualDoors(self.ui.setDoors())
             
         else:
             self.AutoLeftDoors(False)
             self.AutoRightDoors(False)
-            self.ManualDoors(self.ui.setDoors())
         
     def getTestAdvertisements(self):
         self.AutoAdvertisements(self.ui.setAdvertisements())
-        self.ManualAdvertisements(self.ui.setAdvertisements())
     
     def getTestAnnoucements(self):
         self.AutoAnnouncements(self.ui.setAnnouncements())
-        self.ManualAnnouncements(self.ui.setAnnouncements())
     
     def getTestTemperature(self):
         self.AutoTemperature(self.ui.setTemperature())
-        self.ManualTemperature(self.ui.setTemperature())
     
     def getTestEngineFault(self):
         self.AutoEngineFault(self.ui.setEngineFault())
@@ -809,13 +792,11 @@ class Ui_TrainControllerSW_MainWindow(object):
         self.AutoTrackFault(self.ui.setTrackFault())
         if(self.ui.setTrackFault() == True):
             self.ActivateEmergencyBrake()
-        #add ebrake
     
     def getTestCircuitFault(self):
         self.AutoCircuitFault(self.ui.setCircuitFault())
         if(self.ui.setCircuitFault() == True):
             self.ActivateEmergencyBrake()
-        #add ebrake
     
     def getEmergencyBrake(self):
         self.EmergencyBrakeDisplay(self.ui.setEmergencyBrake())
@@ -828,14 +809,69 @@ class Ui_TrainControllerSW_MainWindow(object):
         
     def getTestWindowClose(self):
         self.closeTestWindow()
+        
+####### ManualControl Class Sets
+    def setManualControl_CommandedSpeed(self):
+        ms.setCommandedSpeed(ms, self.speed_Slider.value())
+        
+    def setManualControl_ServiceBrake(self):
+        ms.setServiceBrake(ms, self.braking_Slider.value())
     
-    def getKpValue(self):
-        self.setKpBoxValue(self.ui.setKp())
+    def setManualControl_EmergencyBrake(self):
+        # if E brake is already set and the button is clicked, then it turns off the e brake
+        if(self.EmergencyBrakeDisplayBox.isChecked() == True):
+            ms.setEmergencyBrake(ms, False)
+        elif(self.EmergencyBrakeDisplayBox.isChecked() == False):
+            ms.setEmergencyBrake(ms, True)
+        
+    def setManualControl_Temperature(self):
+        ms.setTemperature(ms, self.Manual_temperature_box.value())
     
-    def getKiValue(self):
-        self.setKiBoxValue(self.ui.setKi())
+    def setManualControl_Lights(self):
+        if(self.Manual_lights_ComboBox.currentIndex() == 0):
+            ms.setInternalLights(ms, False)
+            ms.setExternalLights(ms, False)
+        elif(self.Manual_lights_ComboBox.currentIndex() == 1):
+            ms.setInternalLights(ms, True)
+            ms.setExternalLights(ms, False)
+        elif(self.Manual_lights_ComboBox.currentIndex() == 2):
+            ms.setInternalLights(ms, False)
+            ms.setExternalLights(ms, True)
+        elif(self.Manual_lights_ComboBox.currentIndex() == 3):
+            ms.setInternalLights(ms, True)
+            ms.setExternalLights(ms, True)                
     
- ##########   
+    def setManualControl_Doors(self):
+        if(self.Manual_doors_ComboBox.currentIndex() == 0):
+            ms.setLeftDoor(ms, False)
+            ms.setRightDoor(ms, False)
+        elif(self.Manual_doors_ComboBox.currentIndex() == 0):
+            ms.setLeftDoor(ms, True)
+            ms.setRightDoor(ms, False)
+        elif(self.Manual_doors_ComboBox.currentIndex() == 0):
+            ms.setLeftDoor(ms, False)
+            ms.setRightDoor(ms, True)
+        elif(self.Manual_doors_ComboBox.currentIndex() == 0):
+            ms.setLeftDoor(ms, True)
+            ms.setRightDoor(ms, True)
+    
+    def setManualControl_Advertisements(self):
+        ms.setAdvertisements(ms, self.Manual_Advertisements_CheckBox.checkState())
+    
+    def setManualControl_Announcements(self):
+        ms.setAnnouncements(ms, self.Manual_Annoucements_CheckBox.checkState())
+
+    # Power and Ebrake
+    def ActivateEmergencyBrake(self):
+        if(self.EmergencyBrakeDisplayBox.isChecked() == True):
+            self.EmergencyBrakeDisplay(False)
+            ms.setEmergencyBrake(ms, False)
+        else:
+            ms.setEmergencyBrake(ms, True)
+            self.currentSpeed_lcdDisplay.display(0)
+            self.speed_Slider.setValue(0)
+            self.EmergencyBrakeDisplay(True)
+            
     def setKpValue(self):
         self.kp = self.setKp_Box.value()
     
@@ -849,10 +885,44 @@ class Ui_TrainControllerSW_MainWindow(object):
         self.pid.output_limits = (0, 120000)
     
     def DisplayPowerOutput(self):
-        self.pid.setpoint = (self.Auto_CommandedSpeedDisplay.value() * 0.621371)
+        self.pid.setpoint = (self.Manual_CommandedSpeed_lcdDisplay.value() * 0.621371)
         self.setPID(self.kp, self.ki)
-        self.power = self.pid(self.Auto_CommandedSpeedDisplay.value() * 0.621371)
+        self.power = self.pid(self.Manual_CommandedSpeed_lcdDisplay.value() * 0.621371)
         self.PowerOutput_lcdDisplay.display(self.power)
+        
+####### Connects
+    def ManualControl_Connect(self):
+        self.speed_Slider.valueChanged.connect(self.setManualControl_CommandedSpeed)
+        self.braking_Slider.valueChanged.connect(self.setManualControl_ServiceBrake)
+        self.ManuLebrake_button.clicked.connect(self.setManualControl_EmergencyBrake)
+        self.Manual_temperature_box.valueChanged.connect(self.setManualControl_Temperature)
+        self.Manual_lights_ComboBox.currentIndexChanged.connect(self.setManualControl_Lights)
+        self.Manual_doors_ComboBox.currentIndexChanged.connect(self.setManualControl_Doors)
+        self.Manual_Advertisements_CheckBox.stateChanged.connect(self.setManualControl_Advertisements)
+        self.Manual_Annoucements_CheckBox.stateChanged.connect(self.setManualControl_Announcements)
+        
+        self.timer.timeout.connect(self.setManualControl_CommandedSpeed)
+        self.timer.timeout.connect(self.setManualControl_ServiceBrake)
+        self.timer.timeout.connect(self.setManualControl_EmergencyBrake)
+        self.timer.timeout.connect(self.setManualControl_Temperature)
+        self.timer.timeout.connect(self.setManualControl_Lights)
+        self.timer.timeout.connect(self.setManualControl_Doors)
+        self.timer.timeout.connect(self.setManualControl_Advertisements)
+        self.timer.timeout.connect(self.setManualControl_Announcements)
+
+    def connect(self):
+        self.ManuLebrake_button.clicked.connect(self.ActivateEmergencyBrake)
+        self.setKp_Box.valueChanged.connect(self.setKpValue)
+        self.setKi_Box.valueChanged.connect(self.setKiValue)
+        self.OpenTestUI.clicked.connect(self.openTestWindow)
+        self.ImportTestData.clicked.connect(self.openTestWindow)
+        self.DisplayPower.clicked.connect(self.DisplayPowerOutput)
+        
+        self.timer.timeout.connect(self.ActivateEmergencyBrake)
+        self.timer.timeout.connect(self.setKpValue)
+        self.timer.timeout.connect(self.setKiValue)
+        self.timer.timeout.connect(self.openTestWindow)
+        self.timer.timeout.connect(self.DisplayPowerOutput)
         
 if __name__ == "__main__":
     import sys
@@ -860,5 +930,7 @@ if __name__ == "__main__":
     TrainControllerSW_MainWindow = QtWidgets.QMainWindow()
     ui = Ui_TrainControllerSW_MainWindow()
     ui.setupUi(TrainControllerSW_MainWindow)
+    ui.connect()
+    ui.ManualControl_Connect()
     TrainControllerSW_MainWindow.show()
     sys.exit(app.exec_())
