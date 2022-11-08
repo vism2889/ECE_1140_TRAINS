@@ -27,8 +27,8 @@ class DispatchPopUp(object):
         self.dispatch = QtWidgets.QPushButton(dispatchPopUp)
         self.dispatch.setGeometry(QtCore.QRect(40, 150, 100, 31))
         self.dispatch.setObjectName("dispatchTrain")
-        self.redLineStationsKeys = redLineStations.keys()
-        self.greenLineStationsKeys = greenLineStations.keys()
+        self.redLineStations = redLineStations
+        self.greenLineStations = greenLineStations
         self.lineSelection.activated.connect(self.updateDestinationList)
         self.dispatch.clicked.connect(self.dispatchTrain)
         self.redLineTrains = redLineTrains
@@ -36,7 +36,7 @@ class DispatchPopUp(object):
 
 
         # add items to destinationList
-        for key in self.redLineStationsKeys:
+        for key in self.redLineStations.keys():
             item = QtWidgets.QListWidgetItem()
             self.stationList.addItem(item)
 
@@ -54,7 +54,8 @@ class DispatchPopUp(object):
 
         # set red line destination list 
         self.index = 0
-        for key in self.redLineStationsKeys:
+        self.destinationList = self.redLineStations
+        for key in self.redLineStations.keys():
             item = self.stationList.item(self.index)
             item.setText(_translate("MainWindow", key))
             self.index += 1
@@ -64,28 +65,31 @@ class DispatchPopUp(object):
         self.stationList.clear()
 
         if (self.currentLine == "Red Line"):
-            for key in self.redLineStationsKeys:
+            self.destinationList = self.redLineStations
+            for key in self.redLineStations.keys():
                 item = QtWidgets.QListWidgetItem()
                 item.setText(key)
                 self.stationList.addItem(item)
         elif (self.currentLine == "Green Line"):
-            for key in self.greenLineStationsKeys:
+            self.destinationList = self.greenLineStations
+            for key in self.greenLineStations.keys():
                 item = QtWidgets.QListWidgetItem()
                 item.setText(key)
                 self.stationList.addItem(item)
 
     def dispatchTrain(self):
         self.currentLine = self.lineSelection.currentText()
-        self.destinationList = []
         self.selectedDestinations = self.stationList.selectedItems()
         self.trainName = self.trainNameEntry.text()
-
-        # add dispatch destinations to list
-        for destination in self.selectedDestinations:
-            # TODO make this a dictionary and make it all work
-            self.destinationList.append(destination.text())
 
         if (self.currentLine == "Red Line"):
             self.redLineTrains.addTrain(self.trainName, self.destinationList, 0, 0)
         elif (self.currentLine == "Green Line"):
             self.greenLineTrains.addTrain(self.trainName, self.destinationList, 0, 0)
+
+        # add dispatch destinations to list
+        for destination in self.selectedDestinations:
+            if (self.currentLine == "Red Line"):
+                self.redLineTrains.toggleDestination(self.trainName, destination.text())
+            elif (self.currentLine == "Green Line"):
+                self.greenLineTrains.toggleDestination(self.trainName, destination.text())

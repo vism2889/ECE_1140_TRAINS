@@ -25,9 +25,9 @@ class Ui_MainWindow(object):
         self.redLineStations = dict()
         self.greenLineStations = dict()
         for value in self.redLineBlocks.stations().values():
-            self.redLineStations[value] = "No"
+            self.redLineStations[value] = False
         for value in self.greenLineBlocks.stations().values():
-            self.greenLineStations[value] = "No"
+            self.greenLineStations[value] = False
 
         # select default block
         self.selectedBlock = 1
@@ -35,7 +35,7 @@ class Ui_MainWindow(object):
 
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.setGeometry(10, 10, 600, 613)
+        MainWindow.setGeometry(10, 10, 600, 580)
         MainWindow.setMouseTracking(True)
         self.redLineMaintenance = False
         self.greenLineMaintenance = False
@@ -55,7 +55,7 @@ class Ui_MainWindow(object):
         self.redLineBlockTable.setColumnCount(3)
         self.redLineBlockTable.setColumnWidth(0, 40)
         self.redLineBlockTable.setColumnWidth(2, 42)
-        self.redLineBlockTable.setGeometry(10,20,210,300)
+        self.redLineBlockTable.setGeometry(10,20,210,289)
         self.redLineBlockTable.setHorizontalHeaderLabels(['Block','Switch','Xing'])
         self.redLineBlockTable.verticalHeader().hide()
         self.redLineBlockTable.setSelectionBehavior(QAbstractItemView.SelectRows)
@@ -66,7 +66,7 @@ class Ui_MainWindow(object):
 
         self.redLineTrainTable = QTableWidget(MainWindow)
         self.redLineTrainTable.setColumnCount(1)
-        self.redLineTrainTable.setGeometry(10,320,105,120)
+        self.redLineTrainTable.setGeometry(10,309,105,120)
         self.redLineTrainTable.setHorizontalHeaderLabels(['Active Trains'])
         self.redLineTrainTable.verticalHeader().hide()
         self.redLineTrainTable.itemClicked.connect(self.redTrainSelectionChanged)
@@ -74,7 +74,7 @@ class Ui_MainWindow(object):
 
         self.redLineBacklogTable = QTableWidget(MainWindow)
         self.redLineBacklogTable.setColumnCount(1)
-        self.redLineBacklogTable.setGeometry(115,320,105,120)
+        self.redLineBacklogTable.setGeometry(115,309,105,120)
         self.redLineBacklogTable.setHorizontalHeaderLabels(['Scheduled'])
         self.redLineBacklogTable.verticalHeader().hide()
         self.redLineBacklogTable.show()
@@ -85,7 +85,7 @@ class Ui_MainWindow(object):
         self.greenLineBlockTable.setColumnCount(3)
         self.greenLineBlockTable.setColumnWidth(0, 40)
         self.greenLineBlockTable.setColumnWidth(2, 41)
-        self.greenLineBlockTable.setGeometry(230,20,210,300)
+        self.greenLineBlockTable.setGeometry(230,20,210,289)
         self.greenLineBlockTable.setHorizontalHeaderLabels(['Block','Switch','Xing'])
         self.greenLineBlockTable.verticalHeader().hide()
         self.greenLineBlockTable.setSelectionBehavior(QAbstractItemView.SelectRows)
@@ -96,7 +96,7 @@ class Ui_MainWindow(object):
 
         self.greenLineTrainTable = QTableWidget(MainWindow)
         self.greenLineTrainTable.setColumnCount(1)
-        self.greenLineTrainTable.setGeometry(230,320,105,120)
+        self.greenLineTrainTable.setGeometry(230,309,105,120)
         self.greenLineTrainTable.setHorizontalHeaderLabels(['Active Trains'])
         self.greenLineTrainTable.verticalHeader().hide()
         self.greenLineTrainTable.itemClicked.connect(self.greenTrainSelectionChanged)
@@ -104,7 +104,7 @@ class Ui_MainWindow(object):
 
         self.greenLineBacklogTable = QTableWidget(MainWindow)
         self.greenLineBacklogTable.setColumnCount(1)
-        self.greenLineBacklogTable.setGeometry(335,320,105,120)
+        self.greenLineBacklogTable.setGeometry(335,309,105,120)
         self.greenLineBacklogTable.setHorizontalHeaderLabels(['Scheduled'])
         self.greenLineBacklogTable.verticalHeader().hide()
         self.greenLineBacklogTable.show()
@@ -129,10 +129,10 @@ class Ui_MainWindow(object):
 
     ##################### TRAIN INFO ########################
         self.destinationTable = QtWidgets.QTableWidget(MainWindow)
-        self.destinationTable.setGeometry(10, 460, 200, 100)
-        self.destinationTable.setColumnCount(1)
+        self.destinationTable.setGeometry(10, 440, 210, 120)
+        self.destinationTable.setColumnCount(2)
         self.destinationTable.verticalHeader().hide()
-        self.destinationTable.horizontalHeader().hide()
+        self.destinationTable.setHorizontalHeaderLabels(['Station', 'Stopping'])
         self.destinationTable.show()
 
         self.dispatchTrainButton = QtWidgets.QPushButton(MainWindow)
@@ -141,10 +141,10 @@ class Ui_MainWindow(object):
         self.dispatchTrainButton.show()
         self.dispatchTrainButton.clicked.connect(self.launchDispatchPopUp)
         self.uploadScheduleButton = QtWidgets.QPushButton(MainWindow)
-        self.uploadScheduleButton.setGeometry(620, 100, 130, 30)
+        self.uploadScheduleButton.setGeometry(450, 90, 140, 25)
         self.uploadScheduleButton.setText("Upload Schedule")
         #self.uploadScheduleButton.clicked.connect(self.uploadSchedule)
-        self.uploadScheduleButton.hide()  
+        self.uploadScheduleButton.show()  
 
         self.populateRedLineTable()
         self.populateGreenLineTable()
@@ -235,14 +235,15 @@ class Ui_MainWindow(object):
     def updateDestinationTable(self):
         index = 0
         self.destinationTable.clear()
+        self.destinationTable.setHorizontalHeaderLabels(['Station', 'Stopping'])
         self.destinationTable.setRowCount(len(self.selectedTrainStations))
         for key in self.selectedTrainStations.keys():
-            print(key)
-            item = QtWidgets.QTableWidgetItem()
-            item.setText(key)
-            self.destinationTable.setItem(index, 0, item)
-            print((self.selectedTrainLine.getDestination(self.selectedTrain, key)))
-            self.destinationTable.setItem(index, 1, item)
+            item1 = QtWidgets.QTableWidgetItem()
+            item1.setText(key)
+            self.destinationTable.setItem(index, 0, item1)
+            item2 = QtWidgets.QTableWidgetItem()
+            item2.setText(str(self.selectedTrainStations[key]))
+            self.destinationTable.setItem(index, 1, item2)
             index += 1
 
     def redBlockSelectionChanged(self):
@@ -253,8 +254,7 @@ class Ui_MainWindow(object):
     def redTrainSelectionChanged(self):
         currentRow = self.redLineTrainTable.currentRow()
         self.selectedTrain = self.redLineTrainTable.item(currentRow, 0).text()
-        self.selectedTrainLine = self.redLineTrains
-        self.selectedTrainStations = self.redLineStations
+        self.selectedTrainStations = self.redLineTrains.getDestination(self.selectedTrain)
         self.updateDestinationTable()
 
     def greenBlockSelectionChanged(self):
@@ -265,8 +265,9 @@ class Ui_MainWindow(object):
     def greenTrainSelectionChanged(self):
         currentRow = self.greenLineTrainTable.currentRow()
         self.selectedTrain = self.greenLineTrainTable.item(currentRow, 0).text()
-        self.selectedTrainLine = self.greenLineTrains
-        self.selectedTrainStations = self.greenLineStations
+        self.selectedTrainStations = self.greenLineTrains.getDestination(self.selectedTrain)
+        for destination in self.selectedTrainStations:
+            print(destination)
         self.updateDestinationTable()
 
     def updateBlockTable(self):
@@ -312,7 +313,6 @@ class Ui_MainWindow(object):
 
     def toggleMaintenance(self):
         self.selectedBlockLine.toggleMaintenanceState(str(self.selectedBlock))
-
 
     def launchDispatchPopUp(self):
         self.dispatchWidget = QtWidgets.QWidget()
