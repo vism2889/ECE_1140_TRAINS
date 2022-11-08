@@ -22,24 +22,22 @@ class Ui_Test_SecondWindow(object):
         self.Manual_Frame_4.setGeometry(QtCore.QRect(20, 10, 681, 341))
         self.Manual_Frame_4.setObjectName("Manual_Frame_4")
         
-        self.TestMode_Advertisements = QtWidgets.QCheckBox(self.Manual_Frame_4, stateChanged = lambda: self.setAdvertisements())
-        self.TestMode_Announcements = QtWidgets.QCheckBox(self.Manual_Frame_4, stateChanged = lambda: self.setAnnouncements())
-        self.TestMode_Temperature = QtWidgets.QDoubleSpinBox(self.Manual_Frame_4, valueChanged = lambda: self.setTemperature())
-        self.TestMode_Lights = QtWidgets.QComboBox(self.Manual_Frame_4, currentIndexChanged = lambda: self.setLights())
-        self.TestMode_Doors = QtWidgets.QComboBox(self.Manual_Frame_4, currentIndexChanged = lambda: self.setDoors())
-        self.TestMode_Speed = QtWidgets.QDoubleSpinBox(self.Manual_Frame_4, valueChanged = lambda: self.setSpeed())
-        self.TestMode_Braking = QtWidgets.QDoubleSpinBox(self.Manual_Frame_4, valueChanged = lambda: self.setBraking())
-        self.TestMode_EmergencyBrake = QtWidgets.QCheckBox(self.Manual_Frame_4, stateChanged = lambda: self.setEmergencyBrake())
-        self.TestMode_Authority = QtWidgets.QDoubleSpinBox(self.Manual_Frame_4, valueChanged = lambda: self.setAuthority())
-        self.TestMode_CommandedSpeed = QtWidgets.QDoubleSpinBox(self.Manual_Frame_4, valueChanged = lambda: self.setCommandedSpeed())
-        self.TestMode_EngineFault = QtWidgets.QCheckBox(self.Manual_Frame_4, stateChanged = lambda: self.setEngineFault())
-        self.TestMode_PowerFault = QtWidgets.QCheckBox(self.Manual_Frame_4, stateChanged = lambda: self.setPowerFault())       
-        self.TestMode_TrackFault = QtWidgets.QCheckBox(self.Manual_Frame_4, stateChanged = lambda: self.setTrackFault())
-        self.TestMode_CircuitFault = QtWidgets.QCheckBox(self.Manual_Frame_4, stateChanged = lambda: self.setCircuitFault())
-        self.TestEngineerMode_setKp = QtWidgets.QDoubleSpinBox(self.Manual_Frame_4, valueChanged = lambda: self.setKp())
-        self.TestEngineerMode_setKi = QtWidgets.QDoubleSpinBox(self.Manual_Frame_4, valueChanged = lambda: self.setKi())
-        self.TestMode_NextStation = QtWidgets.QComboBox(self.Manual_Frame_4, currentIndexChanged = lambda: self.setNextStation())
-        self.TestMode_CurrentSpeed = QtWidgets.QDoubleSpinBox(self.Manual_Frame_4, valueChanged = lambda: self.setCurrentSpeed())
+        self.TestMode_Advertisements = QtWidgets.QCheckBox(self.Manual_Frame_4)
+        self.TestMode_Announcements = QtWidgets.QCheckBox(self.Manual_Frame_4)
+        self.TestMode_Temperature = QtWidgets.QDoubleSpinBox(self.Manual_Frame_4)
+        self.TestMode_Lights = QtWidgets.QComboBox(self.Manual_Frame_4)
+        self.TestMode_Doors = QtWidgets.QComboBox(self.Manual_Frame_4)
+        self.TestMode_Speed = QtWidgets.QDoubleSpinBox(self.Manual_Frame_4)
+        self.TestMode_Braking = QtWidgets.QDoubleSpinBox(self.Manual_Frame_4)
+        self.TestMode_EmergencyBrake = QtWidgets.QCheckBox(self.Manual_Frame_4)
+        self.TestMode_Authority = QtWidgets.QDoubleSpinBox(self.Manual_Frame_4)
+        self.TestMode_CommandedSpeed = QtWidgets.QDoubleSpinBox(self.Manual_Frame_4)
+        self.TestMode_EngineFault = QtWidgets.QCheckBox(self.Manual_Frame_4)
+        self.TestMode_PowerFault = QtWidgets.QCheckBox(self.Manual_Frame_4)       
+        self.TestMode_TrackFault = QtWidgets.QCheckBox(self.Manual_Frame_4)
+        self.TestMode_CircuitFault = QtWidgets.QCheckBox(self.Manual_Frame_4)
+        self.TestMode_NextStation = QtWidgets.QComboBox(self.Manual_Frame_4)
+        self.TestMode_CurrentSpeed = QtWidgets.QDoubleSpinBox(self.Manual_Frame_4)
         
         self.commanded_speed = 0
         self.current_speed = 0
@@ -130,12 +128,12 @@ class Ui_Test_SecondWindow(object):
         self.TestMode_Braking.setProperty("value", 0.0)
         self.TestMode_Braking.setObjectName("TestMode_Braking")
         self.label_46 = QtWidgets.QLabel(self.Manual_Frame_4)
-        self.label_46.setGeometry(QtCore.QRect(10, 300, 101, 41))
+        self.label_46.setGeometry(QtCore.QRect(10, 205, 151, 71))
         font = QtGui.QFont()
         font.setBold(True)
         self.label_46.setFont(font)
         self.label_46.setObjectName("label_46")
-        self.TestMode_EmergencyBrake.setGeometry(QtCore.QRect(190, 310, 61, 23))
+        self.TestMode_EmergencyBrake.setGeometry(QtCore.QRect(150, 230, 61, 23))
         self.TestMode_EmergencyBrake.setObjectName("TestMode_EmergencyBrake")
         self.label_47 = QtWidgets.QLabel(self.Manual_Frame_4)
         self.label_47.setGeometry(QtCore.QRect(10, 100, 91, 41))
@@ -209,16 +207,6 @@ class Ui_Test_SecondWindow(object):
         font.setBold(True)
         self.label_33.setFont(font)
         self.label_33.setObjectName("label_33")
-        self.TestEngineerMode_setKp.setGeometry(QtCore.QRect(150, 230, 91, 32))
-        self.TestEngineerMode_setKp.setMinimum(0.0)
-        self.TestEngineerMode_setKp.setMaximum(100.0)
-        self.TestEngineerMode_setKp.setProperty("value", 0.0)
-        self.TestEngineerMode_setKp.setObjectName("TestEngineerMode_setKp")
-        self.TestEngineerMode_setKi.setGeometry(QtCore.QRect(150, 270, 91, 32))
-        self.TestEngineerMode_setKi.setMinimum(0.0)
-        self.TestEngineerMode_setKi.setMaximum(100.0)
-        self.TestEngineerMode_setKi.setProperty("value", 0.0)
-        self.TestEngineerMode_setKi.setObjectName("TestEngineerMode_setKi")
         self.label = QtWidgets.QLabel(self.Manual_Frame_4)
         self.label.setGeometry(QtCore.QRect(10, 230, 63, 20))
         font = QtGui.QFont()
@@ -283,8 +271,6 @@ class Ui_Test_SecondWindow(object):
         #self.timer.timeout.connect(self.initializePID)
         self.timer.timeout.connect(self.DisplayPowerOutput)
         self.timer.timeout.connect(self.setSpeed)
-        self.timer.timeout.connect(self.setKp)
-        self.timer.timeout.connect(self.setKi)
         self.timer.start(100)
         
         self.retranslateUi(Test_SecondWindow)
@@ -323,8 +309,6 @@ class Ui_Test_SecondWindow(object):
         self.TestMode_PowerFault.setText(_translate("Test_SecondWindow", "On/Off"))
         self.TestMode_TrackFault.setText(_translate("Test_SecondWindow", "On/Off"))
         self.TestMode_CircuitFault.setText(_translate("Test_SecondWindow", "On/Off"))
-        self.label_33.setText(_translate("Test_SecondWindow", "Ki"))
-        self.label.setText(_translate("Test_SecondWindow", "Kp"))
         self.label_54.setText(_translate("Test_SecondWindow", "Current Speed (km/h)"))
         self.label_56.setText(_translate("Test_SecondWindow", "Next Station"))
         self.TestMode_NextStation.setItemText(0, _translate("Test_SecondWindow", "Shadyside"))
@@ -338,7 +322,7 @@ class Ui_Test_SecondWindow(object):
         self.groupBox.setTitle(_translate("Test_SecondWindow", "Generated Output"))
         self.label_55.setText(_translate("Test_SecondWindow", "Power (W):"))
 
-    
+    # Manual Control
     def setSpeed(self):
         if(self.current_speed > self.commanded_speed):  #limit the speed
             return self.commanded_speed
@@ -353,14 +337,6 @@ class Ui_Test_SecondWindow(object):
     def setCommandedSpeed(self):
         self.commanded_speed = self.TestMode_CommandedSpeed.value()
         return self.TestMode_CommandedSpeed.value()
-        
-    def setKp(self):
-        self.k_p = self.TestEngineerMode_setKp.value()
-        return self.k_p
-    
-    def setKi(self):
-        self.k_i = self.TestEngineerMode_setKi.value()
-        return self.TestEngineerMode_setKi.value()
     
     def setEmergencyBrake(self):
         return self.TestMode_EmergencyBrake.isChecked()
@@ -412,6 +388,40 @@ class Ui_Test_SecondWindow(object):
         self.power = self.pid(self.current_speed)
         self.TestMode_PowerDisplay.display(self.power)
     
+    def connect(self, TrainControllerSW_MainWindow):
+        self.TestMode_Advertisements.stateChanged.connect(self.setAdvertisements)
+        self.TestMode_Announcements.stateChanged.connect(self.setAnnouncements)
+        self.TestMode_Temperature.valueChanged.connect(self.setTemperature)
+        self.TestMode_Lights.currentIndexChanged.connect(self.setLights)
+        self.TestMode_Doors.currentIndexChanged.connect(self.setDoors)
+        self.TestMode_Speed.valueChanged.connect(self.setSpeed)
+        self.TestMode_Braking.valueChanged.connect(self.setBraking)
+        self.TestMode_EmergencyBrake.stateChanged.connect(self.setEmergencyBrake)
+        self.TestMode_Authority.valueChanged.connect(self.setAuthority)
+        self.TestMode_CommandedSpeed.valueChanged.connect(self.setCommandedSpeed)
+        self.TestMode_EngineFault.stateChanged.connect(self.setEngineFault)
+        self.TestMode_PowerFault.stateChanged.connect(self.setPowerFault)
+        self.TestMode_TrackFault.stateChanged.connect(self.setTrackFault)
+        self.TestMode_CircuitFault.stateChanged.connect(self.setCircuitFault)
+        self.TestMode_NextStation.currentIndexChanged.connect(self.setNextStation)
+        self.TestMode_CurrentSpeed.valueChanged.connect(self.setCurrentSpeed)
+        
+        self.timer.timeout.connect(self.setAdvertisements)
+        self.timer.timeout.connect(self.setAnnouncements)
+        self.timer.timeout.connect(self.setTemperature)
+        self.timer.timeout.connect(self.setLights)
+        self.timer.timeout.connect(self.setDoors)
+        self.timer.timeout.connect(self.setSpeed)
+        self.timer.timeout.connect(self.setBraking)
+        self.timer.timeout.connect(self.setEmergencyBrake)
+        self.timer.timeout.connect(self.setAuthority)
+        self.timer.timeout.connect(self.setCommandedSpeed)
+        self.timer.timeout.connect(self.setEngineFault)
+        self.timer.timeout.connect(self.setPowerFault)
+        self.timer.timeout.connect(self.setTrackFault)
+        self.timer.timeout.connect(self.setCircuitFault)
+        self.timer.timeout.connect(self.setNextStation)
+        self.timer.timeout.connect(self.setCurrentSpeed)
     
 if __name__ == "__main__":
     import sys
@@ -419,5 +429,6 @@ if __name__ == "__main__":
     Test_SecondWindow = QtWidgets.QMainWindow()
     ui = Ui_Test_SecondWindow()
     ui.setupUi(Test_SecondWindow)
+    ui.connect(Test_SecondWindow)
     Test_SecondWindow.show()
     sys.exit(app.exec_())
