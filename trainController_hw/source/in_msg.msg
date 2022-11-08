@@ -2,12 +2,8 @@ int current_speed
 int commanded_speed
 int speed_limit
 int suggested_speed
-int temperature_command
 bool[] authority
 bool left_door_command
 bool right_door_command
-bool internal_light_command
-bool external_light_command
-bool announce_command
 bool ebrake_command
 bool service_brake_command

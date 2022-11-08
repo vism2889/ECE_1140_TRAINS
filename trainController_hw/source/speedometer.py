@@ -1,13 +1,13 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from analoggaugewidget import AnalogGaugeWidget
 from PyQt5.QtCore import pyqtSlot, QTimer, pyqtSignal
-from control import Control as c
-from manualControl import ManualControl as mc
+from control import Control
+from manualControl import ManualControl
 
 class Ui_MainWindow(object):
     def __init__(self):
-        c.__init__(c)
-        mc.__init__(mc)
+        self.c = Control()
+        self.mc = ManualControl()
         self.internal_light_state = False
         self.external_light_state = False
         self.left_door_state = False
@@ -213,85 +213,88 @@ class Ui_MainWindow(object):
 
 
     def toggle_lights_manual(self):
-        mc.lightsButton(mc)
+        self.mc.lightsButton()
 
     def toggle_doors_manual(self):
-        mc.doorsButton(mc)
+        self.mc.doorsButton()
 
     def deploy_ebrake_manual(self):
-        mc.ebrake_button(mc)
+        self.mc.ebrake_button()
 
-    def driverSetSpeed(self):
-        self.speedometer.update_value(mc.setCommandedSpeed(mc))
-    
     def setCurrentSpeed(self):
-        self.speedometer.update_value(c.setCurrentSpeed(c))
+        self.current_speed = self.c.setCurrentSpeed()
+        self.speedometer.update_value(self.current_speed)
 
     def setCommandedSpeed(self):
-        c.setSpeed(c)
+        self.c.setSpeed()
 
     def toggle_internal_lights(self):
         self.internal_light_state = not self.internal_light_state
-        c.setInternalLights(self.internal_light_state)
+        self.c.setInternalLights(self.internal_light_state)
 
     def toggle_external_lights(self):
         self.external_light_state = not self.external_light_state
-        c.setExternalLights(self.external_light_state)
+        self.c.setExternalLights(self.external_light_state)
 
     def toggle_left_door(self):
         self.left_door_state = not self.left_door_state
-        c.setLeftDoor(self.left_door_state)
+        self.c.setLeftDoor(self.left_door_state)
 
     def toggle_right_door(self):
         self.right_door_state = not self.right_door_state
-        c.setRightDoor(self.right_door_state)
-
-    def setSpeed(self):
-        c.setSpeed(c, self.commanded_speed)
-
-    def setCurrentSpeed(self):
-        c.setCurrentSpeed(c)
+        self.c.setRightDoor(self.right_door_state)
 
     def announceStation(self):
         #self.station = self.getNextStation()
-        c.announceStation(c, True, self.station)
+        self.c.announceStation(True, self.station)
 
     def stopAnnounce(self):
-        c.announceStation(c, False, self.station)
+        self.c.announceStation(False, self.station)
 
     def deployEbrake(self):
-        self.speedometer.update_value(0)
-        c.deployEbrake(c)
+        self.c.deployEbrake()
 
     def setSuggestedSpeed(self):
-        c.setSuggestedSpeed(c, self.suggested_speed)
+        self.c.setSuggestedSpeed(self.suggested_speed)
 
     def checkAuthority(self):
-        c.checkAuthority(c)
+        self.c.checkAuthority()
 
     def deployServiceBrake(self):
-        c.deployServiceBrake(c)
+        self.c.deployServiceBrake()
+
+    def setTemperature(self):
+        self.mc.setTemperature()
+
+    def calculatePower(self):
+        self.c.getPowerOutput()
 
     def sendData(self):
-        c.publish(c)
+        self.c.publish()
 
     def subscribe(self):
-        c.subscribe(c)
+        self.c.subscribe()
+
+    def sendRandom(self):
+        self.c.sendRandom()
         
     def connect(self, MainWindow):
         self.timer.timeout.connect(self.subscribe)
         self.timer.timeout.connect(self.setCurrentSpeed)
         self.timer.timeout.connect(self.setCommandedSpeed)
-       # self.timer.timeout.connect(self.toggle_lights_manual)
-       # self.timer.timeout.connect(self.toggle_doors_manual)
-        #self.timer.timeout.connect(self.deploy_ebrake_manual)
+        self.timer.timeout.connect(self.calculatePower)
+        self.timer.timeout.connect(self.setTemperature)
+        self.timer.timeout.connect(self.sendRandom)
+        self.timer.timeout.connect(self.toggle_lights_manual)
+        self.timer.timeout.connect(self.toggle_doors_manual)
+        self.timer.timeout.connect(self.deploy_ebrake_manual)
         #self.timer.timeout.connect(self.driverSetSpeed)
         
         #self.timer.timeout.connect(self.announceStation)
         
         self.timer.timeout.connect(self.sendData)
         
-        self.timer.start(500)
+        self.timer.start(100)
 
 
 if __name__ == "__main__":

@@ -20,8 +20,8 @@ mixer.init()
 class ManualControl():
 
     def __init__(self):
-        Control.__init__(Control)
-        AnalogIn.__init__(AnalogIn)
+        self.c = Control()
+        self.anal_in = AnalogIn()
         self.commandedSpeed = 0
         self.ebrake_state = False
         self.light_state_internal = False
@@ -36,8 +36,8 @@ class ManualControl():
 
     def setCommandedSpeed(self):
         if self.ebrake_state == False:
-            self.commandedSpeed = AnalogIn.getSpeedValue(AnalogIn)
-            Control.setSpeed(Control, self.commandedSpeed)
+            self.commandedSpeed = self.anal_in.getSpeedValue()
+            self.c.setSpeed(self.commandedSpeed)
             return self.commandedSpeed
 
         else: return 0
@@ -45,40 +45,37 @@ class ManualControl():
     def lightsButton(self):
         if GPIO.input(25) == GPIO.HIGH:
             self.light_state_internal = not self.light_state_internal
-            Control.setInternalLights(self.light_state_internal)
+            self.c.setInternalLights(self.light_state_internal)
             sleep(.5)
 
         if GPIO.input(8) == GPIO.HIGH:
             self.light_state_external = not self.light_state_external
-            Control.setExternalLights(self.light_state_external)
+            self.c.setExternalLights(self.light_state_external)
             sleep(.5)
 
     def doorsButton(self):
         if GPIO.input(7) == GPIO.HIGH:
             self.door_state_left = not self.door_state_left
-            Control.setLeftDoor(self.door_state_left)
+            self.c.setLeftDoor(self.door_state_left)
             sleep(.5)
 
         if GPIO.input(16) == GPIO.HIGH:
             self.door_state_right = not self.door_state_right
-            Control.setRightDoor(self.door_state_right)
+            self.c.setRightDoor(self.door_state_right)
             sleep(.5)
 
     def announceButton(self, station_idx):
         if GPIO.input(26) == GPIO.HIGH:
             self.announce_state = not self.announce_state
-            Control.announceStation(Control, self.announce_state, station_idx)
+            self.c.announceStation(self.announce_state, station_idx)
             sleep(.5)
 
     def ebrake_button(self):
-        if GPIO.input(5) == GPIO.LOW:
-            Control.deployEbrake(Control)
-            self.ebrake_state = True
-
-        else: self.ebrake_state = False
-
+        if GPIO.input(5) == GPIO.LOW: self.c.deployEbrake(True)
+        if GPIO.input(5) == GPIO.HIGH: self.c.deployEbrake(False)
+            
     def setTemperature(self):
-        temp = AnalogIn.getTemperatureValue(AnalogIn)
-        Control.setTemperature(Control, temp)
+        temp = self.anal_in.getTemperatureValue()
+        self.c.setTemperature(temp)
         return temp
 

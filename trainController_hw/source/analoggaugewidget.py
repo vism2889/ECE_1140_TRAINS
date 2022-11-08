@@ -212,7 +212,7 @@ class AnalogGaugeWidget(QWidget):
         #     self.valueChanged.emit(int(value))
 
         if value <= self.value_min:
-            self.value = self.value_min
+            self.value = 0
         elif value >= self.value_max:
             self.value = self.value_max
         else:

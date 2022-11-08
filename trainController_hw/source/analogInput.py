@@ -18,7 +18,7 @@ class AnalogIn():
         self.last_read2 = 0
         self.tolerance = 250
 
-    def remap_range(value, left_min, left_max, right_min, right_max):
+    def remap_range(self, value, left_min, left_max, right_min, right_max):
         left_span = left_max - left_min
         right_span = right_max - right_min
         valueScaled = int(value - left_min) / int(left_span)

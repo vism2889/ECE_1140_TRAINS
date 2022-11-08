@@ -85,6 +85,6 @@ if __name__ == '__main__':
     input = TrainData()
     while True:
         input.spinOnce()
-        print("Speed Limit: ",input.getSpeedLimit())
+        print("Commanded Speed: ",input.getCommandedSpeed())
         print("Current Speed: ", input.getCurrentSpeed())
-        time.sleep(.5)
+        time.sleep(.1)
