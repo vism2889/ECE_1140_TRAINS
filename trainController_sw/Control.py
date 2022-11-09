@@ -59,14 +59,14 @@ class Control():
 
     def setLeftDoor(self, door_state=None):
         if(door_state == None):
-            self.door_state_left = input.getLeftDoorCommand(input)
+            self.door_state_left = self.input.getLeftDoorCommand(input)
 
         else: self.door_state_left = door_state
         self.output.setLeftDoor(self.door_state_left)
 
     def setRightDoor(self, door_state=None):
         if(door_state==None):
-            self.door_state_right = input.getRightDoorCommand(input)
+            self.door_state_right = self.input.getRightDoorCommand(input)
 
         else: self.door_state_right = door_state
         self.output.setRightDoorState(self.door_state_right)
@@ -87,7 +87,7 @@ class Control():
     
     def setTemperature(self, temperature=None):
         if(temperature == None):
-            self.temperature = input.getTemperature(input)
+            self.temperature = self.input.getTemperature(input)
 
         else: self.temperature = temperature
 
@@ -100,11 +100,11 @@ class Control():
             pass
         else: 
             self.advertisement_state = advertisement
-        self.output.setAdvertisementState(self.advertisement_state)
+        #self.output.advirtisement
     
     def setAnnouncements(self, announcement=None):
         if(announcement == None):
-            self.announce_state = input.getAnnounceCommand(input)
+            self.announce_state = self.input.getAnnounceCommand(input)
         else:
             self.announce_state = announcement
         self.output.setAnnounceState(self.announce_state)
@@ -123,7 +123,7 @@ class Control():
             return
 
         self.speed_limit = speed_limit
-        self.output.setSpeedLimit(self.speed_limit)
+        #self.output.setSpeedLimit(self.speed_limit)
 
     def setCurrentSpeed(self, current_speed=None):
         if(current_speed==None):
@@ -159,7 +159,7 @@ class Control():
     def checkAuthority(self):
         if self.authority == 0:
             self.deployEbrake(self)
-        self.output.setAuthority(self.authority)
+        #self.output.setAuthority(self.authority)
     
     def set_kp_ki(kp_val, ki_val, self):
         self.k_p = kp_val
@@ -228,7 +228,8 @@ class Control():
     
     #Winserver
     def publish(self):
-        self.output.publish()
+       #self.output.publish()
+        self.output.randomize()
 
     def subscribe(self):
         self.input.spinOnce()
