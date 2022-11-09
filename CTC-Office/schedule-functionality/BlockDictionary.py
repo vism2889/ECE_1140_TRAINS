@@ -35,6 +35,10 @@ class BlockDictionary:
     def toggleOccupancy(self, blockNum):
         self.blockList[blockNum].occupancy = not self.blockList[blockNum].occupancy
 
+        # TODO use this speed limit to send suggested speed and make everything work
+        if self.blockList[blockNum].occupancy:
+            return self.blockList[blockNum].speedLimit
+
     def toggleMaintenanceState(self, blockNum):
         self.blockList[blockNum].maintenanceState = not self.blockList[blockNum].maintenanceState
 
@@ -45,23 +49,14 @@ class BlockDictionary:
         return self.blockList[blockNum].line
     
     def getOccupancy(self, blockNum):
-        if self.blockList[blockNum].occupancy:
-            return "yes"
-        else:
-            return "no"
+        return self.blockList[blockNum].occupancy
 
     def getFaultState(self, blockNum):
-        if self.blockList[blockNum].faultState:
-            return "yes"
-        else:
-            return "no"
+        return self.blockList[blockNum].faultState
 
     def getMaintenanceState(self, blockNum):
-        if self.blockList[blockNum].maintenanceState:
-            return "yes"
-        else:
-            return "no"
-    
+        return self.blockList[blockNum].maintenanceState
+
     def keys(self):
         return self.blockList.keys()
 

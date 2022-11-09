@@ -4,29 +4,27 @@ from PyQt5.QtWidgets import QAbstractItemView, QDialog, QApplication, QFileDialo
 from PyQt5.QtCore import QTimer, QTime, Qt
 
 from TrainDictionary import TrainDictionary
-from scheduleParser import readSchedule
 
 class DispatchPopUp(object):
+
+    def __init__(self):
+        super().__init__()
+
     def setupUi(self, dispatchPopUp, redLineStations, greenLineStations, redLineTrains, greenLineTrains):
-        dispatchPopUp.setObjectName("dispatchPopUp")
-        dispatchPopUp.setGeometry(602, 50, 200, 300)
+        dispatchPopUp.setGeometry(450, 50, 150, 200)
         self.trainNameEntry = QtWidgets.QLineEdit(dispatchPopUp)
-        self.trainNameEntry.setGeometry(QtCore.QRect(40, 10, 100, 21))
-        self.trainNameEntry.setObjectName("trainName")
+        self.trainNameEntry.setGeometry(QtCore.QRect(20, 10, 100, 21))
         self.lineSelection = QtWidgets.QComboBox(dispatchPopUp)
-        self.lineSelection.setGeometry(QtCore.QRect(40, 40, 100, 23))
-        self.lineSelection.setObjectName("comboBox")
+        self.lineSelection.setGeometry(QtCore.QRect(20, 40, 100, 23))
         self.lineSelection.addItem("")
         self.lineSelection.addItem("")
         self.stationList = QtWidgets.QListWidget(dispatchPopUp)
-        self.stationList.setGeometry(QtCore.QRect(40, 70, 111, 71))
+        self.stationList.setGeometry(QtCore.QRect(20, 70, 111, 71))
         self.stationList.setMouseTracking(True)
         self.stationList.setSelectionRectVisible(True)
-        self.stationList.setObjectName("destinationList")
         self.stationList.setSelectionMode(QAbstractItemView.MultiSelection)
         self.dispatch = QtWidgets.QPushButton(dispatchPopUp)
-        self.dispatch.setGeometry(QtCore.QRect(40, 150, 100, 31))
-        self.dispatch.setObjectName("dispatchTrain")
+        self.dispatch.setGeometry(QtCore.QRect(20, 150, 100, 31))
         self.redLineStations = redLineStations
         self.greenLineStations = greenLineStations
         self.lineSelection.activated.connect(self.updateDestinationList)
@@ -40,10 +38,10 @@ class DispatchPopUp(object):
             item = QtWidgets.QListWidgetItem()
             self.stationList.addItem(item)
 
-        self.retranslateUi(dispatchPopUp)
+        self.retranslateUi()
         QtCore.QMetaObject.connectSlotsByName(dispatchPopUp)
 
-    def retranslateUi(self, dispatchPopUp):
+    def retranslateUi(self):
         _translate = QtCore.QCoreApplication.translate
         self.lineSelection.setItemText(0, _translate("MainWindow", "Red Line"))
         self.lineSelection.setItemText(1, _translate("MainWindow", "Green Line"))
@@ -51,6 +49,7 @@ class DispatchPopUp(object):
         self.stationList.setSortingEnabled(False)
         self.stationList.setSortingEnabled(__sortingEnabled)
         self.dispatch.setText(_translate("MainWindow", "Dispatch"))
+        self.trainNameEntry.clear()
 
         # set red line destination list 
         self.index = 0
@@ -90,6 +89,6 @@ class DispatchPopUp(object):
         # add dispatch destinations to list
         for destination in self.selectedDestinations:
             if (self.currentLine == "Red Line"):
-                self.redLineTrains.toggleDestination(self.trainName, destination.text())
+                self.redLineTrains.toggleDestination(self.trainName, destination.text(), False)
             elif (self.currentLine == "Green Line"):
-                self.greenLineTrains.toggleDestination(self.trainName, destination.text())
+                self.greenLineTrains.toggleDestination(self.trainName, destination.text(), False)

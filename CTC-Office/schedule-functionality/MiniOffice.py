@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QMainWindow, QApplication, QWidget, QAction, QTableWidget,QTableWidgetItem,QVBoxLayout, QAbstractItemView
+from PyQt5.QtWidgets import QFileDialog, QMainWindow, QApplication, QWidget, QAction, QTableWidget,QTableWidgetItem,QVBoxLayout, QAbstractItemView
 from PyQt5 import QtCore, QtGui, QtWidgets, QtWidgets
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import pyqtSlot, QTime
@@ -6,6 +6,7 @@ from PyQt5.QtCore import pyqtSlot, QTime
 from TrainDictionary import TrainDictionary
 from LayoutParser import LayoutParser
 from DispatchPopUp import DispatchPopUp
+from ScheduleParser import ScheduleParser
 import sys
 
 class Ui_MainWindow(object):
@@ -20,6 +21,7 @@ class Ui_MainWindow(object):
         self.greenLineBlocks = greenLineBlocks
         self.redLineBlocksKeys = redLineBlocks.keys()
         self.greenLineBlocksKeys = greenLineBlocks.keys()
+        self.scheduleParser = ScheduleParser()
 
         # Create default station dictionary
         self.redLineStations = dict()
@@ -28,6 +30,9 @@ class Ui_MainWindow(object):
             self.redLineStations[value] = False
         for value in self.greenLineBlocks.stations().values():
             self.greenLineStations[value] = False
+
+        self.redLineStations["YARD"] = False
+        self.greenLineStations["YARD"] = False
 
         # select default block
         self.selectedBlock = 1
@@ -54,7 +59,7 @@ class Ui_MainWindow(object):
         self.redLineBlockTable.setRowCount(self.redLineBlocks.len())
         self.redLineBlockTable.setColumnCount(3)
         self.redLineBlockTable.setColumnWidth(0, 40)
-        self.redLineBlockTable.setColumnWidth(2, 42)
+        self.redLineBlockTable.setColumnWidth(2, 40)
         self.redLineBlockTable.setGeometry(10,20,210,289)
         self.redLineBlockTable.setHorizontalHeaderLabels(['Block','Switch','Xing'])
         self.redLineBlockTable.verticalHeader().hide()
@@ -129,8 +134,10 @@ class Ui_MainWindow(object):
 
     ##################### TRAIN INFO ########################
         self.destinationTable = QtWidgets.QTableWidget(MainWindow)
-        self.destinationTable.setGeometry(10, 440, 210, 120)
+        self.destinationTable.setGeometry(10, 440, 250, 120)
         self.destinationTable.setColumnCount(2)
+        self.destinationTable.setColumnWidth(0, 160)
+        self.destinationTable.setColumnWidth(1, 88)
         self.destinationTable.verticalHeader().hide()
         self.destinationTable.setHorizontalHeaderLabels(['Station', 'Stopping'])
         self.destinationTable.show()
@@ -140,10 +147,11 @@ class Ui_MainWindow(object):
         self.dispatchTrainButton.setText("Dispatch")
         self.dispatchTrainButton.show()
         self.dispatchTrainButton.clicked.connect(self.launchDispatchPopUp)
+
         self.uploadScheduleButton = QtWidgets.QPushButton(MainWindow)
         self.uploadScheduleButton.setGeometry(450, 90, 140, 25)
         self.uploadScheduleButton.setText("Upload Schedule")
-        #self.uploadScheduleButton.clicked.connect(self.uploadSchedule)
+        self.uploadScheduleButton.clicked.connect(self.uploadSchedule)
         self.uploadScheduleButton.show()  
 
         self.populateRedLineTable()
@@ -155,6 +163,9 @@ class Ui_MainWindow(object):
         self.timer.timeout.connect(self.updateGreenLineTrainTable)
         self.timer.timeout.connect(self.showTime)
         self.timer.timeout.connect(self.updateBlockTable)
+        self.timer.timeout.connect(self.updateRedLineBacklog)
+        self.timer.timeout.connect(self.updateGreenLineBacklog)
+        self.timer.timeout.connect(self.checkForScheduledTrains)
         self.timer.start(100)
 
     def showTime(self):
@@ -216,6 +227,20 @@ class Ui_MainWindow(object):
                 self.redLineTrainTable.insertRow(rowPosition)
                 self.redLineTrainTable.setItem(rowPosition, 0, item)
                 self.currentRedLineTrains = self.redLineTrains.keys()
+
+    def updateRedLineBacklog(self):
+        self.currentRedLineBacklog = []
+        for i in range(self.redLineBacklogTable.rowCount()):
+            self.currentRedLineBacklog.append(self.redLineBacklogTable.item(i,0).text())
+
+        for train in self.redLineTrains.backlogs():
+            if ((train in self.currentRedLineBacklog) == False):
+                item = QtWidgets.QTableWidgetItem()
+                item.setText(train)
+                rowPosition = self.redLineBacklogTable.rowCount()
+                self.redLineBacklogTable.insertRow(rowPosition)
+                self.redLineBacklogTable.setItem(rowPosition, 0, item)
+                self.currentRedLineBacklog = self.redLineTrains.backlogs()
     
     def updateGreenLineTrainTable(self):
         # TODO checking for removed trains
@@ -231,6 +256,20 @@ class Ui_MainWindow(object):
                 self.greenLineTrainTable.insertRow(rowPosition)
                 self.greenLineTrainTable.setItem(rowPosition, 0, item)
                 self.currentGreenLineTrains = self.greenLineTrains.keys()
+
+    def updateGreenLineBacklog(self):
+        self.currentGreenLineBacklog = []
+        for i in range(self.greenLineBacklogTable.rowCount()):
+            self.currentGreenLineBacklog.append(self.greenLineBacklogTable.item(i,0).text())
+
+        for train in self.greenLineTrains.backlogs():
+            if ((train in self.currentGreenLineBacklog) == False):
+                item = QtWidgets.QTableWidgetItem()
+                item.setText(train)
+                rowPosition = self.greenLineBacklogTable.rowCount()
+                self.greenLineBacklogTable.insertRow(rowPosition)
+                self.greenLineBacklogTable.setItem(rowPosition, 0, item)
+                self.currentGreenLineBacklog = self.greenLineTrains.backlogs()
     
     def updateDestinationTable(self):
         index = 0
@@ -266,8 +305,6 @@ class Ui_MainWindow(object):
         currentRow = self.greenLineTrainTable.currentRow()
         self.selectedTrain = self.greenLineTrainTable.item(currentRow, 0).text()
         self.selectedTrainStations = self.greenLineTrains.getDestination(self.selectedTrain)
-        for destination in self.selectedTrainStations:
-            print(destination)
         self.updateDestinationTable()
 
     def updateBlockTable(self):
@@ -284,9 +321,9 @@ class Ui_MainWindow(object):
     def updateOccupancy(self):
         item = QtWidgets.QTableWidgetItem()
         state = self.selectedBlockLine.getOccupancy(str(self.selectedBlock))
-        item.setText(state)
+        item.setText(str(state))
         self.blockInfoTable.setItem(2,0,item)
-        if state == "yes":
+        if state == True:
             self.selectedBlockTable.item(self.selectedBlock-1,0).setBackground(QtGui.QColor(0,255,0))
         else:
             self.selectedBlockTable.item(self.selectedBlock-1,0).setBackground(QtGui.QColor(255,255,255))
@@ -294,19 +331,19 @@ class Ui_MainWindow(object):
     def updateFaultState(self):
         item = QtWidgets.QTableWidgetItem()
         state = self.selectedBlockLine.getFaultState(str(self.selectedBlock))
-        item.setText(state)
+        item.setText(str(state))
         self.blockInfoTable.setItem(3,0,item)
-        if state == "yes":
-            self.selectedBlockTable.item(self.selectedBlock-1,0).setBackground(QtGui.QColor(0,255,0))
+        if state == True:
+            self.selectedBlockTable.item(self.selectedBlock-1,0).setBackground(QtGui.QColor(255,0,0))
         else:
             self.selectedBlockTable.item(self.selectedBlock-1,0).setBackground(QtGui.QColor(255,255,255))
 
     def updateMaintenanceState(self):
         item = QtWidgets.QTableWidgetItem()
         state = self.selectedBlockLine.getMaintenanceState(str(self.selectedBlock))
-        item.setText(state)
+        item.setText(str(state))
         self.blockInfoTable.setItem(4,0,item)
-        if state == "yes":
+        if state == True:
             self.selectedBlockTable.item(self.selectedBlock-1,0).setBackground(QtGui.QColor(255,255,0))
         else:
             self.selectedBlockTable.item(self.selectedBlock-1,0).setBackground(QtGui.QColor(255,255,255))
@@ -318,9 +355,26 @@ class Ui_MainWindow(object):
         self.dispatchWidget = QtWidgets.QWidget()
         self.dispatchPopUp = DispatchPopUp()
         self.dispatchPopUp.setupUi(self.dispatchWidget, self.redLineStations, self.greenLineStations, self.redLineTrains, self.greenLineTrains)
+        self.dispatchPopUp.dispatch.clicked.connect(self.closeDispatchPopUp)
         self.dispatchWidget.show()
+    
+    def closeDispatchPopUp(self):
+        self.dispatchWidget.close()
 
-        self.greenLineBlockTable.resizeColumnToContents(1)
+    def uploadSchedule(self):
+        fileName = QFileDialog.getOpenFileName(QtWidgets.QStackedWidget(), 'open file', '/home/garrett/git/ECE_1140_TRAINS/CTC-Office', 'xlsx files (*.xlsx)')
+        self.scheduleParser.loadSchedule(fileName[0], self.redLineStations, self.greenLineStations, self.redLineTrains, self.greenLineTrains)
+
+    def checkForScheduledTrains(self):
+        for train in list(self.redLineTrains.backlogs()):
+            if str(train) == self.clockLabel.text():
+                self.redLineTrains.dispatchScheduledTrain(str(train))
+
+        for train in list(self.greenLineTrains.backlogs()):
+            if str(train) == self.clockLabel.text():
+                self.greenLineTrains.dispatchScheduledTrain(str(train))
+        
+                
 
 if __name__ == "__main__":
     import sys

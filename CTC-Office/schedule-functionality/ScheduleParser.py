@@ -1,21 +1,27 @@
-import sys
+import re
 import pandas as pd
 import csv
 
-def readSchedule(scheduleFile, redLineBack):
-    readFile = pd.read_excel(scheduleFile)
-    readFile.to_csv("schedule.csv",
-                    index = None,
-                    header = True)
+class ScheduleParser:
 
-    with open("schedule.csv") as file:
-        readSchedule = csv.reader(file)
+    def __init__(self):
+        self.readSchedule = csv.reader
 
-        for row in readSchedule:
-            destinationList = []
-            if row[0] == "Red":
-                destinationList.append(row[1].split(": ")[1])
-                addRedLineScheduledTrain(destinationList, row[2])
-            elif row[0] == "Green":
-                destinationList.append(row[1].split(": ")[1])
-                addGreenLineScheduledTrain(row[1].split(": ")[1], row[2])
+    def loadSchedule(self, scheduleFile, redLineStations, greenLineStations, redLineTrains, greenLineTrains):
+        self.readFile = pd.read_excel(scheduleFile)
+        self.readFile.to_csv("schedule.csv",
+                            index = None,
+                            header = True)
+
+        with open("schedule.csv") as file:
+            self.readSchedule = csv.reader(file)
+
+            for row in self.readSchedule:
+                if row[0] == "Red":
+                    destination = re.split(': |;', row[1])[1]
+                    redLineTrains.addScheduledTrain(row[2], redLineStations, 0, 0)
+                    redLineTrains.toggleDestination(row[2], destination, True)
+                elif row[0] == "Green":
+                    destination = (row[1].split(": ")[1])
+                    greenLineTrains.addScheduledTrain(row[2], greenLineStations, 0, 0)
+                    redLineTrains.toggleDestination(row[2], destination, True)

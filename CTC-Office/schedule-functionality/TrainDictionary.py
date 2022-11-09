@@ -12,8 +12,15 @@ class TrainDictionary:
     def addScheduledTrain(self, name, destinations, commandedSpeed, authority):
         self.backLog[name] = Train(destinations, commandedSpeed, authority)
 
+    def dispatchScheduledTrain(self, name):
+        self.trainList[name] = self.backLog[name]
+        self.backLog.pop(name)
+
     def keys(self):
         return self.trainList.keys()
+
+    def backlogs(self):
+        return self.backLog.keys()
 
     def getCommandedSpeed(self, name):
         return self.trainList[name].commandedSpeed
@@ -24,5 +31,8 @@ class TrainDictionary:
     def getDestination(self, name):
         return self.trainList[name].destinations
 
-    def toggleDestination(self, name, destination):
-        self.trainList[name].destinations[destination] = not self.trainList[name].destinations[destination]
+    def toggleDestination(self, name, destination, scheduled):
+        if scheduled:
+            self.backLog[name].destinations[destination] = not self.backLog[name].destinations[destination]
+        else:
+            self.trainList[name].destinations[destination] = not self.trainList[name].destinations[destination]
