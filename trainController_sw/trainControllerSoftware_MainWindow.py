@@ -20,6 +20,7 @@ from simple_pid import PID
 
 
 class Ui_TrainControllerSW_MainWindow(object): 
+    
     def setupUi(self, TrainControllerSW_MainWindow):
         ##
         self.speed_limit = 0
@@ -27,7 +28,6 @@ class Ui_TrainControllerSW_MainWindow(object):
         self.speed_display_value = 0
         self.power_failure_value = 0
         ##
-        
         self.commanded_speed = 0
         self.current_speed = 0
         self.kp = 0
@@ -675,7 +675,10 @@ class Ui_TrainControllerSW_MainWindow(object):
     
     def NextStation(self, pValue):
         #self.next_station_label.setText(c.getNextStation)
-        pass   
+        pass
+
+    def subscribe(self):
+        c.subscribe(c)
 
 #########  Test Input Data  
     def openTestWindow(self):
@@ -923,6 +926,8 @@ class Ui_TrainControllerSW_MainWindow(object):
         self.timer.timeout.connect(self.setKiValue)
         self.timer.timeout.connect(self.openTestWindow)
         self.timer.timeout.connect(self.DisplayPowerOutput)
+        self.timer.timeout.connect(self.AutoSpeed)
+        self.timer.start(100)
         
 if __name__ == "__main__":
     import sys

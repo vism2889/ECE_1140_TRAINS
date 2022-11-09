@@ -3,13 +3,13 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import QTimer
 from simple_pid import PID
 
-from outputData import OutputData as output
-from trainData import TrainData as input
+from outputData import OutputData
+from trainData import TrainData
 
 class Control():
     def __init__(self):
-        output.__init__(output)
-        input.__init__(input)
+        self.input = TrainData()
+        self.output = OutputData()
         
         self.authority = [True, True, True, True, True, True]
         self.light_state_internal = False
@@ -40,50 +40,50 @@ class Control():
     # Sets
     def setAuthority(self, authority=None):
         if(authority==None):
-            self.authority = input.getAuthority(input)
+            self.authority = self.input.getAuthority()
             return
         self.authority = authority
     
     def setInternalLights(self, light_state=None):
         if(light_state == None):
-            self.light_state_internal = input.getInternalLightCommand(input)
+            self.light_state_internal = self.input.getInternalLightCommand()
         else: self.light_state_internal = light_state
-        output.setInternalLightState(output, self.light_state_internal)
+        self.output.setInternalLightState(self.light_state_internal)
         
     def setExternalLights(self, light_state=None):
         if(light_state == None):
-            self.light_state_external = input.getInternalLightCommand(input)
+            self.light_state_external = self.input.getInternalLightCommand()
 
         else: self.light_state_external = light_state
-        output.setExternalLightState(output, self.light_state_external)
+        self.output.setExternalLightState(self.light_state_external)
 
     def setLeftDoor(self, door_state=None):
         if(door_state == None):
             self.door_state_left = input.getLeftDoorCommand(input)
 
         else: self.door_state_left = door_state
-        output.setLeftDoor(output, self.door_state_left)
+        self.output.setLeftDoor(self.door_state_left)
 
     def setRightDoor(self, door_state=None):
         if(door_state==None):
             self.door_state_right = input.getRightDoorCommand(input)
 
         else: self.door_state_right = door_state
-        output.setRightDoorState(output, self.door_state_right)
+        self.output.setRightDoorState(self.door_state_right)
         
     def setSpeed(self, speed=None):
         if(speed==None):
-            speed = input.getCommandedSpeed(input)
+            self.commanded_speed = self.input.getCommandedSpeed(input)
 
         if(self.limitSpeed(self, speed)):
-            self.getPowerOutput(speed, input.getCurrentSpeed(input)) # function sends power data out
+            self.getPowerOutput(speed, self.input.getCurrentSpeed()) # function sends power data out
 
     def setServiceBrake(self, brake=None):
         if(brake == None):
-            self.service_brake = input.getServiceBrakeCommand(input)
+            self.service_brake = self.input.getServiceBrakeCommand()
         else:
             self.service_brake = brake
-        output.setServiceBrakeState(output, self.service_brake)
+        self.output.setServiceBrakeState(self.service_brake)
     
     def setTemperature(self, temperature=None):
         if(temperature == None):
@@ -91,7 +91,7 @@ class Control():
 
         else: self.temperature = temperature
 
-        output.setTemperature(self.setTemperature)
+        self.output.setTemperature(self.setTemperature)
 
     
     def setAdvertisements(self, advertisement=None):
@@ -100,57 +100,57 @@ class Control():
             pass
         else: 
             self.advertisement_state = advertisement
-        #output.setAdvertisementState(output, self.advertisement_state)
+        self.output.setAdvertisementState(self.advertisement_state)
     
     def setAnnouncements(self, announcement=None):
         if(announcement == None):
             self.announce_state = input.getAnnounceCommand(input)
         else:
             self.announce_state = announcement
-        output.setAnnounceState(output, self.announce_state)
+        self.output.setAnnounceState(self.announce_state)
     
     def setEmergencyBrake(self, ebrake=None):
         if(ebrake == None):
-            self.emergency_brake = input.getEbrakeCommand(input)
+            self.emergency_brake = self.input.getEbrakeCommand()
         else:
             self.emergency_brake = ebrake
-        output.setEbrakeState(output, self.emergency_brake)
+        self.output.setEbrakeState(self.emergency_brake)
 
 ####### Can remove after Testing
     def setSpeedLimit(self, speed_limit=None):
         if(speed_limit==None):
-            self.speed_limit = input.getSpeedLimit(input)
+            self.speed_limit = self.input.getSpeedLimit()
             return
 
         self.speed_limit = speed_limit
-        output.setSpeedLimit(output, self.speed_limit)
+        self.output.setSpeedLimit(self.speed_limit)
 
     def setCurrentSpeed(self, current_speed=None):
         if(current_speed==None):
-            self.current_speed = input.getCurrentSpeed(input)
+            self.current_speed = self.input.getCurrentSpeed()
             return
 
         self.current_speed = current_speed
         
     def setSuggestedSpeed(self, suggested_speed=None):
         if(suggested_speed == None):
-            self.suggested_speed = input.getSuggestedSpeed(input)
+            self.suggested_speed = self.input.getSuggestedSpeed()
             return 
 
         self.suggested_speed = suggested_speed
 
     # need to refactor to take in next station data from train model
     def announceStation(self, start, file_idx):
-        output.setAnnounceState(output, start)
+        self.output.setAnnounceState(start)
 
     def deployEbrake(self):
         # may have to consider case where if in auto mode and ebrake is deployed, stop taking in commanded speed data 
-        output.setEbrakeState(output, True)
-        output.setPower(output, 0)
+        self.output.setEbrakeState(True)
+        self.output.setPower(0)
 
 
     def limitSpeed(self, speed):
-        speed_limit = input.getSpeedLimit(input)
+        speed_limit = self.input.getSpeedLimit()
         if(speed > speed_limit):
             return False
         
@@ -159,7 +159,7 @@ class Control():
     def checkAuthority(self):
         if self.authority == 0:
             self.deployEbrake(self)
-        output.setAuthority(output, self.authority)
+        self.output.setAuthority(self.authority)
     
     def set_kp_ki(kp_val, ki_val, self):
         self.k_p = kp_val
@@ -218,17 +218,17 @@ class Control():
         self.pid.setpoint = commanded_speed
         self.power = self.pid(current_speed)
         if self.power > 0:
-            output.setPower(output, self.power)
+            self.output.setPower(self.power)
         
         else:
             self.power = 0
-            output.setPower(output, self.power)
+            self.output.setPower(self.power)
     
     # We need to get values for the faults!
     
     #Winserver
     def publish(self):
-        output.publish(output)
+        self.output.publish()
 
     def subscribe(self):
-        input.spinOnce(input)
+        self.input.spinOnce()
