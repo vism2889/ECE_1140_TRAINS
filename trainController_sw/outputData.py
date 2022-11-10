@@ -1,41 +1,61 @@
-from winserver import winserver
-from train_model_msg import in_msg
 import random
 import time
+from winserver import winserver
+from out_msg import out_msg
 
 class OutputData():
     def __init__(self):
         self.node = winserver('my_publisher')
-        self.message = in_msg()
-        self.pub = self.node.advertise('input', in_msg, 1, "192.168.56.1")
+        self.message = out_msg()
+        self.pub = self.node.advertise('my_topic', out_msg , 1)
 
-    def sendRandomData(self):
-        self.message.announcement_command = random.choice([True, False])
-        self.message.commanded_speed = random.randint(10,99)
-        self.message.left_door_command = random.choice([True, False])
-        self.message.right_door_command = random.choice([True, False])
-        self.message.internal_lights_command =  random.choice([True, False])
-        self.message.external_lights_command =  random.choice([True, False])
-        self.message.ebrake_command =  random.choice([True, False])
-        self.message.service_brake_command =  random.choice([True, False])
-        self.message.current_speed = random.randint(10,99)
-        self.message.temperature_command = random.randint(55,80)
-        self.message.suggested_speed = 60
-        self.message.speed_limit = 100
+    def setPower(self, power):
+        print("power: ", power)
+        self.message.power = power
 
+    def setTemperature(self, temp):
+        self.message.temperature = temp
 
-        for i in range(2):
-            self.message.authority.append(random.choice([True, False]))
+    def setAnnounceState(self, state):
+        self.message.announcement_state = state
+
+    def setServiceBrakeState(self, state):
+        self.message.service_brake_command = state
+
+    def setEbrakeState(self, state):
+        self.message.ebrake_command = state
+        
+    def setLeftDoor(self, state):
+        self.message.left_door_state = state
+
+    def setRightDoorState(self, state):
+        self.message.right_door_state = state
+    
+    def setInternalLightState(self, state):
+        self.message.internal_light_state = state
+    
+    def setExternalLightState(self, state):
+        self.message.external_light_state = state
 
     def publish(self):
         self.pub.publish(self.message)
 
-if __name__ == '__main__':
-    output = OutputData()
+    def randomize(self):
+        self.message.announcement_states = random.choice([True, False])
+        self.message.power = random.randint(0,5)
+        self.message.service_brake_command = random.choice([True, False])
+        self.message.ebrake_command = random.choice([True, False])
+        self.message.left_door_state = random.choice([True, False])
+        self.message.right_door_state = random.choice([True, False])
+        self.message.internal_light_state = random.choice([True, False])
+        self.message.external_light_state = random.choice([True, False])
+        self.message.temperature = random.randint(0,100)
 
+if __name__ == '__main__':
+    
+    outdata = OutputData()
+    
     while True:
-        output.sendRandomData()
-        output.publish()
-        time.sleep(1)
-        
-        
+        outdata.randomize()
+        outdata.publish()
+        time.sleep(1.0)

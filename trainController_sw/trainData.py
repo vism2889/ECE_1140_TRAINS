@@ -83,4 +83,7 @@ class TrainData:
 
 if __name__ == '__main__':
     input = TrainData()
-    input.spin()
+    while True:
+        input.spinOnce()
+        print("Commanded speed: ", input.getCommandedSpeed())
+        time.sleep(.1)

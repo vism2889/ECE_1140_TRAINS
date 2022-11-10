@@ -18,15 +18,15 @@ class Control():
         self.door_state_right = False
         self.announce_state = False
         self.advertisement_state = False
-        self.commanded_speed = 0
+        self.commanded_speed = 100
         self.service_brake = False
         self.emergency_brake = False
         self.current_speed = 0
         self.suggested_speed = 0
         self.speed_limit = 100
         self.temperature = 0
-        self.k_p = 0
-        self.k_i = 0
+        self.k_p = 1
+        self.k_i = 0.01
         self.pid = PID(self.k_p, self.k_i, 0, setpoint=self.commanded_speed) # initialize pid with fixed values
         self.pid.outer_limits = (0, 120000) # clamp at max power output specified in datasheet 120kW
         self.power = 0
@@ -59,24 +59,28 @@ class Control():
 
     def setLeftDoor(self, door_state=None):
         if(door_state == None):
-            self.door_state_left = self.input.getLeftDoorCommand(input)
+            self.door_state_left = self.input.getLeftDoorCommand()
 
         else: self.door_state_left = door_state
         self.output.setLeftDoor(self.door_state_left)
 
     def setRightDoor(self, door_state=None):
         if(door_state==None):
-            self.door_state_right = self.input.getRightDoorCommand(input)
+            self.door_state_right = self.input.getRightDoorCommand()
 
         else: self.door_state_right = door_state
         self.output.setRightDoorState(self.door_state_right)
         
     def setSpeed(self, speed=None):
-        if(speed==None):
-            self.commanded_speed = self.input.getCommandedSpeed(input)
+        commanded_speed = self.input.getCommandedSpeed()
+        if(speed==None and commanded_speed != None):
+            self.commanded_speed = commanded_speed
+        
+        # else:
+        #     self.commanded_speed = 0
 
-        if(self.limitSpeed(self, speed)):
-            self.getPowerOutput(speed, self.input.getCurrentSpeed()) # function sends power data out
+        # if(self.limitSpeed(self, speed)):
+        #     self.getPowerOutput(speed, self.input.getCurrentSpeed()) # function sends power data out
 
     def setServiceBrake(self, brake=None):
         if(brake == None):
@@ -87,7 +91,7 @@ class Control():
     
     def setTemperature(self, temperature=None):
         if(temperature == None):
-            self.temperature = self.input.getTemperature(input)
+            self.temperature = self.input.getTemperature()
 
         else: self.temperature = temperature
 
@@ -159,7 +163,7 @@ class Control():
     def checkAuthority(self):
         if self.authority == 0:
             self.deployEbrake(self)
-        #self.output.setAuthority(self.authority)
+        self.output.setAuthority(self.authority)
     
     def set_kp_ki(kp_val, ki_val, self):
         self.k_p = kp_val
@@ -182,7 +186,7 @@ class Control():
         return self.door_state_right
         
     def getTemperature(self):
-        return self.setTemperature
+        return self.temperature
 
     def getServiceBrake(self):
         return self.service_brake
@@ -214,22 +218,23 @@ class Control():
     def getSpeed(self): 
         return self.commanded_speed
 
-    def getPowerOutput(self, commanded_speed, current_speed):
-        self.pid.setpoint = commanded_speed
-        self.power = self.pid(current_speed)
-        if self.power > 0:
-            self.output.setPower(self.power)
+    def getPowerOutput(self):
+        # self.pid.setpoint = commanded_speed
+        # self.power = self.pid(current_speed)
+        # if self.power > 0:
+        #     self.output.setPower(self.power)
         
-        else:
-            self.power = 0
-            self.output.setPower(self.power)
+        # else:
+        #     self.power = 0
+        #     self.output.setPower(self.power)
+        self.output.setPower(100.0)
     
     # We need to get values for the faults!
     
     #Winserver
     def publish(self):
-       #self.output.publish()
         self.output.randomize()
+        self.output.publish()
 
     def subscribe(self):
         self.input.spinOnce()

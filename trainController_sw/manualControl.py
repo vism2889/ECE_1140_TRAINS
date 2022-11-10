@@ -35,19 +35,19 @@ class ManualControl(object):
     # Sets
     def setCommandedSpeed(self, commanded_speed):
         self.commanded_speed = commanded_speed
-        print(self.commanded_speed)
+        #print(self.commanded_speed)
     
     def setServiceBrake(self, brake_state):
         self.service_brake_state = brake_state
-        print(self.service_brake_state)
+        #print(self.service_brake_state)
     
     def setEmergencyBrake(self, brake_state):
         self.emergency_brake_state = brake_state
-        print(self.emergency_brake_state)
+        #print(self.emergency_brake_state)
     
     def setTemperature(self, temperature):
         self.temperature = temperature
-        print(self.temperature)
+        #print(self.temperature)
             
     def setInternalLights(self, light_state):
         self.light_state_internal = light_state

@@ -20,12 +20,11 @@ from simple_pid import PID
 
 
 class Ui_TrainControllerSW_MainWindow(object):
-    def __init__(self):
-        self.c = Control()
-        self.mc = ManualControl()
     
     def setupUi(self, TrainControllerSW_MainWindow):
         ##
+        self.c = Control()
+        self.mc = ManualControl()
         self.speed_limit = 0
         self.authority_value = 0
         self.speed_display_value = 0
@@ -35,7 +34,7 @@ class Ui_TrainControllerSW_MainWindow(object):
         self.current_speed = 0
         self.kp = 0
         self.ki = 0
-        self.pid = PID(self.kp, self.ki, 0.1, setpoint=self.commanded_speed)
+        self.pid = PID(self.kp, self.ki, 0, setpoint=self.commanded_speed)
         self.pid.output_limits = (0, 120000) #clamp at 120W
         
         TrainControllerSW_MainWindow.setObjectName("TrainControllerSW_MainWindow")
@@ -585,50 +584,55 @@ class Ui_TrainControllerSW_MainWindow(object):
 ####### Set Automatic/Main Displays
 ####### Input = trainData
 ####### Output = outputData
-    def AuthorityDisplay(self, pValue):
+    def AuthorityDisplay(self):
         #self.milesValue = pValue * 0.621371
-        self.Authority_lcdDisplay.display(self.c.getAuthority)
+        # this is a bool array need ot display some other way
+        print("Authority: ", self.c.getAuthority())
+        #self.Authority_lcdDisplay.display(self.c.getAuthority())
     
-    def AutoSpeed(self, pValue):
+    def AutoSpeed(self):
         #self.milesValue = pValue * 0.621371
-        self.Auto_SpeedDisplay.display(self.c.getSpeed)
+        self.c.setSpeed()
+        print("Commanded Speed: ", self.c.getCommandedSpeed())
+        self.Auto_SpeedDisplay.display(self.c.getCommandedSpeed())
         
-    def AutoCommandedSpeed(self, pValue):
+    def AutoCommandedSpeed(self):
         #self.milesValue = pValue * 0.621371
-        self.Auto_CommandedSpeedDisplay.display(self.c.getCommandedSpeed)    
+        self.Auto_CommandedSpeedDisplay.display(self.c.getCommandedSpeed())    
 
-    def AutoBraking(self, pValue):
-        self.Auto_BrakingDisplay.display(self.c.getServiceBrake)
+    def AutoBraking(self):
+        self.Auto_BrakingDisplay.display(self.c.getServiceBrake())
         
-    def AutoInternalLights(self, pValue):
-        self.InternalLights_DisplayBox.setCheckState(self.c.getInternalLights)
+    def AutoInternalLights(self):
+        print("Internal Lights: ", self.c.getInternalLights())
+        self.InternalLights_DisplayBox.setCheckState(self.c.getInternalLights())
     
-    def AutoExternalLights(self, pValue):
-        self.ExternalLights_DisplayBox.setCheckState(self.c.getExternalLights)
+    def AutoExternalLights(self):
+        self.ExternalLights_DisplayBox.setCheckState(self.c.getExternalLights())
     
-    def AutoLeftDoors(self, pValue):
-        self.LeftDoors_DisplayBox.setCheckState(self.c.getLeftDoor)
+    def AutoLeftDoors(self):
+        self.LeftDoors_DisplayBox.setCheckState(self.c.getLeftDoor())
     
-    def AutoRightDoors(self, pValue):
-        self.RightDoors_DisplayBox.setCheckState(self.c.getRightDoor)
+    def AutoRightDoors(self):
+        self.RightDoors_DisplayBox.setCheckState(self.c.getRightDoor())
 
-    def AutoAdvertisements(self, pValue):
-        self.Advertisements_DisplayBox.setCheckState(self.c.getAdvertisements)
+    def AutoAdvertisements(self):
+        self.Advertisements_DisplayBox.setCheckState(self.c.getAdvertisements())
     
-    def AutoAnnouncements(self, pValue):
-        self.Announcements_DisplayBox.setCheckState(self.c.getAnnouncements)
+    def AutoAnnouncements(self):
+        self.Announcements_DisplayBox.setCheckState(self.c.getAnnouncements())
     
-    def AutoTemperature(self, pValue):
-        self.Temperature_DisplayBox.display(self.c.getTemperature)
+    def AutoTemperature(self):
+        self.Temperature_DisplayBox.display(self.c.getTemperature())
     
-    def AutoEngineFault(self, pValue):
+    def AutoEngineFault(self):
         self.EngineFault_DisplayBox.setCheckable(True)
-        self.EngineFault_DisplayBox.setCheckState(pValue)  
+        #self.EngineFault_DisplayBox.setCheckState(pValue)  
         self.ActivateEmergencyBrake()
         
-    def AutoPowerFault(self, pValue):
+    def AutoPowerFault(self):
         self.PowerFault_DisplayBox.setCheckable(True)
-        self.PowerFault_DisplayBox.setCheckState(pValue)
+        #self.PowerFault_DisplayBox.setCheckState(pValue)
         self.ActivateEmergencyBrake()
         
     def AutoCircuitFault(self, pValue):
@@ -640,13 +644,14 @@ class Ui_TrainControllerSW_MainWindow(object):
         self.TrackFault_DisplayBox.setCheckable(True)
         self.TrackFault_DisplayBox.setCheckState(pValue)
         
-    def EmergencyBrakeDisplay(self, pValue):
+    def EmergencyBrakeDisplay(self):
         self.EmergencyBrakeDisplayBox.setCheckable(True)
-        self.EmergencyBrakeDisplayBox.setCheckState(pValue)
+        #self.EmergencyBrakeDisplayBox.setCheckState()
+        self.c.deployEbrake()
     
     def CurrentSpeed(self, pValue):
         #self.milesValue = pValue * 0.621371
-        self.currentSpeed_lcdDisplay.display(self.c.getCurrentSpeed)
+        self.currentSpeed_lcdDisplay.display(self.c.getCurrentSpeed())
     
     def NextStation(self, pValue):
         #self.next_station_label.setText(self.c.getNextStation)
@@ -655,139 +660,6 @@ class Ui_TrainControllerSW_MainWindow(object):
     def subscribe(self):
         self.c.subscribe()
 
-#########  Test Input Data  
-    def openTestWindow(self):
-        self.timer.timeout.connect(self.getTestSpeed)
-        self.timer.timeout.connect(self.getTestCommandedSpeed)
-        self.timer.timeout.connect(self.getTestBraking)
-        self.timer.timeout.connect(self.getTestLights)
-        self.timer.timeout.connect(self.getTestDoors)
-        self.timer.timeout.connect(self.getTestAdvertisements)
-        self.timer.timeout.connect(self.getTestAnnoucements)
-        self.timer.timeout.connect(self.getTestTemperature)
-        self.timer.timeout.connect(self.getTestEngineFault)
-        self.timer.timeout.connect(self.getTestPowerFault)
-        self.timer.timeout.connect(self.getTestTrackFault)
-        self.timer.timeout.connect(self.getTestCircuitFault)
-        self.timer.timeout.connect(self.getTestAuthority)
-        self.timer.timeout.connect(self.getTestCurrentSpeed)
-        self.timer.timeout.connect(self.getTestNextStation)
-        self.timer.timeout.connect(self.getEmergencyBrake)
-        self.timer.timeout.connect(self.closeTestWindow)
-        #self.timer.timeout.connect(self.getKpValue)
-        #self.timer.timeout.connect(self.getKiValue)
-        self.timer.start(1)
-        self.TestWindow.show()
-    
-    def closeTestWindow(self):
-        self.timer.timeout.disconnect(self.getTestSpeed)
-        self.timer.timeout.disconnect(self.getTestCommandedSpeed)
-        self.timer.timeout.disconnect(self.getTestBraking)
-        self.timer.timeout.disconnect(self.getTestLights)
-        self.timer.timeout.disconnect(self.getTestDoors)
-        self.timer.timeout.disconnect(self.getTestAdvertisements)
-        self.timer.timeout.disconnect(self.getTestAnnoucements)
-        self.timer.timeout.disconnect(self.getTestTemperature)
-        self.timer.timeout.disconnect(self.getTestEngineFault)
-        self.timer.timeout.disconnect(self.getTestPowerFault)
-        self.timer.timeout.disconnect(self.getTestTrackFault)
-        self.timer.timeout.disconnect(self.getTestCircuitFault)
-        self.timer.timeout.disconnect(self.getTestAuthority)
-        self.timer.timeout.disconnect(self.getTestCurrentSpeed)
-        self.timer.timeout.disconnect(self.getTestNextStation)
-        self.timer.timeout.connect(self.getEmergencyBrake)
-        self.timer.timeout.disconnect(self.closeTestWindow)
-        self.timer.stop()        
-         
-    def getTestSpeed(self):
-        self.AutoSpeed(self.ui.setSpeed())
-    
-    def getTestCommandedSpeed(self):
-        self.AutoCommandedSpeed(self.ui.setCommandedSpeed())
-    
-    def getTestBraking(self):
-       self.AutoBraking(self.ui.setBraking())
-    
-    def getTestAuthority(self):
-        self.AuthorityDisplay(self.ui.setAuthority())
-    
-    # Lights: 0 - Off, 1 - Internal, 2 - External, 3 - Both
-    def getTestLights(self):
-        if(self.ui.setLights() == 1):
-            self.AutoInternalLights(True)
-            self.AutoExternalLights(False)
-            
-        elif(self.ui.setLights() == 2):
-            self.AutoExternalLights(True)
-            self.AutoInternalLights(False)
-            
-        elif(self.ui.setLights() == 3):
-            self.AutoInternalLights(True)
-            self.AutoExternalLights(True)
-            
-        else:
-            self.AutoInternalLights(False)
-            self.AutoExternalLights(False)
-   
-    # Doors: 0 - Closed, 1 - Left, 2 - Right, 3 - Both
-    def getTestDoors(self):
-        if(self.ui.setDoors() == 1):
-            self.AutoLeftDoors(True)
-            self.AutoRightDoors(False)
-            
-        elif(self.ui.setDoors() == 2):
-            self.AutoRightDoors(True)
-            self.AutoLeftDoors(False)
-            
-        elif(self.ui.setDoors() == 3):
-            self.AutoLeftDoors(True)
-            self.AutoRightDoors(True)
-            
-        else:
-            self.AutoLeftDoors(False)
-            self.AutoRightDoors(False)
-        
-    def getTestAdvertisements(self):
-        self.AutoAdvertisements(self.ui.setAdvertisements())
-    
-    def getTestAnnoucements(self):
-        self.AutoAnnouncements(self.ui.setAnnouncements())
-    
-    def getTestTemperature(self):
-        self.AutoTemperature(self.ui.setTemperature())
-    
-    def getTestEngineFault(self):
-        self.AutoEngineFault(self.ui.setEngineFault())
-        if(self.ui.setEngineFault() == True):
-            self.ActivateEmergencyBrake()
-    
-    def getTestPowerFault(self):
-        self.AutoPowerFault(self.ui.setPowerFault())
-        if(self.ui.setPowerFault() == True):
-            self.ActivateEmergencyBrake()
-    
-    def getTestTrackFault(self):
-        self.AutoTrackFault(self.ui.setTrackFault())
-        if(self.ui.setTrackFault() == True):
-            self.ActivateEmergencyBrake()
-    
-    def getTestCircuitFault(self):
-        self.AutoCircuitFault(self.ui.setCircuitFault())
-        if(self.ui.setCircuitFault() == True):
-            self.ActivateEmergencyBrake()
-    
-    def getEmergencyBrake(self):
-        self.EmergencyBrakeDisplay(self.ui.setEmergencyBrake())
-        
-    def getTestCurrentSpeed(self):
-        self.CurrentSpeed(self.ui.setCurrentSpeed())
-    
-    def getTestNextStation(self):
-        self.NextStation(self.ui.setNextStation())
-        
-    def getTestWindowClose(self):
-        self.closeTestWindow()
-        
 ####### ManualControl Class Sets
     def setManualControl_CommandedSpeed(self):
         self.mc.setCommandedSpeed(self.speed_Slider.value())
@@ -863,10 +735,7 @@ class Ui_TrainControllerSW_MainWindow(object):
         self.pid.output_limits = (0, 120000)
     
     def DisplayPowerOutput(self):
-        self.pid.setpoint = (self.Manual_CommandedSpeed_lcdDisplay.value() * 0.621371)
-        self.setPID(self.kp, self.ki)
-        self.power = self.pid(self.Manual_CommandedSpeed_lcdDisplay.value() * 0.621371)
-        self.PowerOutput_lcdDisplay.display(self.power)
+       self.c.getPowerOutput()
         
     def publish(self):
         self.c.publish()
@@ -895,21 +764,28 @@ class Ui_TrainControllerSW_MainWindow(object):
         self.timer.timeout.connect(self.setManualControl_Announcements)
 
     def connect(self):
-        self.ManuLebrake_button.clicked.connect(self.ActivateEmergencyBrake)
+        self.timer.timeout.connect(self.publish)
+        self.timer.timeout.connect(self.subscribe)
         self.setKp_Box.valueChanged.connect(self.setKpValue)
         self.setKi_Box.valueChanged.connect(self.setKiValue)
-        self.OpenTestUI.clicked.connect(self.openTestWindow)
-        self.ImportTestData.clicked.connect(self.openTestWindow)
-        self.DisplayPower.clicked.connect(self.DisplayPowerOutput)
         
-        self.timer.timeout.connect(self.ActivateEmergencyBrake)
+        self.timer.timeout.connect(self.EmergencyBrakeDisplay)
         self.timer.timeout.connect(self.setKpValue)
         self.timer.timeout.connect(self.setKiValue)
-        self.timer.timeout.connect(self.openTestWindow)
         self.timer.timeout.connect(self.DisplayPowerOutput)
         self.timer.timeout.connect(self.AutoSpeed)
-        self.timer.timeeout.connect(self.publish)
-        self.timer.timeout.connect(self.subscribe)
+        self.timer.timeout.connect(self.AutoTemperature)
+        self.timer.timeout.connect(self.AutoBraking)
+        self.timer.timeout.connect(self.AutoAnnouncements)
+        self.timer.timeout.connect(self.AuthorityDisplay)
+        self.timer.timeout.connect(self.AutoCommandedSpeed)
+        self.timer.timeout.connect(self.AutoLeftDoors)
+        self.timer.timeout.connect(self.AutoRightDoors)
+        self.timer.timeout.connect(self.AutoInternalLights)
+        self.timer.timeout.connect(self.AutoExternalLights)
+        self.timer.timeout.connect(self.AutoAnnouncements)
+
+       
         self.timer.start(100)
         
 if __name__ == "__main__":
@@ -919,6 +795,6 @@ if __name__ == "__main__":
     ui = Ui_TrainControllerSW_MainWindow()
     ui.setupUi(TrainControllerSW_MainWindow)
     ui.connect()
-    ui.ManualControl_Connect()
+    #ui.ManualControl_Connect()
     TrainControllerSW_MainWindow.show()
     sys.exit(app.exec_())
