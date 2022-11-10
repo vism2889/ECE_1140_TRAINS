@@ -28,7 +28,7 @@ class BlockDictionary:
             elif type == "SWITCH":
                 noUnderground = re.split('UNDERGROUND', newBlock.infrastructure)[0]
                 switch = noUnderground.split(' ',1)[1]
-                self.switchList[newBlock.number] = switch + " F"
+                self.switchList[newBlock.number] = [switch, True]
             elif type == "RAILWAY":
                 self.crossingList[newBlock.number] = "red"
 

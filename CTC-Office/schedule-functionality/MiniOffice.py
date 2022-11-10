@@ -2,12 +2,13 @@ from PyQt5.QtWidgets import QFileDialog, QMainWindow, QApplication, QWidget, QAc
 from PyQt5 import QtCore, QtGui, QtWidgets, QtWidgets
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import pyqtSlot, QTime
+import sys
 
 from TrainDictionary import TrainDictionary
 from LayoutParser import LayoutParser
 from DispatchPopUp import DispatchPopUp
 from ScheduleParser import ScheduleParser
-import sys
+from PublisherCTC import PublisherCTC
 
 class Ui_MainWindow(object):
 
@@ -22,6 +23,7 @@ class Ui_MainWindow(object):
         self.redLineBlocksKeys = redLineBlocks.keys()
         self.greenLineBlocksKeys = greenLineBlocks.keys()
         self.scheduleParser = ScheduleParser()
+        #self.publisherCTC = PublisherCTC()
 
         # Create default station dictionary
         self.redLineStations = dict()
@@ -182,7 +184,7 @@ class Ui_MainWindow(object):
         for key in self.redLineBlocksKeys:
            if (self.redLineBlocks.switch(key) != 0):      
                 item = QtWidgets.QTableWidgetItem()
-                item.setText(self.redLineBlocks.switch(key))
+                item.setText(self.redLineBlocks.switch(key)[0] + " " + str(self.redLineBlocks.switch(key)[1]))
                 self.redLineBlockTable.setItem(int(key)-1, 1, item)
                 
         for key in self.redLineBlocksKeys:
@@ -202,7 +204,7 @@ class Ui_MainWindow(object):
         for key in self.greenLineBlocksKeys:
            if (self.greenLineBlocks.switch(key) != 0):      
                 item = QtWidgets.QTableWidgetItem()
-                item.setText(self.greenLineBlocks.switch(key))
+                item.setText(self.greenLineBlocks.switch(key)[0] + " " + str(self.greenLineBlocks.switch(key)[1]))
                 self.greenLineBlockTable.setItem(int(key)-1, 1, item)
                 
         for key in self.greenLineBlocksKeys:
@@ -350,6 +352,7 @@ class Ui_MainWindow(object):
 
     def toggleMaintenance(self):
         self.selectedBlockLine.toggleMaintenanceState(str(self.selectedBlock))
+        self.publishTrackMsg("red")
 
     def launchDispatchPopUp(self):
         self.dispatchWidget = QtWidgets.QWidget()
@@ -373,8 +376,30 @@ class Ui_MainWindow(object):
         for train in list(self.greenLineTrains.backlogs()):
             if str(train) == self.clockLabel.text():
                 self.greenLineTrains.dispatchScheduledTrain(str(train))
-        
-                
+    
+    def publishTrackMsg(self, line):
+        switchList = []
+        maintenanceList = []
+        for key in self.redLineBlocks.keys():
+            forward = self.redLineBlocks.switch(key)
+            if forward != 0:
+                if forward[1]:
+                    switchList.append(True)
+                elif not forward[1]:
+                    switchList.append(False)
+            
+        for key in self.redLineBlocks.keys():
+            maintenance = self.redLineBlocks.getMaintenanceState(key)
+            if maintenance == True:
+                maintenanceList.append(True)
+            else:
+                maintenanceList.append(False)
+
+        #self.publisherCTC.publishTrackMsg(switchList, maintenanceList, "red")
+
+    def subscribeTrackMsg(self);
+        print("here")
+
 
 if __name__ == "__main__":
     import sys

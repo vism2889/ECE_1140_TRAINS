@@ -8,12 +8,12 @@ class PublisherCTC:
         self.trackMsg = track_msg()
         self.trackPub = self.node.advertise('trackMsg', track_msg, 1)
     
-    def publishTrackMsg(self):
-        self.trackMsg.occupancy.append(True)
-        self.trackMsg.switchStates.append(True)
-        self.trackMsg.maintenance.append(True)
-        self.trackMsg.failures.append(28)
-        self.line = "red"
+    def publishTrackMsg(self, switchStates, maintenance, line):
+        self.trackMsg.occupancy = []
+        self.trackMsg.switchStates = switchStates
+        self.trackMsg.maintenance = maintenance
+        self.trackMsg.failures = []
+        self.line = line
         self.trackPub.publish(self.trackMsg)
 
 if __name__ == '__main__':
