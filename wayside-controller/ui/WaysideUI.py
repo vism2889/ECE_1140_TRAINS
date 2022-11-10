@@ -3,12 +3,14 @@ import os
 from track_layout import extract_layout
 
 class TrackControllerWindow(object):
-    def __init__(self):
+    def __init__(self, waysideio, bpc=12):
+        
         self.redline_maintenance_mode = []
         self.greenline_maintenance_mode = []
-        self.numBlocksPerController = 12
+        self.numBlocksPerController = bpc
 
         self.redline_reference = {
+            'name' : 'redline',
             'controllers': [],
             'view' : [],
             'faults' : {},
@@ -16,14 +18,16 @@ class TrackControllerWindow(object):
         }
 
         self.greenline_reference = {
+            'name' : 'greenline',
             'controllers' : [],
             'view' : [],
             'faults' : {},
             'maintenance' : []
         }
 
+        self.waysideio_ref = waysideio
         self.FAULTS = ["UNDEFINED", "BROKEN RAIL", "CIRCUIT FAILURE", "POWER FAILURE", "OK"]
-
+        
     def setupUi(self, main_window):
         self.main_window_reference = main_window
 
@@ -115,10 +119,15 @@ class TrackControllerWindow(object):
         self.redline_controllers.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(main_window)
 
+        ## Setup the WaysideIO class
+        self.waysideio_ref.setupLine(redline_layout)
+        self.waysideio_ref.setupLine(greenline_layout)
+
     def dialog(self):
         loc = self.main_window_reference.sender()
         idx = int(''.join(filter(str.isdigit, loc.objectName())))
-
+        print("location ", loc)
+        print("idx ", idx)
         if "redline" in loc.objectName():
             if self.redline_reference['maintenance'][idx]:
                 print(f"PLC upload request to redline controller {idx}")

@@ -20,15 +20,18 @@ class PLCParser():
             os.mkdir(plcDir)
 
         self.outfilePath = ""
-
+        self.outfileName = ""
         if os.name == 'posix':
             self.outfilePath = os.getcwd() + f'{dir}/controller_plc_{controllerId}.py'
+            self.outfileName = f"controller_plc_{controllerId}"
         elif os.name == 'nt':
             self.outfilePath = os.getcwd() + f'{dir}\\controller_plc_{controllerId}.py'
+            self.outfileName = f"controller_plc_{controllerId}"
 
     def parseFile(self, file):
 
         outfile = open(self.outfilePath, 'w')
+        tab = "\t"
         lines = []
 
         for line in file:
@@ -38,9 +41,16 @@ class PLCParser():
                     num = line[idx:].split(' ')[0].replace(vtype, '')
                     line = line.replace(vtype+num, f"input['{vtype.replace('#', '').replace(f'_', '')}']['{num}']")
                     idx = line.find(vtype)
-            lines.append(line)
+            lines.append(tab + line)
 
-        print(lines)
+        outfile.write("def run(input):\n")
+
+        for l in lines:
+            outfile.write(l + "\n")
+
+        outfile.close()
+        return self.outfileName
+        
 
 if __name__ == '__main__':
 
