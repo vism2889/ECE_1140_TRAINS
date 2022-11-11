@@ -45,7 +45,7 @@ def parseTrackLayout(path, size=15):
             controller['total-blocks'] += 1
 
             ## populate block-occupancy
-            controller['block-occupancy'].append((row['Block Number'], row['Section'], False))
+            controller['block-occupancy'].append((row['Block Number'], row['Section'], False, row['Speed Limit (Km/Hr)']))
 
             ## populate switch-state
             if row['Infrastructure'] != None and "SWITCH" in row['Infrastructure']:
@@ -63,7 +63,8 @@ def parseTrackLayout(path, size=15):
                     controller['switch-state'].clear()
                     controller['total-blocks'] = 0
 
-        CONTROLLERS.append(deepcopy(controller))
+        if controller['total-blocks'] > 0:
+            CONTROLLERS.append(deepcopy(controller))
 
         file.close()
     return CONTROLLERS

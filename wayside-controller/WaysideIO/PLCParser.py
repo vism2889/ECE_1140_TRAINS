@@ -39,7 +39,7 @@ class PLCParser():
                 idx = line.find(vtype)
                 while idx>=0:
                     num = line[idx:].split(' ')[0].replace(vtype, '')
-                    line = line.replace(vtype+num, f"input['{vtype.replace('#', '').replace(f'_', '')}']['{num}']")
+                    line = line.replace(vtype+num, f"input['{vtype.replace('#', '').replace(f'_', '')}']['{num}'][0]")
                     idx = line.find(vtype)
             lines.append(tab + line)
 
@@ -50,7 +50,7 @@ class PLCParser():
 
         outfile.close()
         return self.outfileName
-        
+
 
 if __name__ == '__main__':
 

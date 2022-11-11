@@ -3,8 +3,8 @@ import os
 from track_layout import extract_layout
 
 class TrackControllerWindow(object):
-    def __init__(self, waysideio, bpc=12):
-        
+    def __init__(self, waysideio=None, bpc=12):
+
         self.redline_maintenance_mode = []
         self.greenline_maintenance_mode = []
         self.numBlocksPerController = bpc
@@ -27,7 +27,7 @@ class TrackControllerWindow(object):
 
         self.waysideio_ref = waysideio
         self.FAULTS = ["UNDEFINED", "BROKEN RAIL", "CIRCUIT FAILURE", "POWER FAILURE", "OK"]
-        
+
     def setupUi(self, main_window):
         self.main_window_reference = main_window
 
@@ -120,8 +120,9 @@ class TrackControllerWindow(object):
         QtCore.QMetaObject.connectSlotsByName(main_window)
 
         ## Setup the WaysideIO class
-        self.waysideio_ref.setupLine(redline_layout)
-        self.waysideio_ref.setupLine(greenline_layout)
+        if self.waysideio_ref != None:
+            self.waysideio_ref.setupLine(redline_layout)
+            self.waysideio_ref.setupLine(greenline_layout)
 
     def dialog(self):
         loc = self.main_window_reference.sender()
