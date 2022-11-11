@@ -6,8 +6,8 @@ import importlib
 from track_layout import extract_layout
 
 class Controller:
-    def __init__(self, controllerNum):
-        
+    def __init__(self, controllerNum, layout):
+
         ## Function to run PLC program
         self.plc = None
         self.plcGood = False
@@ -16,6 +16,9 @@ class Controller:
 
     ## Run the PLCs
     def run(self):
+        input = {
+            'switch'
+        }
         if self.plcGood:
             try:
                 self.plc(self.track)
@@ -34,24 +37,47 @@ class Controller:
             self.plc = mod.run
             self.plcGood = True
 
-
-
 class WaysideIO:
     def __init__(self, ui):
 
         self.track = {}
         self.blockStates = []
 
-        ## Hold each controller 
+        ## Hold each controller
         self.redline_controllers = []
         self.greenline_controllers = []
 
     def setupLine(self, layout):
-        ## Setup redline controllers
-        if layout['name'] == 'redline':
-            print(layout)
-                
-        
+
+        lineName, controllers = layout
+
+        ## Setup redline controllerss
+        if lineName == 'redline':
+            for i,c in enumerate(controllers):
+
+                controller = {
+                    'block' : {},
+                    'switch' : {},
+                    'crossing' : {}
+                }
+
+                ## Go through the blocks
+                for blocks in c['block-occupancy']:
+                    controller['block'][blocks[0]] = (blocks[2], blocks[3])
+
+                ## Go through the switchs
+                for switches in c['switch-state']:
+                    controller['switch'][switches[0]] = switches[2]
+
+                ## Go through the crossings
+                for crossings in c['crossing-state']:
+                    controller['crossing'][crossings[0]] = crossings[2]
+
+                print(controller)
+                self.redline_controllers.append(Controller(i, controller))
+
+
+        print(self.redline_controllers)
 
 
 
@@ -68,10 +94,8 @@ if __name__ == '__main__':
         path += "\\track_layout\\Track Layout & Vehicle Data vF.xlsx - Green Line.csv"
     elif os.name == 'posix':
         path += "/track_layout/Track Layout & Vehicle Data vF.xlsx - Green Line.csv"
-    
-    layout = extract_layout.parseTrackLayout(path)
-    print(layout)
-    layout['name'] = 'redline'
-    w.setupLine(layout)
 
+    layout = extract_layout.parseTrackLayout(path)
+    # print(layout)
+    w.setupLine(('redline', layout))
 
