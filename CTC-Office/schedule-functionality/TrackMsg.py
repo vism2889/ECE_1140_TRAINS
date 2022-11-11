@@ -1,6 +1,6 @@
 from msg import msg 
 
-class track_msg(msg):
+class TrackMsg(msg):
     def __init__(self):
         super().__init__()
         self.__vars__ = []

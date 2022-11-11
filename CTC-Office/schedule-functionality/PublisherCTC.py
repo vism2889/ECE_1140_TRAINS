@@ -1,12 +1,12 @@
 from time import sleep
 from winserver import winserver
-from track_msg import track_msg
+from TrackMsg import TrackMsg
 
 class PublisherCTC:
     def __init__(self):
         self.node = winserver('PublisherCTC')
-        self.trackMsg = track_msg()
-        self.trackPub = self.node.advertise('trackMsg', track_msg, 1)
+        self.trackMsg = TrackMsg()
+        self.trackPub = self.node.advertise('trackMsg', TrackMsg, 1)
     
     def publishTrackMsg(self, switchStates, maintenance, line):
         self.trackMsg.occupancy = []

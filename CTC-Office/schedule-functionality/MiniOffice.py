@@ -8,7 +8,7 @@ from TrainDictionary import TrainDictionary
 from LayoutParser import LayoutParser
 from DispatchPopUp import DispatchPopUp
 from ScheduleParser import ScheduleParser
-from PublisherCTC import PublisherCTC
+#from PublisherCTC import PublisherCTC
 
 class Ui_MainWindow(object):
 
@@ -156,6 +156,11 @@ class Ui_MainWindow(object):
         self.uploadScheduleButton.clicked.connect(self.uploadSchedule)
         self.uploadScheduleButton.show()  
 
+        self.toggleDestinationsButton = QtWidgets.QPushButton(MainWindow)
+        self.toggleDestinationsButton.setGeometry(265, 535, 120, 25)
+        self.toggleDestinationsButton.setText("Toggle Destinations")
+        self.toggleDestinationsButton.show()
+
         self.populateRedLineTable()
         self.populateGreenLineTable()
 
@@ -293,7 +298,7 @@ class Ui_MainWindow(object):
         self.selectedBlockTable = self.redLineBlockTable
 
     def redTrainSelectionChanged(self):
-        currentRow = self.redLineTrainTable.currentRow()
+        currentRow = self.greenLineTrainTable.currentRow()
         self.selectedTrain = self.redLineTrainTable.item(currentRow, 0).text()
         self.selectedTrainStations = self.redLineTrains.getDestination(self.selectedTrain)
         self.updateDestinationTable()
@@ -397,7 +402,7 @@ class Ui_MainWindow(object):
 
         #self.publisherCTC.publishTrackMsg(switchList, maintenanceList, "red")
 
-    def subscribeTrackMsg(self);
+    def subscribeTrackMsg(self):
         print("here")
 
 
