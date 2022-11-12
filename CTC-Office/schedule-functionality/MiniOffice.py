@@ -8,7 +8,7 @@ from TrainDictionary import TrainDictionary
 from LayoutParser import LayoutParser
 from DispatchPopUp import DispatchPopUp
 from ScheduleParser import ScheduleParser
-#from PublisherCTC import PublisherCTC
+from PublisherCTC import PublisherCTC
 
 class Ui_MainWindow(object):
 
@@ -142,6 +142,8 @@ class Ui_MainWindow(object):
         self.destinationTable.setColumnWidth(1, 88)
         self.destinationTable.verticalHeader().hide()
         self.destinationTable.setHorizontalHeaderLabels(['Station', 'Stopping'])
+        self.destinationTable.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.destinationTable.setSelectionMode(QAbstractItemView.MultiSelection)
         self.destinationTable.show()
 
         self.dispatchTrainButton = QtWidgets.QPushButton(MainWindow)
@@ -159,6 +161,7 @@ class Ui_MainWindow(object):
         self.toggleDestinationsButton = QtWidgets.QPushButton(MainWindow)
         self.toggleDestinationsButton.setGeometry(265, 535, 120, 25)
         self.toggleDestinationsButton.setText("Toggle Destinations")
+        self.toggleDestinationsButton.clicked.connect(self.toggleDestinations)
         self.toggleDestinationsButton.show()
 
         self.populateRedLineTable()
@@ -298,8 +301,9 @@ class Ui_MainWindow(object):
         self.selectedBlockTable = self.redLineBlockTable
 
     def redTrainSelectionChanged(self):
-        currentRow = self.greenLineTrainTable.currentRow()
+        currentRow = self.redLineTrainTable.currentRow()
         self.selectedTrain = self.redLineTrainTable.item(currentRow, 0).text()
+        self.selectedTrainLine = self.redLineTrains
         self.selectedTrainStations = self.redLineTrains.getDestination(self.selectedTrain)
         self.updateDestinationTable()
 
@@ -311,6 +315,7 @@ class Ui_MainWindow(object):
     def greenTrainSelectionChanged(self):
         currentRow = self.greenLineTrainTable.currentRow()
         self.selectedTrain = self.greenLineTrainTable.item(currentRow, 0).text()
+        self.selectedTrainLine = self.greenLineTrains
         self.selectedTrainStations = self.greenLineTrains.getDestination(self.selectedTrain)
         self.updateDestinationTable()
 
@@ -381,6 +386,14 @@ class Ui_MainWindow(object):
         for train in list(self.greenLineTrains.backlogs()):
             if str(train) == self.clockLabel.text():
                 self.greenLineTrains.dispatchScheduledTrain(str(train))
+
+    def toggleDestinations(self):
+        self.selectedDestinations = self.destinationTable.selectedIndexes()
+        for selection in self.selectedDestinations:
+            destination = self.destinationTable.itemFromIndex(selection).text()
+            if (destination != "True" and destination != "False"):
+               self.selectedTrainLine.toggleDestination(self.selectedTrain, destination, False)
+        self.updateDestinationTable()
     
     def publishTrackMsg(self, line):
         switchList = []

@@ -7,10 +7,10 @@ class TrainDictionary:
         self.backLog = dict()
 
     def addTrain(self, name, destinations, commandedSpeed, authority):
-        self.trainList[name] = Train(destinations, commandedSpeed, authority)
+        self.trainList[name] = Train("YARD", destinations, commandedSpeed, authority)
 
     def addScheduledTrain(self, name, destinations, commandedSpeed, authority):
-        self.backLog[name] = Train(destinations, commandedSpeed, authority)
+        self.backLog[name] = Train("YARD", destinations, commandedSpeed, authority)
 
     def dispatchScheduledTrain(self, name):
         self.trainList[name] = self.backLog[name]

@@ -1,6 +1,6 @@
 ## Imports for the winserver library
 from winserver import winserver
-from track_msg import track_msg
+from TrackMsg import TrackMsg
 
 class MySub:
     def __init__(self):
@@ -10,17 +10,14 @@ class MySub:
         self.node = winserver('my_subscriber')
 
         ## Create a subscriber that listens to the topic 'my_topic'
-        self.sub = self.node.subscribe('my_topic', track_msg, self.my_callback, 1)
+        self.sub = self.node.subscribe('TrackMsg', TrackMsg, self.my_callback, 1)
 
     def my_callback(self, msg):
         
         ## Do things with the data coming in 
         #   Here we just print the values of 
         #   each variable found in my_msg.msg
-        print(msg.my_int)
-        print(msg.my_str)
-        print(msg.my_float)
-        print(msg.my_bool)
+        print(TrackMsg.line)
     
     def spin(self):
 

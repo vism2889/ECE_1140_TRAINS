@@ -6,7 +6,7 @@ class PublisherCTC:
     def __init__(self):
         self.node = winserver('PublisherCTC')
         self.trackMsg = TrackMsg()
-        self.trackPub = self.node.advertise('trackMsg', TrackMsg, 1)
+        self.trackPub = self.node.advertise('TrackMsg', TrackMsg, 1)
     
     def publishTrackMsg(self, switchStates, maintenance, line):
         self.trackMsg.occupancy = []
@@ -20,5 +20,5 @@ if __name__ == '__main__':
     mp = PublisherCTC()
 
     while True:
-        mp.publishTrackMsg()
+        mp.publishTrackMsg([True, False], [False, True], "red")
         sleep(1)
