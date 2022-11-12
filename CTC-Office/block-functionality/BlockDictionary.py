@@ -24,52 +24,62 @@ class BlockDictionary:
                     print("Missing station name on block", newBlock.number)
                     return
                 station = re.split('; |: ', newBlock.infrastructure)[1]
-                self.stationList[station] = newBlock.number
+                self.stationList[newBlock.number] = station
             elif type == "SWITCH":
-                switch = newBlock.infrastructure.split(' ',1)[1]
-                self.switchList[switch] = "forward"
+                noUnderground = re.split('UNDERGROUND', newBlock.infrastructure)[0]
+                switch = noUnderground.split(' ',1)[1]
+                self.switchList[newBlock.number] = [switch, True]
             elif type == "RAILWAY":
-                self.crossingList[newBlock.infrastructure] = "red "
+                self.crossingList[newBlock.number] = "red"
 
     def toggleOccupancy(self, blockNum):
-        self.blockList[blockNum].occupancy ^= self.blockList[blockNum].occupancy
+        self.blockList[blockNum].occupancy = not self.blockList[blockNum].occupancy
 
-    def toggleMaintenaceState(self, blockNum):
-        self.blockList[blockNum].maintenanceState ^= self.blockList[blockNum].maintenanceState
+        # TODO use this speed limit to send suggested speed and make everything work
+        if self.blockList[blockNum].occupancy:
+            return self.blockList[blockNum].speedLimit
+
+    def toggleMaintenanceState(self, blockNum):
+        self.blockList[blockNum].maintenanceState = not self.blockList[blockNum].maintenanceState
 
     def toggleFaultState(self, blockNum):
-        self.blockList[blockNum].faultState ^= self.blockList[blockNum].faultState
+        self.blockList[blockNum].faultState = not self.blockList[blockNum].faultState
 
+    def getLine(self, blockNum):
+        return self.blockList[blockNum].line
     
     def getOccupancy(self, blockNum):
-        if self.blockList[blockNum].occupancy:
-            return "yes"
-        else:
-            return "no"
+        return self.blockList[blockNum].occupancy
 
     def getFaultState(self, blockNum):
-        if self.blockList[blockNum].faultState:
-            return "yes"
-        else:
-            return "no"
+        return self.blockList[blockNum].faultState
 
     def getMaintenanceState(self, blockNum):
-        if self.blockList[blockNum].maintenanceState:
-            return "yes"
-        else:
-            return "no"
-    
-    def getBlockList(self):
-        return self.blockList
+        return self.blockList[blockNum].maintenanceState
 
-    def getSwitchList(self):
-        return self.switchList
+    def keys(self):
+        return self.blockList.keys()
 
-    def getStationList(self):
+    def stations(self):
         return self.stationList
 
-    def getCrossingList(self):
-        return self.crossingList
-            
+    def station(self, key):
+        try:
+            return self.stationList[key]
+        except KeyError as K:
+            return 0
+
+    def switch(self, key):
+        try:
+            return self.switchList[key]
+        except KeyError as K:
+            return 0
+
+    def crossing(self, key):
+        try:
+            return self.crossingList[key]
+        except KeyError as K:
+            return 0
+
     def len(self):
         return len(self.blockList)

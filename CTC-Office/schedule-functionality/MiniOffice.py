@@ -4,6 +4,9 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import pyqtSlot, QTime
 import sys
 
+sys.path.append('../train-functionality/')
+sys.path.append('../block-functionality/')
+sys.path.append('../server-functionality/')
 from TrainDictionary import TrainDictionary
 from LayoutParser import LayoutParser
 from DispatchPopUp import DispatchPopUp
