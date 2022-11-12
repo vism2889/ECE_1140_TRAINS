@@ -358,6 +358,7 @@ class Ui_TrainControllerSW_MainWindow(object):
         self.setKi_Box.setObjectName("setKi_Box")
         self.TabWigets.addTab(self.tab_3, "")
         self.OpenTestUI = QtWidgets.QPushButton(self.centralwidget, clicked = lambda: self.openTestWindow())        
+
         self.OpenTestUI.setGeometry(QtCore.QRect(720, 320, 93, 29))
         self.OpenTestUI.setObjectName("OpenTestUI")
         self.ImportTestData = QtWidgets.QPushButton(self.centralwidget, clicked = lambda: self.openTestWindow())
@@ -490,6 +491,7 @@ class Ui_TrainControllerSW_MainWindow(object):
         self.statusbar.setObjectName("statusbar")
         TrainControllerSW_MainWindow.setStatusBar(self.statusbar)
         self.DisplayPower = QtWidgets.QPushButton(self.centralwidget, clicked = lambda: self.DisplayPowerOutput())
+
         self.DisplayPower.setGeometry(QtCore.QRect(720, 280, 93, 29))
         self.DisplayPower.setObjectName("DisplayPower")
 

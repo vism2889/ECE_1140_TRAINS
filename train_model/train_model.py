@@ -10,6 +10,7 @@ class TrainModel(QtWidgets.QMainWindow):
     '''Primary Train Model UI Window that contains all childs/widgets'''
     def __init__(self):
         super(TrainModel, self).__init__()
+
         path = os.getcwd()+'\\train.ui'
         uic.loadUi(path, self)
     
