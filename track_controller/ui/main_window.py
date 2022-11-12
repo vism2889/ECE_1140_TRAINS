@@ -638,8 +638,8 @@ class TrackControllerWindow(object):
         item.setTextAlignment(4)
         item2 = QtWidgets.QTableWidgetItem(str(value))
         item2.setTextAlignment(4)
-
-        if state:
+        
+        if value:
             item.setBackground(QtGui.QColor(0xf4, 0x71, 0x74))
             item2.setBackground(QtGui.QColor(0xf4, 0x71, 0x74))
         else:

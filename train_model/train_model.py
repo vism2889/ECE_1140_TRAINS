@@ -10,7 +10,8 @@ class TrainModel(QtWidgets.QMainWindow):
     '''Primary Train Model UI Window that contains all childs/widgets'''
     def __init__(self):
         super(TrainModel, self).__init__()
-        path = os.getcwd()+'/train.ui'
+
+        path = os.getcwd()+'\\train.ui'
         uic.loadUi(path, self)
     
         self.t = Train()
@@ -220,7 +221,7 @@ class TestWindow(QtWidgets.QMainWindow):
     test_clicked = pyqtSignal(dict)
     def __init__(self):
         super(TestWindow, self).__init__()
-        path = os.getcwd()+'/test.ui'
+        path = os.getcwd()+'\\test.ui'
         uic.loadUi(path, self)
 
         
