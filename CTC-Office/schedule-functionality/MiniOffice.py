@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import QFileDialog, QMainWindow, QApplication, QWidget, QAction, QTableWidget,QTableWidgetItem,QVBoxLayout, QAbstractItemView
 from PyQt5 import QtCore, QtGui, QtWidgets, QtWidgets
 from PyQt5.QtGui import QIcon
-from PyQt5.QtCore import pyqtSlot, QTime
+from PyQt5.QtCore import pyqtSlot, QTime, pyqtSignal
 import sys
 
 sys.path.append('../train-functionality/')
@@ -13,13 +13,13 @@ from DispatchPopUp import DispatchPopUp
 from ScheduleParser import ScheduleParser
 from PublisherCTC import PublisherCTC
 
-class Ui_MainWindow(object):
+class Ui_MainWindow(QtCore.QObject):
     dispatchSignal = QtCore.pyqtSignal(bool)
-
 #################################################################
 # Start UI generation and setup
 #################################################################
     def __init__(self, MainWindow, redLineBlocks, greenLineBlocks):
+        super(Ui_MainWindow, self).__init__()
         self.redLineTrains = TrainDictionary()
         self.greenLineTrains = TrainDictionary()
         self.redLineBlocks = redLineBlocks

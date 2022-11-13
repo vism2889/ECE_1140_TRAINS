@@ -20,18 +20,13 @@ from train import Train
 class TrainModel(QtWidgets.QMainWindow):
     '''Primary Train Model UI Window that contains all childs/widgets'''
     t = pyqtSignal()
-    dispatchSignal = pyqtSignal(bool)
 
-    def __init__(self, t):
+    def __init__(self, t, ctc):
         super(TrainModel, self).__init__()
         # path = os.getcwd()+'\\train_model\\train.ui'
         path = os.getcwd() +'/train.ui'
         uic.loadUi(path, self)
-        layoutFile = "Track_Layout_PGH_Light_Rail.csv"
-        trackLayout = LayoutParser(layoutFile)
-        redLineBlocks, greenLineBlocks = trackLayout.process()
-        MainWindow = QtWidgets.QMainWindow()
-        self.ctc = Ui_MainWindow(MainWindow, redLineBlocks, greenLineBlocks)
+        self.ctc = ctc
         self.ctc.dispatchSignal.connect(self.dispatch)
         self.t = t
 
@@ -44,13 +39,18 @@ class TrainModel(QtWidgets.QMainWindow):
         print(f'Dispatched, message: {msg}')
 
     def UI(self):
+        print('Type of dispatch signal is: ', type(self.ctc.dispatchSignal))
+
+        self.ctc.dispatchSignal.connect(self.dispatch)
+
+        
         # if sys.argv[1] == 'user':
         #     self.test_win.setVisible(False)
         # else:
         #     self.test_win.setVisible(True)
 
         self.test_win.setVisible(False)
-
+       
         self.test_win.clicked.connect(self.test_window)
         #connecting failure buttons to respective slots
         self.sig_fail.clicked.connect(self.sig_failure)
@@ -318,5 +318,12 @@ class TestWindow(QtWidgets.QMainWindow):
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     t =  Train()
-    window = TrainModel(t)
+
+    layoutFile = "Track_Layout_PGH_Light_Rail.csv"
+    trackLayout = LayoutParser(layoutFile)
+    redLineBlocks, greenLineBlocks = trackLayout.process()
+    MainWindow = QtWidgets.QWidget()
+    ctc = Ui_MainWindow(MainWindow, redLineBlocks, greenLineBlocks)
+
+    window = TrainModel(t, ctc)
     app.exec_()
