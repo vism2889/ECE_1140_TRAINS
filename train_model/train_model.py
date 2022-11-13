@@ -64,4 +64,3 @@ if __name__ == "__main__":
         print(f"before publisher train.pm.curr_vel = {t.pm.curr_vel}")
         mp.publish()
         print("done")
-
