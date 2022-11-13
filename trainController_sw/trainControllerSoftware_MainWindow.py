@@ -600,7 +600,7 @@ class Ui_TrainControllerSW_MainWindow(object):
         #self.milesValue = pValue * 0.621371
         self.Auto_CommandedSpeedDisplay.display(self.c.getCommandedSpeed())    
 
-    def AutoBraking(self):
+    def AutoBraking(self): 
         self.Auto_BrakingDisplay.display(self.c.getServiceBrake())
         
     def AutoInternalLights(self):
