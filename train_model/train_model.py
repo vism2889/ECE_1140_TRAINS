@@ -2,6 +2,8 @@ from train import Train
 from winserver import winserver
 from to_TC import to_TC
 from from_TC import from_TC
+import time
+
 
 class MyPub:
     def __init__(self, t):
@@ -29,16 +31,12 @@ class MySub:
         self.train = t
         self.node = winserver('TrainControllerSubscriber')
         self.msg = from_TC()
-        self.sub = self.node.subscribe('my_topic', self.msg, 1, "192.168.0.10")
+        self.sub = self.node.subscribe('my_topic', from_TC , 1, "192.168.0.10")
     
     def call_back(self, msg):
-        print(msg.power)
-        print(msg.temperature)
+        self.train.curr_power = self.msg.power
+        print(self.msg.ebrake_command)
         
-
-
-
-
 def tc_inputs():
     pass
 def tm_inputs():
@@ -50,7 +48,16 @@ def tm_outputs():
 
 if __name__ == "__main__":
     t = Train()
+    t.dispatch()
     mp = MyPub(t)
+    ms = MySub()
     train_dict = {}
-    print("done")
+    while True:
+        time.sleep(2)
+        p = 120000
+        print('setting power')
+        t.set_power(p)
+        print(f"before publisher train.pm.curr_vel = {t.pm.curr_vel}")
+        mp.publish()
+        print("done")
 

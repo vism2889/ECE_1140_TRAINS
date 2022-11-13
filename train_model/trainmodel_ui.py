@@ -27,8 +27,6 @@ class TrainModel(QtWidgets.QMainWindow):
         else:
             self.test_win.setVisible(True)
 
-
-    
         self.test_win.clicked.connect(self.test_window)
         #connecting failure buttons to respective slots
         self.sig_fail.clicked.connect(self.sig_failure)

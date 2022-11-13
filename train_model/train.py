@@ -31,14 +31,17 @@ class TrainData():
     
     #accelerations
     med_accel = float =  0.5    #m/s^2
-    serv_brake = float = -1.2*2/3  #m/s^2
-    emergency_brake = -2.73*2/3    #m/s^2
+    serv_brake = float = -1.2  #m/s^2
+    emergency_brake = -2.73    #m/s^2
+
+    kinetic_fric_force = float = 0.42 #Newtons
+    
 
 
 class PointMassModel():
     def __init__(self):
         self._td = TrainData()
-
+        self.id = None
 
         #time independent values
         self.power = 0
@@ -158,7 +161,10 @@ class PointMassModel():
     def dec_force(self):
         # print(f"Current force is: {self.force}")
         dec_force = self._td.mass_empty * self._td.serv_brake
-        self.force = self.force+dec_force
+        if dec_force < self.force: 
+            self.force = self.force+dec_force
+        else:
+            self.force - self._td.friction_force
         self.curr_accel = self.force/self._td.mass_empty
 
         return self.curr_accel
@@ -271,7 +277,6 @@ class Train():
                 print(f'Current Accel:{self.pm.curr_accel}')
                 print(f'Current_Vel: {self.pm.curr_vel}')
                 print(f'Current Speed: {self.pm.curr_speed} mph\n')
-                print(f'Current Speed: {self.curr_speed} mph\n')
             
                 
             

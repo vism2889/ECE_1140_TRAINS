@@ -22,7 +22,7 @@ class to_TC(msg):
 		self.__vars__.append(self.ebrake_command)
 		self.service_brake_command = None
 		self.__vars__.append(self.service_brake_command)
-		self.__data_types__.append("int")
+		self.__data_types__.append("float")
 		self.__data_types__.append("int")
 		self.__data_types__.append("int")
 		self.__data_types__.append("int")
