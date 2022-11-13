@@ -9,14 +9,19 @@
 ##############################################################################
 
 import sys
-from PyQt5.QtWidgets import QTableWidget, QTableWidgetItem, QComboBox, QApplication, QWidget, QInputDialog, QLineEdit, QFileDialog, QPushButton, QListWidget, QLabel, QCheckBox
-from PyQt5.QtGui import QIcon, QPixmap
+from PyQt5.QtWidgets import QListWidgetItem, QApplication, QWidget, QInputDialog, QLineEdit, QFileDialog, QPushButton, QListWidget, QLabel, QCheckBox
+from PyQt5.QtGui import QIcon, QPixmap, QPainter, QPen, QFont, QColor
 from PyQt5 import QtCore
-sys.path.insert(0,"../parsers") # tell interpreter where to look for model files
+sys.path.append("..\parsers") # tell interpreter where to look for model files
+sys.path.append("..\Communication-Modules") # tell interpreter where to look for model files
 from LayoutParser2 import LayoutParser
+from dummyTrainModel import dummyTrain
+from winserver import winserver
+from TrackMsg import TrackMsg
+import threading 
 
 class App(QWidget):
-    # occupancySignal     = QtCore.pyqtSignal(list)  # <-- This is the sub window's signal
+    occupancySignal     = QtCore.pyqtSignal(list)  # <-- This is the sub window's signal
     def __init__(self):
         super().__init__()
         self.title         = 'Train Model - Pittsburgh Light Rail'
@@ -24,12 +29,13 @@ class App(QWidget):
         self.top           = 10
         self.width         = 1000
         self.height        = 800
-        self.currBlock = None
+        self.currBlock     = None
 
         # Layout Information
         self.lineNames     = []
         self.lines         = []
         self.lineBlocks    = []
+        self.blocksLoaded  = False
         self.stations      = []
         self.crossings     = []
         self.switches      = []
@@ -38,7 +44,35 @@ class App(QWidget):
         self.layoutFile    = None
         #self.testUI       = TestUI()
         self.testList      = []
+        self.occupancy     = [False for i in range(150)]
+        # self.testTrain     = dummyTrain()
+        # self.testTrain.occupancySignal.connect(self.getOccupancy)
+        # self.testTrain.timer()
+
+        self.node = winserver('TrackMsg Subscriber')
+        self.sub  = self.node.subscribe('TrackMsg Topic', TrackMsg, self.my_callback, 1)
+        # self.node.spin()
+        self.x = threading.Thread(target=self.serverThreadCall)
+        self.x.start()
+        # self.y = threading.Thread(target=self.updateBlockCall)
+        # self.y.start()
         self.initUI()
+
+    def serverThreadCall(self):
+        self.node.spin()
+
+    def updateBlockCall(self):
+        if self.currLineIndex != None and self.blocksLoaded == True:
+            self.updateBlocks()
+
+    def my_callback(self, msg):
+        self.occupancy = msg.occupancy
+        print(msg.occupancy)
+        print(msg.switchStates)
+        print(msg.maintenance)
+        print(msg.failures)
+        print(msg.line)
+        self.updateBlockCall()
 
     def initUI(self):
         self.setWindowTitle(self.title)
@@ -76,17 +110,59 @@ class App(QWidget):
         self.blockVallistwidget.move(290,268)
         self.blockVallistwidget.resize(150,480) 
 
+        self.serverConnectionStatus = QLabel("Server Connection Status:", self)
+        self.serverConnectionStatus.move(5,32)
+        self.serverConnectionStatus.resize(130,18)
+
+        self.serverConnectionStatus.setStyleSheet("background-color: cyan; color: black;")
+
+        self.currBlockDisplay = QLabel("BLOCK:", self)
+        self.currBlockDisplay.move(130, 100)
+        self.currBlockDisplay.resize(630, 130)
+        self.currBlockDisplay.setStyleSheet("background-color: cyan; color: black;")
+        self.currBlockDisplay.setFont(QFont('Arial', 45))
+
+        self.trackFault1 = QPushButton("Track Fault 1", self)
+        self.trackFault1.move(140, 600)
+        self.trackFault1.resize(100,50)
+        self.trackFault1.setStyleSheet("background-color: gray ; color: black;")
+        self.trackFault1.clicked.connect(self.updateFaults)
+
+        self.trackFault2 = QPushButton("Track Fault 2", self)
+        self.trackFault2.move(140, 650)
+        self.trackFault2.resize(100,50)
+
+        self.trackFault3 = QPushButton("Track Fault 3", self)
+        self.trackFault3.move(140, 700)
+        self.trackFault3.resize(100,50)
+
+        self.indicator = QPushButton('', self)
+        self.indicator.setStyleSheet("border: 20px; border-top-left-radius: 40px; color: black; background-color: cyan;")
+        self.indicator.move(110, 34)
 
         self.linesLabel = QLabel("TRACK LINES", self)
         self.linesLabel.setStyleSheet("background-color: cyan; color: black;")
-        self.linesLabel.move(5,32)
+        self.linesLabel.move(5,72)
         self.linesLabel.resize(100,18)
         self.linelistwidget = QListWidget(self)
-        self.linelistwidget.move(5,50)
+        self.linelistwidget.move(5,90)
         self.linelistwidget.resize(100,100)
         self.loadBeaconInfo()
 
         self.show()
+
+    def updateFaults(self):
+        print(self.currBlock.faultPresence)
+        if self.currBlock.faultPresence == False:
+            self.currBlock.faultPresence = True
+            self.currBlock.faultsText = "Fault1"
+            self.trackFault1.setStyleSheet("background-color: orange ; color: black;")
+            self.updateBlockInfo(self.currBlockIndex)
+        else:
+            self.currBlock.faultPresence = False
+            self.currBlock.faultsText = "None"
+            self.trackFault1.setStyleSheet("background-color: gray ; color: black;")
+            self.updateBlockInfo(self.currBlockIndex)
 
     def openFileNameDialog(self):
         options = QFileDialog.Options()
@@ -154,15 +230,27 @@ class App(QWidget):
         self.blockInfolistwidget.insertItem(23, "Beacon:               ")
 
     def loadBlocks(self):
+        
         self.blockslistwidget.clear()
         i = 0
         for section in self.lines[self.currLineIndex].sections:
             for block in section.blocks:
                 vBlockNumber = str(block.blockNumber)
-                self.blockslistwidget.insertItem(i+1, "BLOCK "+vBlockNumber)
+                item = QListWidgetItem("BLOCK "+vBlockNumber)
+                # if self.occupancy[i] == True:
+                #     item.setBackground(QColor(200,200,50))
+                self.blockslistwidget.insertItem(i+1, item)
                 self.lineBlocks[self.currLineIndex].append(block)
                 i+=1
         self.blockslistwidget.itemClicked.connect(self.onClickedBlock)
+        self.blocksLoaded = True
+
+    def updateBlocks(self):
+        for i in range(len(self.occupancy)):
+            if self.occupancy[i] == True:
+                self.blockslistwidget.item(i).setBackground(QColor(200,200,50))
+            else:
+                self.blockslistwidget.item(i).setBackground(QColor(250,250,250))
 
     def onClickedLine(self, item):
         currLine = item.text()
@@ -172,14 +260,20 @@ class App(QWidget):
         self.loadBlocks()
 
     def onClickedBlock(self, item):
-        currBlockIndex = int(item.text().split(" ")[1]) -1
+        #self.updateBlocks()
+        self.currBlockIndex = int(item.text().split(" ")[1]) -1
 
-        self.currBlock = self.lineBlocks[self.currLineIndex][currBlockIndex]
+        self.currBlock = self.lineBlocks[self.currLineIndex][self.currBlockIndex]
         # self.loadFaults()
-        self.updateBlockInfo(currBlockIndex)
+        
+        
+        self.updateBlockInfo(self.currBlockIndex)
+        self.currBlockDisplay.setText("BLOCK: "+str(self.currBlock.line)+"-"+str(self.currBlock.section)+"-"+str(self.currBlock.blockNumber))
         # self.updateTableData(currBlockIndex)
+        
 
     def updateBlockInfo(self, pCurrBlockIndex):
+        
         self.blockVallistwidget.clear()
         currBlock = self.lineBlocks[self.currLineIndex][pCurrBlockIndex]
         self.blockVallistwidget.insertItem(0,currBlock.line)
@@ -213,6 +307,9 @@ class App(QWidget):
         self.blockVallistwidget.insertItem(11,"NA")
         self.blockVallistwidget.item(11).setForeground(QtCore.Qt.gray) 
 
+        self.currBlock.occupancy = self.occupancy[self.currBlockIndex]
+        
+        
         if(currBlock.occupancy == True):
             self.blockVallistwidget.insertItem(12,str(currBlock.occupancy))
             self.blockVallistwidget.item(12).setForeground(QtCore.Qt.green)
@@ -262,12 +359,25 @@ class App(QWidget):
         self.beaconInformationlistwidget = QListWidget(self)
         self.beaconInformationlistwidget.move(540,268)
         self.beaconInformationlistwidget.resize(150,380)
+        self.beaconInformationlistwidget.insertItem(0, "Next station Forward:")
+        self.beaconInformationlistwidget.insertItem(1, "Next station Reverse:")
+
 
         self.beaconInformationVallistwidget = QListWidget(self)
         self.beaconInformationVallistwidget.setStyleSheet("color: orange;")
         self.beaconInformationVallistwidget.move(690,268)
         self.beaconInformationVallistwidget.resize(150,380) 
+    
+    def getOccupancy(self, occupancy):
+        self.occupancy = occupancy
+        print("GUI OCCUPANCY", self.occupancy)
+        
+    def updateBlocks2(self):
+        return 42
 
+    def updateBlockList(self, line):
+        for block in self.lineBlocks[line]:
+            block.occupancy = 5
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     ex = App()

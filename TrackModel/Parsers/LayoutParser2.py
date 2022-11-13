@@ -15,7 +15,7 @@
 import csv
 import sys
 # tell interpreter where to look for model files
-sys.path.insert(0,"../Track-System-Models")
+sys.path.insert(0,"..\Track-System-Models")
 from BlockModel import BlockModel
 from TrackSection import TrackSection
 from TrackLine import TrackLine
