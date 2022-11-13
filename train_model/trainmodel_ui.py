@@ -27,7 +27,6 @@ class TrainModel(QtWidgets.QMainWindow):
         path = os.getcwd() +'/train.ui'
         uic.loadUi(path, self)
         self.ctc = ctc
-        self.ctc.dispatchSignal.connect(self.dispatch)
         self.t = t
 
 
@@ -37,6 +36,8 @@ class TrainModel(QtWidgets.QMainWindow):
 
     def dispatch(self, msg):
         print(f'Dispatched, message: {msg}')
+        print('id is: ', {msg['id']})
+        print('line is: ', {msg['line']})
 
     def UI(self):
         print('Type of dispatch signal is: ', type(self.ctc.dispatchSignal))
