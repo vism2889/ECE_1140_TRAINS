@@ -21,7 +21,7 @@ from TrackMsg import TrackMsg
 import threading 
 
 class App(QWidget):
-    occupancySignal     = QtCore.pyqtSignal(list)  # <-- This is the sub window's signal
+    # occupancySignal     = QtCore.pyqtSignal(list)  # <-- This is the sub window's signal
     def __init__(self):
         super().__init__()
         self.title         = 'Train Model - Pittsburgh Light Rail'
