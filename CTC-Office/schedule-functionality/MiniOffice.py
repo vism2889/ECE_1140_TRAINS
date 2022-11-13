@@ -14,11 +14,12 @@ from ScheduleParser import ScheduleParser
 from PublisherCTC import PublisherCTC
 
 class Ui_MainWindow(object):
+    dispatchSignal = QtCore.pyqtSignal(bool)
 
 #################################################################
 # Start UI generation and setup
 #################################################################
-    def __init__(self, redLineBlocks, greenLineBlocks):
+    def __init__(self, MainWindow, redLineBlocks, greenLineBlocks):
         self.redLineTrains = TrainDictionary()
         self.greenLineTrains = TrainDictionary()
         self.redLineBlocks = redLineBlocks
@@ -42,6 +43,8 @@ class Ui_MainWindow(object):
         # select default block
         self.selectedBlock = 1
         self.selectedBlockLine = self.redLineBlocks
+
+        self.setupUi(MainWindow)
 
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
@@ -180,6 +183,7 @@ class Ui_MainWindow(object):
         self.timer.timeout.connect(self.updateGreenLineBacklog)
         self.timer.timeout.connect(self.checkForScheduledTrains)
         self.timer.start(100)
+        MainWindow.show()
 
     def showTime(self):
         current_time = QTime.currentTime()
@@ -376,6 +380,7 @@ class Ui_MainWindow(object):
     
     def closeDispatchPopUp(self):
         self.dispatchWidget.close()
+        self.dispatchSignal.emit(True)
 
     def uploadSchedule(self):
         fileName = QFileDialog.getOpenFileName(QtWidgets.QStackedWidget(), 'open file', '/home/garrett/git/ECE_1140_TRAINS/CTC-Office', 'xlsx files (*.xlsx)')
@@ -432,8 +437,7 @@ if __name__ == "__main__":
 
     app = QtWidgets.QApplication(sys.argv)
     MainWindow = QtWidgets.QMainWindow()
-    mainUi = Ui_MainWindow(redLineBlocks, greenLineBlocks)
-    mainUi.setupUi(MainWindow)
+    mainUi = Ui_MainWindow(MainWindow, redLineBlocks, greenLineBlocks)
     MainWindow.show()
     
     sys.exit(app.exec_())

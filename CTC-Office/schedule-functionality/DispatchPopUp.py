@@ -1,4 +1,6 @@
 import sys
+sys.path.append('../train-functionality/')
+sys.path.append('../CTC-Office/train-functionality/')
 from PyQt5 import QtCore, QtGui, QtWidgets, QtWidgets
 from PyQt5.QtWidgets import QAbstractItemView, QDialog, QApplication, QFileDialog
 from PyQt5.QtCore import QTimer, QTime, Qt
@@ -92,3 +94,4 @@ class DispatchPopUp(object):
                 self.redLineTrains.toggleDestination(self.trainName, destination.text(), False)
             elif (self.currentLine == "Green Line"):
                 self.greenLineTrains.toggleDestination(self.trainName, destination.text(), False)
+

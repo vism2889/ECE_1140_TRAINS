@@ -1,31 +1,55 @@
 # from train import Train
+import sys
+sys.path.append('../CTC-Office/schedule-functionality/')
+sys.path.append('../CTC-Office/train-functionality/')
+sys.path.append('../CTC-Office/block-functionality/')
+sys.path.append('../CTC-Office/server-functionality/')
+
 from PyQt5 import QtWidgets, uic
 from PyQt5.QtCore import QObject, QThread, pyqtSignal, pyqtSlot
+from DispatchPopUp import DispatchPopUp
+from MiniOffice import Ui_MainWindow
+from LayoutParser import LayoutParser
 import sys
 import os
 import time
+from train import Train
+
 
 
 class TrainModel(QtWidgets.QMainWindow):
     '''Primary Train Model UI Window that contains all childs/widgets'''
     t = pyqtSignal()
+    dispatchSignal = pyqtSignal(bool)
+
     def __init__(self, t):
         super(TrainModel, self).__init__()
-        path = os.getcwd()+'\\train_model\\train.ui'
+        # path = os.getcwd()+'\\train_model\\train.ui'
+        path = os.getcwd() +'/train.ui'
         uic.loadUi(path, self)
-    
+        layoutFile = "Track_Layout_PGH_Light_Rail.csv"
+        trackLayout = LayoutParser(layoutFile)
+        redLineBlocks, greenLineBlocks = trackLayout.process()
+        MainWindow = QtWidgets.QMainWindow()
+        self.ctc = Ui_MainWindow(MainWindow, redLineBlocks, greenLineBlocks)
+        self.ctc.dispatchSignal.connect(self.dispatch)
         self.t = t
-        self.t.dispatch()
+
 
         self.UI()
 
         self.show()
 
+    def dispatch(self, msg):
+        print(f'Dispatched, message: {msg}')
+
     def UI(self):
-        if sys.argv[1] == 'user':
-            self.test_win.setVisible(False)
-        else:
-            self.test_win.setVisible(True)
+        # if sys.argv[1] == 'user':
+        #     self.test_win.setVisible(False)
+        # else:
+        #     self.test_win.setVisible(True)
+
+        self.test_win.setVisible(False)
 
         self.test_win.clicked.connect(self.test_window)
         #connecting failure buttons to respective slots
@@ -293,5 +317,6 @@ class TestWindow(QtWidgets.QMainWindow):
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
-    window = TrainModel()
+    t =  Train()
+    window = TrainModel(t)
     app.exec_()
