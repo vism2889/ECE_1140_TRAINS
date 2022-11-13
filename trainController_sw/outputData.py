@@ -6,9 +6,9 @@ from out_msg import out_msg
 #ours
 class OutputData():
     def __init__(self):
-        self.node = winserver('my_publisher', "192.168.0.15")
+        self.node = winserver('my_publisher')
         self.message = out_msg()
-        self.pub = self.node.advertise('my_topic', out_msg , 1, "192.168.0.10")
+        self.pub = self.node.advertise('my_topic', out_msg , 1)
 
     def setPower(self, power):
         self.message.power = power

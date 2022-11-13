@@ -5,8 +5,8 @@ import time
 
 class TrainData:
     def __init__(self):
-        self.node = winserver('my_subscriber', "192.168.0.15")
-        self.sub = self.node.subscribe('my_topic', in_msg, self.my_callback, 1)
+        self.node = winserver('my_subscriber')
+        self.sub = self.node.subscribe('input', in_msg, self.my_callback, 1)
         self.current_speed = None
         self.commanded_speed = None
         self.suggested_speed = None
