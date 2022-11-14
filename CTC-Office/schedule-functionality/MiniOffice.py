@@ -13,16 +13,16 @@ from DispatchPopUp import DispatchPopUp
 from ScheduleParser import ScheduleParser
 from PublisherCTC import PublisherCTC
 
-class Ui_MainWindow(QtCore.QObject):
+class Ui_MainWindow(QWidget):
     dispatchSignal = QtCore.pyqtSignal(bool)
 #################################################################
 # Start UI generation and setup
 #################################################################
-    def __init__(self, MainWindow):
+    def __init__(self):
         super(Ui_MainWindow, self).__init__()
 
         self.parseLayout()
-        self.setupUi(MainWindow)
+        self.setupUi()
 
     def parseLayout(self):
         # getting lists of blocks
@@ -46,16 +46,16 @@ class Ui_MainWindow(QtCore.QObject):
         self.selectedBlock = 1
         self.selectedBlockLine = self.redLineBlocks
 
-    def setupUi(self, MainWindow):
-        MainWindow.setObjectName("MainWindow")
-        MainWindow.setGeometry(10, 10, 600, 580)
-        MainWindow.setMouseTracking(True)
+    def setupUi(self):
+        self.setObjectName("self")
+        self.setGeometry(10, 10, 600, 580)
+        self.setMouseTracking(True)
         self.redLineMaintenance = False
         self.greenLineMaintenance = False
 
         font = QtGui.QFont()
         font.setPointSize(16)
-        self.clockLabel = QtWidgets.QLabel(MainWindow)
+        self.clockLabel = QtWidgets.QLabel(self)
         self.clockLabel.setGeometry(QtCore.QRect(450, 20, 140, 25))
         self.clockLabel.setObjectName("clockLabel")
         self.clockLabel.setStyleSheet("background-color: gray; border: 1px solid black")
@@ -63,7 +63,7 @@ class Ui_MainWindow(QtCore.QObject):
         self.clockLabel.setFont(font)
 
     ##################### RED LINE ##########################
-        self.redLineBlockTable = QTableWidget(MainWindow)
+        self.redLineBlockTable = QTableWidget(self)
         self.redLineBlockTable.setRowCount(self.redLineBlocks.len())
         self.redLineBlockTable.setColumnCount(3)
         self.redLineBlockTable.setColumnWidth(0, 40)
@@ -77,7 +77,7 @@ class Ui_MainWindow(QtCore.QObject):
         self.selectedBlockTable = self.redLineBlockTable
         self.redLineBlockTable.show()
 
-        self.redLineTrainTable = QTableWidget(MainWindow)
+        self.redLineTrainTable = QTableWidget(self)
         self.redLineTrainTable.setColumnCount(1)
         self.redLineTrainTable.setGeometry(10,309,105,120)
         self.redLineTrainTable.setHorizontalHeaderLabels(['Active Trains'])
@@ -85,7 +85,7 @@ class Ui_MainWindow(QtCore.QObject):
         self.redLineTrainTable.itemClicked.connect(self.redTrainSelectionChanged)
         self.redLineTrainTable.show()
 
-        self.redLineBacklogTable = QTableWidget(MainWindow)
+        self.redLineBacklogTable = QTableWidget(self)
         self.redLineBacklogTable.setColumnCount(1)
         self.redLineBacklogTable.setGeometry(115,309,105,120)
         self.redLineBacklogTable.setHorizontalHeaderLabels(['Scheduled'])
@@ -93,7 +93,7 @@ class Ui_MainWindow(QtCore.QObject):
         self.redLineBacklogTable.show()
 
     ##################### GREEN LINE ########################
-        self.greenLineBlockTable = QTableWidget(MainWindow)
+        self.greenLineBlockTable = QTableWidget(self)
         self.greenLineBlockTable.setRowCount(self.greenLineBlocks.len())
         self.greenLineBlockTable.setColumnCount(3)
         self.greenLineBlockTable.setColumnWidth(0, 40)
@@ -107,7 +107,7 @@ class Ui_MainWindow(QtCore.QObject):
         self.greenLineBlockTable.clicked.connect(self.greenBlockSelectionChanged)
         self.greenLineBlockTable.show()
 
-        self.greenLineTrainTable = QTableWidget(MainWindow)
+        self.greenLineTrainTable = QTableWidget(self)
         self.greenLineTrainTable.setColumnCount(1)
         self.greenLineTrainTable.setGeometry(230,309,105,120)
         self.greenLineTrainTable.setHorizontalHeaderLabels(['Active Trains'])
@@ -115,7 +115,7 @@ class Ui_MainWindow(QtCore.QObject):
         self.greenLineTrainTable.itemClicked.connect(self.greenTrainSelectionChanged)
         self.greenLineTrainTable.show()
 
-        self.greenLineBacklogTable = QTableWidget(MainWindow)
+        self.greenLineBacklogTable = QTableWidget(self)
         self.greenLineBacklogTable.setColumnCount(1)
         self.greenLineBacklogTable.setGeometry(335,309,105,120)
         self.greenLineBacklogTable.setHorizontalHeaderLabels(['Scheduled'])
@@ -123,7 +123,7 @@ class Ui_MainWindow(QtCore.QObject):
         self.greenLineBacklogTable.show()
 
     ##################### BLOCK INFO ########################
-        self.blockInfoTable = QTableWidget(MainWindow)
+        self.blockInfoTable = QTableWidget(self)
         self.blockInfoTable.setRowCount(5)
         self.blockInfoTable.verticalHeader().setDefaultSectionSize(20)
         self.blockInfoTable.setEditTriggers(QAbstractItemView.NoEditTriggers)
@@ -134,14 +134,14 @@ class Ui_MainWindow(QtCore.QObject):
         self.blockInfoTable.setVerticalHeaderLabels(['Line','Number','Occupancy','Fault','Maintenance'])
         self.blockInfoTable.show()
 
-        self.toggleMaintenanceButton = QtWidgets.QPushButton(MainWindow)
+        self.toggleMaintenanceButton = QtWidgets.QPushButton(self)
         self.toggleMaintenanceButton.setGeometry(450,300,140,20)
         self.toggleMaintenanceButton.setText("Toggle Maintenance")
         self.toggleMaintenanceButton.clicked.connect(self.toggleMaintenance)
         self.toggleMaintenanceButton.show()
 
     ##################### TRAIN INFO ########################
-        self.destinationTable = QtWidgets.QTableWidget(MainWindow)
+        self.destinationTable = QtWidgets.QTableWidget(self)
         self.destinationTable.setGeometry(10, 440, 250, 120)
         self.destinationTable.setColumnCount(2)
         self.destinationTable.setColumnWidth(0, 160)
@@ -152,19 +152,19 @@ class Ui_MainWindow(QtCore.QObject):
         self.destinationTable.setSelectionMode(QAbstractItemView.MultiSelection)
         self.destinationTable.show()
 
-        self.dispatchTrainButton = QtWidgets.QPushButton(MainWindow)
+        self.dispatchTrainButton = QtWidgets.QPushButton(self)
         self.dispatchTrainButton.setGeometry(450, 55, 140, 25)
         self.dispatchTrainButton.setText("Dispatch")
         self.dispatchTrainButton.show()
         self.dispatchTrainButton.clicked.connect(self.launchDispatchPopUp)
 
-        self.uploadScheduleButton = QtWidgets.QPushButton(MainWindow)
+        self.uploadScheduleButton = QtWidgets.QPushButton(self)
         self.uploadScheduleButton.setGeometry(450, 90, 140, 25)
         self.uploadScheduleButton.setText("Upload Schedule")
         self.uploadScheduleButton.clicked.connect(self.uploadSchedule)
         self.uploadScheduleButton.show()  
 
-        self.toggleDestinationsButton = QtWidgets.QPushButton(MainWindow)
+        self.toggleDestinationsButton = QtWidgets.QPushButton(self)
         self.toggleDestinationsButton.setGeometry(265, 535, 120, 25)
         self.toggleDestinationsButton.setText("Toggle Destinations")
         self.toggleDestinationsButton.clicked.connect(self.toggleDestinations)
@@ -183,7 +183,7 @@ class Ui_MainWindow(QtCore.QObject):
         self.timer.timeout.connect(self.updateGreenLineBacklog)
         self.timer.timeout.connect(self.checkForScheduledTrains)
         self.timer.start(100)
-        MainWindow.show()
+        self.show()
 
     def showTime(self):
         current_time = QTime.currentTime()
@@ -431,8 +431,6 @@ if __name__ == "__main__":
     import sys
 
     app = QtWidgets.QApplication(sys.argv)
-    MainWindow = QtWidgets.QMainWindow()
-    mainUi = Ui_MainWindow(MainWindow)
-    MainWindow.show()
+    mainUi = Ui_MainWindow()
     
     sys.exit(app.exec_())
