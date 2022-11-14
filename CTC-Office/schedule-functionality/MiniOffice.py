@@ -18,16 +18,21 @@ class Ui_MainWindow(QtCore.QObject):
 #################################################################
 # Start UI generation and setup
 #################################################################
-    def __init__(self, MainWindow, redLineBlocks, greenLineBlocks):
+    def __init__(self, MainWindow):
         super(Ui_MainWindow, self).__init__()
+
+        self.parseLayout()
+        self.setupUi(MainWindow)
+
+    def parseLayout(self):
+        # getting lists of blocks
+        layoutFile = "Track_Layout_PGH_Light_Rail.csv"
+        trackLayout = LayoutParser(layoutFile)
+        self.redLineBlocks, self.greenLineBlocks = trackLayout.process()
+
         self.redLineTrains = TrainDictionary()
         self.greenLineTrains = TrainDictionary()
-        self.redLineBlocks = redLineBlocks
-        self.greenLineBlocks = greenLineBlocks
-        self.redLineBlocksKeys = redLineBlocks.keys()
-        self.greenLineBlocksKeys = greenLineBlocks.keys()
         self.scheduleParser = ScheduleParser()
-        #self.publisherCTC = PublisherCTC()
 
         # Create default station dictionary
         self.redLineStations = dict()
@@ -37,14 +42,9 @@ class Ui_MainWindow(QtCore.QObject):
         for value in self.greenLineBlocks.stations().values():
             self.greenLineStations[value] = False
 
-        self.redLineStations["YARD"] = False
-        self.greenLineStations["YARD"] = False
-
         # select default block
         self.selectedBlock = 1
         self.selectedBlockLine = self.redLineBlocks
-
-        self.setupUi(MainWindow)
 
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
@@ -191,18 +191,18 @@ class Ui_MainWindow(QtCore.QObject):
         self.clockLabel.setText(self.label_time)
 
     def populateRedLineTable(self):
-        for key in self.redLineBlocksKeys:
+        for key in self.redLineBlocks.keys():
             item = QtWidgets.QTableWidgetItem()
             item.setText(key)
             self.redLineBlockTable.setItem(int(key)-1, 0, item)
 
-        for key in self.redLineBlocksKeys:
+        for key in self.redLineBlocks.keys():
            if (self.redLineBlocks.switch(key) != 0):      
                 item = QtWidgets.QTableWidgetItem()
                 item.setText(self.redLineBlocks.switch(key)[0] + " " + str(self.redLineBlocks.switch(key)[1]))
                 self.redLineBlockTable.setItem(int(key)-1, 1, item)
                 
-        for key in self.redLineBlocksKeys:
+        for key in self.redLineBlocks.keys():
            if (self.redLineBlocks.crossing(key) != 0):      
                 item = QtWidgets.QTableWidgetItem()
                 item.setText(self.redLineBlocks.crossing(key))
@@ -211,18 +211,18 @@ class Ui_MainWindow(QtCore.QObject):
         self.redLineBlockTable.resizeColumnToContents(1)
 
     def populateGreenLineTable(self):
-        for key in self.greenLineBlocksKeys:
+        for key in self.greenLineBlocks.keys():
             item = QtWidgets.QTableWidgetItem()
             item.setText(key)
             self.greenLineBlockTable.setItem(int(key)-1, 0, item)
 
-        for key in self.greenLineBlocksKeys:
+        for key in self.greenLineBlocks.keys():
            if (self.greenLineBlocks.switch(key) != 0):      
                 item = QtWidgets.QTableWidgetItem()
                 item.setText(self.greenLineBlocks.switch(key)[0] + " " + str(self.greenLineBlocks.switch(key)[1]))
                 self.greenLineBlockTable.setItem(int(key)-1, 1, item)
                 
-        for key in self.greenLineBlocksKeys:
+        for key in self.greenLineBlocks.keys():
            if (self.greenLineBlocks.crossing(key) != 0):      
                 item = QtWidgets.QTableWidgetItem()
                 item.setText(self.greenLineBlocks.crossing(key))
@@ -430,14 +430,9 @@ class Ui_MainWindow(QtCore.QObject):
 if __name__ == "__main__":
     import sys
 
-    # getting lists of blocks
-    layoutFile = "Track_Layout_PGH_Light_Rail.csv"
-    trackLayout = LayoutParser(layoutFile)
-    redLineBlocks, greenLineBlocks = trackLayout.process()
-
     app = QtWidgets.QApplication(sys.argv)
     MainWindow = QtWidgets.QMainWindow()
-    mainUi = Ui_MainWindow(MainWindow, redLineBlocks, greenLineBlocks)
+    mainUi = Ui_MainWindow(MainWindow)
     MainWindow.show()
     
     sys.exit(app.exec_())
