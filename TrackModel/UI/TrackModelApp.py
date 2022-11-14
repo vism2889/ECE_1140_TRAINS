@@ -27,19 +27,19 @@ class TrackModel(QWidget):
         self.title         = 'Track Model - Pittsburgh Light Rail'
         self.left          = 10
         self.top           = 10
-        self.width         = 1000
-        self.height        = 800
+        self.width         = 450
+        self.height        = 750
         self.currBlock     = None
 
         # Layout Information
-        self.lineNames     = []
-        self.lines         = []
-        self.lineBlocks    = []
-        self.blocksLoaded  = False
-        self.stations      = []
-        self.crossings     = []
-        self.switches      = []
-        self.infraCounts   = [] # holds the count  for  stations, switches, crossings
+        self.lineNames     = []    # List of Strings holding line names
+        self.lines         = []    # List of TrackLine Objects
+        self.lineBlocks    = []    # 2D List of blocks, each list representing a line
+        self.blocksLoaded  = False # Bool to represent wether the TrackBlocks for a given line have been loaded
+        # self.stations      = []
+        # self.crossings     = []
+        # self.switches      = []
+        # self.infraCounts   = [] # holds the count  for  stations, switches, crossings
         self.currLineIndex = None
         self.layoutFile    = None
         self.testList      = []
@@ -62,76 +62,77 @@ class TrackModel(QWidget):
         self.setGeometry(self.left, self.top, self.width, self.height)
         self.bt1 = QPushButton("LOAD LAYOUT ",self)
         self.bt1.resize(self.width, 30)
+        self.bt1.setStyleSheet("background-color: orange ; color: black;")
         self.bt1.clicked.connect(self.openFileNameDialog)
-
-        # testing interface UI
-        self.launchTestUIBt = QPushButton("TEST INTERFACE",self)
-        self.launchTestUIBt.resize(130, 30)
-        self.launchTestUIBt.move(self.width-150,50)
+        self.center()
 
         self.blocksLabel = QLabel("TRACK BLOCKS", self)
         self.blocksLabel.setStyleSheet("background-color: cyan; color: black;")
-        self.blocksLabel.move(5,250)
+        self.blocksLabel.move(5,150)
         self.blocksLabel.resize(100,18)
         self.blockslistwidget = QListWidget(self)
-        self.blockslistwidget.move(5,268)
-        self.blockslistwidget.resize(100,480)
+        self.blockslistwidget.move(5,168)
+        self.blockslistwidget.resize(100,580)
+        self.blockslistwidget.setStyleSheet("background-color: gray;")
 
         self.blockInfoLabel = QLabel("- BLOCK INFORMATION -", self)
         self.blockInfoLabel.setAlignment(QtCore.Qt.AlignCenter)
         self.blockInfoLabel.resize(300,18)
         self.blockInfoLabel.setStyleSheet("background-color: cyan; color: black;")
-        self.blockInfoLabel.move(140,250)
+        self.blockInfoLabel.move(130,250)
 
         self.blockInfolistwidget = QListWidget(self)
-        self.blockInfolistwidget.move(140,268)
-        self.blockInfolistwidget.resize(150,480)
+        self.blockInfolistwidget.move(130,268)
+        self.blockInfolistwidget.resize(150,420)
+        self.blockInfolistwidget.setStyleSheet("background-color: gray;")
 
         self.blockVallistwidget = QListWidget(self)
         self.blockVallistwidget.setStyleSheet("color: orange;")
-        self.blockVallistwidget.move(290,268)
-        self.blockVallistwidget.resize(150,480) 
-
-        self.serverConnectionStatus = QLabel("Server Connection Status:", self)
-        self.serverConnectionStatus.move(5,32)
-        self.serverConnectionStatus.resize(130,18)
-
-        self.serverConnectionStatus.setStyleSheet("background-color: cyan; color: black;")
+        self.blockVallistwidget.move(280,268)
+        self.blockVallistwidget.resize(150,420) 
+        self.blockVallistwidget.setStyleSheet("background-color: gray;")
 
         self.currBlockDisplay = QLabel("BLOCK:", self)
-        self.currBlockDisplay.move(130, 100)
-        self.currBlockDisplay.resize(630, 130)
+        self.currBlockDisplay.move(130, 40)
+        self.currBlockDisplay.resize(300, 100)
         self.currBlockDisplay.setStyleSheet("background-color: cyan; color: black;")
-        self.currBlockDisplay.setFont(QFont('Arial', 45))
+        self.currBlockDisplay.setFont(QFont('Arial', 20))
 
-        self.trackFault1 = QPushButton("Track Fault 1", self)
-        self.trackFault1.move(140, 600)
+        self.trackFault1 = QPushButton("Toggle Track Fault", self)
+        self.trackFault1.move(130, 690)
         self.trackFault1.resize(100,50)
-        self.trackFault1.setStyleSheet("background-color: gray ; color: black;")
+        self.trackFault1.setStyleSheet("background-color: orange ; color: black;")
         self.trackFault1.clicked.connect(self.updateFaults)
 
-        self.trackFault2 = QPushButton("Track Fault 2", self)
-        self.trackFault2.move(140, 650)
+        self.trackFault2 = QPushButton("Toggle Power Fault", self)
+        self.trackFault2.move(235, 690)
         self.trackFault2.resize(100,50)
+        self.trackFault2.setStyleSheet("background-color: orange ; color: black;")
 
-        self.trackFault3 = QPushButton("Track Fault 3", self)
-        self.trackFault3.move(140, 700)
+        self.trackFault3 = QPushButton("Toggle Switch Fault", self)
+        self.trackFault3.move(340, 690)
         self.trackFault3.resize(100,50)
-
-        self.indicator = QPushButton('', self)
-        self.indicator.setStyleSheet("border: 20px; border-top-left-radius: 40px; color: black; background-color: cyan;")
-        self.indicator.move(110, 34)
+        self.trackFault3.setStyleSheet("background-color: orange ; color: black;")
 
         self.linesLabel = QLabel("TRACK LINES", self)
         self.linesLabel.setStyleSheet("background-color: cyan; color: black;")
-        self.linesLabel.move(5,72)
+        self.linesLabel.move(5,40)
         self.linesLabel.resize(100,18)
         self.linelistwidget = QListWidget(self)
-        self.linelistwidget.move(5,90)
-        self.linelistwidget.resize(100,100)
+        self.linelistwidget.move(5,58)
+        self.linelistwidget.resize(100,50)
+        self.linelistwidget.setStyleSheet("background-color: gray;")
+
         self.loadBeaconInfo()
 
         self.show()
+
+    def center(self):
+        frameGm = self.frameGeometry()
+        screen = QApplication.desktop().screenNumber(QApplication.desktop().cursor().pos())
+        centerPoint = QApplication.desktop().screenGeometry(screen).center()
+        frameGm.moveCenter(centerPoint)
+        self.move(frameGm.topLeft())
 
     def updateFaults(self):
         print(self.currBlock.faultPresence)
@@ -230,7 +231,7 @@ class TrackModel(QWidget):
             elif self.occupancy[i] == True:
                 self.blockslistwidget.item(i).setBackground(QColor(200,200,50))
             else:
-                self.blockslistwidget.item(i).setBackground(QColor(250,250,250))
+                self.blockslistwidget.item(i).setBackground(QColor(134, 132, 130))
 
     def onClickedLine(self, item):
         currLine = item.text()
@@ -326,19 +327,23 @@ class TrackModel(QWidget):
         self.beaconInformationLabel.setAlignment(QtCore.Qt.AlignCenter)
         self.beaconInformationLabel.resize(300,18)
         self.beaconInformationLabel.setStyleSheet("background-color: cyan; color: black;")
-        self.beaconInformationLabel.move(540,250)
+        self.beaconInformationLabel.move(130,150)
 
         self.beaconInformationlistwidget = QListWidget(self)
-        self.beaconInformationlistwidget.move(540,268)
-        self.beaconInformationlistwidget.resize(150,380)
+        self.beaconInformationlistwidget.move(130,168)
+        self.beaconInformationlistwidget.resize(150,80)
+        self.beaconInformationlistwidget.setStyleSheet("background-color: gray;")
         self.beaconInformationlistwidget.insertItem(0, "Next station Forward:")
-        self.beaconInformationlistwidget.insertItem(1, "Next station Reverse:")
+        self.beaconInformationlistwidget.insertItem(1, "Forward Station Side:")
+        self.beaconInformationlistwidget.insertItem(2, "Next station Reverse:")
+        self.beaconInformationlistwidget.insertItem(3, "Reverse Station Side:")
 
 
         self.beaconInformationVallistwidget = QListWidget(self)
         self.beaconInformationVallistwidget.setStyleSheet("color: orange;")
-        self.beaconInformationVallistwidget.move(690,268)
-        self.beaconInformationVallistwidget.resize(150,380) 
+        self.beaconInformationVallistwidget.move(280,168)
+        self.beaconInformationVallistwidget.resize(150,80) 
+        self.beaconInformationVallistwidget.setStyleSheet("background-color: gray;")
     
     def getOccupancy(self, occupancy):
         self.occupancy = occupancy
