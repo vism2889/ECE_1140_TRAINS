@@ -1,3 +1,13 @@
+#!/usr/bin/env python3
+
+##############################################################################
+# AUTHOR:   Morgan Visnesky
+# DATE:     11/13/2022
+# FILENAME: signalReciever.py
+# DESCRIPTION:
+#   Test case for Signals.py: listens to occupancySignal
+##############################################################################
+
 from PyQt5.QtWidgets import * 
 from PyQt5.QtGui import * 
 from PyQt5.QtCore import *
