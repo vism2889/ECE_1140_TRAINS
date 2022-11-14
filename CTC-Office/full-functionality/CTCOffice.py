@@ -18,7 +18,7 @@ class CTCOffice(QWidget):
 # Start UI generation and setup
 #################################################################
     def __init__(self, signals):
-        super(CTCOffice, self).__init__()
+        super().__init__()
 
         self.parseLayout()
         self.setupUi()
