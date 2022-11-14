@@ -2,11 +2,9 @@ from dataclasses import dataclass
 from tokenize import Double
 from tracemalloc import start
 import time
-from trainmodel_ui import TrainModel
 from PyQt5 import QtWidgets
 import sys
 from PyQt5.QtCore import pyqtSignal
-from units import unit
 
 # class PointMassModel():
 #     def __init__(self) -> None:
@@ -233,10 +231,10 @@ class Train():
         self.grade = 0
         self.switch = 0
         
-    def launch_ui(self):
-        app = QtWidgets.QApplication(sys.argv)
-        window = TrainModel(self)
-        app.exec_()
+    # def launch_ui(self):
+    #     app = QtWidgets.QApplication(sys.argv)
+    #     window = TrainModel(self)
+    #     app.exec_()
           
 
     def e_brake_func(self):
