@@ -4,7 +4,7 @@ import csv
 
 def parseTrackLayout(path, size=15):
 
-    REQUIRED_FIELDS = ['Line', 'Section', 'Block Number', 'Infrastructure']
+    REQUIRED_FIELDS = ['Line', 'Section', 'Block Number', 'Infrastructure', "Speed Limit (Km/Hr)"]
     numBlocksPerController = size
 
     controller = {
@@ -14,9 +14,16 @@ def parseTrackLayout(path, size=15):
         "total-blocks" : 0
     }
 
+    layout = {
+        'line' : None,
+        'sections' : {}
+    }
+
     CONTROLLERS = []
     TOTAL_BLOCKS = 0
 
+
+    ## Opening the csv file with the layout
     with open(path, mode='r') as file:
         ## Read Header
         getRank = csv.DictReader(file)
@@ -27,6 +34,7 @@ def parseTrackLayout(path, size=15):
         file.seek(0)
         track_layout = csv.DictReader(file)
 
+
         ## Check for required headers
         for header in REQUIRED_FIELDS:
             if header not in track_layout.fieldnames:
@@ -34,8 +42,41 @@ def parseTrackLayout(path, size=15):
                 print('exiting')
                 exit(1)
 
-        ## Populate data in to line
+        if "Red Line" in path:
+            layout['line'] = 'Red'
+        elif "Green Line" in path:
+            layout['line'] = 'Green'
+
+        ##
         for row in track_layout:
+            if layout['line'] == None:
+                print("Error in parsing layout")
+                exit(1)
+
+            if row['Line'] == layout['line']:
+                if row['Section'] not in layout['sections']:
+                    layout['sections'][row['Section']] = {
+                        'blocks'    : [],
+                        'switches'  : [],
+                        'crossing'  : []
+                    }
+                ## Populate blocks
+                s = layout['sections'][row['Section']]
+                s['blocks'].append((row['Block Number'],row['Speed Limit (Km/Hr)'], False))
+
+                ## Populate switches
+                if row['Infrastructure'] != None and "SWITCH" in row['Infrastructure']:
+                    s['switches'].append(row['Block Number'])
+
+                ## Populate crossing
+                if row['Infrastructure'] != None and "CROSSING" in row['Infrastructure']:
+                    s['crossing'].append(row['Block Number'])
+
+
+
+            #####################
+
+
 
             TOTAL_BLOCKS += 1
             ## Adding a new controller
@@ -70,4 +111,4 @@ def parseTrackLayout(path, size=15):
     return CONTROLLERS
 
 if __name__ == '__main__':
-    print(parseTrackLayout("Track Layout & Vehicle Data vF.xlsx - Green Line.csv"))
+    parseTrackLayout("Track Layout & Vehicle Data vF.xlsx - Green Line.csv")

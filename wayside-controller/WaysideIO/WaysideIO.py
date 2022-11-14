@@ -43,43 +43,57 @@ class WaysideIO:
         self.track = {}
         self.blockStates = []
 
+        self.lines = ['red', 'green']
+
         ## Hold each controller
         self.redline_controllers = []
         self.greenline_controllers = []
 
-    def setupLine(self, layout):
+        ## Block, Switch, Crossing lookup tables
+        self.lookupTable = {
+            'red' : {},
+            'green' : {}
+        }
 
-        lineName, controllers = layout
+    def updateBlock(self,line, blockNum):
+        pass
 
-        ## Setup redline controllerss
-        if lineName == 'redline':
-            for i,c in enumerate(controllers):
+    def setupLine(self, line, layout):
 
-                controller = {
-                    'block' : {},
-                    'switch' : {},
-                    'crossing' : {}
-                }
+        ## Redline
+        if line.lower() == self.lines[0]:
+            for i, c in enumerate(layout):
+                self.redline_controllers.append(c)
 
-                ## Go through the blocks
-                for blocks in c['block-occupancy']:
-                    controller['block'][blocks[0]] = (blocks[2], blocks[3])
+                ## Populate lookup table
+                for sec in c['sections']:
+                    for block in c['sections'][sec]['blocks']:
+                        entry = self.lookupTable[self.lines[0]]
+                        if block[0] not in entry:
+                            entry[block[0]] = {
+                                'controller' : [],
+                            }
 
-                ## Go through the switchs
-                for switches in c['switch-state']:
-                    controller['switch'][switches[0]] = switches[2]
+                        entry[block[0]]['controller'].append(i)
+                        entry[block[0]]['section'] = sec
 
-                ## Go through the crossings
-                for crossings in c['crossing-state']:
-                    controller['crossing'][crossings[0]] = crossings[2]
+        ## Greenline
+        if line.lower() == self.lines[1]:
+            for i, c in enumerate(layout):
+                self.greenline_controllers.append(c)
 
-                print(controller)
-                self.redline_controllers.append(Controller(i, controller))
+                ## Populate lookup table
+                for sec in c['sections']:
+                    for block in c['sections'][sec]['blocks']:
+                        entry = self.lookupTable[self.lines[1]]
+                        if block[0] not in entry:
+                            entry[block[0]] = {
+                                'controller' : [],
+                            }
 
-
-        print(self.redline_controllers)
-
-
+                        entry[block[0]]['controller'].append(i)
+                        entry[block[0]]['section'] = sec
+        print(self.lookupTable)
 
 if __name__ == '__main__':
     w = WaysideIO(1)
@@ -88,14 +102,16 @@ if __name__ == '__main__':
     # f = open('tests/testplc.plc', 'r')
     # w.uploadPLC(f)
 
-    path = os.getcwd()
+    ## Testing configuration
+    csvPath = os.getcwd()
+    jsonPath = os.getcwd()
 
     if os.name == 'nt':
-        path += "\\track_layout\\Track Layout & Vehicle Data vF.xlsx - Green Line.csv"
+        csvPath += "\\track_layout\\Track Layout & Vehicle Data vF.xlsx - Green Line.csv"
+        jsonPath += "\\track_layout\\greenline-layout.json"
     elif os.name == 'posix':
-        path += "/track_layout/Track Layout & Vehicle Data vF.xlsx - Green Line.csv"
+        csvPath += "/track_layout/Track Layout & Vehicle Data vF.xlsx - Green Line.csv"
+        jsonPath += "/track_layout/greenline-layout.json"
 
-    layout = extract_layout.parseTrackLayout(path)
-    # print(layout)
-    w.setupLine(('redline', layout))
-
+    *other, layout = extract_layout.parseTrackLayout(csvPath, jsonPath)
+    w.setupLine('green', layout)

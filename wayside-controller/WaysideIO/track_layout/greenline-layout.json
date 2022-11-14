@@ -1,10 +1,10 @@
 {
-    "name" : "greenline",
+    "track" : "greenline",
     "controllers":[
         {"sections" : ["A", "B", "C"]},
         {"sections" : ["A", "C", "D", "G", "E", "F", "G", "Z"]},
         {"sections" : ["R", "S", "T", "U", "V", "W", "X", "Y", "Z"]},
         {"sections" : ["G", "H", "I", "J", "K", "L", "M"]},
-        {"sections" : ["M", "N", "O", "P","Q", "R", ""]}
+        {"sections" : ["M", "N", "O", "P","Q", "R"]}
     ]
 }
