@@ -22,11 +22,11 @@ from LayoutParser2 import LayoutParser
 
 
 class TrackModel(QWidget):
-    def __init__(self, signals):
+    def __init__(self, signals=None):
         super().__init__()
         self.title         = 'Track Model - Pittsburgh Light Rail'
-        self.left          = 10
-        self.top           = 10
+        self.left          = 40
+        self.top           = 40
         self.width         = 450
         self.height        = 750
         self.currBlock     = None
@@ -36,20 +36,17 @@ class TrackModel(QWidget):
         self.lines         = []    # List of TrackLine Objects
         self.lineBlocks    = []    # 2D List of blocks, each list representing a line
         self.blocksLoaded  = False # Bool to represent wether the TrackBlocks for a given line have been loaded
-        # self.stations      = []
-        # self.crossings     = []
-        # self.switches      = []
-        # self.infraCounts   = [] # holds the count  for  stations, switches, crossings
         self.currLineIndex = None
         self.layoutFile    = None
         self.testList      = []
 
-        # System Communication Signals
-        self.signals       = signals
+        # System Communication Signals  
         self.occupancy     = [False for i in range(150)] # only Green line for right not
         self.faults        = [0 for i in range(150)]     # only Green line for right not
 
-        self.signals.occupancySignal.connect(self.getOccupancy)
+        if signals:
+            self.signals = signals
+            self.signals.occupancySignal.connect(self.getOccupancy)
 
         self.initUI()
 
@@ -64,7 +61,7 @@ class TrackModel(QWidget):
         self.bt1.resize(self.width, 30)
         self.bt1.setStyleSheet("background-color: orange ; color: black;")
         self.bt1.clicked.connect(self.openFileNameDialog)
-        self.center()
+        # self.center() # Opens UI in the center of the current screen
 
         self.blocksLabel = QLabel("TRACK BLOCKS", self)
         self.blocksLabel.setStyleSheet("background-color: cyan; color: black;")
