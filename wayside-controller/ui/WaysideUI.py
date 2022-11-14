@@ -47,17 +47,20 @@ class TrackControllerWindow(object):
         self.toolBox.setObjectName("toolBox")
         self.toolBox.setFont(QtGui.QFont())
 
-        # redline_view_layout = extract_layout.parseTrackLayout("track_layout/Track Layout & Vehicle Data vF.xlsx - Red Line.csv", 0)
-        # os.get
         path = os.getcwd()
+        jsonPath = os.getcwd()
+
         if os.name == 'nt':
             path += "\\track_layout\\Track Layout & Vehicle Data vF.xlsx - Red Line.csv"
+            jsonPath += "\\track_layout\\redline-layout.json"
         elif os.name == 'posix':
             path += "/track_layout/Track Layout & Vehicle Data vF.xlsx - Red Line.csv"
+            jsonPath += "/track_layout/redline-layout.json"
 
-        redline_view_layout = extract_layout.parseTrackLayout(path, 0)
-        redline_layout = extract_layout.parseTrackLayout(path, self.numBlocksPerController)
+        redline_view_layout, *other = extract_layout.parseTrackLayout(path, jsonPath,0)
+        redline_layout, *other = extract_layout.parseTrackLayout(path, jsonPath, self.numBlocksPerController)
 
+        print(redline_layout)
         self.redline_reference['total-blocks'] = redline_view_layout[0]['total-blocks']
 
         ######## Red Line ########
@@ -82,14 +85,17 @@ class TrackControllerWindow(object):
 
         ######## Green Line ########
         path = os.getcwd()
-
+        jsonPath = os.getcwd()
+        
         if os.name == 'nt':
             path += "\\track_layout\\Track Layout & Vehicle Data vF.xlsx - Green Line.csv"
+            jsonPath += "\\track_layout\\greenline-layout.json"
         elif os.name == 'posix':
             path += "/track_layout/Track Layout & Vehicle Data vF.xlsx - Green Line.csv"
+            jsonPath += "/track_layout/greenline-layout.json"
 
-        greenline_view_layout = extract_layout.parseTrackLayout(path, 0)
-        greenline_layout = extract_layout.parseTrackLayout(path, self.numBlocksPerController)
+        greenline_view_layout, *dc = extract_layout.parseTrackLayout(path, jsonPath,0)
+        greenline_layout, *dc = extract_layout.parseTrackLayout(path, jsonPath, self.numBlocksPerController)
 
         self.greenline_reference['total-blocks'] = greenline_view_layout[0]['total-blocks']
 

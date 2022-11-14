@@ -1,6 +1,7 @@
 import os
-from PLCParser import PLCParser
 import importlib
+import threading
+from PLCParser import PLCParser
 
 ## testing
 from track_layout import extract_layout
@@ -8,6 +9,7 @@ from track_layout import extract_layout
 class Controller:
     def __init__(self, controllerNum, layout):
 
+        # self.thread = None
         self.layout = layout
         ## Function to run PLC program
         self.plc = None
@@ -18,16 +20,18 @@ class Controller:
 
         ## Setup layout
         self.track = {
-            'blocks' : {},
-            'switches' : {},
+            'blocks' : {}, ## block occupancy
+            'switches' : {}, ##
             'crossings': {},
-            'failures' : {}
+            'block-states' : {}, ## block failures as one-hot encoded
+            'sections' : {}
         }
 
         for section in self.layout['sections']:
             ## Blocks
             for block in self.layout['sections'][section]['blocks']:
                 self.track['blocks'][block[0]] = block[1]
+                self.track['block-states'][block[0]] = 0x00
 
             ## Switches
             for switch in self.layout['sections'][section]['switches']:
@@ -39,32 +43,42 @@ class Controller:
 
         self.id = controllerNum
         self.parser = PLCParser(controllerNum)
-
+        print(f"Controller {self.id} blocks: {self.track['blocks']}")
 
     ## Get Current Track State ##
-    def getStates(self):
+    def getTrack(self):
         return self.track
 
     ## Update block occupancies
-    def updateStates(self, blocks):
+    def updateOccupancy(self, blocks):
         for i,block in enumerate(blocks):
             self.track['blocks'][i] = block
+        
+        ## Run PLC program
+        self.run()
+    
+    ## Update block failures
+    def updateFailures(self, failures):
+        for i, failure in enumerate(failures):
+            self.track['block-states'][i] = failure
+
+        ## Run PLC program
+        self.run()
+
+    ## Toggle maintenance mode ##
+    def toggleMaintence(self):
+        self.maintenance != self.maintenance
+        return self.maintenance
 
     ## Run the PLCs ##
     def run(self):
         if self.plcGood:
             try:
                 self.plc(self.track)
+                # self.thread.start()
             except:
                 self.plcGood = False
-            else:
-                ## TODO Send data out 
-                pass
-
-    ## Toggle maintenance mode ##
-    def toggleMaintence(self):
-        self.maintenance != self.maintenance
-        return self.maintenance
+                # self.thread.join()
 
     ## Upload a PLC ##
     def uploadPLC(self, file):
@@ -81,16 +95,12 @@ class Controller:
         else:
             print(f"Error: Controller {self.id} not in maintenance mode for PLC upload")
 
-    ## Filter Authority ## 
-    def filterAuthority(self, blockNum, authority):
-        if self.track['blocks'][blockNum] 
-
 class WaysideIO:
     def __init__(self, ui):
 
-        self.track = {}
-        self.blockStates = []
+        self.ui = ui
 
+        self.track = {}
         self.lines = ['red', 'green']
 
         ## Hold each controller
@@ -108,6 +118,10 @@ class WaysideIO:
             return self.lookupTable[line.lower()][str(blockNum)]['speed-limit']
         else:
             return speed
+
+    def setFaults(self, line, blockNum, faultId):
+        ## Set the faults on the UI 
+        pass
 
     def lookupBlock(self, line, blockNum):
         return self.lookupTable[line.lower()][str(blockNum)]
@@ -136,11 +150,13 @@ class WaysideIO:
                             entry[block[0]] = {
                                 'controller' : [],
                             }
-
                         ## Mapped data for a block
                         entry[block[0]]['controller'].append(i)
                         entry[block[0]]['section'] = sec
                         entry[block[0]]['speed-limit'] = block[1]
+
+                        if len(c['sections'][sec]['switches']):
+                            entry[block[0]]['isPivot'] = True
 
         ## Greenline
         if line.lower() == self.lines[1]:
@@ -162,6 +178,7 @@ class WaysideIO:
                         entry[block[0]]['controller'].append(i)
                         entry[block[0]]['section'] = sec
                         entry[block[0]]['speed-limit'] = block[1]
+
 
 if __name__ == '__main__':
     w = WaysideIO(1)

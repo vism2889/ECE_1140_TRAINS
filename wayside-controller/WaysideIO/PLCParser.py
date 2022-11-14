@@ -35,6 +35,7 @@ class PLCParser():
         lines = []
 
         for line in file:
+            line.replace('#running', 'running')
             for vtype in self.VAR_TYPES:
                 idx = line.find(vtype)
                 while idx>=0:
@@ -43,7 +44,7 @@ class PLCParser():
                     idx = line.find(vtype)
             lines.append(tab + line)
 
-        outfile.write("def run(input):\n")
+        outfile.write("def run(input, running):\n")
 
         for l in lines:
             outfile.write(l + "\n")
