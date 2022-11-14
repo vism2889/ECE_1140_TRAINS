@@ -3,7 +3,7 @@
 ##############################################################################
 # AUTHOR:   Morgan Visnesky
 # DATE:     11/03/2022
-# FILENAME: TrackModel-App.py
+# FILENAME: TrackModelApp.py
 # DESCRIPTION:
 #
 ##############################################################################
@@ -174,12 +174,6 @@ class TrackModel(QWidget):
             print(line.name)
         self.loadLines()
         self.loadBlockInfoLabels()
-
-    # def confirmLayoutData(self):
-    #     for line in self.lines:
-    #         print(line.name)
-    #         for section in line.sections:
-    #             print("\t", section.name)
 
     def loadLines(self):
         for i in range(len(self.lines)):
