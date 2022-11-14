@@ -15,15 +15,13 @@ class Controller:
 
         ##
         self.maintenance = True
-        # print(f'Controller {controllerNum}')
-        # print(layout)
 
         ## Setup layout
-
         self.track = {
-            'blocks' : {}, 
+            'blocks' : {},
             'switches' : {},
-            'crossings': {}
+            'crossings': {},
+            'failures' : {}
         }
 
         for section in self.layout['sections']:
@@ -38,28 +36,54 @@ class Controller:
             ## Crossings
             for crossing in self.layout['sections'][section]['crossing']:
                 self.track['crossings'][crossing] = False
- 
+
+        self.id = controllerNum
         self.parser = PLCParser(controllerNum)
- 
-    ## Run the PLCs
+
+
+    ## Get Current Track State ##
+    def getStates(self):
+        return self.track
+
+    ## Update block occupancies
+    def updateStates(self, blocks):
+        for i,block in enumerate(blocks):
+            self.track['blocks'][i] = block
+
+    ## Run the PLCs ##
     def run(self):
         if self.plcGood:
             try:
                 self.plc(self.track)
             except:
                 self.plcGood = False
+            else:
+                ## TODO Send data out 
+                pass
 
-    ##
+    ## Toggle maintenance mode ##
+    def toggleMaintence(self):
+        self.maintenance != self.maintenance
+        return self.maintenance
+
+    ## Upload a PLC ##
     def uploadPLC(self, file):
-        modname = self.parser.parseFile(file)
-        try:
-            mod = importlib.import_module("plc."+modname)
-        except ImportError:
-            print("Err in importing PLC program")
-            self.plcGood = False
+        if self.maintenance:
+            modname = self.parser.parseFile(file)
+            try:
+                mod = importlib.import_module("plc."+modname)
+            except ImportError:
+                print("Err in importing PLC program")
+                self.plcGood = False
+            else:
+                self.plc = mod.run
+                self.plcGood = True
         else:
-            self.plc = mod.run
-            self.plcGood = True
+            print(f"Error: Controller {self.id} not in maintenance mode for PLC upload")
+
+    ## Filter Authority ## 
+    def filterAuthority(self, blockNum, authority):
+        if self.track['blocks'][blockNum] 
 
 class WaysideIO:
     def __init__(self, ui):
@@ -79,6 +103,12 @@ class WaysideIO:
             'green' : {}
         }
 
+    def filterSpeed(self, line, blockNum, speed):
+        if int(self.lookupTable[line.lower()][str(blockNum)]['speed-limit']) < speed:
+            return self.lookupTable[line.lower()][str(blockNum)]['speed-limit']
+        else:
+            return speed
+
     def lookupBlock(self, line, blockNum):
         return self.lookupTable[line.lower()][str(blockNum)]
 
@@ -86,7 +116,7 @@ class WaysideIO:
         ## Redline
         if line.lower() == self.lines[0]:
             self.redline_controllers[controllerNum].uploadPLC(file)
-        
+
         ## Greenline
         if line.lower() == self.lines[1]:
             self.greenline_controllers[controllerNum].uploadPLC(file)
@@ -107,8 +137,10 @@ class WaysideIO:
                                 'controller' : [],
                             }
 
+                        ## Mapped data for a block
                         entry[block[0]]['controller'].append(i)
                         entry[block[0]]['section'] = sec
+                        entry[block[0]]['speed-limit'] = block[1]
 
         ## Greenline
         if line.lower() == self.lines[1]:
@@ -118,15 +150,18 @@ class WaysideIO:
                 ## Populate lookup table
                 for sec in c['sections']:
                     for block in c['sections'][sec]['blocks']:
+
+                        blockData = c['sections'][sec]['blocks']
                         entry = self.lookupTable[self.lines[1]]
                         if block[0] not in entry:
                             entry[block[0]] = {
                                 'controller' : [],
                             }
 
+                        ## Mapped data for a block
                         entry[block[0]]['controller'].append(i)
                         entry[block[0]]['section'] = sec
-    
+                        entry[block[0]]['speed-limit'] = block[1]
 
 if __name__ == '__main__':
     w = WaysideIO(1)
@@ -148,5 +183,9 @@ if __name__ == '__main__':
 
     *other, layout = extract_layout.parseTrackLayout(csvPath, jsonPath)
     w.setupLine('green', layout)
+
+
+    ## Testing filter speed
+    # print(w.filterSpeed('green', 1, 105))
 
 
