@@ -14,15 +14,16 @@ from PyQt5.QtGui import QIcon, QPixmap, QPainter, QPen, QFont, QColor
 from PyQt5 import QtCore
 sys.path.append("..\parsers") # tell interpreter where to look for model files
 sys.path.append("..\Communication-Modules") # tell interpreter where to look for model files
+sys.path.append("..\..\SystemSignals") # tell interpreter where to look for model files
 from LayoutParser2 import LayoutParser
-from dummyTrainModel import dummyTrain
 from winserver import winserver
 from TrackMsg import TrackMsg
 import threading 
+# from Signals import Signals
 
-class App(QWidget):
+class TrackModel(QWidget):
     # occupancySignal     = QtCore.pyqtSignal(list)  # <-- This is the sub window's signal
-    def __init__(self):
+    def __init__(self, signals):
         super().__init__()
         self.title         = 'Train Model - Pittsburgh Light Rail'
         self.left          = 10
@@ -30,6 +31,8 @@ class App(QWidget):
         self.width         = 1000
         self.height        = 800
         self.currBlock     = None
+
+        self.signals = signals
 
         # Layout Information
         self.lineNames     = []
@@ -46,8 +49,8 @@ class App(QWidget):
         self.testList      = []
         self.occupancy     = [False for i in range(150)]
         # self.testTrain     = dummyTrain()
-        # self.testTrain.occupancySignal.connect(self.getOccupancy)
-        # self.testTrain.timer()
+        #self.testTrain.occupancySignal.connect(self.getOccupancy)
+        #self.testTrain.timer()
 
         self.node = winserver('TrackMsg Subscriber')
         self.sub  = self.node.subscribe('TrackMsg Topic', TrackMsg, self.my_callback, 1)

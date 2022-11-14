@@ -1,3 +1,13 @@
+#!/usr/bin/env python3
+
+##############################################################################
+# AUTHOR:   Morgan Visnesky
+# DATE:     11/13/2022
+# FILENAME: signalSender.py
+# DESCRIPTION:
+#   Test case for Signals.py: emits to occupancySignal
+##############################################################################
+
 from PyQt5.QtWidgets import * 
 from PyQt5 import QtCore
 from PyQt5.QtGui import * 
