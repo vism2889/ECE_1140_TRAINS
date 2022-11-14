@@ -2,31 +2,31 @@ from PyQt5.QtWidgets import QFileDialog, QMainWindow, QApplication, QWidget, QAc
 from PyQt5 import QtCore, QtGui, QtWidgets, QtWidgets
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import pyqtSlot, QTime, pyqtSignal
-import sys
+import sys, os
 
 sys.path.append('../train-functionality/')
 sys.path.append('../block-functionality/')
-sys.path.append('../server-functionality/')
+sys.path.append('../schedule-functionality/')
 from TrainDictionary import TrainDictionary
 from LayoutParser import LayoutParser
 from DispatchPopUp import DispatchPopUp
 from ScheduleParser import ScheduleParser
-from PublisherCTC import PublisherCTC
 
-class Ui_MainWindow(QWidget):
+class CTCOffice(QWidget):
     dispatchSignal = QtCore.pyqtSignal(bool)
 #################################################################
 # Start UI generation and setup
 #################################################################
-    def __init__(self):
-        super(Ui_MainWindow, self).__init__()
+    def __init__(self, signals):
+        super(CTCOffice, self).__init__()
 
         self.parseLayout()
         self.setupUi()
+        self.signals = signals
 
     def parseLayout(self):
         # getting lists of blocks
-        layoutFile = "Track_Layout_PGH_Light_Rail.csv"
+        layoutFile = 'Track_Layout_PGH_Light_Rail.csv'
         trackLayout = LayoutParser(layoutFile)
         self.redLineBlocks, self.greenLineBlocks = trackLayout.process()
 
@@ -402,35 +402,12 @@ class Ui_MainWindow(QWidget):
             if (destination != "True" and destination != "False"):
                self.selectedTrainLine.toggleDestination(self.selectedTrain, destination, False)
         self.updateDestinationTable()
-    
-    def publishTrackMsg(self, line):
-        switchList = []
-        maintenanceList = []
-        for key in self.redLineBlocks.keys():
-            forward = self.redLineBlocks.switch(key)
-            if forward != 0:
-                if forward[1]:
-                    switchList.append(True)
-                elif not forward[1]:
-                    switchList.append(False)
-            
-        for key in self.redLineBlocks.keys():
-            maintenance = self.redLineBlocks.getMaintenanceState(key)
-            if maintenance == True:
-                maintenanceList.append(True)
-            else:
-                maintenanceList.append(False)
-
-        #self.publisherCTC.publishTrackMsg(switchList, maintenanceList, "red")
-
-    def subscribeTrackMsg(self):
-        print("here")
 
 
 if __name__ == "__main__":
     import sys
 
     app = QtWidgets.QApplication(sys.argv)
-    mainUi = Ui_MainWindow()
+    mainUi = CTCOffice()
     
     sys.exit(app.exec_())
