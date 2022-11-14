@@ -16,6 +16,13 @@ from PyQt5.QtCore import *
 # Python IMPORTS
 import sys
 
+# CTC Office IMPORTS
+sys.path.append("../CTC-Office/full-functionality")
+sys.path.append("../CTC-Office/train-functionality")
+sys.path.append("../CTC-Office/block-functionality")
+sys.path.append("../CTC-Office/schedule-functionality")
+from CTCOffice import CTCOffice
+
 # TrackModel IMPORTS
 sys.path.append("../TrackModel/UI") 
 sys.path.append("../TrackModel/Parsers") 
@@ -30,6 +37,7 @@ class PittsburghLightRail():
     def __init__(self):
         self.signals    = Signals()
         self.trackModel = TrackModel(self.signals)
+        self.CTCOffice = CTCOffice(self.signals)
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
