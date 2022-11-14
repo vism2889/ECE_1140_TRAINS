@@ -1,8 +1,9 @@
 from copy import deepcopy
 import os
+import json
 import csv
 
-def parseTrackLayout(path, size=15):
+def parseTrackLayout(path, jsonPath, size=15):
 
     REQUIRED_FIELDS = ['Line', 'Section', 'Block Number', 'Infrastructure', "Speed Limit (Km/Hr)"]
     numBlocksPerController = size
@@ -14,10 +15,12 @@ def parseTrackLayout(path, size=15):
         "total-blocks" : 0
     }
 
-    layout = {
+    trackLayout = {
         'line' : None,
         'sections' : {}
     }
+
+    controllerLayout = []
 
     CONTROLLERS = []
     TOTAL_BLOCKS = 0
@@ -43,25 +46,27 @@ def parseTrackLayout(path, size=15):
                 exit(1)
 
         if "Red Line" in path:
-            layout['line'] = 'Red'
+            trackLayout['line'] = 'Red'
         elif "Green Line" in path:
-            layout['line'] = 'Green'
+            trackLayout['line'] = 'Green'
 
-        ##
+        ## Parse through each line in the csv file
         for row in track_layout:
-            if layout['line'] == None:
+            #####################
+            if trackLayout['line'] == None:
                 print("Error in parsing layout")
                 exit(1)
 
-            if row['Line'] == layout['line']:
-                if row['Section'] not in layout['sections']:
-                    layout['sections'][row['Section']] = {
+            if row['Line'] == trackLayout['line']:
+                if row['Section'] not in trackLayout['sections']:
+                    trackLayout['sections'][row['Section']] = {
                         'blocks'    : [],
                         'switches'  : [],
                         'crossing'  : []
                     }
+
                 ## Populate blocks
-                s = layout['sections'][row['Section']]
+                s = trackLayout['sections'][row['Section']]
                 s['blocks'].append((row['Block Number'],row['Speed Limit (Km/Hr)'], False))
 
                 ## Populate switches
@@ -72,12 +77,11 @@ def parseTrackLayout(path, size=15):
                 if row['Infrastructure'] != None and "CROSSING" in row['Infrastructure']:
                     s['crossing'].append(row['Block Number'])
 
-
-
+                ## End of populating trackLayout
             #####################
 
 
-
+            
             TOTAL_BLOCKS += 1
             ## Adding a new controller
 
@@ -107,8 +111,28 @@ def parseTrackLayout(path, size=15):
         if controller['total-blocks'] > 0:
             CONTROLLERS.append(deepcopy(controller))
 
+        ## Open json file
+        jsonFile = open(jsonPath)
+        layout = json.load(jsonFile)
+
+        if trackLayout['line'].lower() not in layout['track']:
+            print("Invalid line in json file")
+            exit(1)
+
+        for c in layout['controllers']:
+            ctrler = {
+                'sections' : {}
+            }
+
+            for s in c['sections']:
+                ctrler['sections'][s] = trackLayout['sections'][s]
+            controllerLayout.append(ctrler)
+        ## End of opening json file
+
+        ## Close Files
         file.close()
-    return CONTROLLERS
+        jsonFile.close()
+    return (CONTROLLERS, controllerLayout)
 
 if __name__ == '__main__':
-    parseTrackLayout("Track Layout & Vehicle Data vF.xlsx - Green Line.csv")
+    parseTrackLayout("Track Layout & Vehicle Data vF.xlsx - Green Line.csv", "greenline-layout.json")
