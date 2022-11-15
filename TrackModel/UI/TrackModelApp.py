@@ -46,7 +46,7 @@ class TrackModel(QWidget):
 
         if signals:
             self.signals = signals
-            self.signals.occupancySignal.connect(self.getOccupancy)
+            self.signals.occupancyFromTrainSignal.connect(self.getOccupancy)
 
         self.initUI()
 

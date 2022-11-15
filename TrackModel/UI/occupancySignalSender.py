@@ -61,7 +61,7 @@ class SendOccupancy():
             self.occupancy[self.currBlockIndex]   = 1
             
             print("NEW OCCUPANCY:", self.currBlockIndex)
-        self.signals.occupancySignal.emit(self.occupancy)
+        self.signals.occupancyFromTrainSignal.emit(self.occupancy)
         
         print("Train on Block:", self.currBlockIndex+1)
         print("FAULTS:\n", self.faults)
