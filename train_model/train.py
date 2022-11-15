@@ -279,6 +279,7 @@ class Train():
 
     def dispatch(self):
         self.dispatched = True
+        self.pm.power = 120000
         self.set_power(120000, time.time())
 
     def set_power(self, power, t = None):
