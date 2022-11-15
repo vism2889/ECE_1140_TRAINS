@@ -19,8 +19,8 @@ mixer.init()
 # class that handles gpio for manual input from train driver
 class ManualControl():
 
-    def __init__(self):
-        self.c = Control()
+    def __init__(self, obj):
+        self.c = obj
         self.anal_in = AnalogIn()
         self.commandedSpeed = 0
         self.ebrake_state = False
@@ -30,6 +30,11 @@ class ManualControl():
         self.door_state_left = False
         self.door_state_right = False
         self.announce_state = False
+        self.c.setInternalLights(self.light_state_internal)
+        self.c.setExternalLights(self.light_state_external)
+        self.c.setLeftDoor(self.door_state_left)
+        self.c.setRightDoor(self.door_state_right)
+        self.c.announceStation(self.announce_state, 0)
         self.station_audio = ["shadyside_herron.mp3", "herron_swissvale.mp3", 
                               "swissvale_penn.mp3", "penn_steelplaza.mp3", 
                               "steelplaza_first.mp3","first_stationSquare.mp3", 
@@ -76,7 +81,7 @@ class ManualControl():
         if GPIO.input(5) == GPIO.HIGH: self.c.deployEbrake(False)
 
             
-    def setTemperature(self):
+    def setTemperature_manual(self):
         temp = self.anal_in.getTemperatureValue()
         self.c.setTemperature(temp)
 

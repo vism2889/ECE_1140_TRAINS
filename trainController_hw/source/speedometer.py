@@ -4,10 +4,10 @@ from PyQt5.QtCore import pyqtSlot, QTimer, pyqtSignal
 from control import Control
 from manualControl import ManualControl
 
-class Ui_MainWindow(object):
+class Ui_MainWindow():
     def __init__(self):
         self.c = Control()
-        self.mc = ManualControl()
+        self.mc = ManualControl(self.c)
         self.internal_light_state = False
         self.external_light_state = False
         self.left_door_state = False
@@ -230,7 +230,7 @@ class Ui_MainWindow(object):
         self.mc.announceButton(0)
 
     def setTemperature_manual(self):
-        self.mc.setTemperature()
+        self.mc.setTemperature_manual()
 
     def setCurrentSpeed(self):
         self.current_speed = self.c.setCurrentSpeed()
@@ -280,31 +280,25 @@ class Ui_MainWindow(object):
         self.c.sendRandom()
     
     def manual_connect(self, MainWindow):
+        self.timer.timeout.connect(self.subscribe)
         self.timer.timeout.connect(self.setSpeed_manual)
+        self.timer.timeout.connect(self.setCurrentSpeed)
+        self.timer.timeout.connect(self.checkAuthority)
+        self.timer.timeout.connect(self.setSuggestedSpeed)
         self.timer.timeout.connect(self.calculatePower_manual)
         self.timer.timeout.connect(self.setTemperature_manual)
         self.timer.timeout.connect(self.toggle_lights_manual)
         self.timer.timeout.connect(self.toggle_doors_manual)
         self.timer.timeout.connect(self.deploy_ebrake_manual)
         self.timer.timeout.connect(self.announce_manual)
-        
         self.timer.timeout.connect(self.setServiceBrake)
         self.timer.timeout.connect(self.sendData)
-        self.timer.start(50)
-        
+        self.timer.start(100)
 
     def auto_connect(self, MainWindow):
         self.timer.timeout.connect(self.setCommandedSpeed)
         self.timer.timeout.connect(self.calculatePower)
         self.timer.timeout.connect(self.sendData)
-
-    def connect(self, MainWindow):
-        self.timer.timeout.connect(self.subscribe)
-        self.timer.timeout.connect(self.setCurrentSpeed)
-        self.timer.timeout.connect(self.checkAuthority)
-        self.timer.timeout.connect(self.setSuggestedSpeed)
-        self.timer.start(50)
-
 
 if __name__ == "__main__":
     import sys
@@ -312,7 +306,6 @@ if __name__ == "__main__":
     MainWindow = QtWidgets.QMainWindow()
     ui = Ui_MainWindow()
     ui.setupUi(MainWindow)
-    ui.connect(MainWindow)
     ui.manual_connect(MainWindow)
     MainWindow.show()
     sys.exit(app.exec_())

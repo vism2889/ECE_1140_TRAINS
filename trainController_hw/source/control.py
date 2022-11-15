@@ -112,8 +112,8 @@ class Control():
     def setTemperature(self, temperature):
         if temperature != None:
             self.temperature = temperature
-            
-        self.output.setTemperature(self.temperature)
+        
+        self.output.setTemperatureValue(self.temperature)
 
     def setSuggestedSpeed(self, suggested_speed=None):
         if(suggested_speed == None):
@@ -138,10 +138,6 @@ class Control():
         else:
             self.ebrakeCommand = deploy
             self.output.setEbrakeState(self.ebrakeCommand)
-
-        if(self.ebrakeCommand):
-            self.commanded_speed = 0
-            self.output.setPower(0)
 
     def deployServiceBrake(self, state=None):
         if state != None:
@@ -173,8 +169,8 @@ class Control():
         return self.k_p, self.k_i
 
     def getPowerOutput(self, commanded_speed=None):
-        if self.ebrakeCommand:
-            self.output.setPower(0.00)
+        if self.ebrakeCommand == True:
+            self.output.setPower(0.0)
             return
         
         if commanded_speed == None and self.input.getCommandedSpeed() != None:
@@ -191,10 +187,11 @@ class Control():
             self.output.setPower(self.power)
 
         else:
-            self.output.setPower(0.00)
+            self.output.setPower(0.0)
 
     def sendRandom(self):
         self.output.randomize()
+        self.output.publish()
 
     def publish(self):
         self.output.publish()
