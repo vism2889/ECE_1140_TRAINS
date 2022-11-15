@@ -40,16 +40,16 @@ class TrainData():
 
 
 class PointMassModel():
-    def __init__(self, blocks, blockLens):
+    def __init__(self):
         
         self.id = None
 
         self._td = TrainData()
         
-        self.blocks = blocks
+        self.blocks = []
         self.curr_block = 0
-        self.blockLens = blockLens
-        self.occ_list = [0 for i in range(len(blocks))]
+        self.blockLens = []
+        # self.occ_list = [0 for i in range(len(blocks))]
 
         #time independent values
         self.power = 0
@@ -185,7 +185,7 @@ class PointMassModel():
         if self.curr_vel > 0:
             self.force = float(self.power)/float(self.curr_vel)
         else:
-            self.force = self.power * 2
+            self.force = 120000 * 2
             self.force -= static_friction_force
             print(f'force - static force = {self.force}')
 
@@ -201,16 +201,17 @@ class PointMassModel():
         self.curr_speed = round(self.curr_vel * (1/1000) * (0.62) * (3600))
     
     def calcPos(self):
-        self.occ_list[self.curr_block] = 1
-        self.prev_pos = self.curr_pos
-        self.curr_pos = self.prev_pos + (self.elapsed_time/2)*(self.prev_vel +self.curr_vel)
+        # self.occ_list[self.curr_block] = 1
+        # self.prev_pos = self.curr_pos
+        # self.curr_pos = self.prev_pos + (self.elapsed_time/2)*(self.prev_vel +self.curr_vel)
 
-        if self.curr_pos >= self.blockLens[self.curr_block]:
-            self.occ_list[self.curr_block] = 0
-            self.curr_pos = 0
-            self.prev_pos = 0
-            self.curr_block += 1
-            self.occ_list[self.curr_block] = 1
+        # if self.curr_pos >= self.blockLens[self.curr_block]:
+        #     self.occ_list[self.curr_block] = 0
+        #     self.curr_pos = 0
+        #     self.prev_pos = 0
+        #     self.curr_block += 1
+        #     self.occ_list[self.curr_block] = 1
+        pass
 
 
         
@@ -223,7 +224,7 @@ class Train():
         self.blockLens       = [random.randint(10,25) for i in range(150)]
 
         #point Mass model
-        self.pm = PointMassModel(self.blocks, self.blockLens)
+        self.pm = PointMassModel()
 
         #dispatch
         self.dispatched = False
@@ -293,13 +294,13 @@ class Train():
                 return 
         
         if(self.dispatched):
-            print ('---------------------Setting Power-----------------------')
             if self.service_brake == 'On' and self.pm.curr_vel > 0:
                 self.serv_brake_func()
             elif self.e_brake == 'On' and self.pm.curr_vel>0:
                 self.e_brake_func()
             else:
                 self.pm.setPower(self.curr_power, time.time() )
+
                 print('\nTrain Model Object Values')
                 print(f'time_elapsed: {self.pm.elapsed_time}')
                 print(f'Current Power: {self.curr_power}')
@@ -308,8 +309,8 @@ class Train():
                 print(f'Previous Accel:{self.pm.prev_accel}')
                 print(f'Current Accel:{self.pm.curr_accel}')
                 print(f'Current_Vel: {self.pm.curr_vel}')
-                print(f'Current Speed: {self.pm.curr_speed} mph\n')
-                print(f'Current Position: {self.pm.curr_pos}')
+                print(f'Current Speed: {self.pm.curr_speed} mph')
+                print(f'Current Position: {self.pm.curr_pos} m \n')
             
                 
             

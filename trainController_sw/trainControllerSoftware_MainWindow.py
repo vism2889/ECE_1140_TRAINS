@@ -24,13 +24,12 @@ from signalSender import signalSender
 class Ui_TrainControllerSW_MainWindow(QWidget):
     def __init__(self, signals):
         super().__init__()
-
+        self.signals = signals
         self.setupUi()
-
         self.timer = QtCore.QTimer()
         #self.connect()
         #self.ManualControl_Connect()
-        self.signals = signals
+        
         self.show()
         
 
@@ -44,10 +43,10 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
         self.power_failure_value = 0
         
         ## Initialize PID
-        self.commanded_speed = 30 * 2.23694 # commanded speed input as mph
+        self.commanded_speed = 30 / 2.23694 # commanded speed input as mph
         self.current_speed = 0
-        self.kp = 1
-        self.ki = 0.01
+        self.kp = 0.5
+        self.ki = 0.1
         self.pid = PID(self.kp, self.ki, 0, setpoint=self.commanded_speed)
         self.pid.output_limits = (0, 120000) #clamp at 120W
         
@@ -607,8 +606,6 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
         self.label_26.setText(_translate("self", "Power (W):"))
         self.DisplayPower.setText(_translate("self", "Display Power"))
         self.label_33.setText(_translate("self", "Emergency Brake"))
-##
-    def signalSend(self):
         self.dict = {
                 # 'int_lights': self.,
                 # 'ext_lights': self.ext_lights_box.currentText(),
@@ -779,13 +776,13 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
     def setPID(self, msg):
         # Km/hr to mph
         # msg input as m/s
-        self.pid = PID(msg)
+        self.power = self.pid(msg)
         self.pid.output_limits = (0, 120000)
-        self.dict['power'] = self.pid
+        self.dict['power'] = self.power
         self.emitPower()
     
     def emitPower(self):
-       self.signals.powerSignal.emit(self.dict['power'])     
+        self.signals.powerSignal.emit(self.dict)     
             
         
 if __name__ == "__main__":
