@@ -11,18 +11,35 @@
 import sys
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtWidgets import QWidget
 from PyQt5.QtCore import QTimer
 from functools import partial
 from trainControllerSoftware_TestSecondWindow import Ui_Test_SecondWindow
 from manualControl import ManualControl
 from Control import Control
 from simple_pid import PID
+from signalSender import signalSender
 
 
-class Ui_TrainControllerSW_MainWindow(object):
-    
-    def setupUi(self, TrainControllerSW_MainWindow):
+class Ui_TrainControllerSW_MainWindow(QWidget):
+    def __init__(self, signals):
+        super().__init__()
+        print('\n\n\nInside Train Controller INIT\n\n\n\n\n\n\n\n\n')
+
+        self.setupUi()
+        print('\n\n***************JUST SET UP UI ************************\n\n\n')
+
+        self.timer = QtCore.QTimer()
+        #self.connect()
+        #self.ManualControl_Connect()
+        self.signals = signals
+        print('\n\n***************NOW SHOWING UI FOR TRAIN CONTROLLER ************************\n\n\n')
+        self.show()
+        
+
+    def setupUi(self):
         ##
+        print('\n\n\nInside Train Controller setupUII\n\n\n\n\n\n\n\n\n')
         self.c = Control()
         self.mc = ManualControl()
         self.speed_limit = 0
@@ -37,10 +54,10 @@ class Ui_TrainControllerSW_MainWindow(object):
         self.pid = PID(self.kp, self.ki, 0, setpoint=self.commanded_speed)
         self.pid.output_limits = (0, 120000) #clamp at 120W
         
-        TrainControllerSW_MainWindow.setObjectName("TrainControllerSW_MainWindow")
-        TrainControllerSW_MainWindow.resize(835, 423)
-        TrainControllerSW_MainWindow.setAutoFillBackground(False)
-        self.centralwidget = QtWidgets.QWidget(TrainControllerSW_MainWindow)
+        self.setObjectName("self")
+        self.resize(835, 423)
+        self.setAutoFillBackground(False)
+        self.centralwidget = QtWidgets.QWidget(self)
         self.centralwidget.setObjectName("centralwidget")
         self.label_5 = QtWidgets.QLabel(self.centralwidget)
         self.label_5.setGeometry(QtCore.QRect(545, 170, 121, 41))
@@ -498,132 +515,142 @@ class Ui_TrainControllerSW_MainWindow(object):
         self.label_33.setFont(font)
         self.label_33.setWordWrap(True)
         self.label_33.setObjectName("label_33")
-        TrainControllerSW_MainWindow.setCentralWidget(self.centralwidget)
-        self.statusbar = QtWidgets.QStatusBar(TrainControllerSW_MainWindow)
+        #self.setCentralWidget(self.centralwidget)
+        self.statusbar = QtWidgets.QStatusBar(self)
         self.statusbar.setObjectName("statusbar")
-        TrainControllerSW_MainWindow.setStatusBar(self.statusbar)
+        #self.setStatusBar(self.statusbar)
         self.DisplayPower = QtWidgets.QPushButton(self.centralwidget)
         self.DisplayPower.setGeometry(QtCore.QRect(720, 280, 93, 29))
         self.DisplayPower.setObjectName("DisplayPower")
 
-        
+        #######
+        self.speed_Slider.valueChanged.connect(self.setManualControl_CommandedSpeed)
+        self.braking_Slider.valueChanged.connect(self.setManualControl_ServiceBrake)
+        self.ManuLebrake_button.clicked.connect(self.setManualControl_EmergencyBrake)
+        self.Manual_temperature_box.valueChanged.connect(self.setManualControl_Temperature)
+        self.Manual_lights_ComboBox.currentIndexChanged.connect(self.setManualControl_Lights)
+        self.Manual_doors_ComboBox.currentIndexChanged.connect(self.setManualControl_Doors)
+        self.Manual_Advertisements_CheckBox.stateChanged.connect(self.setManualControl_Advertisements)
+        self.Manual_Annoucements_CheckBox.stateChanged.connect(self.setManualControl_Announcements)
+        ##
         
         self.TestWindow =  QtWidgets.QMainWindow()
         self.ui = Ui_Test_SecondWindow()
         self.ui.__init__()
         self.ui.setupUi(self.TestWindow)
-        self.timer = QtCore.QTimer()
                 
         
-        self.retranslateUi(TrainControllerSW_MainWindow)
+        self.retranslateUi()
         self.TabWigets.setCurrentIndex(2)
         self.speed_Slider.valueChanged['int'].connect(self.Manual_CommandedSpeed_lcdDisplay.display)
         self.Manual_temperature_box.valueChanged['double'].connect(self.Manual_temperature_box.setValue)
         self.braking_Slider.valueChanged['int'].connect(self.Manual_Braking_lcdDisplay.display)
-        QtCore.QMetaObject.connectSlotsByName(TrainControllerSW_MainWindow)
+        QtCore.QMetaObject.connectSlotsByName(self)
+        
+        print("END OF SETUP UI")
 
-    def retranslateUi(self, TrainControllerSW_MainWindow):
+    def retranslateUi(self):
         _translate = QtCore.QCoreApplication.translate
-        TrainControllerSW_MainWindow.setWindowTitle(_translate("TrainControllerSW_MainWindow", "MainWindow"))
-        self.label_5.setText(_translate("TrainControllerSW_MainWindow", "Next Station:"))
-        self.pushButton.setText(_translate("TrainControllerSW_MainWindow", "I/0"))
-        self.ManualMode_GroupBox.setTitle(_translate("TrainControllerSW_MainWindow", "Automatic Mode"))
-        self.label_11.setText(_translate("TrainControllerSW_MainWindow", "Vital Controls"))
-        self.label_13.setText(_translate("TrainControllerSW_MainWindow", "Speed(MPH)"))
-        self.label_14.setText(_translate("TrainControllerSW_MainWindow", "Braking"))
-        self.label_15.setText(_translate("TrainControllerSW_MainWindow", "Commanded Speed(MPH)"))
-        self.label_16.setText(_translate("TrainControllerSW_MainWindow", "Non-Vital Controls"))
-        self.label_18.setText(_translate("TrainControllerSW_MainWindow", "External Lights"))
-        self.label_20.setText(_translate("TrainControllerSW_MainWindow", "Left Doors"))
-        self.label_19.setText(_translate("TrainControllerSW_MainWindow", "Internal Lights"))
-        self.label_21.setText(_translate("TrainControllerSW_MainWindow", "Right Doors"))
-        self.label_22.setText(_translate("TrainControllerSW_MainWindow", "Advertisements"))
-        self.label_24.setText(_translate("TrainControllerSW_MainWindow", "Announcements"))
-        self.label_23.setText(_translate("TrainControllerSW_MainWindow", "Temperature (F)"))
-        self.TabWigets.setTabText(self.TabWigets.indexOf(self.tab), _translate("TrainControllerSW_MainWindow", "Automatic Mode"))
-        self.Manual_Frame.setTitle(_translate("TrainControllerSW_MainWindow", "Manual Mode"))
-        self.Manual_Advertisements_CheckBox.setText(_translate("TrainControllerSW_MainWindow", "On/Off"))
-        self.label_10.setText(_translate("TrainControllerSW_MainWindow", "Braking"))
-        self.label_3.setText(_translate("TrainControllerSW_MainWindow", "Lights"))
-        self.Manual_Annoucements_CheckBox.setText(_translate("TrainControllerSW_MainWindow", "On/Off"))
-        self.Manual_lights_ComboBox.setItemText(0, _translate("TrainControllerSW_MainWindow", "Off"))
-        self.Manual_lights_ComboBox.setItemText(1, _translate("TrainControllerSW_MainWindow", "Internal"))
-        self.Manual_lights_ComboBox.setItemText(2, _translate("TrainControllerSW_MainWindow", "External"))
-        self.Manual_lights_ComboBox.setItemText(3, _translate("TrainControllerSW_MainWindow", "Both"))
-        self.Manual_doors_ComboBox.setItemText(0, _translate("TrainControllerSW_MainWindow", "Closed"))
-        self.Manual_doors_ComboBox.setItemText(1, _translate("TrainControllerSW_MainWindow", "Left"))
-        self.Manual_doors_ComboBox.setItemText(2, _translate("TrainControllerSW_MainWindow", "Right"))
-        self.Manual_doors_ComboBox.setItemText(3, _translate("TrainControllerSW_MainWindow", "Both"))
-        self.label_4.setText(_translate("TrainControllerSW_MainWindow", "Doors"))
-        self.label_8.setText(_translate("TrainControllerSW_MainWindow", "Announcements"))
-        self.label_2.setText(_translate("TrainControllerSW_MainWindow", "Commanded Speed(MPH)"))
-        self.label_12.setText(_translate("TrainControllerSW_MainWindow", "Advertisements"))
-        self.label_9.setText(_translate("TrainControllerSW_MainWindow", "Temperature(F)"))
-        self.ManuLebrake_button.setText(_translate("TrainControllerSW_MainWindow", "Emergency Brake"))
-        self.label_6.setText(_translate("TrainControllerSW_MainWindow", "Commanded Speed(MPH)"))
-        self.TabWigets.setTabText(self.TabWigets.indexOf(self.tab_2), _translate("TrainControllerSW_MainWindow", "Manual/Driver Mode"))
-        self.EngineerMode_Frame.setTitle(_translate("TrainControllerSW_MainWindow", "Engineer Mode"))
-        self.label_31.setText(_translate("TrainControllerSW_MainWindow", "Set Ki:"))
-        self.label.setText(_translate("TrainControllerSW_MainWindow", "Set Kp:"))
-        self.TabWigets.setTabText(self.TabWigets.indexOf(self.tab_3), _translate("TrainControllerSW_MainWindow", "Engineer Mode"))
-        self.OpenTestUI.setText(_translate("TrainControllerSW_MainWindow", "Open Test UI"))
-        self.ImportTestData.setText(_translate("TrainControllerSW_MainWindow", "Import Test Data"))
-        self.label_17.setText(_translate("TrainControllerSW_MainWindow", "Authority (miles):"))
-        self.label_7.setText(_translate("TrainControllerSW_MainWindow", "Faults"))
-        self.label_27.setText(_translate("TrainControllerSW_MainWindow", "Engine"))
-        self.label_29.setText(_translate("TrainControllerSW_MainWindow", "Power"))
-        self.label_28.setText(_translate("TrainControllerSW_MainWindow", "Track"))
-        self.label_30.setText(_translate("TrainControllerSW_MainWindow", "Circuit"))
-        self.next_station_label.setText(_translate("TrainControllerSW_MainWindow", "Station Square"))
-        self.label_25.setText(_translate("TrainControllerSW_MainWindow", "Current Speed(mph):"))
-        self.label_26.setText(_translate("TrainControllerSW_MainWindow", "Power (W):"))
-        self.DisplayPower.setText(_translate("TrainControllerSW_MainWindow", "Display Power"))
-        self.label_33.setText(_translate("TrainControllerSW_MainWindow", "Emergency Brake"))
+        self.setWindowTitle(_translate("self", "MainWindow"))
+        self.label_5.setText(_translate("self", "Next Station:"))
+        self.pushButton.setText(_translate("self", "I/0"))
+        self.ManualMode_GroupBox.setTitle(_translate("self", "Automatic Mode"))
+        self.label_11.setText(_translate("self", "Vital Controls"))
+        self.label_13.setText(_translate("self", "Speed(MPH)"))
+        self.label_14.setText(_translate("self", "Braking"))
+        self.label_15.setText(_translate("self", "Commanded Speed(MPH)"))
+        self.label_16.setText(_translate("self", "Non-Vital Controls"))
+        self.label_18.setText(_translate("self", "External Lights"))
+        self.label_20.setText(_translate("self", "Left Doors"))
+        self.label_19.setText(_translate("self", "Internal Lights"))
+        self.label_21.setText(_translate("self", "Right Doors"))
+        self.label_22.setText(_translate("self", "Advertisements"))
+        self.label_24.setText(_translate("self", "Announcements"))
+        self.label_23.setText(_translate("self", "Temperature (F)"))
+        self.TabWigets.setTabText(self.TabWigets.indexOf(self.tab), _translate("self", "Automatic Mode"))
+        self.Manual_Frame.setTitle(_translate("self", "Manual Mode"))
+        self.Manual_Advertisements_CheckBox.setText(_translate("self", "On/Off"))
+        self.label_10.setText(_translate("self", "Braking"))
+        self.label_3.setText(_translate("self", "Lights"))
+        self.Manual_Annoucements_CheckBox.setText(_translate("self", "On/Off"))
+        self.Manual_lights_ComboBox.setItemText(0, _translate("self", "Off"))
+        self.Manual_lights_ComboBox.setItemText(1, _translate("self", "Internal"))
+        self.Manual_lights_ComboBox.setItemText(2, _translate("self", "External"))
+        self.Manual_lights_ComboBox.setItemText(3, _translate("self", "Both"))
+        self.Manual_doors_ComboBox.setItemText(0, _translate("self", "Closed"))
+        self.Manual_doors_ComboBox.setItemText(1, _translate("self", "Left"))
+        self.Manual_doors_ComboBox.setItemText(2, _translate("self", "Right"))
+        self.Manual_doors_ComboBox.setItemText(3, _translate("self", "Both"))
+        self.label_4.setText(_translate("self", "Doors"))
+        self.label_8.setText(_translate("self", "Announcements"))
+        self.label_2.setText(_translate("self", "Commanded Speed(MPH)"))
+        self.label_12.setText(_translate("self", "Advertisements"))
+        self.label_9.setText(_translate("self", "Temperature(F)"))
+        self.ManuLebrake_button.setText(_translate("self", "Emergency Brake"))
+        self.label_6.setText(_translate("self", "Commanded Speed(MPH)"))
+        self.TabWigets.setTabText(self.TabWigets.indexOf(self.tab_2), _translate("self", "Manual/Driver Mode"))
+        self.EngineerMode_Frame.setTitle(_translate("self", "Engineer Mode"))
+        self.label_31.setText(_translate("self", "Set Ki:"))
+        self.label.setText(_translate("self", "Set Kp:"))
+        self.TabWigets.setTabText(self.TabWigets.indexOf(self.tab_3), _translate("self", "Engineer Mode"))
+        self.OpenTestUI.setText(_translate("self", "Open Test UI"))
+        self.ImportTestData.setText(_translate("self", "Import Test Data"))
+        self.label_17.setText(_translate("self", "Authority (miles):"))
+        self.label_7.setText(_translate("self", "Faults"))
+        self.label_27.setText(_translate("self", "Engine"))
+        self.label_29.setText(_translate("self", "Power"))
+        self.label_28.setText(_translate("self", "Track"))
+        self.label_30.setText(_translate("self", "Circuit"))
+        self.next_station_label.setText(_translate("self", "Station Square"))
+        self.label_25.setText(_translate("self", "Current Speed(mph):"))
+        self.label_26.setText(_translate("self", "Power (W):"))
+        self.DisplayPower.setText(_translate("self", "Display Power"))
+        self.label_33.setText(_translate("self", "Emergency Brake"))
 ##
     
 ####### Set Automatic/Main Displays
 ####### Input = trainData
 ####### Output = outputData
-    def AuthorityDisplay(self):
-        #self.milesValue = pValue * 0.621371
-        # this is a bool array need ot display some other way
-        print("Authority: ", self.c.getAuthority())
-        #self.Authority_lcdDisplay.display(self.c.getAuthority())
+    # def AuthorityDisplay(self):
+    #     #self.milesValue = pValue * 0.621371
+    #     # this is a bool array need ot display some other way
+    #     print("Authority: ", self.c.getAuthority())
+    #     #self.Authority_lcdDisplay.display(self.c.getAuthority())
     
-    def AutoSpeed(self):
-        #self.milesValue = pValue * 0.621371
-        self.c.setSpeed()
-        print("Commanded Speed: ", self.c.getCommandedSpeed())
-        self.Auto_SpeedDisplay.display(self.c.getCommandedSpeed())
+    # def AutoSpeed(self):
+    #     #self.milesValue = pValue * 0.621371
+    #     self.c.setSpeed()
+    #     print("Commanded Speed: ", self.c.getCommandedSpeed())
+    #     self.Auto_SpeedDisplay.display(self.c.getCommandedSpeed())
         
-    def AutoCommandedSpeed(self):
-        #self.milesValue = pValue * 0.621371
-        self.Auto_CommandedSpeedDisplay.display(self.c.getCommandedSpeed())    
+    # def AutoCommandedSpeed(self):
+    #     #self.milesValue = pValue * 0.621371
+    #     self.Auto_CommandedSpeedDisplay.display(self.c.getCommandedSpeed())    
 
-    def AutoBraking(self): 
-        self.Auto_BrakingDisplay.display(self.c.getServiceBrake())
+    # def AutoBraking(self): 
+    #     self.Auto_BrakingDisplay.display(self.c.getServiceBrake())
         
-    def AutoInternalLights(self):
-        print("Internal Lights: ", self.c.getInternalLights())
-        self.InternalLights_DisplayBox.setCheckState(self.c.getInternalLights())
+    # def AutoInternalLights(self):
+    #     print("Internal Lights: ", self.c.getInternalLights())
+    #     self.InternalLights_DisplayBox.setCheckState(self.c.getInternalLights())
     
-    def AutoExternalLights(self):
-        self.ExternalLights_DisplayBox.setCheckState(self.c.getExternalLights())
+    # def AutoExternalLights(self):
+    #     self.ExternalLights_DisplayBox.setCheckState(self.c.getExternalLights())
     
-    def AutoLeftDoors(self):
-        self.LeftDoors_DisplayBox.setCheckState(self.c.getLeftDoor())
+    # def AutoLeftDoors(self):
+    #     self.LeftDoors_DisplayBox.setCheckState(self.c.getLeftDoor())
     
-    def AutoRightDoors(self):
-        self.RightDoors_DisplayBox.setCheckState(self.c.getRightDoor())
+    # def AutoRightDoors(self):
+    #     self.RightDoors_DisplayBox.setCheckState(self.c.getRightDoor())
 
-    def AutoAdvertisements(self):
-        self.Advertisements_DisplayBox.setCheckState(self.c.getAdvertisements())
+    # def AutoAdvertisements(self):
+    #     self.Advertisements_DisplayBox.setCheckState(self.c.getAdvertisements())
     
-    def AutoAnnouncements(self):
-        self.Announcements_DisplayBox.setCheckState(self.c.getAnnouncements())
+    # def AutoAnnouncements(self):
+    #     self.Announcements_DisplayBox.setCheckState(self.c.getAnnouncements())
     
-    def AutoTemperature(self):
-        self.Temperature_DisplayBox.display(self.c.getTemperature())
+    # def AutoTemperature(self):
+    #     self.Temperature_DisplayBox.display(self.c.getTemperature())
     
     def AutoEngineFault(self):
         self.EngineFault_DisplayBox.setCheckable(True)
@@ -647,7 +674,7 @@ class Ui_TrainControllerSW_MainWindow(object):
     def EmergencyBrakeDisplay(self):
         self.EmergencyBrakeDisplayBox.setCheckable(True)
         #self.EmergencyBrakeDisplayBox.setCheckState()
-        self.c.deployEbrake()
+        #self.c.deployEbrake()
     
     def CurrentSpeed(self, pValue):
         #self.milesValue = pValue * 0.621371
@@ -657,12 +684,12 @@ class Ui_TrainControllerSW_MainWindow(object):
         #self.next_station_label.setText(self.c.getNextStation)
         pass
 
-    def subscribe(self):
-        self.c.subscribe()
+    # def subscribe(self):
+    #     self.c.subscribe()
 
 ####### ManualControl Class Sets
     def setManualControl_CommandedSpeed(self):
-        self.mc.setCommandedSpeed(self.speed_Slider.value())
+        self.mc.setCommandedSpeed(self.speed_Slider.value())       
         
     def setManualControl_ServiceBrake(self):
         self.mc.setServiceBrake( self.braking_Slider.value())
@@ -670,8 +697,10 @@ class Ui_TrainControllerSW_MainWindow(object):
     def setManualControl_EmergencyBrake(self):
         # if E brake is already set and the button is clicked, then it turns off the e brake
         if(self.EmergencyBrakeDisplayBox.isChecked() == True):
+            self.ActivateEmergencyBrake()
             self.mc.setEmergencyBrake( False)
         elif(self.EmergencyBrakeDisplayBox.isChecked() == False):
+            self.ActivateEmergencyBrake()
             self.mc.setEmergencyBrake( True)
         
     def setManualControl_Temperature(self):
@@ -714,13 +743,13 @@ class Ui_TrainControllerSW_MainWindow(object):
     # Power and Ebrake
     def ActivateEmergencyBrake(self):
         if(self.EmergencyBrakeDisplayBox.isChecked() == True):
-            self.EmergencyBrakeDisplay(False)
+            self.EmergencyBrakeDisplayBox.setCheckState(False)
             self.mc.setEmergencyBrake(False)
         else:
             self.mc.setEmergencyBrake(True)
             self.currentSpeed_lcdDisplay.display(0)
             self.speed_Slider.setValue(0)
-            self.EmergencyBrakeDisplay(True)
+            self.EmergencyBrakeDisplayBox.setCheckState(True)
             
     def setKpValue(self):
         self.kp = self.setKp_Box.value()
@@ -742,59 +771,62 @@ class Ui_TrainControllerSW_MainWindow(object):
         
     def subscribe(self):
         self.c.subscribe()
+    
+    def signalSenderEmit(self):
+        #self.sender.emit()
+        pass
+        
                 
 ####### Connects
     def ManualControl_Connect(self):
-        self.speed_Slider.valueChanged.connect(self.setManualControl_CommandedSpeed)
-        self.braking_Slider.valueChanged.connect(self.setManualControl_ServiceBrake)
-        self.ManuLebrake_button.clicked.connect(self.setManualControl_EmergencyBrake)
-        self.Manual_temperature_box.valueChanged.connect(self.setManualControl_Temperature)
-        self.Manual_lights_ComboBox.currentIndexChanged.connect(self.setManualControl_Lights)
-        self.Manual_doors_ComboBox.currentIndexChanged.connect(self.setManualControl_Doors)
-        self.Manual_Advertisements_CheckBox.stateChanged.connect(self.setManualControl_Advertisements)
-        self.Manual_Annoucements_CheckBox.stateChanged.connect(self.setManualControl_Announcements)
+        # self.speed_Slider.valueChanged.connect(self.setManualControl_CommandedSpeed)
+        # self.braking_Slider.valueChanged.connect(self.setManualControl_ServiceBrake)
+        # self.ManuLebrake_button.clicked.connect(self.setManualControl_EmergencyBrake)
+        # self.Manual_temperature_box.valueChanged.connect(self.setManualControl_Temperature)
+        # self.Manual_lights_ComboBox.currentIndexChanged.connect(self.setManualControl_Lights)
+        # self.Manual_doors_ComboBox.currentIndexChanged.connect(self.setManualControl_Doors)
+        # self.Manual_Advertisements_CheckBox.stateChanged.connect(self.setManualControl_Advertisements)
+        # self.Manual_Annoucements_CheckBox.stateChanged.connect(self.setManualControl_Announcements)
         
-        self.timer.timeout.connect(self.setManualControl_CommandedSpeed)
-        self.timer.timeout.connect(self.setManualControl_ServiceBrake)
-        self.timer.timeout.connect(self.setManualControl_EmergencyBrake)
-        self.timer.timeout.connect(self.setManualControl_Temperature)
-        self.timer.timeout.connect(self.setManualControl_Lights)
-        self.timer.timeout.connect(self.setManualControl_Doors)
-        self.timer.timeout.connect(self.setManualControl_Advertisements)
-        self.timer.timeout.connect(self.setManualControl_Announcements)
+        # self.timer.timeout.connect(self.setManualControl_CommandedSpeed)
+        # self.timer.timeout.connect(self.setManualControl_ServiceBrake)
+        # self.timer.timeout.connect(self.setManualControl_EmergencyBrake)
+        # self.timer.timeout.connect(self.setManualControl_Temperature)
+        # self.timer.timeout.connect(self.setManualControl_Lights)
+        # self.timer.timeout.connect(self.setManualControl_Doors)
+        # self.timer.timeout.connect(self.setManualControl_Advertisements)
+        # self.timer.timeout.connect(self.setManualControl_Announcements)
+        pass
 
     def connect(self):
-        self.timer.timeout.connect(self.publish)
-        self.timer.timeout.connect(self.subscribe)
-        self.setKp_Box.valueChanged.connect(self.setKpValue)
-        self.setKi_Box.valueChanged.connect(self.setKiValue)
+        # self.timer.timeout.connect(self.publish)
+        # self.timer.timeout.connect(self.subscribe)
+        # self.setKp_Box.valueChanged.connect(self.setKpValue)
+        # self.setKi_Box.valueChanged.connect(self.setKiValue)
         
-        self.timer.timeout.connect(self.EmergencyBrakeDisplay)
-        self.timer.timeout.connect(self.setKpValue)
-        self.timer.timeout.connect(self.setKiValue)
-        self.timer.timeout.connect(self.DisplayPowerOutput)
-        self.timer.timeout.connect(self.AutoSpeed)
-        self.timer.timeout.connect(self.AutoTemperature)
-        self.timer.timeout.connect(self.AutoBraking)
-        self.timer.timeout.connect(self.AutoAnnouncements)
-        self.timer.timeout.connect(self.AuthorityDisplay)
-        self.timer.timeout.connect(self.AutoCommandedSpeed)
-        self.timer.timeout.connect(self.AutoLeftDoors)
-        self.timer.timeout.connect(self.AutoRightDoors)
-        self.timer.timeout.connect(self.AutoInternalLights)
-        self.timer.timeout.connect(self.AutoExternalLights)
-        self.timer.timeout.connect(self.AutoAnnouncements)
+        #self.timer.timeout.connect(self.EmergencyBrakeDisplay)
+        # self.timer.timeout.connect(self.setKpValue)
+        # self.timer.timeout.connect(self.setKiValue)
+        # self.timer.timeout.connect(self.DisplayPowerOutput)
+        # self.timer.timeout.connect(self.AutoSpeed)
+        # self.timer.timeout.connect(self.AutoTemperature)
+        # self.timer.timeout.connect(self.AutoBraking)
+        # self.timer.timeout.connect(self.AutoAnnouncements)
+        # self.timer.timeout.connect(self.AuthorityDisplay)
+        # self.timer.timeout.connect(self.AutoCommandedSpeed)
+        # self.timer.timeout.connect(self.AutoLeftDoors)
+        # self.timer.timeout.connect(self.AutoRightDoors)
+        # self.timer.timeout.connect(self.AutoInternalLights)
+        # self.timer.timeout.connect(self.AutoExternalLights)
+        # self.timer.timeout.connect(self.AutoAnnouncements)
+        #self.timer.timeout.connect(self.signalSenderEmit)
+        pass
 
-       
-        self.timer.start(100)
+        #self.timer.start(100)
         
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
-    TrainControllerSW_MainWindow = QtWidgets.QMainWindow()
     ui = Ui_TrainControllerSW_MainWindow()
-    ui.setupUi(TrainControllerSW_MainWindow)
-    ui.connect()
-    #ui.ManualControl_Connect()
-    TrainControllerSW_MainWindow.show()
+    
     sys.exit(app.exec_())
