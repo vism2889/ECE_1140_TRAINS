@@ -20,31 +20,30 @@ class CTCOffice(QWidget):
     def __init__(self, signals):
         super().__init__()
 
-        self.parseLayout()
+        self.setupLayout()
         self.setupUi()
         self.signals = signals
 
-    def parseLayout(self):
+    def setupLayout(self):
         # getting lists of blocks
         layoutFile = 'Track_Layout_PGH_Light_Rail.csv'
         trackLayout = LayoutParser(layoutFile)
         self.redLineBlocks, self.greenLineBlocks = trackLayout.process()
 
-        self.redLineTrains = TrainDictionary()
-        self.greenLineTrains = TrainDictionary()
-        self.scheduleParser = ScheduleParser()
-
         # Create default station dictionary
         self.redLineStations = dict()
         self.greenLineStations = dict()
-        for key, value in self.redLineBlocks.stations().items():
-            self.redLineStations[value] = [False, key]
-        for key, value in self.greenLineBlocks.stations().items():
-            self.greenLineStations[value] = [False, key]
+        for value in self.redLineBlocks.stations().values():
+            self.redLineStations[value] = False
+        for value in self.greenLineBlocks.stations().values():
+            self.greenLineStations[value] = False
 
         # select default block
         self.selectedBlock = 1
         self.selectedBlockLine = self.redLineBlocks
+        self.redLineTrains = TrainDictionary()
+        self.greenLineTrains = TrainDictionary()
+        self.scheduleParser = ScheduleParser()
 
     def setupUi(self):
         self.setObjectName("self")
@@ -380,7 +379,6 @@ class CTCOffice(QWidget):
     
     def closeDispatchPopUp(self):
         self.dispatchWidget.close()
-        self.dispatchSignal.emit(True)
 
     def uploadSchedule(self):
         fileName = QFileDialog.getOpenFileName(QtWidgets.QStackedWidget(), 'open file', '/home/garrett/git/ECE_1140_TRAINS/CTC-Office', 'xlsx files (*.xlsx)')
