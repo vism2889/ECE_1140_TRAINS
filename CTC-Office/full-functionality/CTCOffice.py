@@ -37,10 +37,10 @@ class CTCOffice(QWidget):
         # Create default station dictionary
         self.redLineStations = dict()
         self.greenLineStations = dict()
-        for value in self.redLineBlocks.stations().values():
-            self.redLineStations[value] = False
-        for value in self.greenLineBlocks.stations().values():
-            self.greenLineStations[value] = False
+        for key, value in self.redLineBlocks.stations().items():
+            self.redLineStations[value] = [False, key]
+        for key, value in self.greenLineBlocks.stations().items():
+            self.greenLineStations[value] = [False, key]
 
         # select default block
         self.selectedBlock = 1
@@ -373,7 +373,7 @@ class CTCOffice(QWidget):
 
     def launchDispatchPopUp(self):
         self.dispatchWidget = QtWidgets.QWidget()
-        self.dispatchPopUp = DispatchPopUp()
+        self.dispatchPopUp = DispatchPopUp(self.signals)
         self.dispatchPopUp.setupUi(self.dispatchWidget, self.redLineStations, self.greenLineStations, self.redLineTrains, self.greenLineTrains)
         self.dispatchPopUp.dispatch.clicked.connect(self.closeDispatchPopUp)
         self.dispatchWidget.show()
