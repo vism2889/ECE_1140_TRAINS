@@ -42,6 +42,8 @@ class TrainData():
 class PointMassModel():
     def __init__(self, blocks, blockLens):
         
+        self.id = None
+
         self._td = TrainData()
         
         self.blocks = blocks
@@ -74,7 +76,6 @@ class PointMassModel():
             self.prev_time = t
             self.curr_time = time.time()
         else:
-
             #setting time values
             self.prev_time = self.curr_time
             self.curr_time = t
@@ -186,6 +187,8 @@ class PointMassModel():
         else:
             self.force = self.power * 2
             self.force -= static_friction_force
+            print(f'force - static force = {self.force}')
+
                 
     
     def calcAccel(self):
