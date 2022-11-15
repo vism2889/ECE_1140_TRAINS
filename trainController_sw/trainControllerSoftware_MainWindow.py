@@ -42,11 +42,12 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
         self.authority_value = 0
         self.speed_display_value = 0
         self.power_failure_value = 0
-        ##
-        self.commanded_speed = 0
+        
+        ## Initialize PID
+        self.commanded_speed = 30 * 2.23694 # commanded speed input as mph
         self.current_speed = 0
-        self.kp = 0
-        self.ki = 0
+        self.kp = 1
+        self.ki = 0.01
         self.pid = PID(self.kp, self.ki, 0, setpoint=self.commanded_speed)
         self.pid.output_limits = (0, 120000) #clamp at 120W
         
@@ -519,7 +520,7 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
         self.DisplayPower.setGeometry(QtCore.QRect(720, 280, 93, 29))
         self.DisplayPower.setObjectName("DisplayPower")
 
-        #######
+        ##
         self.speed_Slider.valueChanged.connect(self.setManualControl_CommandedSpeed)
         self.braking_Slider.valueChanged.connect(self.setManualControl_ServiceBrake)
         self.ManuLebrake_button.clicked.connect(self.setManualControl_EmergencyBrake)
@@ -528,6 +529,10 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
         self.Manual_doors_ComboBox.currentIndexChanged.connect(self.setManualControl_Doors)
         self.Manual_Advertisements_CheckBox.stateChanged.connect(self.setManualControl_Advertisements)
         self.Manual_Annoucements_CheckBox.stateChanged.connect(self.setManualControl_Announcements)
+        ##
+        
+        ## Connect to Train Model
+        self.signals.currentSpeedOfTrainModel.connect(self.setPID)
         ##
         
         self.TestWindow =  QtWidgets.QMainWindow()
@@ -603,7 +608,25 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
         self.DisplayPower.setText(_translate("self", "Display Power"))
         self.label_33.setText(_translate("self", "Emergency Brake"))
 ##
-    
+    def signalSend(self):
+        self.dict = {
+                # 'int_lights': self.,
+                # 'ext_lights': self.ext_lights_box.currentText(),
+                # 'temperature': self.temp_edit.toPlainText(),
+                # 'left_doors': self.left_doors_edit.toPlainText(),
+                # 'right_doors': self.right_doors_edit.toPlainText(),
+                # 'passenger_count':self.pass_edit.toPlainText(),
+                # 'crew_count': self.crew_edit.toPlainText(),
+                # 'authority': self.auth_edit.toPlainText(),
+                # 'grade': self.grade_edit.toPlainText(),
+                # 'switch': self.switch_edit.toPlainText(),
+                # 'curr_power':self.cmd_pwr_edit.toPlainText(),
+                # 'cmd_speed':self.cmd_speed_edit.toPlainText(),
+                # 'curr_speed':self.curr_speed_edit.toPlainText(),
+                # 'last_station':self.last_station_edit.toPlainText(),
+                # 'next_station':self.nxt_station_edit.toPlainText()
+                'power' : self.PowerOutput_lcdDisplay.value()
+                }
 ####### Set Automatic/Main Displays
 ####### Input = trainData
 ####### Output = outputData
@@ -753,72 +776,17 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
     def setKiValue(self):
         self.ki = self.setKi_Box.value()
         
-    def setPID(self, kp_val, ki_val):
-        self.kp = kp_val
-        self.ki = ki_val
-        self.pid = PID(self.kp, self.ki, 0.1, setpoint=(self.Manual_CommandedSpeed_lcdDisplay.value() * 0.621371))
+    def setPID(self, msg):
+        # Km/hr to mph
+        # msg input as m/s
+        self.pid = PID(msg)
         self.pid.output_limits = (0, 120000)
+        self.dict['power'] = self.pid
+        self.emitPower()
     
-    def DisplayPowerOutput(self):
-       self.c.getPowerOutput()
-        
-    def publish(self):
-        self.c.publish()
-        
-    def subscribe(self):
-        self.c.subscribe()
-    
-    def signalSenderEmit(self):
-        #self.sender.emit()
-        pass
-        
-                
-####### Connects
-    def ManualControl_Connect(self):
-        # self.speed_Slider.valueChanged.connect(self.setManualControl_CommandedSpeed)
-        # self.braking_Slider.valueChanged.connect(self.setManualControl_ServiceBrake)
-        # self.ManuLebrake_button.clicked.connect(self.setManualControl_EmergencyBrake)
-        # self.Manual_temperature_box.valueChanged.connect(self.setManualControl_Temperature)
-        # self.Manual_lights_ComboBox.currentIndexChanged.connect(self.setManualControl_Lights)
-        # self.Manual_doors_ComboBox.currentIndexChanged.connect(self.setManualControl_Doors)
-        # self.Manual_Advertisements_CheckBox.stateChanged.connect(self.setManualControl_Advertisements)
-        # self.Manual_Annoucements_CheckBox.stateChanged.connect(self.setManualControl_Announcements)
-        
-        # self.timer.timeout.connect(self.setManualControl_CommandedSpeed)
-        # self.timer.timeout.connect(self.setManualControl_ServiceBrake)
-        # self.timer.timeout.connect(self.setManualControl_EmergencyBrake)
-        # self.timer.timeout.connect(self.setManualControl_Temperature)
-        # self.timer.timeout.connect(self.setManualControl_Lights)
-        # self.timer.timeout.connect(self.setManualControl_Doors)
-        # self.timer.timeout.connect(self.setManualControl_Advertisements)
-        # self.timer.timeout.connect(self.setManualControl_Announcements)
-        pass
-
-    def connect(self):
-        # self.timer.timeout.connect(self.publish)
-        # self.timer.timeout.connect(self.subscribe)
-        # self.setKp_Box.valueChanged.connect(self.setKpValue)
-        # self.setKi_Box.valueChanged.connect(self.setKiValue)
-        
-        #self.timer.timeout.connect(self.EmergencyBrakeDisplay)
-        # self.timer.timeout.connect(self.setKpValue)
-        # self.timer.timeout.connect(self.setKiValue)
-        # self.timer.timeout.connect(self.DisplayPowerOutput)
-        # self.timer.timeout.connect(self.AutoSpeed)
-        # self.timer.timeout.connect(self.AutoTemperature)
-        # self.timer.timeout.connect(self.AutoBraking)
-        # self.timer.timeout.connect(self.AutoAnnouncements)
-        # self.timer.timeout.connect(self.AuthorityDisplay)
-        # self.timer.timeout.connect(self.AutoCommandedSpeed)
-        # self.timer.timeout.connect(self.AutoLeftDoors)
-        # self.timer.timeout.connect(self.AutoRightDoors)
-        # self.timer.timeout.connect(self.AutoInternalLights)
-        # self.timer.timeout.connect(self.AutoExternalLights)
-        # self.timer.timeout.connect(self.AutoAnnouncements)
-        #self.timer.timeout.connect(self.signalSenderEmit)
-        pass
-
-        #self.timer.start(100)
+    def emitPower(self):
+       self.signals.powerSignal.emit(self.dict['power'])     
+            
         
 if __name__ == "__main__":
     import sys
