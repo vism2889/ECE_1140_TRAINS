@@ -1,3 +1,12 @@
+##############################################################################
+# AUTHOR(S):    Sushmit Acharya
+# DATE:         11/14/2022
+# FILENAME:     trainmodel_ui.py
+# DESCRIPTION:
+#  Primary Train Model UI that runs the Train Model UI
+##############################################################################
+
+
 # from train import Train
 import sys
 sys.path.append('../CTC-Office/schedule-functionality/')
@@ -7,44 +16,43 @@ sys.path.append('../CTC-Office/server-functionality/')
 
 from PyQt5 import QtWidgets, uic
 from PyQt5.QtCore import QObject, QThread, pyqtSignal, pyqtSlot
-from DispatchPopUp import DispatchPopUp
-from MiniOffice import Ui_MainWindow
-from LayoutParser import LayoutParser
+# from DispatchPopUp import DispatchPopUp
+# from MiniOffice import Ui_MainWindow
+# from LayoutParser import LayoutParser
 import sys
 import os
 import time
 from train import Train
+sys.path.append('../train_model/')
+
 
 
 
 class TrainModel(QtWidgets.QMainWindow):
     '''Primary Train Model UI Window that contains all childs/widgets'''
-    t = pyqtSignal()
+    train_dict = {}
 
-    def __init__(self, t, ctc):
-        super(TrainModel, self).__init__()
+    def __init__(self, ui, signals):
+        super().__init__()
         # path = os.getcwd()+'\\train_model\\train.ui'
-        path = os.getcwd() +'/train.ui'
-        uic.loadUi(path, self)
-        self.ctc = ctc
-        self.t = t
-
-
+        uic.loadUi(ui, self)
+        self.t = Train()
+        self.t.dispatch()
+        self.signals = signals
         self.UI()
-
         self.show()
 
     def dispatch(self, msg):
         print(f'Dispatched, message: {msg}')
-        print('id is: ', {msg['id']})
-        print('line is: ', {msg['line']})
+        print('id is: ', {msg[0]})
+        print('line is: ', {msg[1]})
+        self.t.dispatch()
+
 
     def UI(self):
-        print('Type of dispatch signal is: ', type(self.ctc.dispatchSignal))
+        print('Type of dispatch signal is: ', type(self.signals.dispatchTrainSignal))
 
-        self.ctc.dispatchSignal.connect(self.dispatch)
-
-        
+        self.signals.dispatchTrainSignal.connect(self.dispatch)
         # if sys.argv[1] == 'user':
         #     self.test_win.setVisible(False)
         # else:
@@ -235,10 +243,15 @@ class DisplayWorker(QObject):
             #stations
             self.qt.last_st_disp.setText(f'{self.qt.t.last_station}')
             self.qt.next_st_disp.setText(f'{self.qt.t.next_station}')
-
-            if time.time()-last_update > 5:
+            
+            if time.time()-last_update > 1:
                 if self.qt.t.e_brake == 'Off' and self.qt.t.service_brake == 'Off':
-                    self.qt.t.set_power(self.qt.t.curr_power)
+                    print('Setting Train Power')
+                    self.qt.t.curr_power = 120000
+                    self.qt.t.set_power(120000)
+                    print(f'Occ_list is: {self.qt.t.pm.occ_list}')
+                    print(f'Curr Pos in block {self.qt.t.pm.curr_block} is: {self.qt.t.pm.curr_pos}')
+                    self.qt.signals.occupancySignal.emit(self.qt.t.pm.occ_list)
                     last_update = time.time()
 
 
@@ -293,8 +306,6 @@ class TestWindow(QtWidgets.QMainWindow):
             curr_pwr = float(self.cmd_pwr_edit.toPlainText()) * 1000
             self.dict['curr_power'] = curr_pwr
 
-
-
         print(self.temp_edit.toPlainText())
         self.test_clicked.emit(self.dict)
     
@@ -316,15 +327,15 @@ class TestWindow(QtWidgets.QMainWindow):
      
 
 
-if __name__ == "__main__":
-    app = QtWidgets.QApplication(sys.argv)
-    t =  Train()
+# if __name__ == "__main__":
+#     app = QtWidgets.QApplication(sys.argv)
+#     t =  Train()
 
-    layoutFile = "Track_Layout_PGH_Light_Rail.csv"
-    trackLayout = LayoutParser(layoutFile)
-    redLineBlocks, greenLineBlocks = trackLayout.process()
-    MainWindow = QtWidgets.QWidget()
-    ctc = Ui_MainWindow(MainWindow, redLineBlocks, greenLineBlocks)
+#     layoutFile = "Track_Layout_PGH_Light_Rail.csv"
+#     trackLayout = LayoutParser(layoutFile)
+#     redLineBlocks, greenLineBlocks = trackLayout.process()
+#     MainWindow = QtWidgets.QWidget()
+#     ctc = Ui_MainWindow()
 
-    window = TrainModel(t, ctc)
-    app.exec_()
+#     window = TrainModel(t, ctc)
+#     app.exec_()

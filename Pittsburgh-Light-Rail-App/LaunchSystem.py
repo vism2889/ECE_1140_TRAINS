@@ -29,6 +29,10 @@ sys.path.append("../TrackModel/Parsers")
 sys.path.append("../TrackModel/Track-System-Models") 
 from TrackModelApp import TrackModel
 
+sys.path.append("../train_model")
+from trainmodel_ui import TrainModel
+
+
 # Signal IMPORTS
 sys.path.append("../SystemSignals") 
 from Signals import Signals
@@ -38,6 +42,10 @@ class PittsburghLightRail():
         self.signals    = Signals()
         self.trackModel = TrackModel(self.signals)
         self.CTCOffice = CTCOffice(self.signals)
+
+        #train model
+        file = r"C:\Users\achar\OneDrive\Desktop\fall_2022\trains\ECE_1140_TRAINS\train_model\train.ui"
+        self.trainModel = TrainModel(file, self.signals)
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
