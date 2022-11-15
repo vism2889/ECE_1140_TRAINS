@@ -2,11 +2,11 @@ from dataclasses import dataclass
 from tokenize import Double
 from tracemalloc import start
 import time
-from trainmodel_ui import TrainModel
 from PyQt5 import QtWidgets
 import sys
 from PyQt5.QtCore import pyqtSignal
-from units import unit
+import random
+
 
 # class PointMassModel():
 #     def __init__(self) -> None:
@@ -31,17 +31,23 @@ class TrainData():
     
     #accelerations
     med_accel = float =  0.5    #m/s^2
-    serv_brake = float = -1.2  #m/s^2
-    emergency_brake = -2.73    #m/s^2
+    serv_brake = float = 1.2  #m/s^2
+    emergency_brake = 2.73    #m/s^2
 
-    kinetic_fric_force = float = 0.42 #Newtons
+    kinetic_fric_constant = float = 0.1 #Newtons
+    static_fric_constant = float = 0.6
     
 
 
 class PointMassModel():
-    def __init__(self):
+    def __init__(self, blocks, blockLens):
+        
         self._td = TrainData()
-        self.id = None
+        
+        self.blocks = blocks
+        self.curr_block = 0
+        self.blockLens = blockLens
+        self.occ_list = [0 for i in range(len(blocks))]
 
         #time independent values
         self.power = 0
@@ -63,7 +69,7 @@ class PointMassModel():
         self.curr_pos = 0
     
     def setPower(self, power, t):
-
+        self.mass = self._td.mass_empty
         if self.prev_time == 0:
             self.prev_time = t
             self.curr_time = time.time()
@@ -126,13 +132,15 @@ class PointMassModel():
         print(f'Serv Brake velocity before decleration:{self.curr_speed}')
         print(f'Serv Brake force before deceleration: {self.force}')
         print(f'Deceleration force is: {self._td.mass_empty * self._td.serv_brake}')
-        print(f'Train acceleration before stop seqeuence: {self.curr_accel}\n')
+        print(f'Train acceleration before stop seqeuence: {self.curr_accel}')
+        print(f'Friction Force: {self._td.mass_empty*self._td.kinetic_fric_constant}\n')
         while self.curr_vel > 0:
 
             self.prev_accel = self.curr_accel
-            self.curr_accel = self.dec_force()
+            
 
-            if self.elapsed_time > 0:
+            if self.elapsed_time > 0.5:
+                self.curr_accel = self.dec_force()
                 self.calcVel()
                 self.calcPos()
                 
@@ -147,7 +155,7 @@ class PointMassModel():
             self.prev_accel = self.curr_accel
 
             
-            if time.time() - temp_start_t > 0.05:
+            if time.time() - temp_start_t > 2:
                 print(f'Current Force is: {self.force}')
                 print(f'Current Acceleration is: {self.curr_accel}')
                 print(f'Current Velocity is: {self.curr_vel}')
@@ -161,19 +169,24 @@ class PointMassModel():
     def dec_force(self):
         # print(f"Current force is: {self.force}")
         dec_force = self._td.mass_empty * self._td.serv_brake
-        if dec_force < self.force: 
-            self.force = self.force+dec_force
-        else:
-            self.force - self._td.friction_force
-        self.curr_accel = self.force/self._td.mass_empty
+        kinetic_friction_force = self._td.mass_empty*9.8*self._td.kinetic_fric_constant
 
+        if self.force > 0: 
+            self.force = self.force-dec_force
+        else:
+            self.force -= kinetic_friction_force*0.25
+            
+        self.curr_accel = self.force/self._td.mass_empty
         return self.curr_accel
 
     def calcForce(self):
+        static_friction_force = self._td.mass_empty*9.8*self._td.static_fric_constant
         if self.curr_vel > 0:
             self.force = float(self.power)/float(self.curr_vel)
         else:
-            self.force = float(self._td.mass_empty)*float(self._td.med_accel)
+            self.force = self.power * 2
+            self.force -= static_friction_force
+                
     
     def calcAccel(self):
         self.prev_accel = self.curr_accel
@@ -185,16 +198,29 @@ class PointMassModel():
         self.curr_speed = round(self.curr_vel * (1/1000) * (0.62) * (3600))
     
     def calcPos(self):
+        self.occ_list[self.curr_block] = 1
         self.prev_pos = self.curr_pos
         self.curr_pos = self.prev_pos + (self.elapsed_time/2)*(self.prev_vel +self.curr_vel)
+
+        if self.curr_pos >= self.blockLens[self.curr_block]:
+            self.occ_list[self.curr_block] = 0
+            self.curr_pos = 0
+            self.prev_pos = 0
+            self.curr_block += 1
+            self.occ_list[self.curr_block] = 1
+
 
         
 
 class Train():
     def __init__ (self):
+        
+        #block list
+        self.blocks          = [i for i in range(150)]
+        self.blockLens       = [random.randint(10,25) for i in range(150)]
 
         #point Mass model
-        self.pm = PointMassModel()
+        self.pm = PointMassModel(self.blocks, self.blockLens)
 
         #dispatch
         self.dispatched = False
@@ -233,10 +259,10 @@ class Train():
         self.grade = 0
         self.switch = 0
         
-    def launch_ui(self):
-        app = QtWidgets.QApplication(sys.argv)
-        window = TrainModel(self)
-        app.exec_()
+    # def launch_ui(self):
+    #     app = QtWidgets.QApplication(sys.argv)
+    #     window = TrainModel(self)
+    #     app.exec_()
           
 
     def e_brake_func(self):
@@ -253,6 +279,7 @@ class Train():
         self.set_power(120000, time.time())
 
     def set_power(self, power, t = None):
+
         self.curr_speed = self.pm.curr_speed
         self.curr_power = power
 
@@ -262,6 +289,7 @@ class Train():
                 return 
         
         if(self.dispatched):
+            print ('---------------------Setting Power-----------------------')
             if self.service_brake == 'On' and self.pm.curr_vel > 0:
                 self.serv_brake_func()
             elif self.e_brake == 'On' and self.pm.curr_vel>0:
@@ -277,6 +305,7 @@ class Train():
                 print(f'Current Accel:{self.pm.curr_accel}')
                 print(f'Current_Vel: {self.pm.curr_vel}')
                 print(f'Current Speed: {self.pm.curr_speed} mph\n')
+                print(f'Current Position: {self.pm.curr_pos}')
             
                 
             

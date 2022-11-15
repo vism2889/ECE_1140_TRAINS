@@ -25,7 +25,7 @@ class Signals(QWidget):
 
 
     # CTC Office Signals
-    dispatchTrainSignal      = QtCore.pyqtSignal(str)
+    dispatchTrainSignal      = QtCore.pyqtSignal(list)
     suggestedSpeedSignal     = QtCore.pyqtSignal(list)
 
     # Train Model Signals

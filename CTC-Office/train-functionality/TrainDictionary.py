@@ -7,10 +7,10 @@ class TrainDictionary:
         self.backLog = dict()
 
     def addTrain(self, name, destinations, commandedSpeed, authority):
-        self.trainList[name] = Train("YARD", destinations, commandedSpeed, authority)
+        self.trainList[name] = Train(destinations, commandedSpeed, authority)
 
     def addScheduledTrain(self, name, destinations, commandedSpeed, authority):
-        self.backLog[name] = Train("YARD", destinations, commandedSpeed, authority)
+        self.backLog[name] = Train(destinations, commandedSpeed, authority)
 
     def dispatchScheduledTrain(self, name):
         self.trainList[name] = self.backLog[name]
@@ -33,6 +33,6 @@ class TrainDictionary:
 
     def toggleDestination(self, name, destination, scheduled):
         if scheduled:
-            self.backLog[name].destinations[destination] = not self.backLog[name].destinations[destination]
+            self.backLog[name].destinations[destination][0] = not self.backLog[name].destinations[destination][0]
         else:
-            self.trainList[name].destinations[destination] = not self.trainList[name].destinations[destination]
+            self.trainList[name].destinations[destination][0] = not self.trainList[name].destinations[destination][0]
