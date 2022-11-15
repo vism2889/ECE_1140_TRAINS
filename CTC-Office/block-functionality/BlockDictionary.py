@@ -32,12 +32,12 @@ class BlockDictionary:
             elif type == "RAILWAY":
                 self.crossingList[newBlock.number] = "red"
 
-    def toggleOccupancy(self, blockNum):
-        self.blockList[blockNum].occupancy = not self.blockList[blockNum].occupancy
+    def setOccupancy(self, blockNum, value):
+        self.blockList[blockNum].occupancy = value
 
         # TODO use this speed limit to send suggested speed and make everything work
-        if self.blockList[blockNum].occupancy:
-            return self.blockList[blockNum].speedLimit
+        # if self.blockList[blockNum].occupancy:
+        #     return self.blockList[blockNum].speedLimit
 
     def toggleMaintenanceState(self, blockNum):
         self.blockList[blockNum].maintenanceState = not self.blockList[blockNum].maintenanceState
