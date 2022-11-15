@@ -30,8 +30,10 @@ class SendOccupancy():
         self.faults          = [0 for i in range(150)]
         self.maintenance     = [0 for i in range(150)]
         self.line            = "Green"
+        self.lineBlocks      = []
 
         self.signals.trackFailuresSignal.connect(self.updateFaults)
+        self.signals.trackBlocksToTrainModelSignal.connect(self.updateLineBlocks)
         self.occupancyThread = threading.Thread(target=self.timer)
         self.occupancyThread.start()
         
@@ -47,6 +49,9 @@ class SendOccupancy():
     def updateFaults(self, faults):
         self.faults = faults
 
+    def updateLineBlocks(self, blocks):
+        self.lineBlocks = blocks
+
     def getOccupancy(self):
         if self.distance >= self.blockLens[self.currBlockIndex]:
             self.currBlockIndex += 1
@@ -60,3 +65,4 @@ class SendOccupancy():
         
         print("Train on Block:", self.currBlockIndex+1)
         print("FAULTS:\n", self.faults)
+        print("LineBlocks:\n", self.lineBlocks)

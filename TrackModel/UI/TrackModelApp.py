@@ -220,6 +220,7 @@ class TrackModel(QWidget):
                 i+=1
         self.blockslistwidget.itemClicked.connect(self.onClickedBlock)
         self.blocksLoaded = True
+        self.signals.trackBlocksToTrainModelSignal.emit(self.lineBlocks)
 
     def updateBlocks(self):
         for i in range(len(self.occupancy)):
