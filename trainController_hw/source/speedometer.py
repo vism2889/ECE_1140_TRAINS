@@ -211,7 +211,6 @@ class Ui_MainWindow(object):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "AnalogGaugeWidget_Demo"))
 
-
     def toggle_lights_manual(self):
         self.mc.lightsButton()
 
@@ -220,6 +219,18 @@ class Ui_MainWindow(object):
 
     def deploy_ebrake_manual(self):
         self.mc.ebrake_button()
+
+    def setSpeed_manual(self):
+        self.mc.setCommandedSpeed()
+    
+    def calculatePower_manual(self):
+        self.mc.calculatePower()
+
+    def announce_manual(self):
+        self.mc.announceButton(0)
+
+    def setTemperature_manual(self):
+        self.mc.setTemperature()
 
     def setCurrentSpeed(self):
         self.current_speed = self.c.setCurrentSpeed()
@@ -244,27 +255,17 @@ class Ui_MainWindow(object):
         self.right_door_state = not self.right_door_state
         self.c.setRightDoor(self.right_door_state)
 
-    def announceStation(self):
-        #self.station = self.getNextStation()
-        self.c.announceStation(True, self.station)
-
-    def stopAnnounce(self):
-        self.c.announceStation(False, self.station)
-
     def deployEbrake(self):
         self.c.deployEbrake()
 
     def setSuggestedSpeed(self):
-        self.c.setSuggestedSpeed(self.suggested_speed)
+        self.c.setSuggestedSpeed()
 
     def checkAuthority(self):
         self.c.checkAuthority()
 
-    def deployServiceBrake(self):
-        self.c.deployServiceBrake()
-
-    def setTemperature(self):
-        self.mc.setTemperature()
+    def setServiceBrake(self):
+        self.c.deployServiceBrake(False)
 
     def calculatePower(self):
         self.c.getPowerOutput()
@@ -277,24 +278,32 @@ class Ui_MainWindow(object):
 
     def sendRandom(self):
         self.c.sendRandom()
-        
-    def connect(self, MainWindow):
-        self.timer.timeout.connect(self.subscribe)
-        self.timer.timeout.connect(self.setCurrentSpeed)
-        self.timer.timeout.connect(self.setCommandedSpeed)
-        self.timer.timeout.connect(self.calculatePower)
-        self.timer.timeout.connect(self.setTemperature)
-        self.timer.timeout.connect(self.sendRandom)
+    
+    def manual_connect(self, MainWindow):
+        self.timer.timeout.connect(self.setSpeed_manual)
+        self.timer.timeout.connect(self.calculatePower_manual)
+        self.timer.timeout.connect(self.setTemperature_manual)
         self.timer.timeout.connect(self.toggle_lights_manual)
         self.timer.timeout.connect(self.toggle_doors_manual)
         self.timer.timeout.connect(self.deploy_ebrake_manual)
-        #self.timer.timeout.connect(self.driverSetSpeed)
+        self.timer.timeout.connect(self.announce_manual)
         
-        #self.timer.timeout.connect(self.announceStation)
-        
+        self.timer.timeout.connect(self.setServiceBrake)
         self.timer.timeout.connect(self.sendData)
+        self.timer.start(50)
         
-        self.timer.start(100)
+
+    def auto_connect(self, MainWindow):
+        self.timer.timeout.connect(self.setCommandedSpeed)
+        self.timer.timeout.connect(self.calculatePower)
+        self.timer.timeout.connect(self.sendData)
+
+    def connect(self, MainWindow):
+        self.timer.timeout.connect(self.subscribe)
+        self.timer.timeout.connect(self.setCurrentSpeed)
+        self.timer.timeout.connect(self.checkAuthority)
+        self.timer.timeout.connect(self.setSuggestedSpeed)
+        self.timer.start(50)
 
 
 if __name__ == "__main__":
@@ -304,5 +313,6 @@ if __name__ == "__main__":
     ui = Ui_MainWindow()
     ui.setupUi(MainWindow)
     ui.connect(MainWindow)
+    ui.manual_connect(MainWindow)
     MainWindow.show()
     sys.exit(app.exec_())

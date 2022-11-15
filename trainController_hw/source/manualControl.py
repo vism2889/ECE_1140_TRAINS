@@ -24,6 +24,7 @@ class ManualControl():
         self.anal_in = AnalogIn()
         self.commandedSpeed = 0
         self.ebrake_state = False
+        self.service_brake_state = False
         self.light_state_internal = False
         self.light_state_external = False
         self.door_state_left = False
@@ -73,9 +74,11 @@ class ManualControl():
     def ebrake_button(self):
         if GPIO.input(5) == GPIO.LOW: self.c.deployEbrake(True)
         if GPIO.input(5) == GPIO.HIGH: self.c.deployEbrake(False)
+
             
     def setTemperature(self):
         temp = self.anal_in.getTemperatureValue()
         self.c.setTemperature(temp)
-        return temp
 
+    def calculatePower(self):
+        self.c.getPowerOutput(self.commandedSpeed)

@@ -110,8 +110,10 @@ class Control():
             return 0
 
     def setTemperature(self, temperature):
-        self.temperature = temperature
-        self.output.setTemperature(self.setTemperature)
+        if temperature != None:
+            self.temperature = temperature
+            
+        self.output.setTemperature(self.temperature)
 
     def setSuggestedSpeed(self, suggested_speed=None):
         if(suggested_speed == None):
@@ -141,17 +143,16 @@ class Control():
             self.commanded_speed = 0
             self.output.setPower(0)
 
-        
+    def deployServiceBrake(self, state=None):
+        if state != None:
+            self.brakeCommand = state
+            self.output.setServiceBrakeState(self.brakeCommand)
 
-    def deployServiceBrake(self):
-        self.brakeCommand = not self.brakeCommand
-        if self.brakeCommand:
-            print("Brake Command on")
-
-        if not self.brakeCommand:
-            print("Brake Command off")
-
-        self.output.setServiceBrakeState(self.brakeCommand)
+        else:
+            brake = self.input.getServiceBrakeCommand()
+            if brake != None:
+                self.brakeCommand = brake
+            self.output.setServiceBrakeState(self.brakeCommand)
 
     def limitSpeed(self, speed):
         speed_limit = self.input.getSpeedLimit()
@@ -163,7 +164,6 @@ class Control():
     def checkAuthority(self):
         if self.authority == 0:
             self.deployEbrake(self)
-        self.output.setAuthority(self.authority)
     
     def set_kp_ki(kp_val, ki_val, self):
         self.k_p = kp_val
@@ -174,19 +174,24 @@ class Control():
 
     def getPowerOutput(self, commanded_speed=None):
         if self.ebrakeCommand:
+            self.output.setPower(0.00)
             return
         
         if commanded_speed == None and self.input.getCommandedSpeed() != None:
             self.pid.setpoint = self.input.getCommandedSpeed()
             self.current_speed = self.input.getCurrentSpeed()
 
-        else:
+        elif commanded_speed != None:
             self.commanded_speed = commanded_speed
+            self.pid.setpoint = self.commanded_speed
 
         self.power = self.pid(self.current_speed)
 
         if self.power >= 0:
             self.output.setPower(self.power)
+
+        else:
+            self.output.setPower(0.00)
 
     def sendRandom(self):
         self.output.randomize()
