@@ -43,11 +43,14 @@ class TrainModel(QtWidgets.QMainWindow):
         print('line is: ', {msg[1]})
         self.t.id = msg[0]
         self.t.line = msg[1]
+        print(f'------------DISPATCHED!!!!!!!!!!!------------------')
         self.t.dispatch()
 
     def curr_t_power(self, msg):
-        print(f'Message is:{msg}')
-        print(f'Message type is: {type(msg)}')
+        # print(f'Message is:{msg}')
+        # print(f'Message type is: {type(msg)}')
+        p = msg['power']
+        print(f'---------RECEIVED POWER IS: {p}------------------')
         self.t.pm.power = msg['power']
 
     def UI(self):
@@ -215,7 +218,7 @@ class DisplayWorker(QObject):
             self.qt.ext_lights_disp.setText(self.qt.t.ext_lights)
            
             #power
-            self.qt.cmd_pwr_disp.setText(f'{round(float(self.qt.t.curr_power)/1000)} kW')
+            self.qt.cmd_pwr_disp.setText(f'{round(float(self.qt.t.pm.power)/1000)} kW')
             # self.qt.t.set_power(round(float(self.qt.t.curr_power)/1000))
             self.qt.cmd_speed_disp.setText(f'{self.qt.t.cmd_speed} mph')
             
@@ -245,10 +248,10 @@ class DisplayWorker(QObject):
             self.qt.next_st_disp.setText(f'{self.qt.t.next_station}')
             
             if time.time()-last_update > 1:
-                if self.qt.t.e_brake == 'Off' and self.qt.t.service_brake == 'Off':
+                if self.qt.t.e_brake == 'Off' and self.qt.t.service_brake == 'Off' and self.qt.t.dispatched:
                     # print('Setting Train Power')
                     self.qt.t.set_power(self.qt.t.pm.power)
-                    self.qt.signals.currentSpeedOfTrainModel(self.qt.t.pm.curr_vel)
+                    self.qt.signals.currentSpeedOfTrainModel.emit(self.qt.t.pm.curr_vel)
                     # print(f'Occ_list is: {self.qt.t.pm.occ_list}')
                     # print(f'Curr Pos in block {self.qt.t.pm.curr_block} is: {self.qt.t.pm.curr_pos}')
                     self.qt.signals.occupancySignal.emit(self.qt.t.pm.occ_list)
