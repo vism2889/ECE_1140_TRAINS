@@ -24,22 +24,18 @@ from signalSender import signalSender
 class Ui_TrainControllerSW_MainWindow(QWidget):
     def __init__(self, signals):
         super().__init__()
-        print('\n\n\nInside Train Controller INIT\n\n\n\n\n\n\n\n\n')
 
         self.setupUi()
-        print('\n\n***************JUST SET UP UI ************************\n\n\n')
 
         self.timer = QtCore.QTimer()
         #self.connect()
         #self.ManualControl_Connect()
         self.signals = signals
-        print('\n\n***************NOW SHOWING UI FOR TRAIN CONTROLLER ************************\n\n\n')
         self.show()
         
 
     def setupUi(self):
         ##
-        print('\n\n\nInside Train Controller setupUII\n\n\n\n\n\n\n\n\n')
         self.c = Control()
         self.mc = ManualControl()
         self.speed_limit = 0

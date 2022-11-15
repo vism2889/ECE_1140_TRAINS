@@ -9,10 +9,6 @@
 
 # from train import Train
 import sys
-sys.path.append('../CTC-Office/schedule-functionality/')
-sys.path.append('../CTC-Office/train-functionality/')
-sys.path.append('../CTC-Office/block-functionality/')
-sys.path.append('../CTC-Office/server-functionality/')
 
 from PyQt5 import QtWidgets, uic
 from PyQt5.QtCore import QObject, QThread, pyqtSignal, pyqtSlot
@@ -32,12 +28,11 @@ class TrainModel(QtWidgets.QMainWindow):
     '''Primary Train Model UI Window that contains all childs/widgets'''
     train_dict = {}
 
-    def __init__(self, ui, signals):
+    def __init__(self, ui,signals):
         super().__init__()
         # path = os.getcwd()+'\\train_model\\train.ui'
         uic.loadUi(ui, self)
         self.t = Train()
-        self.t.dispatch()
         self.signals = signals
         self.UI()
         self.show()
@@ -46,12 +41,12 @@ class TrainModel(QtWidgets.QMainWindow):
         print(f'Dispatched, message: {msg}')
         print('id is: ', {msg[0]})
         print('line is: ', {msg[1]})
+        self.t.id = msg[0]
+        self.t.line = msg[1]
         self.t.dispatch()
 
 
     def UI(self):
-        print('Type of dispatch signal is: ', type(self.signals.dispatchTrainSignal))
-
         self.signals.dispatchTrainSignal.connect(self.dispatch)
         # if sys.argv[1] == 'user':
         #     self.test_win.setVisible(False)
@@ -246,11 +241,11 @@ class DisplayWorker(QObject):
             
             if time.time()-last_update > 1:
                 if self.qt.t.e_brake == 'Off' and self.qt.t.service_brake == 'Off':
-                    print('Setting Train Power')
+                    # print('Setting Train Power')
                     self.qt.t.curr_power = 120000
                     self.qt.t.set_power(120000)
-                    print(f'Occ_list is: {self.qt.t.pm.occ_list}')
-                    print(f'Curr Pos in block {self.qt.t.pm.curr_block} is: {self.qt.t.pm.curr_pos}')
+                    # print(f'Occ_list is: {self.qt.t.pm.occ_list}')
+                    # print(f'Curr Pos in block {self.qt.t.pm.curr_block} is: {self.qt.t.pm.curr_pos}')
                     self.qt.signals.occupancySignal.emit(self.qt.t.pm.occ_list)
                     last_update = time.time()
 

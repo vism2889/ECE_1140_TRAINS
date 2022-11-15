@@ -13,8 +13,10 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import * 
 from PyQt5.QtCore import *
 
+
 # Python IMPORTS
 import sys
+import os
 
 # CTC Office IMPORTS
 sys.path.append("../CTC-Office/full-functionality")
@@ -46,11 +48,11 @@ class PittsburghLightRail():
         self.signals    = Signals()
         self.trackModel = TrackModel(self.signals)
         self.CTCOffice = CTCOffice(self.signals)
-        #self.trainController = Ui_TrainControllerSW_MainWindow(self.signals)
+        self.trainController = Ui_TrainControllerSW_MainWindow(self.signals)
 
         #train model
-        file = r"C:\Users\12159\Documents\GitHub\ECE_1140_TRAINS\train_model\train.ui"
-        self.trainModel = TrainModel(file)
+        file = f'{os.getcwd()}/train.ui'
+        self.trainModel = TrainModel(file, self.signals)
         
 
         
