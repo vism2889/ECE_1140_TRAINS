@@ -6,9 +6,3 @@ class Train:
         self.destinations = destinations.copy()
         self.commandedSpeed = commandedSpeed
         self.authority = authority
-        self.location = "YARD"
-
-
-    
-
-

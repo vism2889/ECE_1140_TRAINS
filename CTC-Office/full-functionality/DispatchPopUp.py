@@ -9,8 +9,9 @@ from TrainDictionary import TrainDictionary
 
 class DispatchPopUp(object):
 
-    def __init__(self):
+    def __init__(self, signals):
         super().__init__()
+        self.signals = signals
 
     def setupUi(self, dispatchPopUp, redLineStations, greenLineStations, redLineTrains, greenLineTrains):
         dispatchPopUp.setGeometry(450, 50, 150, 200)
@@ -94,4 +95,6 @@ class DispatchPopUp(object):
                 self.redLineTrains.toggleDestination(self.trainName, destination.text(), False)
             elif (self.currentLine == "Green Line"):
                 self.greenLineTrains.toggleDestination(self.trainName, destination.text(), False)
+
+        self.signals.dispatchTrainSignal.emit([self.trainName, self.currentLine])
 
