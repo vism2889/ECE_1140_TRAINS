@@ -3,14 +3,8 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import QTimer
 from simple_pid import PID
 
-from outputData import OutputData
-from trainData import TrainData
-
 class Control():
     def __init__(self):
-        self.input = TrainData()
-        self.output = OutputData()
-        
         self.authority = [True, True, True, True, True, True]
         self.light_state_internal = False
         self.light_state_external = False
