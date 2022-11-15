@@ -14,7 +14,7 @@ class DispatchPopUp(object):
         self.signals = signals
 
     def setupUi(self, dispatchPopUp, redLineStations, greenLineStations, redLineTrains, greenLineTrains):
-        dispatchPopUp.setGeometry(450, 50, 150, 200)
+        dispatchPopUp.setGeometry(400, 50, 200, 250)
         self.trainNameEntry = QtWidgets.QLineEdit(dispatchPopUp)
         self.trainNameEntry.setGeometry(QtCore.QRect(20, 10, 100, 21))
 
@@ -29,16 +29,17 @@ class DispatchPopUp(object):
         self.lineSelection.addItem("")
 
         self.stationTable = QtWidgets.QTableWidget(dispatchPopUp)
-        self.stationTable.setGeometry(20,70,111,71)
+        self.stationTable.setGeometry(20,70,150,130)
         self.stationTable.setMouseTracking(True)
         self.stationTable.setSelectionMode(QAbstractItemView.MultiSelection)
         self.stationTable.setRowCount(len(self.redLineStations))
         self.stationTable.setColumnCount(2)
+        self.stationTable.setColumnWidth(1, 12)
         self.stationTable.horizontalHeader().hide()
         self.stationTable.verticalHeader().hide()
 
         self.dispatch = QtWidgets.QPushButton(dispatchPopUp)
-        self.dispatch.setGeometry(QtCore.QRect(20, 150, 100, 31))
+        self.dispatch.setGeometry(QtCore.QRect(20, 210, 100, 25))
 
         self.retranslateUi()
         QtCore.QMetaObject.connectSlotsByName(dispatchPopUp)
@@ -59,6 +60,9 @@ class DispatchPopUp(object):
             item = QtWidgets.QTableWidgetItem()
             item.setText(_translate("MainWindow", key))
             self.stationTable.setItem(self.index, 0, item)
+            spinBox = QtWidgets.QSpinBox()
+            spinBox.setRange(3,5)
+            self.stationTable.setCellWidget(self.index, 1, spinBox)
             self.index += 1
 
     def updateDestinationList(self):
@@ -74,6 +78,9 @@ class DispatchPopUp(object):
                 item = QtWidgets.QTableWidgetItem()
                 item.setText(key)
                 self.stationTable.setItem(self.index, 0, item)
+                spinBox = QtWidgets.QSpinBox()
+                spinBox.setRange(3,5)
+                self.stationTable.setCellWidget(self.index, 1, spinBox)
                 self.index += 1
 
         elif (self.currentLine == "Green Line"):
@@ -85,9 +92,10 @@ class DispatchPopUp(object):
                 item = QtWidgets.QTableWidgetItem()
                 item.setText(key)
                 self.stationTable.setItem(self.index, 0, item)
+                spinBox = QtWidgets.QSpinBox()
+                spinBox.setRange(3,5)
+                self.stationTable.setCellWidget(self.index, 1, spinBox)
                 self.index += 1
-
-            
 
     def dispatchTrain(self):
         self.currentLine = self.lineSelection.currentText()
