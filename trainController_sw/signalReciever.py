@@ -16,13 +16,18 @@ class signalReciever(QMainWindow):
     def __init__(self, signals):
         super().__init__()
         self.signals = signals
-        self.occupancy = []
-        self.signals.occupancySignal.connect(self.printOccupancy)
-
-        self.setWindowTitle("Signal Reciever ")
-        self.setGeometry(100, 100, 400, 600)
-        self.show()
-
-    def printOccupancy(self, occupancy):
-        print("OCCUPANCY RECIEVED IN Signal Reciever:", end=None)
-        print(occupancy)
+        
+        self.powerSignal = []
+        self.lightSignal = []
+        self.doorSignal = []
+        self.temperatureSignal = []
+        self.announcementsSignal = []
+        self.advertisementsSignals = []
+        self.serviceBrakeSignal = []
+        self.emergencyBrakeSignal = []
+        
+        self.signal.powerSignal.connect(self.printPower)
+    
+    def printPower(self, power):
+        print("POWER RECIEVED IN Signal Reciever:", end=None)
+        print(power)
