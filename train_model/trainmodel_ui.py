@@ -45,9 +45,14 @@ class TrainModel(QtWidgets.QMainWindow):
         self.t.line = msg[1]
         self.t.dispatch()
 
+    def curr_t_power(self, msg):
+        print(f'Message is:{msg}')
+        print(f'Message type is: {type(msg)}')
+        self.t.pm.power = msg['power']
 
     def UI(self):
         self.signals.dispatchTrainSignal.connect(self.dispatch)
+        self.signals.powerSignal.connect(self.curr_t_power)
         # if sys.argv[1] == 'user':
         #     self.test_win.setVisible(False)
         # else:
@@ -242,8 +247,8 @@ class DisplayWorker(QObject):
             if time.time()-last_update > 1:
                 if self.qt.t.e_brake == 'Off' and self.qt.t.service_brake == 'Off':
                     # print('Setting Train Power')
-                    self.qt.t.curr_power = 120000
-                    self.qt.t.set_power(120000)
+                    self.qt.t.set_power(self.qt.t.pm.power)
+                    self.qt.signals.currentSpeedOfTrainModel(self.qt.t.pm.curr_vel)
                     # print(f'Occ_list is: {self.qt.t.pm.occ_list}')
                     # print(f'Curr Pos in block {self.qt.t.pm.curr_block} is: {self.qt.t.pm.curr_pos}')
                     self.qt.signals.occupancySignal.emit(self.qt.t.pm.occ_list)
