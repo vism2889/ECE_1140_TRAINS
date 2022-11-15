@@ -35,6 +35,7 @@ class ManualControl():
         self.c.setLeftDoor(self.door_state_left)
         self.c.setRightDoor(self.door_state_right)
         self.c.announceStation(self.announce_state, 0)
+        self.c.deployServiceBrake(False)
         self.station_audio = ["shadyside_herron.mp3", "herron_swissvale.mp3", 
                               "swissvale_penn.mp3", "penn_steelplaza.mp3", 
                               "steelplaza_first.mp3","first_stationSquare.mp3", 
@@ -46,7 +47,10 @@ class ManualControl():
             self.c.setSpeed(self.commandedSpeed)
             return self.commandedSpeed
 
-        else: return 0
+        else: self.commandedSpeed = 0
+
+    def setServiceBrake(self):
+        self.c.deployServiceBrake(self.anal_in.getBrakingValue())
 
     def lightsButton(self):
         if GPIO.input(25) == GPIO.HIGH:
@@ -77,10 +81,14 @@ class ManualControl():
             sleep(.5)
 
     def ebrake_button(self):
-        if GPIO.input(5) == GPIO.LOW: self.c.deployEbrake(True)
-        if GPIO.input(5) == GPIO.HIGH: self.c.deployEbrake(False)
+        if GPIO.input(5) == GPIO.LOW:
+            self.ebrake_state = True
+            self.c.deployEbrake(True)
 
-            
+        if GPIO.input(5) == GPIO.HIGH:
+            self.ebrake_state = False
+            self.c.deployEbrake(False)
+                 
     def setTemperature_manual(self):
         temp = self.anal_in.getTemperatureValue()
         self.c.setTemperature(temp)

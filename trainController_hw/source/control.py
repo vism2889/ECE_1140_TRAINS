@@ -115,13 +115,6 @@ class Control():
         
         self.output.setTemperatureValue(self.temperature)
 
-    def setSuggestedSpeed(self, suggested_speed=None):
-        if(suggested_speed == None):
-            self.suggested_speed = self.input.getSuggestedSpeed()
-            return 
-
-        self.suggested_speed = suggested_speed
-
     # need to refactor to take in next station data from train model
     def announceStation(self, start, file_idx):
         self.output.setAnnounceState(start)

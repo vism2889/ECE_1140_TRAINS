@@ -220,6 +220,9 @@ class Ui_MainWindow():
     def deploy_ebrake_manual(self):
         self.mc.ebrake_button()
 
+    def deploy_serviceBrake_manual(self):
+        self.mc.setServiceBrake()
+
     def setSpeed_manual(self):
         self.mc.setCommandedSpeed()
     
@@ -291,9 +294,9 @@ class Ui_MainWindow():
         self.timer.timeout.connect(self.toggle_doors_manual)
         self.timer.timeout.connect(self.deploy_ebrake_manual)
         self.timer.timeout.connect(self.announce_manual)
-        self.timer.timeout.connect(self.setServiceBrake)
+        self.timer.timeout.connect(self.deploy_serviceBrake_manual)
         self.timer.timeout.connect(self.sendData)
-        self.timer.start(100)
+        self.timer.start(50)
 
     def auto_connect(self, MainWindow):
         self.timer.timeout.connect(self.setCommandedSpeed)
