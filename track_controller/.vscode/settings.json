@@ -1,0 +1,5 @@
+{
+    "python.analysis.extraPaths": [
+        "./ui/track_layout"
+    ]
+}
