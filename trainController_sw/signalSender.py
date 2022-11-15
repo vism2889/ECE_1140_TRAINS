@@ -13,34 +13,29 @@ from PyQt5 import QtCore
 from PyQt5.QtGui import * 
 from PyQt5.QtCore import * 
 
-
 class signalSender(QWidget):
     def __init__(self, signals):
         super().__init__()
         self.signals = signals
         
         # Outputs to Train Model
-        self.powerSignal = 0
-        self.lightSignal = [False, False]
+        self.powerSignal = [10]
+        self.lightSignal = [True, True]
         self.doorSignal = [False, False]
-        self.temperatureSignal = 72.0
-        self.announcementsSignal = False
-        self.advertisementsSignals = False
-        self.serviceBrakeSignal = False
-        self.emergencyBrakeSignal = False
-        
-        
-
-        self.occupancy = [True, False, True, False]
-
-        self.pb = QPushButton("EMIT", self)
-        self.pb.setGeometry(125, 100, 150, 50)
-        self.pb.clicked.connect(self.emit)
-        self.setWindowTitle("Signal Sender")
-        self.setGeometry(100, 100, 400, 600)
-        
-        self.show()
+        self.temperatureSignal = [72.0]
+        self.announcementsSignal = [False]
+        self.advertisementsSignals = [False]
+        self.serviceBrakeSignal = [False]
+        self.emergencyBrakeSignal = [False]
     
     def emit(self):
         print("Emitting From Signal Sender")
-        self.signals.occupancySignal.emit(self.occupancy)
+        self.signals.powerSignal.emit(self.powerSignal)
+        self.signals.lightSignal.emit(self.lightSignal)
+        self.signals.doorSignal.emit(self.doorSignal)
+        self.signals.temperatureSignal.emit(self.temperatureSignal)
+        self.signals.announcementsSignal.emit(self.announcementsSignal)
+        self.signals.advertisementsSignals.emit(self.advertisementsSignals)
+        self.signals.serviceBrakeSignal.emit(self.serviceBrakeSignal)
+        self.signals.emergencyBrakeSignal.emit(self.emergencyBrakeSignal)
+        

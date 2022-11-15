@@ -37,15 +37,23 @@ from trainmodel_ui import TrainModel
 sys.path.append("../SystemSignals") 
 from Signals import Signals
 
+# Train Controller IMPORTS
+sys.path.append("../trainController_sw/")
+from trainControllerSoftware_MainWindow import Ui_TrainControllerSW_MainWindow
+
 class PittsburghLightRail():
     def __init__(self):
         self.signals    = Signals()
         self.trackModel = TrackModel(self.signals)
         self.CTCOffice = CTCOffice(self.signals)
+        #self.trainController = Ui_TrainControllerSW_MainWindow(self.signals)
 
         #train model
-        file = r"C:\Users\achar\OneDrive\Desktop\fall_2022\trains\ECE_1140_TRAINS\train_model\train.ui"
-        self.trainModel = TrainModel(file, self.signals)
+        file = r"C:\Users\12159\Documents\GitHub\ECE_1140_TRAINS\train_model\train.ui"
+        self.trainModel = TrainModel(file)
+        
+
+        
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
