@@ -19,13 +19,17 @@ sys.path.append("..\..\SystemSignals") # tell interpreter where to look for mode
 from Signals import Signals
 
 class signalTestMain(QMainWindow):
+    '''
+    Class Description here
+    '''
     def __init__(self):
         super().__init__()
         self.signals         = Signals()
         self.TrackModelUI    = TrackModel(self.signals)
         self.occupancySender = SendOccupancy(self.signals)
 
-App = QApplication(sys.argv)
-x   = signalTestMain()
+if __name__ == '__main__':
+    App = QApplication(sys.argv)
+    x   = signalTestMain()
 
-sys.exit(App.exec())
+    sys.exit(App.exec())
