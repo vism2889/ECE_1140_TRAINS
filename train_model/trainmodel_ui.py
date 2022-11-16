@@ -36,6 +36,11 @@ class TrainModel(QtWidgets.QMainWindow):
         self.last_update = 0
         self.UI()
         self.show()
+        self.signals.trackBlocksToTrainModelSignal.connect(self.set_blocks)
+
+    def set_blocks(self,msg):
+        print('got blocks: ', msg[1])
+        self.t.pm.glBlockMOdels = msg[1]
 
     def dispatch(self, msg):
         print(f'Dispatched, message: {msg}')
@@ -55,6 +60,7 @@ class TrainModel(QtWidgets.QMainWindow):
         self.t.pm.power = msg['power']
 
     def UI(self):
+        
         self.signals.dispatchTrainSignal.connect(self.dispatch)
         self.signals.powerSignal.connect(self.curr_t_power)
         # if sys.argv[1] == 'user':
