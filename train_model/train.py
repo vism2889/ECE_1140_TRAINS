@@ -230,7 +230,6 @@ class Train():
 
         #dispatch
         self.dispatched = False
-        self.speed_limit = 0
         #Failure States
         self.brake_failure = False
         self.signal_pickup_failure = False
@@ -241,43 +240,50 @@ class Train():
         self.line = 'blue'
         
         #Brake Values
-        self.e_brake = 'Off'
-        self.service_brake = 'Off'
+        self.e_brake = False
+        self.service_brake = False
 
         self.curr_power = 0
         self.curr_speed = 0
-        self.cmd_speed = 0
+        self.cmd_speed = 30.22
 
 
-        self.int_lights = 'ON'
-        self.ext_lights = 'ON'
+        self.int_lights = False
+        self.ext_lights = False
         self.crew_count = 0
         self.curr_speed = self.pm.curr_speed
         self.passenger_count = 0
         self.temperature = 0
-        self.left_doors = 'Closed'
-        self.right_doors = 'Closed'
+        self.left_doors = False
+        self.right_doors = False
+        self.announcements = False
 
         self.last_station = 'Pitt'
         self.next_station = 'Phil'
 
-        self.authority = []
+        self.authority = [False,False,False,False,False,True,False,False]
         self.grade = 0
         self.switch = 0
+
+        currentTime = time.time() * 10
         
     # def launch_ui(self):
     #     app = QtWidgets.QApplication(sys.argv)
     #     window = TrainModel(self)
     #     app.exec_()
-          
+    def get_temperature(self):
+        return self.temperature
+
+    def get_int_light_state(self):
+        return self.int
 
     def e_brake_func(self):
-        if self.e_brake == 'On' and self.pm.curr_vel > 0:
+        if self.e_brake == True and self.pm.curr_vel > 0:
             self.pm.e_brake(time.time())
     
     def serv_brake_func(self):
         print('inside service brake')
-        if self.service_brake == 'On' and self.pm.curr_vel > 0:
+        if self.service_brake == True and self.pm.curr_vel > 0:
             self.pm.serv_brake(time.time())
 
     def dispatch(self):
@@ -296,9 +302,9 @@ class Train():
                 return 
         
         if(self.dispatched):
-            if self.service_brake == 'On' and self.pm.curr_vel > 0:
+            if self.service_brake == True and self.pm.curr_vel > 0:
                 self.serv_brake_func()
-            elif self.e_brake == 'On' and self.pm.curr_vel>0:
+            elif self.e_brake == True and self.pm.curr_vel>0:
                 self.e_brake_func()
             else:
                 self.pm.setPower(self.curr_power, time.time() )
@@ -306,13 +312,13 @@ class Train():
                 print('\nTrain Model Object Values')
                 print(f'time_elapsed: {self.pm.elapsed_time}')
                 print(f'Current Power: {self.curr_power}')
-                print(f'Previous Vel:{self.pm.prev_vel}')
-                print(f'Force: {self.pm.force}')
-                print(f'Previous Accel:{self.pm.prev_accel}')
-                print(f'Current Accel:{self.pm.curr_accel}')
+                # print(f'Previous Vel:{self.pm.prev_vel}')
+                # print(f'Force: {self.pm.force}')
+                # print(f'Previous Accel:{self.pm.prev_accel}')
+                # print(f'Current Accel:{self.pm.curr_accel}')
                 print(f'Current_Vel: {self.pm.curr_vel}')
                 print(f'Current Speed: {self.pm.curr_speed} mph')
-                print(f'Current Position: {self.pm.curr_pos} m \n')
+                # print(f'Current Position: {self.pm.curr_pos} m \n')
             
                 
             
