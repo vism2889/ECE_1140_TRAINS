@@ -10,6 +10,9 @@
 ##############################################################################
 
 class TrackSection:
+    '''
+    Class Description here
+    '''
     def __init__(self, pName):
         self.name       = pName
         self.blocks     = []

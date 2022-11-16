@@ -10,6 +10,9 @@
 ##############################################################################
 
 class TrackLine:
+    '''
+    Class Description here
+    '''
     def __init__(self, pName):
         self.name         = pName
         self.sections     = []
