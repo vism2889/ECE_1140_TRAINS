@@ -46,10 +46,10 @@ class PointMassModel():
 
         self._td = TrainData()
         
-        self.curr_block = 0
+        
 
         #self.blocks          = [i for i in range(150)]
-
+        self.curr_block = 0
         sec1 = [i for i in range(63, 101)]
         sec2 = [i for i in range(85, 76, -1)]
         sec3 = [i for i in range(101, 151)]
@@ -57,9 +57,9 @@ class PointMassModel():
         sec5 = [i for i in range(13, 58)]
 
         self.blocks = sec1 + sec2 + sec3 + sec4 + sec5
+        self.blockLens = [random.randint(10,25) for i in range(len(self.blocks))]        
+        self.occ_list = [0 for i in range(150)]
 
-        self.blockLens       = [random.randint(10,25) for i in range(150)]        
-        self.occ_list = [0 for i in range(len(self.blocks))]
 
         #time independent values
         self.power = 0
@@ -211,17 +211,25 @@ class PointMassModel():
         self.curr_speed = round(self.curr_vel * (1/1000) * (0.62) * (3600))
     
     def calcPos(self):
-        self.occ_list[self.curr_block] = 1
+        
+        #position calculation
         self.prev_pos = self.curr_pos
         self.curr_pos = self.prev_pos + (self.elapsed_time/2)*(self.prev_vel +self.curr_vel)
 
         if self.curr_pos >= self.blockLens[self.curr_block]:
-            self.occ_list[self.curr_block] = 0
+            self.occ_list[self.occ_index] = 0
+
+            #resetting position
             self.curr_pos = 0
             self.prev_pos = 0
+
+            #incrementing curr_block
             self.curr_block += 1
-            self.occ_list[self.curr_block] = 1
-        pass
+        
+        self.occ_index = self.blocks[self.curr_block]
+        self.occ_list[self.occ_index] = 1
+        
+        
 
 
         
