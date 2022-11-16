@@ -20,6 +20,10 @@ class Signals(QWidget):
     maintenanceSignal            = QtCore.pyqtSignal(list) # List of booleans, length of a single trackline
     trackFailuresSignal          = QtCore.pyqtSignal(list) # List of booleans, length of a single trackline
     lineSignal                   = QtCore.pyqtSignal(str)  # String Name of trackline
+    blockFailures = QtCore.pyqtSignal(list) # List of length N where N is the number of blocks in the track
+                                            ## Track Failure = 0x01, Circuit Failure = 0x02, Power Failure = 0x04 
+                                            #   - any combination of the three should be logically OR'd together (i.e. TF + CF = 0x03)
+
     # Above could be a single list signal formatted as below: 
     # ["TrackLineName", [lineOccupancy], [lineSwitchStates], [lineMaintenance], [lineFailures]]
 
@@ -27,13 +31,20 @@ class Signals(QWidget):
     # CTC Office Signals
     dispatchTrainSignal      = QtCore.pyqtSignal(list)
     suggestedSpeedSignal     = QtCore.pyqtSignal(list)
+    
+    # Wayside Controller Signals
+    switchState = QtCore.pyqtSignal(list) # List of length two indicating a block and it's switch state [block #, boolean state]
+    crossingState = QtCore.pyqtSignal(list) # List of length two indicating a block and it's crossing state [block #, boolean state]
+    blockFailures = QtCore.pyqtSignal(list) # List of length N where N is the number of blocks in the track
+                                            ## Track Failure = 0x01, Circuit Failure = 0x02, Power Failure = 0x04 
+                                            #   - any combination of the three should be logically OR'd together (i.e. TF + CF = 0x03)
+    waysideAuthority = QtCore.pyqtSignal(list) # List of variable length N. Each index holds a block number identifying that block as a "do not pass" mark
 
     # Train Model Signals
     blockListSignal          = QtCore.pyqtSignal(list)
     blockLengthSignal        = QtCore.pyqtSignal(list)
     gradeSignal              = QtCore.pyqtSignal(list)
 
-    # Wayside Controller Signals
 
     # Train Controller (SW) Inputs Signals
     authoritySignal          = QtCore.pyqtSignal(list)
