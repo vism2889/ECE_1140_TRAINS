@@ -14,43 +14,42 @@ class DispatchPopUp(object):
         self.signals = signals
 
     def setupUi(self, dispatchPopUp, redLineStations, greenLineStations, redLineTrains, greenLineTrains):
-        dispatchPopUp.setGeometry(450, 50, 150, 200)
+        dispatchPopUp.setGeometry(400, 50, 200, 250)
         self.trainNameEntry = QtWidgets.QLineEdit(dispatchPopUp)
         self.trainNameEntry.setGeometry(QtCore.QRect(20, 10, 100, 21))
+
+        self.redLineStations = redLineStations
+        self.greenLineStations = greenLineStations
+        self.redLineTrains = redLineTrains
+        self.greenLineTrains = greenLineTrains
+
         self.lineSelection = QtWidgets.QComboBox(dispatchPopUp)
         self.lineSelection.setGeometry(QtCore.QRect(20, 40, 100, 23))
         self.lineSelection.addItem("")
         self.lineSelection.addItem("")
-        self.stationList = QtWidgets.QListWidget(dispatchPopUp)
-        self.stationList.setGeometry(QtCore.QRect(20, 70, 111, 71))
-        self.stationList.setMouseTracking(True)
-        self.stationList.setSelectionRectVisible(True)
-        self.stationList.setSelectionMode(QAbstractItemView.MultiSelection)
+
+        self.stationTable = QtWidgets.QTableWidget(dispatchPopUp)
+        self.stationTable.setGeometry(20,70,150,130)
+        self.stationTable.setMouseTracking(True)
+        self.stationTable.setSelectionMode(QAbstractItemView.MultiSelection)
+        self.stationTable.setRowCount(len(self.redLineStations))
+        self.stationTable.setColumnCount(2)
+        self.stationTable.setColumnWidth(1, 12)
+        self.stationTable.horizontalHeader().hide()
+        self.stationTable.verticalHeader().hide()
+
         self.dispatch = QtWidgets.QPushButton(dispatchPopUp)
-        self.dispatch.setGeometry(QtCore.QRect(20, 150, 100, 31))
-        self.redLineStations = redLineStations
-        self.greenLineStations = greenLineStations
-        self.lineSelection.activated.connect(self.updateDestinationList)
-        self.dispatch.clicked.connect(self.dispatchTrain)
-        self.redLineTrains = redLineTrains
-        self.greenLineTrains = greenLineTrains
-
-
-        # add items to destinationList
-        for key in self.redLineStations.keys():
-            item = QtWidgets.QListWidgetItem()
-            self.stationList.addItem(item)
+        self.dispatch.setGeometry(QtCore.QRect(20, 210, 100, 25))
 
         self.retranslateUi()
         QtCore.QMetaObject.connectSlotsByName(dispatchPopUp)
+        self.lineSelection.activated.connect(self.updateDestinationList)
+        self.dispatch.clicked.connect(self.dispatchTrain)
 
     def retranslateUi(self):
         _translate = QtCore.QCoreApplication.translate
         self.lineSelection.setItemText(0, _translate("MainWindow", "Red Line"))
         self.lineSelection.setItemText(1, _translate("MainWindow", "Green Line"))
-        __sortingEnabled = self.stationList.isSortingEnabled()
-        self.stationList.setSortingEnabled(False)
-        self.stationList.setSortingEnabled(__sortingEnabled)
         self.dispatch.setText(_translate("MainWindow", "Dispatch"))
         self.trainNameEntry.clear()
 
@@ -58,30 +57,49 @@ class DispatchPopUp(object):
         self.index = 0
         self.destinationList = self.redLineStations
         for key in self.redLineStations.keys():
-            item = self.stationList.item(self.index)
+            item = QtWidgets.QTableWidgetItem()
             item.setText(_translate("MainWindow", key))
+            self.stationTable.setItem(self.index, 0, item)
+            spinBox = QtWidgets.QSpinBox()
+            spinBox.setRange(3,5)
+            self.stationTable.setCellWidget(self.index, 1, spinBox)
             self.index += 1
 
     def updateDestinationList(self):
         self.currentLine = self.lineSelection.currentText()
-        self.stationList.clear()
+        self.stationTable.clear()
 
         if (self.currentLine == "Red Line"):
             self.destinationList = self.redLineStations
+            self.stationTable.setRowCount(len(self.redLineStations))
+
+            self.index = 0
             for key in self.redLineStations.keys():
-                item = QtWidgets.QListWidgetItem()
+                item = QtWidgets.QTableWidgetItem()
                 item.setText(key)
-                self.stationList.addItem(item)
+                self.stationTable.setItem(self.index, 0, item)
+                spinBox = QtWidgets.QSpinBox()
+                spinBox.setRange(3,5)
+                self.stationTable.setCellWidget(self.index, 1, spinBox)
+                self.index += 1
+
         elif (self.currentLine == "Green Line"):
             self.destinationList = self.greenLineStations
+            self.stationTable.setRowCount(len(self.greenLineStations))
+            
+            self.index = 0
             for key in self.greenLineStations.keys():
-                item = QtWidgets.QListWidgetItem()
+                item = QtWidgets.QTableWidgetItem()
                 item.setText(key)
-                self.stationList.addItem(item)
+                self.stationTable.setItem(self.index, 0, item)
+                spinBox = QtWidgets.QSpinBox()
+                spinBox.setRange(3,5)
+                self.stationTable.setCellWidget(self.index, 1, spinBox)
+                self.index += 1
 
     def dispatchTrain(self):
         self.currentLine = self.lineSelection.currentText()
-        self.selectedDestinations = self.stationList.selectedItems()
+        self.selectedDestinations = self.stationTable.selectedItems()
         self.trainName = self.trainNameEntry.text()
 
         if (self.currentLine == "Red Line"):

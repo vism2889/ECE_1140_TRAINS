@@ -344,7 +344,7 @@ class TrackModel(QWidget):
     
     def getOccupancy(self, occupancy):
         self.occupancy = occupancy
-        print("GUI OCCUPANCY", self.occupancy)
+        # print("GUI OCCUPANCY", self.occupancy)
         self.updateBlockCall()
 
     def updateBlockList(self, line):

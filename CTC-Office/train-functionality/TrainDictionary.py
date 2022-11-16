@@ -33,6 +33,6 @@ class TrainDictionary:
 
     def toggleDestination(self, name, destination, scheduled):
         if scheduled:
-            self.backLog[name].destinations[destination][0] = not self.backLog[name].destinations[destination][0]
+            self.backLog[name].destinations[destination] = not self.backLog[name].destinations[destination]
         else:
-            self.trainList[name].destinations[destination][0] = not self.trainList[name].destinations[destination][0]
+            self.trainList[name].destinations[destination] = not self.trainList[name].destinations[destination]
