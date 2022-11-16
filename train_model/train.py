@@ -47,7 +47,17 @@ class PointMassModel():
         self._td = TrainData()
         
         self.curr_block = 0
-        self.blocks          = [i for i in range(150)]
+
+        #self.blocks          = [i for i in range(150)]
+
+        sec1 = [i for i in range(63, 101)]
+        sec2 = [i for i in range(85, 76, -1)]
+        sec3 = [i for i in range(101, 151)]
+        sec4 = [i for i in range(29, 0, -1)]
+        sec5 = [i for i in range(13, 58)]
+
+        self.blocks = sec1 + sec2 + sec3 + sec4 + sec5
+
         self.blockLens       = [random.randint(10,25) for i in range(150)]        
         self.occ_list = [0 for i in range(len(self.blocks))]
 
