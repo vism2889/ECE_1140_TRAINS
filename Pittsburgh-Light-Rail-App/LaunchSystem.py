@@ -54,8 +54,9 @@ class PittsburghLightRail():
         file = f'{os.getcwd()}/train.ui'
         self.trainModel = TrainModel(file, self.signals)
         self.globalOcc = []
-        self.signals.globalOccupancyFromTrackModelSignal.connect(self.getOcc)
+        self.signals.globalOccupancyFromTrackModelSignal.connect(self.getOcc) # just for testing
         
+    # just for testing
     def getOcc(self, occ):
         self.globalOcc = occ
         print("Master Luanch Global Occ:", self.globalOcc)
