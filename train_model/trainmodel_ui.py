@@ -10,7 +10,7 @@
 # from train import Train
 import sys
 
-from PyQt5 import QtWidgets, uic
+from PyQt5 import QtWidgets, uic, QtCore
 from PyQt5.QtCore import QObject, QThread, pyqtSignal, pyqtSlot
 # from DispatchPopUp import DispatchPopUp
 # from MiniOffice import Ui_MainWindow
@@ -19,7 +19,6 @@ import sys
 import os
 import time
 from train import Train
-sys.path.append('../train_model/')
 
 
 
@@ -34,8 +33,14 @@ class TrainModel(QtWidgets.QMainWindow):
         uic.loadUi(ui, self)
         self.t = Train()
         self.signals = signals
+        self.last_update = 0
         self.UI()
         self.show()
+        self.signals.trackBlocksToTrainModelSignal.connect(self.set_blocks)
+
+    def set_blocks(self,msg):
+        print('got blocks: ', msg[1])
+        self.t.pm.glBlockMOdels = msg[1]
 
     def dispatch(self, msg):
         print(f'Dispatched, message: {msg}')
@@ -45,6 +50,7 @@ class TrainModel(QtWidgets.QMainWindow):
         self.t.line = msg[1]
         print(f'------------DISPATCHED!!!!!!!!!!!------------------')
         self.t.dispatch()
+        self.last_update = time.time()
 
     def curr_t_power(self, msg):
         # print(f'Message is:{msg}')
@@ -54,6 +60,7 @@ class TrainModel(QtWidgets.QMainWindow):
         self.t.pm.power = msg['power']
 
     def UI(self):
+        
         self.signals.dispatchTrainSignal.connect(self.dispatch)
         self.signals.powerSignal.connect(self.curr_t_power)
         # if sys.argv[1] == 'user':
@@ -75,16 +82,19 @@ class TrainModel(QtWidgets.QMainWindow):
 
         self.int_lights_disp.setText(self.t.int_lights)
 
-        #Setting up Thread and worker to continuously update labels
-        self.disp_thread = QThread()
-        self.disp_worker = DisplayWorker(self)
-        self.disp_worker.moveToThread(self.disp_thread)
+        self.timer = QtCore.QTimer()
+        self.timer.timeout.connect(self.update_display)
+        self.timer.start(100)
 
+        #Setting up Thread and worker to continuously update labels
+        # self.disp_thread = QThread()
+        # self.disp_worker = DisplayWorker(self)
+        # self.disp_worker.moveToThread(self.disp_thread)
         #connecting signals and slots
-        self.disp_thread.started.connect(self.disp_worker.run)
+        # self.disp_thread.started.connect(self.disp_worker.run)
         # self.disp_worker.finished.connect(self.disp_thread.quit)
         
-        self.disp_thread.start()
+        # self.disp_thread.start()
     
     def train_eng_failure(self):
         if self.t.train_engine_failure:
@@ -116,6 +126,54 @@ class TrainModel(QtWidgets.QMainWindow):
             self.t.brake_failure = True
             self.brake_fail.setStyleSheet("background-color: red")
     
+    def update_display(self):
+        
+        #lights
+        self.int_lights_disp.setText(self.t.int_lights)
+        self.ext_lights_disp.setText(self.t.ext_lights)
+        
+        #power
+        self.cmd_pwr_disp.setText(f'{round(float(self.t.pm.power)/1000)} kW')
+        # self.qt.t.set_power(round(float(self.qt.t.curr_power)/1000))
+        self.cmd_speed_disp.setText(f'{self.t.cmd_speed} mph')
+        
+        self.curr_speed_disp.setText(f'{self.t.pm.curr_speed} mph')
+
+        #temperature
+        self.temp_disp.setText(f'{self.t.temperature} F')
+
+        #doors
+        
+        self.left_doors_disp.setText(self.t.left_doors)
+        self.right_doors_disp.setText(self.t.right_doors)
+        
+        
+        self.pass_disp.setText(f'{self.t.passenger_count}')
+        self.crew_disp.setText(f'{self.t.crew_count}')
+
+        #critical info
+        self.serv_brake_disp.setText(f'{self.t.service_brake}')
+        self.ebrake_disp.setText(f'{self.t.e_brake}')
+        self.auth_disp.setText(f'{self.t.authority}')
+        self.grade_disp.setText(f'{self.t.grade} %')
+        self.switch_disp.setText(f'{self.t.switch} miles')
+
+        #stations
+        self.last_st_disp.setText(f'{self.t.last_station}')
+        self.next_st_disp.setText(f'{self.t.next_station}')
+        
+        if time.time()-self.last_update > 0.5:
+            if self.t.e_brake == 'Off' and self.t.service_brake == 'Off' and self.t.dispatched:
+                # print('Setting Train Power')
+                self.t.set_power(self.t.pm.power)
+                self.signals.currentSpeedOfTrainModel.emit(self.t.pm.curr_vel)
+                print(f'Occ_list is: {self.t.pm.occ_list}')
+                # print(f'Curr Pos in block {self.qt.t.pm.curr_block} is: {self.qt.t.pm.curr_pos}')
+                self.signals.occupancyFromTrainSignal.emit(self.t.pm.occ_list)
+                self.signals.commandedSpeedSignal.emit(self.t.pm.speed_limit)
+                self.last_update = time.time()
+
+
     def update_model(self, dict):
         for key in dict:
             if key == 'signal_pickup_failure':
@@ -203,59 +261,59 @@ class Ebrake(QObject):
         print('train stopped')
         self.stopped.emit()
 
-class DisplayWorker(QObject):
-    progress = pyqtSignal(QObject)
+# class DisplayWorker(QObject):
+#     progress = pyqtSignal(QObject)
     
-    def __init__(self, qt):
-        super(DisplayWorker, self).__init__()
-        self.qt = qt
+#     def __init__(self, qt):
+#         super(DisplayWorker, self).__init__()
+#         self.qt = qt
 
-    def run(self):
-        last_update = time.time()
-        while True:
-            #lights
-            self.qt.int_lights_disp.setText(self.qt.t.int_lights)
-            self.qt.ext_lights_disp.setText(self.qt.t.ext_lights)
+#     def run(self):
+#         last_update = time.time()
+#         while True:
+#             #lights
+#             self.qt.int_lights_disp.setText(self.qt.t.int_lights)
+#             self.qt.ext_lights_disp.setText(self.qt.t.ext_lights)
            
-            #power
-            self.qt.cmd_pwr_disp.setText(f'{round(float(self.qt.t.pm.power)/1000)} kW')
-            # self.qt.t.set_power(round(float(self.qt.t.curr_power)/1000))
-            self.qt.cmd_speed_disp.setText(f'{self.qt.t.cmd_speed} mph')
+#             #power
+#             self.qt.cmd_pwr_disp.setText(f'{round(float(self.qt.t.pm.power)/1000)} kW')
+#             # self.qt.t.set_power(round(float(self.qt.t.curr_power)/1000))
+#             self.qt.cmd_speed_disp.setText(f'{self.qt.t.cmd_speed} mph')
             
-            self.qt.curr_speed_disp.setText(f'{self.qt.t.pm.curr_speed} mph')
+#             self.qt.curr_speed_disp.setText(f'{self.qt.t.pm.curr_speed} mph')
 
-            #temperature
-            self.qt.temp_disp.setText(f'{self.qt.t.temperature} F')
+#             #temperature
+#             self.qt.temp_disp.setText(f'{self.qt.t.temperature} F')
 
-            #doors
+#             #doors
             
-            self.qt.left_doors_disp.setText(self.qt.t.left_doors)
-            self.qt.right_doors_disp.setText(self.qt.t.right_doors)
+#             self.qt.left_doors_disp.setText(self.qt.t.left_doors)
+#             self.qt.right_doors_disp.setText(self.qt.t.right_doors)
             
             
-            self.qt.pass_disp.setText(f'{self.qt.t.passenger_count}')
-            self.qt.crew_disp.setText(f'{self.qt.t.crew_count}')
+#             self.qt.pass_disp.setText(f'{self.qt.t.passenger_count}')
+#             self.qt.crew_disp.setText(f'{self.qt.t.crew_count}')
 
-            #critical info
-            self.qt.serv_brake_disp.setText(f'{self.qt.t.service_brake}')
-            self.qt.ebrake_disp.setText(f'{self.qt.t.e_brake}')
-            self.qt.auth_disp.setText(f'{self.qt.t.authority}')
-            self.qt.grade_disp.setText(f'{self.qt.t.grade} %')
-            self.qt.switch_disp.setText(f'{self.qt.t.switch} miles')
+#             #critical info
+#             self.qt.serv_brake_disp.setText(f'{self.qt.t.service_brake}')
+#             self.qt.ebrake_disp.setText(f'{self.qt.t.e_brake}')
+#             self.qt.auth_disp.setText(f'{self.qt.t.authority}')
+#             self.qt.grade_disp.setText(f'{self.qt.t.grade} %')
+#             self.qt.switch_disp.setText(f'{self.qt.t.switch} miles')
 
-            #stations
-            self.qt.last_st_disp.setText(f'{self.qt.t.last_station}')
-            self.qt.next_st_disp.setText(f'{self.qt.t.next_station}')
+#             #stations
+#             self.qt.last_st_disp.setText(f'{self.qt.t.last_station}')
+#             self.qt.next_st_disp.setText(f'{self.qt.t.next_station}')
             
-            if time.time()-last_update > 1:
-                if self.qt.t.e_brake == 'Off' and self.qt.t.service_brake == 'Off' and self.qt.t.dispatched:
-                    # print('Setting Train Power')
-                    self.qt.t.set_power(self.qt.t.pm.power)
-                    self.qt.signals.currentSpeedOfTrainModel.emit(self.qt.t.pm.curr_vel)
-                    # print(f'Occ_list is: {self.qt.t.pm.occ_list}')
-                    # print(f'Curr Pos in block {self.qt.t.pm.curr_block} is: {self.qt.t.pm.curr_pos}')
-                    self.qt.signals.occupancySignal.emit(self.qt.t.pm.occ_list)
-                    last_update = time.time()
+#             if time.time()-last_update > 1:
+#                 if self.qt.t.e_brake == 'Off' and self.qt.t.service_brake == 'Off' and self.qt.t.dispatched:
+#                     # print('Setting Train Power')
+#                     self.qt.t.set_power(self.qt.t.pm.power)
+#                     self.qt.signals.currentSpeedOfTrainModel.emit(self.qt.t.pm.curr_vel)
+#                     print(f'Occ_list is: {self.qt.t.pm.occ_list}')
+#                     # print(f'Curr Pos in block {self.qt.t.pm.curr_block} is: {self.qt.t.pm.curr_pos}')
+#                     self.qt.signals.occupancyFromTrainSignal.emit(self.qt.t.pm.occ_list)
+#                     last_update = time.time()
 
 
 
@@ -332,13 +390,7 @@ class TestWindow(QtWidgets.QMainWindow):
 
 # if __name__ == "__main__":
 #     app = QtWidgets.QApplication(sys.argv)
-#     t =  Train()
-
-#     layoutFile = "Track_Layout_PGH_Light_Rail.csv"
-#     trackLayout = LayoutParser(layoutFile)
-#     redLineBlocks, greenLineBlocks = trackLayout.process()
-#     MainWindow = QtWidgets.QWidget()
-#     ctc = Ui_MainWindow()
-
-#     window = TrainModel(t, ctc)
+#     signals = Signals()
+#     file = r"C:\Users\achar\OneDrive\Desktop\fall_2022\trains\ECE_1140_TRAINS\train_model\train.ui"
+#     window = TrainModel(file, signals)
 #     app.exec_()

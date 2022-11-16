@@ -24,6 +24,9 @@ class CTCOffice(QWidget):
         self.setupUi()
         self.signals = signals
 
+        # connect to necessary signals
+        self.signals.globalOccupancyFromTrackModelSignal.connect(self.readOccupancySignal)
+
     def setupLayout(self):
         # getting lists of blocks
         layoutFile = 'Track_Layout_PGH_Light_Rail.csv'
@@ -74,6 +77,10 @@ class CTCOffice(QWidget):
         self.redLineBlockTable.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.redLineBlockTable.itemClicked.connect(self.redBlockSelectionChanged)
         self.selectedBlockTable = self.redLineBlockTable
+
+        for row in range(0,self.redLineBlockTable.rowCount()):
+            self.redLineBlockTable.setRowHeight(row, 10)
+
         self.redLineBlockTable.show()
 
         self.redLineTrainTable = QTableWidget(self)
@@ -104,6 +111,10 @@ class CTCOffice(QWidget):
         self.greenLineBlockTable.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.greenLineBlockTable.itemClicked.connect(self.greenBlockSelectionChanged)
         self.greenLineBlockTable.clicked.connect(self.greenBlockSelectionChanged)
+
+        for row in range(0,self.greenLineBlockTable.rowCount()):
+            self.greenLineBlockTable.setRowHeight(row, 10)
+            
         self.greenLineBlockTable.show()
 
         self.greenLineTrainTable = QTableWidget(self)
@@ -181,6 +192,7 @@ class CTCOffice(QWidget):
         self.timer.timeout.connect(self.updateRedLineBacklog)
         self.timer.timeout.connect(self.updateGreenLineBacklog)
         self.timer.timeout.connect(self.checkForScheduledTrains)
+        self.timer.timeout.connect(self.updateAllOccupancies)
         self.timer.start(100)
         self.show()
 
@@ -336,6 +348,13 @@ class CTCOffice(QWidget):
         self.updateFaultState()
         self.updateMaintenanceState()
 
+    def updateAllOccupancies(self):
+        for key in self.greenLineBlocks.keys():
+            if self.greenLineBlocks.getOccupancy(key):
+                self.greenLineBlockTable.item(int(key)-1,0).setBackground(QtGui.QColor(0,255,0))
+            else:
+                self.greenLineBlockTable.item(int(key)-1,0).setBackground(QtGui.QColor(255,255,255))       
+
     def updateOccupancy(self):
         item = QtWidgets.QTableWidgetItem()
         state = self.selectedBlockLine.getOccupancy(str(self.selectedBlock))
@@ -368,7 +387,6 @@ class CTCOffice(QWidget):
 
     def toggleMaintenance(self):
         self.selectedBlockLine.toggleMaintenanceState(str(self.selectedBlock))
-        self.publishTrackMsg("red")
 
     def launchDispatchPopUp(self):
         self.dispatchWidget = QtWidgets.QWidget()
@@ -401,9 +419,10 @@ class CTCOffice(QWidget):
                self.selectedTrainLine.toggleDestination(self.selectedTrain, destination, False)
         self.updateDestinationTable()
 
-    def occupancyCallBack(self, msg):
-        for key in self.greenLineBlocks.keys():
-            self.greenLineBlocks.setOccupancy(key, msg[int(key-1)])
+    def readOccupancySignal(self, occupancySignal):
+        for block in range(0, len(occupancySignal)):
+            self.greenLineBlocks.setOccupancy(str(block+1), occupancySignal[block])
+            
 
 if __name__ == "__main__":
     import sys

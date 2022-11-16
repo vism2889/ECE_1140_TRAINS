@@ -101,11 +101,22 @@ class DispatchPopUp(object):
         self.currentLine = self.lineSelection.currentText()
         self.selectedDestinations = self.stationTable.selectedItems()
         self.trainName = self.trainNameEntry.text()
+        self.totalTTS = 0
+
+        for row in range(0,self.stationTable.rowCount()):
+            spinBox = self.stationTable.cellWidget(row, 1)
+            TTS = spinBox.value()
+            self.totalTTS += int(TTS)
+            print(self.totalTTS)
 
         if (self.currentLine == "Red Line"):
             self.redLineTrains.addTrain(self.trainName, self.destinationList, 0, 0)
+            self.redLineTrains.setSuggestedSpeed(self.trainName, self.totalTTS)
+            self.suggestedSpeed = self.redLineTrains.getSuggestedSpeed(self.trainName)
         elif (self.currentLine == "Green Line"):
             self.greenLineTrains.addTrain(self.trainName, self.destinationList, 0, 0)
+            self.greenLineTrains.setSuggestedSpeed(self.trainName, self.totalTTS)
+            self.suggestedSpeed = self.greenLineTrains.getSuggestedSpeed(self.trainName)
 
         # add dispatch destinations to list
         for destination in self.selectedDestinations:
@@ -114,5 +125,5 @@ class DispatchPopUp(object):
             elif (self.currentLine == "Green Line"):
                 self.greenLineTrains.toggleDestination(self.trainName, destination.text(), False)
 
-        self.signals.dispatchTrainSignal.emit([self.trainName, self.currentLine])
+        self.signals.dispatchTrainSignal.emit([self.trainName, self.currentLine, self.suggestedSpeed])
 
