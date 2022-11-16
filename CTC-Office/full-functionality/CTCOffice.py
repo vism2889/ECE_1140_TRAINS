@@ -401,6 +401,9 @@ class CTCOffice(QWidget):
                self.selectedTrainLine.toggleDestination(self.selectedTrain, destination, False)
         self.updateDestinationTable()
 
+    def occupancyCallBack(self, msg):
+        for key in self.greenLineBlocks.keys():
+            self.greenLineBlocks.setOccupancy(key, msg[int(key-1)])
 
 if __name__ == "__main__":
     import sys

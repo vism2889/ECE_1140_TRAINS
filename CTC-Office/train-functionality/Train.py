@@ -2,7 +2,7 @@ import sys
 
 class Train:
     
-    def __init__(self, destinations, commandedSpeed, authority):
+    def __init__(self, destinations, suggestedSpeed, authority):
         self.destinations = destinations.copy()
-        self.commandedSpeed = commandedSpeed
+        self.suggestedSpeed = suggestedSpeed
         self.authority = authority
