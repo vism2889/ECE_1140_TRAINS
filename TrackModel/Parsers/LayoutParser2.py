@@ -11,26 +11,34 @@
 #
 ##############################################################################
 
-# IMPORTS
+# Python IMPORTS
 import csv
 import sys
-# tell interpreter where to look for model files
-sys.path.insert(0,"../Track-System-Models")
+
+# Dependency Path Links
+sys.path.insert(0,"..\Track-System-Models")
+
+# Developer Imports
 from BlockModel import BlockModel
 from TrackSection import TrackSection
 from TrackLine import TrackLine
 
- 
 class LayoutParser:
-    
+    '''
+    Description Here
+    '''
+
     def __init__(self, pLayoutFile):
+        '''
+        Description Here
+        '''
         self.filename       = pLayoutFile
         self.fields         = [] # Column Names
         self.rows           = [] # Data Rows / Block Information
         
         self.trackLines     = [] 
         self.trackLineNames = [] # Names of all lines for a layout EX: [RED, GREEN]
-        self.currTrackLine = ""
+        self.currTrackLine  = ""
 
         self.sections       = []
         self.sectionNames   = [] # Names of all the sections, of all the track lines
@@ -40,6 +48,9 @@ class LayoutParser:
         self.blockNames     = [] # Names of all the blocks, of all the sections, of all the trackLines
 
     def process(self):
+        '''
+        Description Here
+        '''
         with open(self.filename, 'r') as csvfile:
             print("\tParsing Track Layout File: ", self.filename)
             csvreader   = csv.reader(csvfile)
@@ -56,6 +67,9 @@ class LayoutParser:
         return self.trackLines
 
     def displayData(self):
+        '''
+        Description Here
+        '''
         for trackLine in self.trackLines:
             print("Track Line:", trackLine.name)
             print("Number Sections:", len(trackLine.sections))
@@ -65,16 +79,25 @@ class LayoutParser:
                     print("\t",block.blockNumber, block.section, "Underground:", block.underground, "Station:", block.station, "Switch:",block.switch)
 
     def addTrackLine(self, currTrackLineName):
+        '''
+        Description Here
+        '''
         self.trackLineNames.append(currTrackLineName)
         self.currTrackLine = TrackLine(currTrackLineName)
         self.trackLines.append(self.currTrackLine)
         self.addSections()
 
     def updateTrackLine(self, currTrackLine):
+        '''
+        Description Here
+        '''
         self.addSections()
         return 42
 
     def addSections(self):
+        '''
+        Description Here
+        '''
         for row in self.rows:
             currSectionName = row[1]
             if currSectionName not in self.currTrackLine.sectionNames and self.currTrackLine.name == row[0]:
@@ -83,18 +106,27 @@ class LayoutParser:
                 continue
 
     def addSection(self, currSectionName):
+        '''
+        Description Here
+        '''
         self.currTrackLine.sectionNames.append(currSectionName)
         self.currSection = TrackSection(currSectionName)
         self.currTrackLine.sections.append(self.currSection)
         self.addBlocks()
 
     def addBlocks(self):
+        '''
+        Description Here
+        '''
         for row in self.rows:
             currBlockName = row[2]
             if currBlockName not in self.currSection.blockNames and self.currSection.name == row[1] and self.currTrackLine.name == row[0]:
                 self.addBlock(currBlockName, row)
 
     def addBlock(self, currBlockName, row):
+        '''
+        Description Here
+        '''
         self.currSection.blockNames.append(currBlockName)
         self.currBlock = BlockModel(row[0], row[1], row[2], row[3], 
                                           row[4], row[5], row[6], row[7], 
@@ -104,6 +136,9 @@ class LayoutParser:
         self.currSection.blocks.append(self.currBlock)
     
     def parseInfrastructure(self):
+        '''
+        Description Here
+        '''
         infra = self.currBlock.infrastructure
         if infra != '':
             if 'STATION' in infra:
@@ -132,7 +167,6 @@ def main():
     parser = LayoutParser(vLayout)
     parser.process()
     #parser.displayData()
-    
 
 if __name__ == "__main__":
     main()

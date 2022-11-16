@@ -1,18 +1,11 @@
 import sys
-from train import train
+from TrainDictionary import TrainDictionary
 
-trainList = dict()
+destinations = dict()
+destinations["SWISSVALE"] = False
+destinations["PENN-STATION"] = False
 
-trainList["Train 1"] = train(1, "red")
-trainList["Train 2"] = train(2, "red")
-trainList["Train 3"] = train(3, "red")
+trainList = TrainDictionary
 
-print(trainList["Train 1"].getAuthority())
-
-del trainList["Train 2"]
-
-keys = trainList.keys()
-
-for key in keys:
-    print(key)
+trainList.addTrain("train1", )
 
