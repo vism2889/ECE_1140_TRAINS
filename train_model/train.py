@@ -56,7 +56,7 @@ class PointMassModel():
         self.curr_block = 0
         sec1 = [i for i in range(63, 101)]
         sec2 = [i for i in range(85, 76, -1)]
-        sec3 = [i for i in range(101, 151)]
+        sec3 = [i for i in range(101, 150)]
         sec4 = [i for i in range(29, 0, -1)]
         sec5 = [i for i in range(13, 58)]
 
@@ -95,7 +95,7 @@ class PointMassModel():
             self.prev_time = self.curr_time
             self.curr_time = t
 
-        self.elapsed_time = self.curr_time-self.prev_time
+        self.elapsed_time = (self.curr_time-self.prev_time)*500
 
         self.power = power
         
@@ -245,6 +245,9 @@ class PointMassModel():
             #incrementing curr_block
             self.curr_block += 1
         
+        if self.occ_index > 147:
+            print(self.occ_index)
+
         self.occ_index = self.blocks[self.curr_block]
         self.occ_list[self.occ_index] = 1
         
