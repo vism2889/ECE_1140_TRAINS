@@ -31,6 +31,8 @@ class TrackModel(QWidget):
         self.height        = 750
         self.currBlock     = None
 
+
+
         # Layout Information
         self.lineNames     = []    # List of Strings holding line names
         self.lines         = []    # List of TrackLine Objects
@@ -39,7 +41,7 @@ class TrackModel(QWidget):
         self.currLineIndex = None
         self.layoutFile    = None
         self.testList      = []
-        
+        self.signals = None
 
         # System Communication Signals  
         self.occupancy     = [False for i in range(150)] # only Green line for right not
@@ -78,8 +80,6 @@ class TrackModel(QWidget):
         self.bt1.clicked.connect(self.openFileNameDialog)
         # self.center() # Opens UI in the center of the current screen
 
-        
-
         self.blocksLabel = QLabel("TRACK BLOCKS", self)
         self.blocksLabel.setStyleSheet("background-color: cyan; color: black;")
         self.blocksLabel.move(5,150)
@@ -87,7 +87,7 @@ class TrackModel(QWidget):
         self.blockslistwidget = QListWidget(self)
         self.blockslistwidget.move(5,168)
         self.blockslistwidget.resize(100,580)
-        self.blockslistwidget.setStyleSheet("background-color: gray;")
+        self.blockslistwidget.setStyleSheet("background-color: rgb(128, 128, 128);")
 
         self.blockInfoLabel = QLabel("- BLOCK INFORMATION -", self)
         self.blockInfoLabel.setAlignment(QtCore.Qt.AlignCenter)
@@ -112,21 +112,9 @@ class TrackModel(QWidget):
         self.currBlockDisplay.setStyleSheet("background-color: cyan; color: black;")
         self.currBlockDisplay.setFont(QFont('Arial', 20))
 
-        self.trackFault1 = QPushButton("Toggle Track Fault", self)
-        self.trackFault1.move(130, 690)
-        self.trackFault1.resize(100,50)
-        self.trackFault1.setStyleSheet("background-color: orange ; color: black;")
-        self.trackFault1.clicked.connect(self.updateFaults)
-
-        self.trackFault2 = QPushButton("Toggle Power Fault", self)
-        self.trackFault2.move(235, 690)
-        self.trackFault2.resize(100,50)
-        self.trackFault2.setStyleSheet("background-color: orange ; color: black;")
-
-        self.trackFault3 = QPushButton("Toggle Switch Fault", self)
-        self.trackFault3.move(340, 690)
-        self.trackFault3.resize(100,50)
-        self.trackFault3.setStyleSheet("background-color: orange ; color: black;")
+        
+        self.blockFaultIndicator = QLabel('', self)
+        self.blockFaultIndicator.hide()
 
         self.linesLabel = QLabel("TRACK LINES", self)
         self.linesLabel.setStyleSheet("background-color: cyan; color: black;")
@@ -136,10 +124,34 @@ class TrackModel(QWidget):
         self.linelistwidget.move(5,58)
         self.linelistwidget.resize(100,50)
         self.linelistwidget.setStyleSheet("background-color: gray;")
-
+        
+        self.displayFaultButtons()
         self.loadBeaconInfo()
-
         self.show()
+
+    def displayFaultButtons(self):
+        self.trackFault1 = QPushButton("Toggle Track Fault", self)
+        self.trackFault1.move(130, 690)
+        self.trackFault1.resize(100,50)
+        self.trackFault1.setStyleSheet("background-color: orange ; color: black;")
+        self.trackFault1.clicked.connect(lambda : self.updateFaults("Track Fault"))
+
+        self.trackFault2 = QPushButton("Toggle Power Fault", self)
+        self.trackFault2.move(235, 690)
+        self.trackFault2.resize(100,50)
+        self.trackFault2.setStyleSheet("background-color: orange ; color: black;")
+        self.trackFault2.clicked.connect(lambda : self.updateFaults("Power Fault"))
+
+        self.trackFault3 = QPushButton("Toggle Circuit Fault", self)
+        self.trackFault3.move(340, 690)
+        self.trackFault3.resize(100,50)
+        self.trackFault3.setStyleSheet("background-color: orange ; color: black;")
+        self.trackFault3.clicked.connect(lambda : self.updateFaults("Circuit Fault"))
+
+        
+        self.trackFault1.setEnabled(False)
+        self.trackFault2.setEnabled(False)
+        self.trackFault3.setEnabled(False)
 
     def center(self):
         frameGm = self.frameGeometry()
@@ -148,23 +160,30 @@ class TrackModel(QWidget):
         frameGm.moveCenter(centerPoint)
         self.move(frameGm.topLeft())
 
-    def updateFaults(self):
-        print(self.currBlock.faultPresence)
-        if self.currBlock.faultPresence == False:
+    def updateFaults(self, faultName):
+        print(faultName)
+
+        if self.currBlock.faultPresence == False and faultName not in self.currBlock.faultsText:
+            self.currBlock.faultsText = []
             self.currBlock.faultPresence = True
-            self.currBlock.faultsText = "Fault1"
+            self.currBlock.faultsText.append(faultName)
             self.blockslistwidget.item(int(self.currBlock.blockNumber)-1).setBackground(QColor(255,0,0))
             self.updateBlockInfo(self.currBlockIndex)
-
             self.faults[self.currBlockIndex] = 1
-            self.signals.trackFailuresSignal.emit(self.faults)
-        else:
-            self.currBlock.faultPresence = False
-            self.currBlock.faultsText = "None"
-            self.blockslistwidget.item(int(self.currBlock.blockNumber)-1).setBackground(QColor(250,250,250))
+        elif self.currBlock.faultPresence == True and faultName not in self.currBlock.faultsText: 
+            self.currBlock.faultsText.append(faultName)
             self.updateBlockInfo(self.currBlockIndex)
-
+        elif self.currBlock.faultPresence == True and faultName in self.currBlock.faultsText:
+            self.currBlock.faultsText.remove(faultName)
+            self.updateBlockInfo(self.currBlockIndex)
+        if not self.currBlock.faultsText:
+            self.currBlock.faultPresence = False
             self.faults[self.currBlockIndex] = 0
+            self.blockslistwidget.item(int(self.currBlock.blockNumber)-1).setBackground(QColor(128, 128, 128))
+            self.currBlockDisplay.setStyleSheet("background-color: cyan; color: black;")
+        
+        print(self.currBlock.faultPresence)
+        if self.signals:
             self.signals.trackFailuresSignal.emit(self.faults)
 
     def openFileNameDialog(self):
@@ -237,8 +256,9 @@ class TrackModel(QWidget):
                 i+=1
         self.blockslistwidget.itemClicked.connect(self.onClickedBlock)
         self.blocksLoaded = True
-        self.signals.trackBlocksToTrainModelSignal.emit(self.lineBlocks)
-        self.signals.greenLineTrackBlockSignal.emit(self.orderedGreenLineList)
+        if self.signals:
+            self.signals.trackBlocksToTrainModelSignal.emit(self.lineBlocks)
+            self.signals.greenLineTrackBlockSignal.emit(self.orderedGreenLineList)
 
     def updateBlocks(self):
         for i in range(len(self.occupancy)):
@@ -246,8 +266,12 @@ class TrackModel(QWidget):
                 self.blockslistwidget.item(i).setBackground(QColor(255,0,0))
             elif self.occupancy[i] == True:
                 self.blockslistwidget.item(i).setBackground(QColor(200,200,50))
+                if self.currBlockIndex == i: 
+                    self.currBlockDisplay.setStyleSheet("background-color: rgb(200,200,50); color: black;")
             else:
                 self.blockslistwidget.item(i).setBackground(QColor(134, 132, 130))
+
+        self.updateBlockInfo(self.currBlockIndex)
 
     def onClickedLine(self, item):
         currLine = item.text()
@@ -260,9 +284,25 @@ class TrackModel(QWidget):
         self.currBlock      = self.lineBlocks[self.currLineIndex][self.currBlockIndex]
         self.updateBlockInfo(self.currBlockIndex)
         self.currBlockDisplay.setText("BLOCK: "+str(self.currBlock.line)+"-"+str(self.currBlock.section)+"-"+str(self.currBlock.blockNumber))
+        self.trackFault1.setEnabled(True)
+        self.trackFault2.setEnabled(True)
+        self.trackFault3.setEnabled(True)
         
     def updateBlockInfo(self, pCurrBlockIndex):
-        
+        if self.currBlock.faultsText:
+            self.currBlockDisplay.setStyleSheet("background-color: red; color: black;")
+
+            self.blockFaultIndicator.setText(str(self.currBlock.faultsText))
+            
+            self.blockFaultIndicator.show()
+            self.blockFaultIndicator.move(130, 40)
+            self.blockFaultIndicator.resize(300, 20)
+            self.blockFaultIndicator.setStyleSheet("background-color: yellow; color: black;")
+            self.blockFaultIndicator.setFont(QFont('Arial', 10))
+        else:
+            self.currBlockDisplay.setStyleSheet("background-color: cyan; color: black;")
+            self.blockFaultIndicator.hide()
+
         self.blockVallistwidget.clear()
         currBlock = self.lineBlocks[self.currLineIndex][pCurrBlockIndex]
         self.blockVallistwidget.insertItem(0,currBlock.line)
@@ -329,7 +369,7 @@ class TrackModel(QWidget):
             self.blockVallistwidget.item(16).setForeground(QtCore.Qt.red)
         self.blockVallistwidget.insertItem(17,"NA")
         self.blockVallistwidget.item(17).setForeground(QtCore.Qt.gray) 
-        self.blockVallistwidget.insertItem(18,currBlock.faultsText)
+        self.blockVallistwidget.insertItem(18,str(currBlock.faultsText))
         self.blockVallistwidget.item(18).setForeground(QtCore.Qt.red)
         self.blockVallistwidget.insertItem(19,currBlock.station)
         self.blockVallistwidget.item(19).setForeground(QtCore.Qt.yellow)
