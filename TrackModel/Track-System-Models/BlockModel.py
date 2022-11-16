@@ -10,6 +10,9 @@
 ##############################################################################
 
 class BlockModel:
+    '''
+    Class Description here
+    '''
     def __init__(self, pLine='', pSection='', pBlockNumber='', pBlockLength='',
                 pGrade='', pSpeedLimit='', pInfrastructure='', pStationSide='', 
                 pElevation='',  pCumulativeElevation='', pSecsToTraverseBlock=''):
