@@ -24,6 +24,9 @@ class CTCOffice(QWidget):
         self.setupUi()
         self.signals = signals
 
+        # connect to necessary signals
+        self.signals.globalOccupancyFromTrackModelSignal.connect(self.readOccupancySignal)
+
     def setupLayout(self):
         # getting lists of blocks
         layoutFile = 'Track_Layout_PGH_Light_Rail.csv'
@@ -401,9 +404,9 @@ class CTCOffice(QWidget):
                self.selectedTrainLine.toggleDestination(self.selectedTrain, destination, False)
         self.updateDestinationTable()
 
-    def occupancyCallBack(self, msg):
-        for key in self.greenLineBlocks.keys():
-            self.greenLineBlocks.setOccupancy(key, msg[int(key-1)])
+    def readOccupancySignal(self, occupancySignal):
+        for block in range(0,occupancySignal):
+            self.greenLineBlocks.setOccupancy(block+1, occupancySignal[block])
 
 if __name__ == "__main__":
     import sys
