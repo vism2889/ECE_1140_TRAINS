@@ -138,7 +138,6 @@ def parseTrackLayout(path, jsonPath):
         file.close()
         jsonFile.close()
 
-    print(UI_CONTROLLERS[1])
     return ([VIEW], UI_CONTROLLERS, IO_CONTROLLERS)
 
 if __name__ == '__main__':

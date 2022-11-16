@@ -3,10 +3,9 @@ import os
 import json
 import csv
 
-def parseTrackLayout(path, jsonPath,size=15):
+def parseTrackLayout(path, jsonPath):
 
     REQUIRED_FIELDS = ['Line', 'Section', 'Block Number', 'Infrastructure', "Speed Limit (Km/Hr)"]
-    numBlocksPerController = size
 
     controller = {
         "block-occupancy" : [],
@@ -20,23 +19,17 @@ def parseTrackLayout(path, jsonPath,size=15):
         'sections' : {}
     }
 
-    controllerLayout = []
+    IO_CONTROLLERS = []
 
-    CONTROLLERS = []
-    TOTAL_BLOCKS = 0
+    UI_CONTROLLERS = []
 
 
     ## Opening the csv file with the layout
     with open(path, mode='r') as file:
-        ## Read Header
-        getRank = csv.DictReader(file)
-        if size == 0:
-            numBlocksPerController = sum(1 for row in getRank)
 
         ## Return to the top of the file - is there a better solution?
         file.seek(0)
         track_layout = csv.DictReader(file)
-
 
         ## Check for required headers
         for header in REQUIRED_FIELDS:
@@ -79,35 +72,8 @@ def parseTrackLayout(path, jsonPath,size=15):
 
                 ## End of populating trackLayout
             #####################
-            TOTAL_BLOCKS += 1
-            ## Adding a new controller
-
-            ## Increment the number of blocks assigned
-            ## to that controller
-            controller['total-blocks'] += 1
-
-            ## populate block-occupancy
-            controller['block-occupancy'].append((row['Block Number'], row['Section'], False, row['Speed Limit (Km/Hr)']))
-
-            ## populate switch-state
-            if row['Infrastructure'] != None and "SWITCH" in row['Infrastructure']:
-                controller['switch-state'].append((row['Block Number'], row['Section'], False))
-
-            ## populate crossing-state
-            if row['Infrastructure'] != None and "CROSSING" in row['Infrastructure']:
-                controller['crossing-state'].append((row['Block Number'], row['Section'], False))
-
-            if size > 0:
-                if TOTAL_BLOCKS % numBlocksPerController == 0:
-                    CONTROLLERS.append(deepcopy(controller))
-                    controller['block-occupancy'].clear()
-                    controller['crossing-state'].clear()
-                    controller['switch-state'].clear()
-                    controller['total-blocks'] = 0
-
-        if controller['total-blocks'] > 0:
-            CONTROLLERS.append(deepcopy(controller))
-
+        ## 
+        checkedSections = []
         ## Open json file
         jsonFile = open(jsonPath)
         layout = json.load(jsonFile)
@@ -116,20 +82,63 @@ def parseTrackLayout(path, jsonPath,size=15):
             print("Invalid line in json file")
             exit(1)
 
+
+        VIEW = {
+            "block-occupancy" : [],
+            "switch-state" : [],
+            "crossing-state" : [],
+            "total-blocks" : 0
+        }
+
         for c in layout['controllers']:
-            ctrler = {
+            controller = {
                 'sections' : {}
             }
 
+            ui_controller = {
+                    "block-occupancy" : [],
+                    "switch-state" : [],
+                    "crossing-state" : [],
+                    "total-blocks" : 0
+                }
+            
             for s in c['sections']:
-                ctrler['sections'][s] = trackLayout['sections'][s]
-            controllerLayout.append(ctrler)
+                sec = trackLayout['sections'][s]
+                controller['sections'][s] = sec
+                
+                ## UI info
+                ## Block Occupancy
+                for block in sec['blocks']:
+                    ui_controller['block-occupancy'].append((block[0], s, block[2], block[1]))      
+                    ui_controller['total-blocks'] += 1
+                    
+                    if s not in checkedSections: 
+                        VIEW['block-occupancy'].append((block[0], s, block[2], block[1]))      
+                        VIEW['total-blocks'] += 1
+                
+                ## Switch info
+                for switch in sec['switches']:
+                    ui_controller['switch-state'].append((switch, s, False))
+                    if s not in checkedSections: VIEW['switch-state'].append((switch, s, False)) 
+
+                ## Crossing info
+                for crossing in sec['crossing']:
+                    ui_controller['crossing-state'].append((crossing, s, False))
+                    if s not in checkedSections: VIEW['crossing-state'].append((crossing, s, False))
+
+                if s not in checkedSections:
+                    checkedSections.append(s)
+
+            UI_CONTROLLERS.append(ui_controller)
+            IO_CONTROLLERS.append(controller)
+
         ## End of opening json file
 
         ## Close Files
         file.close()
         jsonFile.close()
-    return (CONTROLLERS, controllerLayout)
+        
+    return ([VIEW], UI_CONTROLLERS, IO_CONTROLLERS)
 
 if __name__ == '__main__':
     parseTrackLayout("Track Layout & Vehicle Data vF.xlsx - Green Line.csv", "greenline-layout.json")
