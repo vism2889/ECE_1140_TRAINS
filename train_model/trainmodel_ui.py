@@ -33,6 +33,7 @@ class TrainModel(QtWidgets.QMainWindow):
         uic.loadUi(ui, self)
         self.t = Train()
         self.signals = signals
+        self.last_update = 0
         self.UI()
         self.show()
 
@@ -44,6 +45,7 @@ class TrainModel(QtWidgets.QMainWindow):
         self.t.line = msg[1]
         print(f'------------DISPATCHED!!!!!!!!!!!------------------')
         self.t.dispatch()
+        self.last_update = time.time()
 
     def curr_t_power(self, msg):
         # print(f'Message is:{msg}')
@@ -119,7 +121,6 @@ class TrainModel(QtWidgets.QMainWindow):
             self.brake_fail.setStyleSheet("background-color: red")
     
     def update_display(self):
-        last_update = time.time()
         
         #lights
         self.int_lights_disp.setText(self.t.int_lights)
@@ -155,7 +156,7 @@ class TrainModel(QtWidgets.QMainWindow):
         self.last_st_disp.setText(f'{self.t.last_station}')
         self.next_st_disp.setText(f'{self.t.next_station}')
         
-        if time.time()-last_update > 1:
+        if time.time()-self.last_update > 1:
             if self.t.e_brake == 'Off' and self.t.service_brake == 'Off' and self.t.dispatched:
                 # print('Setting Train Power')
                 self.t.set_power(self.t.pm.power)
@@ -163,7 +164,7 @@ class TrainModel(QtWidgets.QMainWindow):
                 print(f'Occ_list is: {self.t.pm.occ_list}')
                 # print(f'Curr Pos in block {self.qt.t.pm.curr_block} is: {self.qt.t.pm.curr_pos}')
                 self.signals.occupancyFromTrainSignal.emit(self.t.pm.occ_list)
-                last_update = time.time()
+                self.last_update = time.time()
 
 
     def update_model(self, dict):
