@@ -39,16 +39,31 @@ class TrackModel(QWidget):
         self.currLineIndex = None
         self.layoutFile    = None
         self.testList      = []
+        
 
         # System Communication Signals  
         self.occupancy     = [False for i in range(150)] # only Green line for right not
         self.faults        = [0 for i in range(150)]     # only Green line for right not
-
+        self.orderedGreenLineList = []
+        self.orderedGreenLine()
         if signals:
             self.signals = signals
             self.signals.occupancyFromTrainSignal.connect(self.getOccupancy)
-
+            self.signals.globalOccupancyFromTrackModelSignal.emit(self.occupancy)
+            
+        
+        print('ORDERED GREENLINE LIST:', self.orderedGreenLineList)
         self.initUI()
+
+    def orderedGreenLine(self):
+        print("Ordered green line being created")
+        sec1     = [i for i in range(63, 101)]
+        sec2     = [i for i in range(85, 76, -1)]
+        sec3     = [i for i in range(101, 151)]
+        sec4     = [i for i in range(29, 0, -1)]
+        sec5     = [i for i in range(13, 58)]
+        self.orderedGreenLineList = sec1 + sec2 + sec3 + sec4 + sec5
+        print('FROM UI', self.orderedGreenLineList)
 
     def updateBlockCall(self):
         if self.currLineIndex != None and self.blocksLoaded == True:
@@ -62,6 +77,8 @@ class TrackModel(QWidget):
         self.bt1.setStyleSheet("background-color: orange ; color: black;")
         self.bt1.clicked.connect(self.openFileNameDialog)
         # self.center() # Opens UI in the center of the current screen
+
+        
 
         self.blocksLabel = QLabel("TRACK BLOCKS", self)
         self.blocksLabel.setStyleSheet("background-color: cyan; color: black;")
@@ -221,6 +238,7 @@ class TrackModel(QWidget):
         self.blockslistwidget.itemClicked.connect(self.onClickedBlock)
         self.blocksLoaded = True
         self.signals.trackBlocksToTrainModelSignal.emit(self.lineBlocks)
+        self.signals.greenLineTrackBlockSignal.emit(self.orderedGreenLineList)
 
     def updateBlocks(self):
         for i in range(len(self.occupancy)):

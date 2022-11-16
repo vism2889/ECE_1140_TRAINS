@@ -31,20 +31,29 @@ class SendOccupancy():
         self.maintenance     = [0 for i in range(150)]
         self.line            = "Green"
         self.lineBlocks      = []
+        self.greenLineBlocks = [] 
+
+        
+        self.signals.greenLineTrackBlockSignal.connect(self.loadGreenLineBlocks)
 
         self.signals.trackFailuresSignal.connect(self.updateFaults)
         self.signals.trackBlocksToTrainModelSignal.connect(self.updateLineBlocks)
+
         self.occupancyThread = threading.Thread(target=self.timer)
         self.occupancyThread.start()
         
     def timer(self):
-        while self.currBlockIndex < 15:
+        while self.currBlockIndex < 5:
             speed = 50
             self.timerr += .01
             self.distance = speed*self.timerr
             print("distance:", self.distance)
             self.getOccupancy()
             time.sleep(0.1)
+
+    def loadGreenLineBlocks(self, blockNums):
+        self.greenLineBlocks = blockNums
+        print("LOADING GREEN LINE BLOCKS:", self.greenLineBlocks)
 
     def updateFaults(self, faults):
         self.faults = faults
@@ -66,3 +75,4 @@ class SendOccupancy():
         print("Train on Block:", self.currBlockIndex+1)
         print("FAULTS:\n", self.faults)
         print("LineBlocks:\n", self.lineBlocks)
+        print("GREEN LINE", self.greenLineBlocks)
