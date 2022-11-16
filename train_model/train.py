@@ -42,14 +42,18 @@ class TrainData():
 class PointMassModel():
     def __init__(self):
         
+        self.suggested_speed = 0
+        #track model to train comms
+        self.speed_limit = 0
+        
         self.id = None
 
         self._td = TrainData()
-        
-        self.curr_block = 0
+
+        self.glBlockMOdels = None
 
         #self.blocks          = [i for i in range(150)]
-
+        self.curr_block = 0
         sec1 = [i for i in range(63, 101)]
         sec2 = [i for i in range(85, 76, -1)]
         sec3 = [i for i in range(101, 151)]
@@ -57,9 +61,10 @@ class PointMassModel():
         sec5 = [i for i in range(13, 58)]
 
         self.blocks = sec1 + sec2 + sec3 + sec4 + sec5
+        self.blockLens = [random.randint(10,25) for i in range(len(self.blocks))]        
+        self.occ_list = [0 for i in range(150)]
+        self.occ_index = self.blocks[0]
 
-        self.blockLens       = [random.randint(10,25) for i in range(150)]        
-        self.occ_list = [0 for i in range(len(self.blocks))]
 
         #time independent values
         self.power = 0
@@ -211,17 +216,41 @@ class PointMassModel():
         self.curr_speed = round(self.curr_vel * (1/1000) * (0.62) * (3600))
     
     def calcPos(self):
-        self.occ_list[self.curr_block] = 1
+        
+        #position calculation
         self.prev_pos = self.curr_pos
         self.curr_pos = self.prev_pos + (self.elapsed_time/2)*(self.prev_vel +self.curr_vel)
 
-        if self.curr_pos >= self.blockLens[self.curr_block]:
-            self.occ_list[self.curr_block] = 0
-            self.curr_pos = 0
+        #block object length calculation
+        curr_block_object = self.glBlockMOdels[self.occ_index]
+        self.curr_block_len = curr_block_object.blockLength
+        self.curr_block_len = float(self.curr_block_len)
+
+        #getting block values for speed
+        self.speed_limit = float(curr_block_object.speedLimit)
+        if self.suggested_speed > self.speed_limit:
+            self.speed_limit = self.speed_limit
+        else:
+            self.speed_limit = self.suggested_speed
+
+        
+        print(f'-------------------Position: {self.curr_pos}-----------------------------')
+        if self.curr_pos >= self.curr_block_len:
+            self.occ_list[self.occ_index] = 0
+            
+            #resetting position
+            self.curr_pos = self.curr_pos-self.curr_block_len
             self.prev_pos = 0
+
+            #incrementing curr_block
             self.curr_block += 1
-            self.occ_list[self.curr_block] = 1
-        pass
+        
+        self.occ_index = self.blocks[self.curr_block]
+        self.occ_list[self.occ_index] = 1
+        
+        
+        
+        
 
 
         

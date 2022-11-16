@@ -55,7 +55,7 @@ class Signals(QWidget):
 
     # Train Controller (SW) Inputs Signals
     authoritySignal          = QtCore.pyqtSignal(list)
-    commandedSpeedSignal     = QtCore.pyqtSignal(list)
+    commandedSpeedSignal     = QtCore.pyqtSignal(float)
     speedLimitSignal         = QtCore.pyqtSignal(list)
     trainFailuresSignal      = QtCore.pyqtSignal(list)
     beaconSignal             = QtCore.pyqtSignal(list)        # Next Station and Station Side
