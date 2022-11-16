@@ -405,8 +405,8 @@ class CTCOffice(QWidget):
         self.updateDestinationTable()
 
     def readOccupancySignal(self, occupancySignal):
-        for block in occupancySignal:
-            self.greenLineBlocks.
+        for block in range(0,occupancySignal):
+            self.greenLineBlocks.setOccupancy(block+1, occupancySignal[block])
 
 if __name__ == "__main__":
     import sys
