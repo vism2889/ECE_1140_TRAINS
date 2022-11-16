@@ -7,17 +7,8 @@
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from trainController_hw import Control as c
 
 class Ui_DriverTestUI(object):
-    def __init__(self):
-        c.__init__(c)
-        self.suggested_speed = 0
-        self.lights_internal_state = False
-        self.lights_external_state = False
-        self.left_door_state = False
-        self.right_door_state = False
-        
     def setupUi(self, DriverTestUI):
         DriverTestUI.setObjectName("DriverTestUI")
         DriverTestUI.resize(1120, 600)
@@ -351,48 +342,6 @@ class Ui_DriverTestUI(object):
         self.label_7.setText(_translate("DriverTestUI", "Faults"))
         self.pushButton.setText(_translate("DriverTestUI", "I/0"))
 
-    def toggle_lights_internal(self):
-        self.lights_internal_state = not self.lights_internal_state
-        c.setInternalLights(self.lights_internal_state)
-
-    def toggle_lights_external(self):
-        self.lights_external_state = not self.lights_external_state
-        c.setExternalLights(self.lights_external_state)
-
-    def toggle_left_door(self):
-        self.left_door_state = not self.left_door_state
-        c.setLeftDoor(self.left_door_state)
-
-    def toggle_right_door(self):
-        self.right_door_state = not self.right_door_state
-        c.setRightDoor(self.right_door_state)
-
-    def setSpeed(self):
-        c.setSpeed(c,self.speed_slider.value())
-
-    def setTemperature(self):
-        c.setTemperature(c, self.temperature_box.value())
-
-    def deployEbrake(self):
-        self.speed_slider.setValue(0)
-        c.deployEbrake(c)
-    
-    def displaySuggestedSpeed(self):
-        self.suggested_speed = c.getSuggestedSpeed(c)
-        self.lcd_suggested.display(self.suggested_speed)
-
-    def getSuggestedSpeed(self):
-        return self.suggested_speed
-
-    def connect(self, DriverTestUI):
-        self.lights_internal_button.clicked.connect(self.toggle_lights_internal)
-        self.lights_external_button.clicked.connect(self.toggle_lights_external)
-        self.doors_left_button.clicked.connect(self.toggle_left_door)
-        self.doors_right_button.clicked.connect(self.toggle_right_door)
-        self.speed_slider.valueChanged['int'].connect(self.setSpeed)
-        self.temperature_box.valueChanged['double'].connect(self.setTemperature)
-        self.e_brake_button.clicked.connect(self.deployEbrake)
-       
 
 if __name__ == "__main__":
     import sys
@@ -400,8 +349,6 @@ if __name__ == "__main__":
     DriverTestUI = QtWidgets.QMainWindow()
     ui = Ui_DriverTestUI()
     ui.setupUi(DriverTestUI)
-    ui.connect(DriverTestUI)
     DriverTestUI.show()
-    ui.displaySuggestedSpeed()
-    
     sys.exit(app.exec_())
+

@@ -1,0 +1,9 @@
+float power
+int temperature
+bool announcement_states
+bool left_door_state
+bool right_door_state
+bool internal_light_state
+bool external_light_state
+bool service_brake_command
+bool ebrake_command
