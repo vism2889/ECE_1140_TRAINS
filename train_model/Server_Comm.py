@@ -6,13 +6,13 @@ import time
 
 
 class MyPub:
-    def __init__(self, train):
-        self.train = train
+    def __init__(self, t):
+        self.train = t
         self.node =  winserver('TrainModelPublisher')
 
         #message for train controllers
         self.tc_msg = to_TC()
-        self.tc_pub = self.node.advertise('To_Train_Controller', to_TC, 1)    
+        self.tc_pub = self.node.advertise('To_Train_Controller', to_TC, 1, "192.168.0.15")    
     def publish(self):
         self.tc_msg.current_speed = self.train.pm.curr_vel
         self.tc_msg.authority = self.train.authority
@@ -25,38 +25,44 @@ class MyPub:
        
         self.tc_pub.publish(self.tc_msg)
 
-class MySub:
-    def __init__(self, train):
-        self.train = train
-        self.node = winserver('TrainControllerSubscriber')
-        self.msg = from_TC()
-        self.sub = self.node.subscribe('my_topic', from_TC , 1, "192.168.0.10")
+# class MySub:
+#     def __init__(self):
+#         self.node = winserver('TrainControllerSubscriber')
+#         self.msg = from_TC()
+#         self.sub = self.node.subscribe('To_Train_Model', from_TC , 1, "192.168.0.10")
     
-    def call_back(self, msg):
-        self.train.curr_power = self.msg.power
-        print(self.msg.ebrake_command)
+#     def call_back(self, msg):
+#         self.power = self.msg.power
+#         self.temperature = self.msg.temperature
+#         self.announcement_states = self.msg.announcement_states
+#         self.left_door_state = self.left_door_state
+#         self.right_door_state = self.right_door_state
+#         self.internal_light_state = self.internal_light_state
+#         self.external_light_state = self.external_light_state
+#         self.service_brake_command = self.service_brake_command
+#         self.ebrake_command = self.msg.ebrake_command
+#         print(self.msg.ebrake_command)
+    
+#     def spinOnce(self):
+#         self.node.spinOnce()
         
-def tc_inputs():
-    pass
-def tm_inputs():
-    pass
-def tc_outputs():
-    pass
-def tm_outputs():
-    pass
 
 if __name__ == "__main__":
     t = Train()
     t.dispatch()
     mp = MyPub(t)
-    ms = MySub(t)
+    # ms = MySub()
     train_dict = {}
     while True:
         time.sleep(2)
         p = 120000
         print('setting power')
         t.set_power(p)
-        time.sleep()
+        time.sleep(1)
         print(f"before publisher train.pm.curr_vel = {t.pm.curr_vel}")
         mp.publish()
         print("done")
+
+
+
+        # ms.spinOnce()

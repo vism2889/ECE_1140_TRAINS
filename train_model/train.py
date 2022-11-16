@@ -218,6 +218,8 @@ class PointMassModel():
 
 class Train():
     def __init__ (self):
+
+        self.speed_limit = 13.4112
         
         #block list
         self.blocks          = [i for i in range(150)]

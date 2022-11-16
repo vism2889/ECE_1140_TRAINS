@@ -1,9 +1,0 @@
-int current_speed
-int commanded_speed
-int speed_limit
-int suggested_speed
-bool[] authority
-bool left_door_command
-bool right_door_command
-bool ebrake_command
-bool service_brake_command
