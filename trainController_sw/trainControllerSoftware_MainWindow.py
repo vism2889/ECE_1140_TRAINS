@@ -37,16 +37,24 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
         ##
         self.c = Control()
         self.mc = ManualControl()
-        self.speed_limit = 0
-        self.authority_value = 0
+        self.internal_light_state = True
+        self.external_light_state = True
+        self.left_door_state = False
+        self.right_door_state = False
+        self.announce_state = False
+        self.advertisement_state = False
+        self.commanded_speed = 100
+        self.service_brake = False
+        self.emergency_brake = False
+        self.temperature = 72
         self.speed_display_value = 0
         self.power_failure_value = 0
         
         ## Initialize PID
         self.commanded_speed = 30 / 2.23694 # commanded speed input as mph
         self.current_speed = 0
-        self.kp = 0.5
-        self.ki = 0.1
+        self.kp = 10000
+        self.ki = 10
         self.pid = PID(self.kp, self.ki, 0, setpoint=self.commanded_speed)
         self.pid.output_limits = (0, 120000) #clamp at 120W
         
@@ -342,6 +350,7 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
         font.setBold(True)
         self.ManuLebrake_button.setFont(font)
         self.ManuLebrake_button.setLayoutDirection(QtCore.Qt.LeftToRight)
+        self.ManuLebrake_button.setStyleSheet("background-color : red")
         self.ManuLebrake_button.setAutoFillBackground(False)
         self.ManuLebrake_button.setObjectName("ManuLebrake_button")
         self.label_6 = QtWidgets.QLabel(self.Manual_Frame)
@@ -606,24 +615,25 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
         self.label_26.setText(_translate("self", "Power (W):"))
         self.DisplayPower.setText(_translate("self", "Display Power"))
         self.label_33.setText(_translate("self", "Emergency Brake"))
-        self.dict = {
-                # 'int_lights': self.,
-                # 'ext_lights': self.ext_lights_box.currentText(),
-                # 'temperature': self.temp_edit.toPlainText(),
-                # 'left_doors': self.left_doors_edit.toPlainText(),
-                # 'right_doors': self.right_doors_edit.toPlainText(),
-                # 'passenger_count':self.pass_edit.toPlainText(),
-                # 'crew_count': self.crew_edit.toPlainText(),
-                # 'authority': self.auth_edit.toPlainText(),
-                # 'grade': self.grade_edit.toPlainText(),
-                # 'switch': self.switch_edit.toPlainText(),
-                # 'curr_power':self.cmd_pwr_edit.toPlainText(),
-                # 'cmd_speed':self.cmd_speed_edit.toPlainText(),
-                # 'curr_speed':self.curr_speed_edit.toPlainText(),
-                # 'last_station':self.last_station_edit.toPlainText(),
-                # 'next_station':self.nxt_station_edit.toPlainText()
+        
+        self.powerDict = {
                 'power' : self.PowerOutput_lcdDisplay.value()
                 }
+        self.vitalDict = {
+            'serviceBrake' : self.service_brake,
+            'emergencyBrake' : self.emergency_brake,
+            'commandedSpeed' : self.commanded_speed
+        }
+        self.nonVitalDict = {
+            'int_lights' : self.internal_light_state,
+            'ext_lights' : self.external_light_state,
+            'temperature' : self.temperature,
+            'left_doors' : self.left_door_state,
+            'right_doors' : self.right_door_state,
+            'announce_state' : self.announce_state,
+            'advertisement_state' : self.advertisement_state,
+        }
+        
 ####### Set Automatic/Main Displays
 ####### Input = trainData
 ####### Output = outputData
@@ -705,64 +715,64 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
 
 ####### ManualControl Class Sets
     def setManualControl_CommandedSpeed(self):
-        self.mc.setCommandedSpeed(self.speed_Slider.value())       
+        self.commanded_speed = (self.speed_Slider.value() / 2.23694)      
         
     def setManualControl_ServiceBrake(self):
-        self.mc.setServiceBrake( self.braking_Slider.value())
+        self.service_brake = self.braking_Slider.value()
     
     def setManualControl_EmergencyBrake(self):
         # if E brake is already set and the button is clicked, then it turns off the e brake
         if(self.EmergencyBrakeDisplayBox.isChecked() == True):
             self.ActivateEmergencyBrake()
-            self.mc.setEmergencyBrake( False)
+            self.emergency_brake = False
         elif(self.EmergencyBrakeDisplayBox.isChecked() == False):
             self.ActivateEmergencyBrake()
-            self.mc.setEmergencyBrake( True)
+            self.emergency_brake = True
         
     def setManualControl_Temperature(self):
-        self.mc.setTemperature( self.Manual_temperature_box.value())
+        self.temperature = self.Manual_temperature_box.value()
     
     def setManualControl_Lights(self):
         if(self.Manual_lights_ComboBox.currentIndex() == 0):
-            self.mc.setInternalLights( False)
-            self.mc.setExternalLights( False)
+            self.internal_light_state = False
+            self.external_light_state = False
         elif(self.Manual_lights_ComboBox.currentIndex() == 1):
-            self.mc.setInternalLights( True)
-            self.mc.setExternalLights( False)
+            self.internal_light_state = True
+            self.external_light_state = False
         elif(self.Manual_lights_ComboBox.currentIndex() == 2):
-            self.mc.setInternalLights( False)
-            self.mc.setExternalLights( True)
+            self.internal_light_state = False
+            self.external_light_state = True
         elif(self.Manual_lights_ComboBox.currentIndex() == 3):
-            self.mc.setInternalLights( True)
-            self.mc.setExternalLights( True)                
+            self.internal_light_state = True
+            self.external_light_state = True                
     
     def setManualControl_Doors(self):
         if(self.Manual_doors_ComboBox.currentIndex() == 0):
-            self.mc.setLeftDoor( False)
-            self.mc.setRightDoor( False)
+            self.left_door_state = False
+            self.right_door_state = False
         elif(self.Manual_doors_ComboBox.currentIndex() == 0):
-            self.mc.setLeftDoor( True)
-            self.mc.setRightDoor( False)
+            self.left_door_state = True
+            self.right_door_state = False
         elif(self.Manual_doors_ComboBox.currentIndex() == 0):
-            self.mc.setLeftDoor( False)
-            self.mc.setRightDoor( True)
+            self.left_door_state = False
+            self.right_door_state = True
         elif(self.Manual_doors_ComboBox.currentIndex() == 0):
-            self.mc.setLeftDoor( True)
-            self.mc.setRightDoor( True)
+            self.left_door_state = True
+            self.right_door_state = True
     
     def setManualControl_Advertisements(self):
-        self.mc.setAdvertisements( self.Manual_Advertisements_CheckBox.checkState())
+        self.advertisement_state = self.Manual_Advertisements_CheckBox.checkState()
     
     def setManualControl_Announcements(self):
-        self.mc.setAnnouncements( self.Manual_Annoucements_CheckBox.checkState())
+        self.announce_state = self.Manual_Annoucements_CheckBox.checkState()
 
     # Power and Ebrake
     def ActivateEmergencyBrake(self):
         if(self.EmergencyBrakeDisplayBox.isChecked() == True):
             self.EmergencyBrakeDisplayBox.setCheckState(False)
-            self.mc.setEmergencyBrake(False)
+            self.emergency_brake = False
         else:
-            self.mc.setEmergencyBrake(True)
+            self.emergency_brake = True
             self.currentSpeed_lcdDisplay.display(0)
             self.speed_Slider.setValue(0)
             self.EmergencyBrakeDisplayBox.setCheckState(True)
@@ -776,13 +786,17 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
     def setPID(self, msg):
         # Km/hr to mph
         # msg input as m/s
-        self.power = self.pid(msg)
-        self.pid.output_limits = (0, 120000)
-        self.dict['power'] = self.power
+        if(self.EmergencyBrakeDisplayBox.isChecked() == True):
+            self.power = 0
+        else:
+            self.pid.setpoint = self.commanded_speed
+            self.power = self.pid(msg)
+            self.pid.output_limits = (0, 120000)
+            self.powerDict['power'] = self.power
         self.emitPower()
     
     def emitPower(self):
-        self.signals.powerSignal.emit(self.dict)     
+        self.signals.powerSignal.emit(self.powerDict)     
             
         
 if __name__ == "__main__":
