@@ -39,8 +39,9 @@ class TrackModel(QWidget):
         self.height        = 750
 
         # Current Selections
-        self.currBlock     = None
-        self.currLineIndex = None
+        self.currBlock      = None
+        self.currBlockIndex = None
+        self.currLineIndex  = None
 
         # Layout Information
         self.lineNames     = []    # List of Strings holding line names
