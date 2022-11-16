@@ -49,7 +49,7 @@ class TrackModel(QWidget):
         if signals:
             self.signals = signals
             self.signals.occupancyFromTrainSignal.connect(self.getOccupancy)
-            self.signals.globalOccupancyFromTrackModelSignal.emit(self.occupancy)
+            
             
         
         print('ORDERED GREENLINE LIST:', self.orderedGreenLineList)
@@ -364,6 +364,7 @@ class TrackModel(QWidget):
     def getOccupancy(self, occupancy):
         self.occupancy = occupancy
         # print("GUI OCCUPANCY", self.occupancy)
+        self.signals.globalOccupancyFromTrackModelSignal.emit(self.occupancy)
         self.updateBlockCall()
 
     def updateBlockList(self, line):
