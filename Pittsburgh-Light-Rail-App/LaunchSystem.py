@@ -49,11 +49,17 @@ class PittsburghLightRail():
         self.trackModel = TrackModel(self.signals)
         self.CTCOffice = CTCOffice(self.signals)
         self.trainController = Ui_TrainControllerSW_MainWindow(self.signals)
+        
         #train model
         file = f'{os.getcwd()}/train.ui'
         self.trainModel = TrainModel(file, self.signals)
+        self.globalOcc = []
+        self.signals.globalOccupancyFromTrackModelSignal.connect(self.getOcc) # just for testing
         
-
+    # just for testing
+    def getOcc(self, occ):
+        self.globalOcc = occ
+        print("Master Luanch Global Occ:", self.globalOcc)
         
 
 if __name__ == '__main__':
