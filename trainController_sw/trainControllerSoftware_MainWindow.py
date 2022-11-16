@@ -43,7 +43,6 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
         self.right_door_state = False
         self.announce_state = False
         self.advertisement_state = False
-        self.commanded_speed = 100
         self.service_brake = False
         self.emergency_brake = False
         self.temperature = 72
@@ -53,8 +52,8 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
         ## Initialize PID
         self.commanded_speed = 30 / 2.23694 # commanded speed input as mph
         self.current_speed = 0
-        self.kp = 10000
-        self.ki = 10
+        self.kp = 24000
+        self.ki = 100
         self.pid = PID(self.kp, self.ki, 0, setpoint=self.commanded_speed)
         self.pid.output_limits = (0, 120000) #clamp at 120W
         
@@ -255,6 +254,7 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
         self.speed_Slider.setGeometry(QtCore.QRect(20, 80, 121, 22))
         self.speed_Slider.setOrientation(QtCore.Qt.Horizontal)
         self.speed_Slider.setObjectName("speed_Slider")
+        self.speed_Slider.setMaximum(70);
         self.label_3 = QtWidgets.QLabel(self.Manual_Frame)
         self.label_3.setGeometry(QtCore.QRect(240, 70, 67, 17))
         font = QtGui.QFont()
@@ -392,12 +392,6 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
         self.setKi_Box.setProperty("value", 0.0)
         self.setKi_Box.setObjectName("setKi_Box")
         self.TabWigets.addTab(self.tab_3, "")
-        self.OpenTestUI = QtWidgets.QPushButton(self.centralwidget)        
-        self.OpenTestUI.setGeometry(QtCore.QRect(720, 320, 93, 29))
-        self.OpenTestUI.setObjectName("OpenTestUI")
-        self.ImportTestData = QtWidgets.QPushButton(self.centralwidget)
-        self.ImportTestData.setGeometry(QtCore.QRect(720, 360, 93, 29))
-        self.ImportTestData.setObjectName("ImportTestData")
         
         self.label_17 = QtWidgets.QLabel(self.centralwidget)
         self.label_17.setGeometry(QtCore.QRect(540, 80, 161, 41))
@@ -481,7 +475,7 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
         self.next_station_label.setWordWrap(True)
         self.next_station_label.setObjectName("next_station_label")
         self.label_25 = QtWidgets.QLabel(self.centralwidget)
-        self.label_25.setGeometry(QtCore.QRect(530, 30, 201, 41))
+        self.label_25.setGeometry(QtCore.QRect(540, 30, 201, 41))
         font = QtGui.QFont()
         font.setPointSize(10)
         font.setBold(True)
@@ -490,7 +484,7 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
         self.label_25.setObjectName("label_25")
         
         self.label_26 = QtWidgets.QLabel(self.centralwidget)
-        self.label_26.setGeometry(QtCore.QRect(558, 125, 161, 41))
+        self.label_26.setGeometry(QtCore.QRect(545, 125, 161, 41))
         font = QtGui.QFont()
         font.setPointSize(10)
         font.setBold(True)
@@ -504,30 +498,25 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
         font.setPointSize(14)
         font.setBold(True)
         self.frame = QtWidgets.QFrame(self.centralwidget)
-        self.frame.setGeometry(QtCore.QRect(700, 230, 111, 41))
+        self.frame.setGeometry(QtCore.QRect(700, 230, 111, 80))
         self.frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.frame.setFrameShadow(QtWidgets.QFrame.Plain)
         self.frame.setObjectName("frame")
         self.EmergencyBrakeDisplayBox = QtWidgets.QCheckBox(self.frame)
-        self.EmergencyBrakeDisplayBox.setGeometry(QtCore.QRect(80, 10, 31, 24))
+        self.EmergencyBrakeDisplayBox.setGeometry(QtCore.QRect(50, 30, 60, 60))
         self.EmergencyBrakeDisplayBox.setText("")
-        self.EmergencyBrakeDisplayBox.setCheckable(False)
+        self.EmergencyBrakeDisplayBox.setCheckable(True)
         self.EmergencyBrakeDisplayBox.setObjectName("EmergencyBrakeDisplayBox")
         self.label_33 = QtWidgets.QLabel(self.frame)
-        self.label_33.setGeometry(QtCore.QRect(10, 0, 61, 41))
+        self.label_33.setGeometry(QtCore.QRect(10, 0, 95, 50))
+        self.label_33.setAlignment(QtCore.Qt.AlignCenter)
         font = QtGui.QFont()
-        font.setBold(False)
+        font.setBold(True)
+        font.setPointSize(10)
         self.label_33.setFont(font)
         self.label_33.setWordWrap(True)
         self.label_33.setObjectName("label_33")
-        #self.setCentralWidget(self.centralwidget)
-        self.statusbar = QtWidgets.QStatusBar(self)
-        self.statusbar.setObjectName("statusbar")
-        #self.setStatusBar(self.statusbar)
-        self.DisplayPower = QtWidgets.QPushButton(self.centralwidget)
-        self.DisplayPower.setGeometry(QtCore.QRect(720, 280, 93, 29))
-        self.DisplayPower.setObjectName("DisplayPower")
-
+        
         ##
         self.speed_Slider.valueChanged.connect(self.setManualControl_CommandedSpeed)
         self.braking_Slider.valueChanged.connect(self.setManualControl_ServiceBrake)
@@ -602,8 +591,6 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
         self.label_31.setText(_translate("self", "Set Ki:"))
         self.label.setText(_translate("self", "Set Kp:"))
         self.TabWigets.setTabText(self.TabWigets.indexOf(self.tab_3), _translate("self", "Engineer Mode"))
-        self.OpenTestUI.setText(_translate("self", "Open Test UI"))
-        self.ImportTestData.setText(_translate("self", "Import Test Data"))
         self.label_17.setText(_translate("self", "Authority (miles):"))
         self.label_7.setText(_translate("self", "Faults"))
         self.label_27.setText(_translate("self", "Engine"))
@@ -612,8 +599,7 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
         self.label_30.setText(_translate("self", "Circuit"))
         self.next_station_label.setText(_translate("self", "Station Square"))
         self.label_25.setText(_translate("self", "Current Speed(mph):"))
-        self.label_26.setText(_translate("self", "Power (W):"))
-        self.DisplayPower.setText(_translate("self", "Display Power"))
+        self.label_26.setText(_translate("self", "Power (hp):"))
         self.label_33.setText(_translate("self", "Emergency Brake"))
         
         self.powerDict = {
@@ -723,10 +709,12 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
     def setManualControl_EmergencyBrake(self):
         # if E brake is already set and the button is clicked, then it turns off the e brake
         if(self.EmergencyBrakeDisplayBox.isChecked() == True):
-            self.ActivateEmergencyBrake()
+            self.EmergencyBrakeDisplayBox.setCheckState(False)           
             self.emergency_brake = False
         elif(self.EmergencyBrakeDisplayBox.isChecked() == False):
-            self.ActivateEmergencyBrake()
+            self.currentSpeed_lcdDisplay.display(0)
+            self.speed_Slider.setValue(0)
+            self.EmergencyBrakeDisplayBox.setCheckState(True)
             self.emergency_brake = True
         
     def setManualControl_Temperature(self):
@@ -771,7 +759,7 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
         if(self.EmergencyBrakeDisplayBox.isChecked() == True):
             self.EmergencyBrakeDisplayBox.setCheckState(False)
             self.emergency_brake = False
-        else:
+        elif(self.EmergencyBrakeDisplayBox.isChecked() == False):
             self.emergency_brake = True
             self.currentSpeed_lcdDisplay.display(0)
             self.speed_Slider.setValue(0)
@@ -786,13 +774,19 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
     def setPID(self, msg):
         # Km/hr to mph
         # msg input as m/s
-        if(self.EmergencyBrakeDisplayBox.isChecked() == True):
+        # msg = current speed
+        print("msg input: ", msg)
+        print("commanded speed: ", self.commanded_speed)
+        if((self.EmergencyBrakeDisplayBox.isChecked() == True) or (msg >= self.commanded_speed)):
             self.power = 0
+            self.powerDict['power'] = self.power
         else:
             self.pid.setpoint = self.commanded_speed
             self.power = self.pid(msg)
             self.pid.output_limits = (0, 120000)
             self.powerDict['power'] = self.power
+        self.currentSpeed_lcdDisplay.display(msg * 2.23694)
+        self.PowerOutput_lcdDisplay.display((self.power/1000)*1.34102) #horsepower
         self.emitPower()
     
     def emitPower(self):
