@@ -77,6 +77,10 @@ class CTCOffice(QWidget):
         self.redLineBlockTable.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.redLineBlockTable.itemClicked.connect(self.redBlockSelectionChanged)
         self.selectedBlockTable = self.redLineBlockTable
+
+        for row in range(0,self.redLineBlockTable.rowCount()):
+            self.redLineBlockTable.setRowHeight(row, 10)
+
         self.redLineBlockTable.show()
 
         self.redLineTrainTable = QTableWidget(self)
@@ -107,6 +111,10 @@ class CTCOffice(QWidget):
         self.greenLineBlockTable.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.greenLineBlockTable.itemClicked.connect(self.greenBlockSelectionChanged)
         self.greenLineBlockTable.clicked.connect(self.greenBlockSelectionChanged)
+
+        for row in range(0,self.greenLineBlockTable.rowCount()):
+            self.greenLineBlockTable.setRowHeight(row, 10)
+            
         self.greenLineBlockTable.show()
 
         self.greenLineTrainTable = QTableWidget(self)
