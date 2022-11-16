@@ -252,7 +252,7 @@ class DisplayWorker(QObject):
                     # print('Setting Train Power')
                     self.qt.t.set_power(self.qt.t.pm.power)
                     self.qt.signals.currentSpeedOfTrainModel.emit(self.qt.t.pm.curr_vel)
-                    # print(f'Occ_list is: {self.qt.t.pm.occ_list}')
+                    print(f'Occ_list is: {self.qt.t.pm.occ_list}')
                     # print(f'Curr Pos in block {self.qt.t.pm.curr_block} is: {self.qt.t.pm.curr_pos}')
                     self.qt.signals.occupancySignal.emit(self.qt.t.pm.occ_list)
                     last_update = time.time()
