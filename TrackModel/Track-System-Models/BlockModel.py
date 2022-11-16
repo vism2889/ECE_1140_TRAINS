@@ -10,6 +10,9 @@
 ##############################################################################
 
 class BlockModel:
+    '''
+    Class Description here
+    '''
     def __init__(self, pLine='', pSection='', pBlockNumber='', pBlockLength='',
                 pGrade='', pSpeedLimit='', pInfrastructure='', pStationSide='', 
                 pElevation='',  pCumulativeElevation='', pSecsToTraverseBlock=''):
@@ -27,7 +30,7 @@ class BlockModel:
 
         self.occupancy              = False
         self.faultPresence          = False
-        self.faultsText             = ""
+        self.faultsText             = []
         self.station                = ""
         self.switch                 = ""
         self.crossingPresence       = False

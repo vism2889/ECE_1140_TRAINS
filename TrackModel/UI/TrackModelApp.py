@@ -22,40 +22,53 @@ from LayoutParser2 import LayoutParser
 
 
 class TrackModel(QWidget):
+    '''
+    Class Description here
+    '''
+
     def __init__(self, signals=None):
+        '''
+        Description here
+        '''
         super().__init__()
+        # Pyqt Window Properties
         self.title         = 'Track Model - Pittsburgh Light Rail'
         self.left          = 40
         self.top           = 40
         self.width         = 450
         self.height        = 750
+
+        # Current Selections
         self.currBlock     = None
+        self.currLineIndex = None
 
         # Layout Information
         self.lineNames     = []    # List of Strings holding line names
         self.lines         = []    # List of TrackLine Objects
         self.lineBlocks    = []    # 2D List of blocks, each list representing a line
         self.blocksLoaded  = False # Bool to represent wether the TrackBlocks for a given line have been loaded
-        self.currLineIndex = None
         self.layoutFile    = None
         self.testList      = []
-        
+        self.signals       = None
 
-        # System Communication Signals  
-        self.occupancy     = [False for i in range(150)] # only Green line for right not
-        self.faults        = [0 for i in range(150)]     # only Green line for right not
+        # Variables to hold values for System Communication Signals  
+        self.occupancy            = [False for i in range(150)] # only Green line for right not
+        self.faults               = [0 for i in range(150)]     # only Green line for right not
         self.orderedGreenLineList = []
         self.orderedGreenLine()
+        
+        # System Communication Signals
         if signals:
             self.signals = signals
             self.signals.occupancyFromTrainSignal.connect(self.getOccupancy)
             
-            
-        
         print('ORDERED GREENLINE LIST:', self.orderedGreenLineList)
         self.initUI()
 
     def orderedGreenLine(self):
+        '''
+        Description here
+        '''
         print("Ordered green line being created")
         sec1     = [i for i in range(63, 101)]
         sec2     = [i for i in range(85, 76, -1)]
@@ -66,20 +79,69 @@ class TrackModel(QWidget):
         print('FROM UI', self.orderedGreenLineList)
 
     def updateBlockCall(self):
+        '''
+        Description here
+        '''
         if self.currLineIndex != None and self.blocksLoaded == True:
             self.updateBlocks()
 
     def initUI(self):
+        '''
+        Description here
+        '''
         self.setWindowTitle(self.title)
         self.setGeometry(self.left, self.top, self.width, self.height)
+        
+        self.displayLoadLayoutButton()
+        # self.center() # Opens UI in the center of the current screen
+        self.displayTrackBlockList()
+        self.displayBlockInformationSection()
+        self.displayLargeSelectedBlockLabel()
+        self.displayTrackLineList()
+        self.displayFaultButtons()
+        self.displayBeaconInformationLabels()
+        self.show()
+
+    def displayLoadLayoutButton(self):
+        '''
+        Description here
+        '''
         self.bt1 = QPushButton("LOAD LAYOUT ",self)
         self.bt1.resize(self.width, 30)
         self.bt1.setStyleSheet("background-color: orange ; color: black;")
         self.bt1.clicked.connect(self.openFileNameDialog)
-        # self.center() # Opens UI in the center of the current screen
 
+    def displayLargeSelectedBlockLabel(self):
+        '''
+        Description here
+        '''
+        self.currBlockDisplay = QLabel("BLOCK:", self)
+        self.currBlockDisplay.move(130, 40)
+        self.currBlockDisplay.resize(300, 100)
+        self.currBlockDisplay.setStyleSheet("background-color: cyan; color: black;")
+        self.currBlockDisplay.setFont(QFont('Arial', 20))
         
+        # Sets large indicator with track fault label
+        self.blockFaultIndicator = QLabel('', self)
+        self.blockFaultIndicator.hide()
 
+    def displayTrackLineList(self):
+        '''
+        Description here
+        '''
+        self.linesLabel = QLabel("TRACK LINES", self)
+        self.linesLabel.setStyleSheet("background-color: cyan; color: black;")
+        self.linesLabel.move(5,40)
+        self.linesLabel.resize(100,18)
+        self.linelistwidget = QListWidget(self)
+        self.linelistwidget.move(5,58)
+        self.linelistwidget.resize(100,50)
+        self.linelistwidget.setStyleSheet("background-color: gray;")
+
+    def displayTrackBlockList(self):
+        '''
+        Description here
+        '''
         self.blocksLabel = QLabel("TRACK BLOCKS", self)
         self.blocksLabel.setStyleSheet("background-color: cyan; color: black;")
         self.blocksLabel.move(5,150)
@@ -87,8 +149,12 @@ class TrackModel(QWidget):
         self.blockslistwidget = QListWidget(self)
         self.blockslistwidget.move(5,168)
         self.blockslistwidget.resize(100,580)
-        self.blockslistwidget.setStyleSheet("background-color: gray;")
+        self.blockslistwidget.setStyleSheet("background-color: rgb(128, 128, 128);")
 
+    def displayBlockInformationSection(self):
+        '''
+        Description here
+        '''
         self.blockInfoLabel = QLabel("- BLOCK INFORMATION -", self)
         self.blockInfoLabel.setAlignment(QtCore.Qt.AlignCenter)
         self.blockInfoLabel.resize(300,18)
@@ -106,68 +172,78 @@ class TrackModel(QWidget):
         self.blockVallistwidget.resize(150,420) 
         self.blockVallistwidget.setStyleSheet("background-color: gray;")
 
-        self.currBlockDisplay = QLabel("BLOCK:", self)
-        self.currBlockDisplay.move(130, 40)
-        self.currBlockDisplay.resize(300, 100)
-        self.currBlockDisplay.setStyleSheet("background-color: cyan; color: black;")
-        self.currBlockDisplay.setFont(QFont('Arial', 20))
-
+    def displayFaultButtons(self):
+        '''
+        Description here
+        '''
         self.trackFault1 = QPushButton("Toggle Track Fault", self)
         self.trackFault1.move(130, 690)
         self.trackFault1.resize(100,50)
         self.trackFault1.setStyleSheet("background-color: orange ; color: black;")
-        self.trackFault1.clicked.connect(self.updateFaults)
+        self.trackFault1.clicked.connect(lambda : self.updateFaults("Track Fault"))
 
         self.trackFault2 = QPushButton("Toggle Power Fault", self)
         self.trackFault2.move(235, 690)
         self.trackFault2.resize(100,50)
         self.trackFault2.setStyleSheet("background-color: orange ; color: black;")
+        self.trackFault2.clicked.connect(lambda : self.updateFaults("Power Fault"))
 
-        self.trackFault3 = QPushButton("Toggle Switch Fault", self)
+        self.trackFault3 = QPushButton("Toggle Circuit Fault", self)
         self.trackFault3.move(340, 690)
         self.trackFault3.resize(100,50)
         self.trackFault3.setStyleSheet("background-color: orange ; color: black;")
+        self.trackFault3.clicked.connect(lambda : self.updateFaults("Circuit Fault"))
 
-        self.linesLabel = QLabel("TRACK LINES", self)
-        self.linesLabel.setStyleSheet("background-color: cyan; color: black;")
-        self.linesLabel.move(5,40)
-        self.linesLabel.resize(100,18)
-        self.linelistwidget = QListWidget(self)
-        self.linelistwidget.move(5,58)
-        self.linelistwidget.resize(100,50)
-        self.linelistwidget.setStyleSheet("background-color: gray;")
-
-        self.loadBeaconInfo()
-
-        self.show()
+        self.trackFault1.setEnabled(False)
+        self.trackFault2.setEnabled(False)
+        self.trackFault3.setEnabled(False)
 
     def center(self):
-        frameGm = self.frameGeometry()
-        screen = QApplication.desktop().screenNumber(QApplication.desktop().cursor().pos())
+        '''
+        Description here
+        '''
+        frameGm     = self.frameGeometry()
+        screen      = QApplication.desktop().screenNumber(QApplication.desktop().cursor().pos())
         centerPoint = QApplication.desktop().screenGeometry(screen).center()
         frameGm.moveCenter(centerPoint)
         self.move(frameGm.topLeft())
 
-    def updateFaults(self):
-        print(self.currBlock.faultPresence)
-        if self.currBlock.faultPresence == False:
-            self.currBlock.faultPresence = True
-            self.currBlock.faultsText = "Fault1"
+    def updateFaults(self, faultName):
+        '''
+        Description here
+        '''
+        print(faultName)
+
+        if self.currBlock.faultPresence == False and faultName not in self.currBlock.faultsText:
+            self.currBlock.faultsText        = []
+            self.currBlock.faultPresence     = True
+            self.faults[self.currBlockIndex] = 1
+            self.currBlock.faultsText.append(faultName)
             self.blockslistwidget.item(int(self.currBlock.blockNumber)-1).setBackground(QColor(255,0,0))
             self.updateBlockInfo(self.currBlockIndex)
-
-            self.faults[self.currBlockIndex] = 1
-            self.signals.trackFailuresSignal.emit(self.faults)
-        else:
-            self.currBlock.faultPresence = False
-            self.currBlock.faultsText = "None"
-            self.blockslistwidget.item(int(self.currBlock.blockNumber)-1).setBackground(QColor(250,250,250))
+        
+        elif self.currBlock.faultPresence == True and faultName not in self.currBlock.faultsText: 
+            self.currBlock.faultsText.append(faultName)
             self.updateBlockInfo(self.currBlockIndex)
-
+        
+        elif self.currBlock.faultPresence == True and faultName in self.currBlock.faultsText:
+            self.currBlock.faultsText.remove(faultName)
+            self.updateBlockInfo(self.currBlockIndex)
+        
+        if not self.currBlock.faultsText:
+            self.currBlock.faultPresence     = False
             self.faults[self.currBlockIndex] = 0
+            self.blockslistwidget.item(int(self.currBlock.blockNumber)-1).setBackground(QColor(128, 128, 128))
+            self.currBlockDisplay.setStyleSheet("background-color: cyan; color: black;")
+        
+        print(self.currBlock.faultPresence)
+        if self.signals:
             self.signals.trackFailuresSignal.emit(self.faults)
 
     def openFileNameDialog(self):
+        '''
+        Description here
+        '''
         options = QFileDialog.Options()
         options |= QFileDialog.DontUseNativeDialog
         fileName, _ = QFileDialog.getOpenFileName(self,"Track Layout Selection", "../Layout-Files","All Files (*);;Python Files (*.py)", options=options)
@@ -182,21 +258,29 @@ class TrackModel(QWidget):
             and a 2D list of BlockModel objects, the columns are the track-lines, 
             and the rows are the blocks for that line
         '''
-        parser = LayoutParser(self.layoutFile)
+        parser     = LayoutParser(self.layoutFile)
         self.lines = parser.process()
         for line in self.lines:
             self.lineNames.append(line.name)
             print(line.name)
+
         self.loadLines()
-        self.loadBlockInfoLabels()
+        self.displayBlockInfoLabels()
 
     def loadLines(self):
+        '''
+        Loads the names of the track lines parsed from the layout file into the 
+        lines selection list.
+        '''
         for i in range(len(self.lines)):
             self.lineBlocks.append([])
             self.linelistwidget.insertItem(i, self.lines[i].name)
         self.linelistwidget.itemClicked.connect(self.onClickedLine)
 
-    def loadBlockInfoLabels(self):
+    def displayBlockInfoLabels(self):
+        '''
+        Displays all of the labels for the information contained in a given track block.
+        '''
         self.blockInfolistwidget.insertItem(0,  "Track Line:           ")
         self.blockInfolistwidget.insertItem(1,  "Section:              ")
         self.blockInfolistwidget.insertItem(2,  "Block Number:         ")
@@ -226,6 +310,10 @@ class TrackModel(QWidget):
         self.blockInfolistwidget.insertItem(23, "Beacon:               ")
 
     def loadBlocks(self):
+        '''
+        Loads all of the track blocks for a given track line into
+        the block selection list.
+        '''
         self.blockslistwidget.clear()
         i = 0
         for section in self.lines[self.currLineIndex].sections:
@@ -237,32 +325,69 @@ class TrackModel(QWidget):
                 i+=1
         self.blockslistwidget.itemClicked.connect(self.onClickedBlock)
         self.blocksLoaded = True
-        self.signals.trackBlocksToTrainModelSignal.emit(self.lineBlocks)
-        self.signals.greenLineTrackBlockSignal.emit(self.orderedGreenLineList)
+        if self.signals:
+            self.signals.trackBlocksToTrainModelSignal.emit(self.lineBlocks)
+            self.signals.greenLineTrackBlockSignal.emit(self.orderedGreenLineList)
 
     def updateBlocks(self):
+        '''
+        Updates the background color of all the blocks in the current lines
+        block selection list with colors reflecting thier fault and occupancy states.
+        '''
         for i in range(len(self.occupancy)):
             if self.faults[i] == True:
                 self.blockslistwidget.item(i).setBackground(QColor(255,0,0))
             elif self.occupancy[i] == True:
                 self.blockslistwidget.item(i).setBackground(QColor(200,200,50))
+                if self.currBlockIndex == i: 
+                    self.currBlockDisplay.setStyleSheet("background-color: rgb(200,200,50); color: black;")
             else:
                 self.blockslistwidget.item(i).setBackground(QColor(134, 132, 130))
 
+        self.updateBlockInfo(self.currBlockIndex)
+
     def onClickedLine(self, item):
+        '''
+        Sets the current line based on the selection make from the list of lines
+        and loads the blocks for that line.
+        '''
         currLine = item.text()
         self.currLineIndex = self.lineNames.index(currLine)
         print(currLine, self.currLineIndex)
         self.loadBlocks()
 
     def onClickedBlock(self, item):
+        '''
+        Sets the current block selected from the current lines block list
+        and loads that blocks information into the block information values list.
+        '''
         self.currBlockIndex = int(item.text().split(" ")[1]) -1
         self.currBlock      = self.lineBlocks[self.currLineIndex][self.currBlockIndex]
         self.updateBlockInfo(self.currBlockIndex)
         self.currBlockDisplay.setText("BLOCK: "+str(self.currBlock.line)+"-"+str(self.currBlock.section)+"-"+str(self.currBlock.blockNumber))
+        self.trackFault1.setEnabled(True)
+        self.trackFault2.setEnabled(True)
+        self.trackFault3.setEnabled(True)
         
     def updateBlockInfo(self, pCurrBlockIndex):
-        
+        '''
+        Updates the displayed information in the block information list to that of
+        the currently selected block.
+        '''
+        if self.currBlock.faultsText:
+            self.currBlockDisplay.setStyleSheet("background-color: red; color: black;")
+
+            self.blockFaultIndicator.setText(str(self.currBlock.faultsText))
+            
+            self.blockFaultIndicator.show()
+            self.blockFaultIndicator.move(130, 40)
+            self.blockFaultIndicator.resize(300, 20)
+            self.blockFaultIndicator.setStyleSheet("background-color: yellow; color: black;")
+            self.blockFaultIndicator.setFont(QFont('Arial', 10))
+        else:
+            self.currBlockDisplay.setStyleSheet("background-color: cyan; color: black;")
+            self.blockFaultIndicator.hide()
+
         self.blockVallistwidget.clear()
         currBlock = self.lineBlocks[self.currLineIndex][pCurrBlockIndex]
         self.blockVallistwidget.insertItem(0,currBlock.line)
@@ -329,7 +454,7 @@ class TrackModel(QWidget):
             self.blockVallistwidget.item(16).setForeground(QtCore.Qt.red)
         self.blockVallistwidget.insertItem(17,"NA")
         self.blockVallistwidget.item(17).setForeground(QtCore.Qt.gray) 
-        self.blockVallistwidget.insertItem(18,currBlock.faultsText)
+        self.blockVallistwidget.insertItem(18,str(currBlock.faultsText))
         self.blockVallistwidget.item(18).setForeground(QtCore.Qt.red)
         self.blockVallistwidget.insertItem(19,currBlock.station)
         self.blockVallistwidget.item(19).setForeground(QtCore.Qt.yellow)
@@ -338,7 +463,10 @@ class TrackModel(QWidget):
         self.blockVallistwidget.insertItem(21,str(currBlock.underground))
         self.blockVallistwidget.item(21).setForeground(QtCore.Qt.red)
         
-    def loadBeaconInfo(self):
+    def displayBeaconInformationLabels(self):
+        '''
+        Description here
+        '''
         self.beaconInformationLabel = QLabel("-BEACON INFORMATION-",self)
         self.beaconInformationLabel.setAlignment(QtCore.Qt.AlignCenter)
         self.beaconInformationLabel.resize(300,18)
@@ -354,7 +482,6 @@ class TrackModel(QWidget):
         self.beaconInformationlistwidget.insertItem(2, "Next station Reverse:")
         self.beaconInformationlistwidget.insertItem(3, "Reverse Station Side:")
 
-
         self.beaconInformationVallistwidget = QListWidget(self)
         self.beaconInformationVallistwidget.setStyleSheet("color: orange;")
         self.beaconInformationVallistwidget.move(280,168)
@@ -362,12 +489,18 @@ class TrackModel(QWidget):
         self.beaconInformationVallistwidget.setStyleSheet("background-color: gray;")
     
     def getOccupancy(self, occupancy):
+        '''
+        Description here
+        '''
         self.occupancy = occupancy
         # print("GUI OCCUPANCY", self.occupancy)
         self.signals.globalOccupancyFromTrackModelSignal.emit(self.occupancy)
         self.updateBlockCall()
 
     def updateBlockList(self, line):
+        '''
+        Description here
+        '''
         for block in self.lineBlocks[line]:
             block.occupancy = 5
 

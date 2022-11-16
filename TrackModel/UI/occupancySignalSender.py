@@ -12,11 +12,15 @@
 #       - Block Maintenance
 ##############################################################################
 
+# Python Imports
 import time
 import random
 import threading
 
 class SendOccupancy():
+    '''
+    Class Description here
+    '''
     def __init__(self, signals):
         super().__init__()
         self.signals         = signals
@@ -33,9 +37,8 @@ class SendOccupancy():
         self.lineBlocks      = []
         self.greenLineBlocks = [] 
 
-        
+        # Signal Connections
         self.signals.greenLineTrackBlockSignal.connect(self.loadGreenLineBlocks)
-
         self.signals.trackFailuresSignal.connect(self.updateFaults)
         self.signals.trackBlocksToTrainModelSignal.connect(self.updateLineBlocks)
 
@@ -70,6 +73,8 @@ class SendOccupancy():
             self.occupancy[self.currBlockIndex]   = 1
             
             print("NEW OCCUPANCY:", self.currBlockIndex)
+
+        # Emit Occupancy    
         self.signals.occupancyFromTrainSignal.emit(self.occupancy)
         
         print("Train on Block:", self.currBlockIndex+1)
