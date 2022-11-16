@@ -41,7 +41,8 @@ class TrainData():
 
 class PointMassModel():
     def __init__(self):
-
+        
+        self.suggested_speed = 0
         #track model to train comms
         self.speed_limit = 0
         
@@ -224,6 +225,13 @@ class PointMassModel():
         curr_block_object = self.glBlockMOdels[self.occ_index]
         self.curr_block_len = curr_block_object.blockLength
         self.curr_block_len = float(self.curr_block_len)
+
+        #getting block values for speed
+        self.speed_limit = float(curr_block_object.speedLimit)
+        if self.suggested_speed > self.speed_limit:
+            self.speed_limit = self.speed_limit
+        else:
+            self.speed_limit = self.suggested_speed
 
         
         print(f'-------------------Position: {self.curr_pos}-----------------------------')
