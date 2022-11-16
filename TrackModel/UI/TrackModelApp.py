@@ -31,29 +31,33 @@ class TrackModel(QWidget):
         Description here
         '''
         super().__init__()
+        # Pyqt Window Properties
         self.title         = 'Track Model - Pittsburgh Light Rail'
         self.left          = 40
         self.top           = 40
         self.width         = 450
         self.height        = 750
+
+        # Current Selections
         self.currBlock     = None
+        self.currLineIndex = None
 
         # Layout Information
         self.lineNames     = []    # List of Strings holding line names
         self.lines         = []    # List of TrackLine Objects
         self.lineBlocks    = []    # 2D List of blocks, each list representing a line
         self.blocksLoaded  = False # Bool to represent wether the TrackBlocks for a given line have been loaded
-        self.currLineIndex = None
         self.layoutFile    = None
         self.testList      = []
         self.signals       = None
 
-        # System Communication Signals  
+        # Variables to hold values for System Communication Signals  
         self.occupancy            = [False for i in range(150)] # only Green line for right not
         self.faults               = [0 for i in range(150)]     # only Green line for right not
         self.orderedGreenLineList = []
         self.orderedGreenLine()
         
+        # System Communication Signals
         if signals:
             self.signals = signals
             self.signals.occupancyFromTrainSignal.connect(self.getOccupancy)
@@ -87,12 +91,57 @@ class TrackModel(QWidget):
         '''
         self.setWindowTitle(self.title)
         self.setGeometry(self.left, self.top, self.width, self.height)
+        
+        self.displayLoadLayoutButton()
+        # self.center() # Opens UI in the center of the current screen
+        self.displayTrackBlockList()
+        self.displayBlockInformationSection()
+        self.displayLargeSelectedBlockLabel()
+        self.displayTrackLineList()
+        self.displayFaultButtons()
+        self.displayBeaconInformationLabels()
+        self.show()
+
+    def displayLoadLayoutButton(self):
+        '''
+        Description here
+        '''
         self.bt1 = QPushButton("LOAD LAYOUT ",self)
         self.bt1.resize(self.width, 30)
         self.bt1.setStyleSheet("background-color: orange ; color: black;")
         self.bt1.clicked.connect(self.openFileNameDialog)
-        # self.center() # Opens UI in the center of the current screen
 
+    def displayLargeSelectedBlockLabel(self):
+        '''
+        Description here
+        '''
+        self.currBlockDisplay = QLabel("BLOCK:", self)
+        self.currBlockDisplay.move(130, 40)
+        self.currBlockDisplay.resize(300, 100)
+        self.currBlockDisplay.setStyleSheet("background-color: cyan; color: black;")
+        self.currBlockDisplay.setFont(QFont('Arial', 20))
+        
+        # Sets large indicator with track fault label
+        self.blockFaultIndicator = QLabel('', self)
+        self.blockFaultIndicator.hide()
+
+    def displayTrackLineList(self):
+        '''
+        Description here
+        '''
+        self.linesLabel = QLabel("TRACK LINES", self)
+        self.linesLabel.setStyleSheet("background-color: cyan; color: black;")
+        self.linesLabel.move(5,40)
+        self.linesLabel.resize(100,18)
+        self.linelistwidget = QListWidget(self)
+        self.linelistwidget.move(5,58)
+        self.linelistwidget.resize(100,50)
+        self.linelistwidget.setStyleSheet("background-color: gray;")
+
+    def displayTrackBlockList(self):
+        '''
+        Description here
+        '''
         self.blocksLabel = QLabel("TRACK BLOCKS", self)
         self.blocksLabel.setStyleSheet("background-color: cyan; color: black;")
         self.blocksLabel.move(5,150)
@@ -102,6 +151,10 @@ class TrackModel(QWidget):
         self.blockslistwidget.resize(100,580)
         self.blockslistwidget.setStyleSheet("background-color: rgb(128, 128, 128);")
 
+    def displayBlockInformationSection(self):
+        '''
+        Description here
+        '''
         self.blockInfoLabel = QLabel("- BLOCK INFORMATION -", self)
         self.blockInfoLabel.setAlignment(QtCore.Qt.AlignCenter)
         self.blockInfoLabel.resize(300,18)
@@ -118,29 +171,6 @@ class TrackModel(QWidget):
         self.blockVallistwidget.move(280,268)
         self.blockVallistwidget.resize(150,420) 
         self.blockVallistwidget.setStyleSheet("background-color: gray;")
-
-        self.currBlockDisplay = QLabel("BLOCK:", self)
-        self.currBlockDisplay.move(130, 40)
-        self.currBlockDisplay.resize(300, 100)
-        self.currBlockDisplay.setStyleSheet("background-color: cyan; color: black;")
-        self.currBlockDisplay.setFont(QFont('Arial', 20))
-
-        
-        self.blockFaultIndicator = QLabel('', self)
-        self.blockFaultIndicator.hide()
-
-        self.linesLabel = QLabel("TRACK LINES", self)
-        self.linesLabel.setStyleSheet("background-color: cyan; color: black;")
-        self.linesLabel.move(5,40)
-        self.linesLabel.resize(100,18)
-        self.linelistwidget = QListWidget(self)
-        self.linelistwidget.move(5,58)
-        self.linelistwidget.resize(100,50)
-        self.linelistwidget.setStyleSheet("background-color: gray;")
-        
-        self.displayFaultButtons()
-        self.displayBeaconInformationLabels()
-        self.show()
 
     def displayFaultButtons(self):
         '''
@@ -211,6 +241,9 @@ class TrackModel(QWidget):
             self.signals.trackFailuresSignal.emit(self.faults)
 
     def openFileNameDialog(self):
+        '''
+        Description here
+        '''
         options = QFileDialog.Options()
         options |= QFileDialog.DontUseNativeDialog
         fileName, _ = QFileDialog.getOpenFileName(self,"Track Layout Selection", "../Layout-Files","All Files (*);;Python Files (*.py)", options=options)
