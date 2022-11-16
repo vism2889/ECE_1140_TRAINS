@@ -27,7 +27,7 @@ class BlockModel:
 
         self.occupancy              = False
         self.faultPresence          = False
-        self.faultsText             = ""
+        self.faultsText             = []
         self.station                = ""
         self.switch                 = ""
         self.crossingPresence       = False

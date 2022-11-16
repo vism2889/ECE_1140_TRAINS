@@ -12,14 +12,19 @@
 from PyQt5 import QtCore
 from PyQt5.QtWidgets import QWidget
 
-class Signals(QWidget):
+class Signals(QWidget): 
     # Track Message Signals
-    trackModelLayoutLoadedSignal = QtCore.pyqtSignal(list) # Lets other modules know that the TrackLayout has been successfully loaded
-    occupancySignal              = QtCore.pyqtSignal(list) # List of booleans, length of a single trackline
-    switchStatesSignal           = QtCore.pyqtSignal(list) # List of integers, length of a single trackline
-    maintenanceSignal            = QtCore.pyqtSignal(list) # List of booleans, length of a single trackline
-    trackFailuresSignal          = QtCore.pyqtSignal(list) # List of booleans, length of a single trackline
-    lineSignal                   = QtCore.pyqtSignal(str)  # String Name of trackline
+    globalOccupancyFromTrackModelSignal = QtCore.pyqtSignal(list)
+    trackModelLayoutLoadedSignal        = QtCore.pyqtSignal(list) # Lets other modules know that the TrackLayout has been successfully loaded
+    occupancyFromTrainSignal            = QtCore.pyqtSignal(list) # List of booleans, length of a single trackline
+    switchStatesSignal                  = QtCore.pyqtSignal(list) # List of integers, length of a single trackline
+    maintenanceSignal                   = QtCore.pyqtSignal(list) # List of booleans, length of a single trackline
+    trackFailuresSignal                 = QtCore.pyqtSignal(list) # List of booleans, length of a single trackline
+    lineSignal                          = QtCore.pyqtSignal(str)  # String Name of trackline
+          
+    trackBlocksToTrainModelSignal       = QtCore.pyqtSignal(list) # List of block objects, sent to train
+    greenLineTrackBlockSignal           = QtCore.pyqtSignal(list) # List of integer block numbers in the correct order for the green line.
+    
     # Above could be a single list signal formatted as below: 
     # ["TrackLineName", [lineOccupancy], [lineSwitchStates], [lineMaintenance], [lineFailures]]
 
