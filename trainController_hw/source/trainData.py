@@ -1,7 +1,18 @@
+##############################################################################
+# AUTHOR:   Juin Sommer
+# DATE:     11/17/2022
+# FILENAME: trainData.py
+# DESCRIPTION:
+# Class to handle Train Controller input data received from Train Model with
+# the winserver using TCP/IP via ethernet.
+##############################################################################
+
 from winserver import winserver
-from in_msg import in_msg
 import random 
 import time
+import sys
+sys.path.append("../server_interfaces")
+from in_msg import in_msg
 
 class TrainData:
     def __init__(self):

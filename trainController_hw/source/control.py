@@ -1,3 +1,28 @@
+##############################################################################
+# AUTHOR:   Juin Sommer
+# DATE:     11/17/2022
+# FILENAME: control.py
+# DESCRIPTION:
+# Class to define the Train Controller functionality and define GPIO outputs
+# for the RPi
+
+# TODO:
+# - Generate new message files to take authority as a distance
+# - Change max speed value range to 43.5 MPH. 
+# - Change speedometer max display value to 50 MPH.
+# - implement failure states
+#   + failure indicators
+#   + stop train 
+# - Implement speed limit 
+#   + train cannot exceed speed limit
+# - Implement next station
+#   + display next station
+#   + use next station for announcements 
+# - Implement authority
+#   + stop train when authority is reached
+# - Implement station announcement audio for green line
+##############################################################################
+
 import RPi.GPIO as GPIO
 from simple_pid import PID
 from pygame import mixer
@@ -123,26 +148,16 @@ class Control():
         if(not start) : mixer.music.stop()
 
     def deployEbrake(self, deploy=None):
-        # may have to consider case where if in auto mode and ebrake is deployed, stop taking in commanded speed data
-        if(deploy == None):
-            self.ebrakeCommand = self.input.getEbrakeCommand()
-            self.output.setEbrakeState(self.ebrakeCommand)
-        
-        else:
+        if deploy != None:
             self.ebrakeCommand = deploy
             self.output.setEbrakeState(self.ebrakeCommand)
 
-    def deployServiceBrake(self, state=None):
-        if state != None:
-            self.brakeCommand = state
+    def deployServiceBrake(self, deploy=None):
+        if deploy != None:
+            self.brakeCommand = deploy
             self.output.setServiceBrakeState(self.brakeCommand)
 
-        else:
-            brake = self.input.getServiceBrakeCommand()
-            if brake != None:
-                self.brakeCommand = brake
-            self.output.setServiceBrakeState(self.brakeCommand)
-
+    # TODO: implement speed limit
     def limitSpeed(self, speed):
         speed_limit = self.input.getSpeedLimit()
         if(speed > speed_limit):
@@ -150,6 +165,7 @@ class Control():
         
         else: return True
 
+    # TODO: implement authority
     def checkAuthority(self):
         if self.authority == 0:
             self.deployEbrake(self)
@@ -162,7 +178,7 @@ class Control():
         return self.k_p, self.k_i
 
     def getPowerOutput(self, commanded_speed=None):
-        if self.ebrakeCommand == True:
+        if self.ebrakeCommand == True or self.brakeCommand == True:
             self.output.setPower(0.0)
             return
         
@@ -181,7 +197,8 @@ class Control():
 
         else:
             self.output.setPower(0.0)
-
+    
+    # used for server interface testing to send dummy data to a client acting as train model
     def sendRandom(self):
         self.output.randomize()
         self.output.publish()

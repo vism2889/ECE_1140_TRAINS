@@ -1,3 +1,12 @@
+##############################################################################
+# AUTHOR:   Juin Sommer
+# DATE:     11/17/2022
+# FILENAME: driver_UI.py
+# DESCRIPTION:
+# Train Driver UI to display necessary information and driving code for 
+# Control and ManualControl classes
+##############################################################################
+
 from PyQt5 import QtCore, QtGui, QtWidgets
 from analoggaugewidget import AnalogGaugeWidget
 from PyQt5.QtCore import pyqtSlot, QTimer, pyqtSignal

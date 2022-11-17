@@ -1,3 +1,13 @@
+##############################################################################
+# AUTHOR:   Juin Sommer
+# DATE:     11/17/2022
+# FILENAME: analogInput.py
+# DESCRIPTION:
+# Class to handle ADC from the analog inputs interfacing the RPi.
+# Analog inputs are a sliding pot for changing speed and braking, a pot for
+# changing temperature value.
+##############################################################################
+
 import os
 import time
 import busio
@@ -41,6 +51,7 @@ class AnalogIn():
         time.sleep(.1)
         return set_value
 
+    # sliding pot value below tolerance will send bool value to activate service brake
     def getBrakingValue(self):
         set_value = False
         trim_pot_changed = False

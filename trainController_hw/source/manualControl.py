@@ -1,3 +1,12 @@
+##############################################################################
+# AUTHOR:   Juin Sommer
+# DATE:     11/17/2022
+# FILENAME: manualControl.pu
+# DESCRIPTION:
+# Class to define manual control functionality for the Train Driver UI
+# interfacing with hardware (RPi GPIO). Defines inputs to RPi.
+##############################################################################
+
 import RPi.GPIO as GPIO
 from time import sleep
 from pygame import mixer

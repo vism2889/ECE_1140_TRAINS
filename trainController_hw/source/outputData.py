@@ -1,6 +1,17 @@
+##############################################################################
+# AUTHOR:   Juin Sommer
+# DATE:     11/17/2022
+# FILENAME: outputData.py
+# DESCRIPTION:
+# Class to handle Train Controller output data to send to Train Model with
+# the winserver using TCP/IP via ethernet.
+##############################################################################
+
 import random
 import time
 from winserver import winserver
+import sys
+sys.path.append("../server_interfaces")
 from out_msg import out_msg
 
 class OutputData():

@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+# Analog speedometer widget used in driver_UI.py
+
 ###
 # Author: Stefan Holstein
 # inspired by: https://github.com/Werkov/PyQt4/blob/master/examples/widgets/analogclock.py
