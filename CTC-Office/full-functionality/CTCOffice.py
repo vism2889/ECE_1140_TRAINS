@@ -12,7 +12,7 @@ from TrainDictionary import TrainDictionary
 from LayoutParser import LayoutParser
 from DispatchPopUp import DispatchPopUp
 from ScheduleParser import ScheduleParser
-from Signals import Signals
+#from Signals import Signals
 
 class CTCOffice(QWidget):
     dispatchSignal = QtCore.pyqtSignal(bool)
@@ -46,16 +46,18 @@ class CTCOffice(QWidget):
         # select default block
         self.selectedBlock = 1
         self.selectedBlockLine = self.redLineBlocks
-        self.redLineTrains = TrainDictionary()
-        self.greenLineTrains = TrainDictionary()
-        self.scheduleParser = ScheduleParser()
+        self.redLineTrains      = TrainDictionary()
+        self.greenLineTrains    = TrainDictionary()
+        self.scheduleParser     = ScheduleParser()
 
     def setupUi(self):
         self.setObjectName("self")
         self.setGeometry(10, 10, 600, 580)
         self.setMouseTracking(True)
-        self.redLineMaintenance = False
+        self.redLineMaintenance   = False
         self.greenLineMaintenance = False
+        self.manualMode           = True
+        self.tenTimeSpeed         = False
 
         font = QtGui.QFont()
         font.setPointSize(16)
@@ -65,6 +67,11 @@ class CTCOffice(QWidget):
         self.clockLabel.setStyleSheet("background-color: gray; border: 1px solid black")
         self.clockLabel.setAlignment(QtCore.Qt.AlignCenter)
         self.clockLabel.setFont(font)
+
+        self.changeClockSpeedButton = QtWidgets.QPushButton(self)
+        self.changeClockSpeedButton.setGeometry(450,5,140,15)
+        self.changeClockSpeedButton.setText("Change clock speed")
+        self.changeClockSpeedButton.clicked.connect(self.toggleTenTimeSpeed)
 
     ##################### RED LINE ##########################
         self.redLineLabelTable = QTableWidget(self)
@@ -84,6 +91,7 @@ class CTCOffice(QWidget):
         self.redLineBlockTable.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.redLineBlockTable.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.redLineBlockTable.itemClicked.connect(self.redBlockSelectionChanged)
+        self.redLineBlockTable.clicked.connect(self.redBlockSelectionChanged)
         self.selectedBlockTable = self.redLineBlockTable
 
         for row in range(0,self.redLineBlockTable.rowCount()):
@@ -183,10 +191,16 @@ class CTCOffice(QWidget):
         self.dispatchTrainButton.clicked.connect(self.launchDispatchPopUp)
 
         self.uploadScheduleButton = QtWidgets.QPushButton(self)
-        self.uploadScheduleButton.setGeometry(450, 90, 140, 25)
+        self.uploadScheduleButton.setGeometry(450, 55, 140, 25)
         self.uploadScheduleButton.setText("Upload Schedule")
         self.uploadScheduleButton.clicked.connect(self.uploadSchedule)
-        self.uploadScheduleButton.show()  
+        self.uploadScheduleButton.hide()  
+
+        self.toggleDispatchModeButton = QtWidgets.QPushButton(self)
+        self.toggleDispatchModeButton.setGeometry(450,90,140,25)
+        self.toggleDispatchModeButton.setText("Toggle Dispatch Mode")
+        self.toggleDispatchModeButton.show()
+        self.toggleDispatchModeButton.clicked.connect(self.toggleDispatchMode)
 
         self.toggleDestinationsButton = QtWidgets.QPushButton(self)
         self.toggleDestinationsButton.setGeometry(265, 535, 140, 20)
@@ -222,8 +236,30 @@ class CTCOffice(QWidget):
 
     def showTime(self):
         current_time = QTime.currentTime()
-        self.label_time = current_time.toString('hh:mm:ss')
-        self.clockLabel.setText(self.label_time)
+
+        if self.tenTimeSpeed:
+            self.seconds = int(self.seconds)
+            self.minutes = int(self.minutes)
+            self.hours   = int(self.hours)
+
+            self.seconds += 1
+            if self.seconds == 60:
+                self.seconds = 0
+                self.minutes += 1
+            if self.minutes == 60:
+                self.hours += 1
+                self.minutes = 0
+            if self.hours == 24:
+                self.hours = 0
+        else:
+            self.seconds = current_time.toString('ss')
+            self.minutes = current_time.toString('mm')
+            self.hours   = current_time.toString('hh')
+        
+        self.clockLabel.setText(f"{self.hours:02}" + ":" + f"{self.minutes:02}" + ":" + f"{self.seconds:02}")
+
+    def toggleTenTimeSpeed(self):
+        self.tenTimeSpeed = not self.tenTimeSpeed
 
     def populateRedLineTable(self):
         for key in self.redLineBlocks.keys():
@@ -456,6 +492,18 @@ class CTCOffice(QWidget):
     def readOccupancySignal(self, occupancySignal):
         for block in range(0, len(occupancySignal)):
             self.greenLineBlocks.setOccupancy(str(block+1), occupancySignal[block])
+
+    def toggleDispatchMode(self):
+        if self.manualMode:
+            self.dispatchTrainButton.hide()
+            self.toggleMaintenanceButton.hide()
+            self.uploadScheduleButton.show()
+            self.manualMode = False
+        else:
+            self.dispatchTrainButton.show()
+            self.toggleMaintenanceButton.show()
+            self.uploadScheduleButton.hide()
+            self.manualMode = True
             
 
 if __name__ == "__main__":
