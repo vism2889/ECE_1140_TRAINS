@@ -12,22 +12,17 @@ class MyPub:
 
         #message for train controllers
         self.tc_msg = to_TC()
-        self.tc_pub = self.node.advertise('To_Train_Controller', to_TC, 1)
-
-        #messag for track model
-        self.tm_pub = self.node.advertise('To_Track_Model')
-    
+        self.tc_pub = self.node.advertise('To_Train_Controller', to_TC, 1)    
     def publish(self):
         self.tc_msg.current_speed = self.train.pm.curr_vel
         self.tc_msg.authority = self.train.authority
         self.tc_msg.commanded_speed = self.train.cmd_speed
         self.tc_msg.speed_limit = self.train.speed_limit
-        self.tc_msg.suggested_speed = 0
-        self.tc_msg.left_door_command = False
-        self.tc_msg.right_door_command = False
-        self.tc_msg.ebrake_command = False
-        self.tc_msg.service_brake_command = False
-
+        self.tc_msg.next_station = self.train.next_station
+        self.tc_msg.brake_failure = self.train.brake_failure
+        self.tc_msg.signalPickup_failure = self.train.signal_pickup_failure
+        self.tc_msg.engine_failure = self.train.train_engine_failure
+       
         self.tc_pub.publish(self.tc_msg)
 
 class MySub:
@@ -61,6 +56,7 @@ if __name__ == "__main__":
         p = 120000
         print('setting power')
         t.set_power(p)
+        time.sleep()
         print(f"before publisher train.pm.curr_vel = {t.pm.curr_vel}")
         mp.publish()
         print("done")
