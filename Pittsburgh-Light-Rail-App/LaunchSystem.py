@@ -64,10 +64,13 @@ class PittsburghLightRail():
         print("Master Luanch Global Occ:", self.globalOcc)
         
 if __name__ == '__main__':
-    if sys.argv[1] == 'hw':
+
+    if len(sys.argv) > 1:
         hardWare = True
     else:
+        print('Hardware is False')
         hardWare = False
+
     app = QApplication(sys.argv)
     ex = PittsburghLightRail(hardWare)
     sys.exit(app.exec_())
