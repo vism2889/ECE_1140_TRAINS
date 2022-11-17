@@ -257,10 +257,15 @@ class CTCOffice(QWidget):
                 self.minutes = 0
             if self.hours == 24:
                 self.hours = 0
+
+            self.signals.clockSpeedSignal.emit(10)
+
         else:
             self.seconds = current_time.toString('ss')
             self.minutes = current_time.toString('mm')
             self.hours   = current_time.toString('hh')
+
+            self.signals.clockSpeedSignal.emit(1)
         
         self.clockLabel.setText(str(self.hours) + ":" + str(self.minutes) + ":" + str(self.seconds))
 
