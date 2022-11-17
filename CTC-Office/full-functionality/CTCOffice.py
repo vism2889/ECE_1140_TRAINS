@@ -12,7 +12,7 @@ from TrainDictionary import TrainDictionary
 from LayoutParser import LayoutParser
 from DispatchPopUp import DispatchPopUp
 from ScheduleParser import ScheduleParser
-#from Signals import Signals
+from Signals import Signals
 
 class CTCOffice(QWidget):
     dispatchSignal = QtCore.pyqtSignal(bool)
@@ -174,7 +174,7 @@ class CTCOffice(QWidget):
 
     ##################### TRAIN INFO ########################
         self.destinationTable = QtWidgets.QTableWidget(self)
-        self.destinationTable.setGeometry(10, 440, 250, 120)
+        self.destinationTable.setGeometry(10,440,250,120)
         self.destinationTable.setColumnCount(2)
         self.destinationTable.setColumnWidth(0, 160)
         self.destinationTable.setColumnWidth(1, 88)
@@ -185,13 +185,13 @@ class CTCOffice(QWidget):
         self.destinationTable.show()
 
         self.dispatchTrainButton = QtWidgets.QPushButton(self)
-        self.dispatchTrainButton.setGeometry(450, 55, 140, 25)
+        self.dispatchTrainButton.setGeometry(450,55,140,25)
         self.dispatchTrainButton.setText("Dispatch")
         self.dispatchTrainButton.show()
         self.dispatchTrainButton.clicked.connect(self.launchDispatchPopUp)
 
         self.uploadScheduleButton = QtWidgets.QPushButton(self)
-        self.uploadScheduleButton.setGeometry(450, 55, 140, 25)
+        self.uploadScheduleButton.setGeometry(450,55,140,25)
         self.uploadScheduleButton.setText("Upload Schedule")
         self.uploadScheduleButton.clicked.connect(self.uploadSchedule)
         self.uploadScheduleButton.hide()  
@@ -203,15 +203,20 @@ class CTCOffice(QWidget):
         self.toggleDispatchModeButton.clicked.connect(self.toggleDispatchMode)
 
         self.toggleDestinationsButton = QtWidgets.QPushButton(self)
-        self.toggleDestinationsButton.setGeometry(265, 535, 140, 20)
+        self.toggleDestinationsButton.setGeometry(265,535,140,20)
         self.toggleDestinationsButton.setText("Toggle Destinations")
         self.toggleDestinationsButton.clicked.connect(self.toggleDestinations)
         self.toggleDestinationsButton.show()
 
         self.suggestedSpeedLabel = QtWidgets.QLabel(self)
-        self.suggestedSpeedLabel.setGeometry(265, 510, 140, 20)
+        self.suggestedSpeedLabel.setGeometry(265,510,140,20)
         self.suggestedSpeedLabel.setText("Suggested Speed: N/A")
         self.suggestedSpeedLabel.show()
+
+        self.selectedTrainLabel = QtWidgets.QLabel(self)
+        self.selectedTrainLabel.setGeometry(265,485,140,20)
+        self.selectedTrainLabel.setText("Selected Train: N/A")
+        self.selectedTrainLabel.show()
 
         self.trainImage          = QtWidgets.QLabel(self)
         self.pixmap              = QPixmap('Train.png')
@@ -373,9 +378,10 @@ class CTCOffice(QWidget):
             self.destinationTable.setItem(index, 1, item2)
             index += 1
 
-    def updateSuggestedSpeed(self):
+    def updateTrainInfo(self):
         speed = int(self.selectedTrainLine.getSuggestedSpeed(self.selectedTrain))
         self.suggestedSpeedLabel.setText("Suggested Speed: " + str(speed) + " mph")
+        self.selectedTrainLabel.setText("Selected Train: " + self.selectedTrain)
 
     def redBlockSelectionChanged(self):
         self.selectedBlock = self.redLineBlockTable.currentRow() + 1
@@ -388,7 +394,7 @@ class CTCOffice(QWidget):
         self.selectedTrainLine = self.redLineTrains
         self.selectedTrainStations = self.redLineTrains.getDestination(self.selectedTrain)
         self.updateDestinationTable()
-        self.updateSuggestedSpeed()
+        self.updateTrainInfo()
 
     def greenBlockSelectionChanged(self):
         self.selectedBlock = self.greenLineBlockTable.currentRow() + 1
@@ -401,7 +407,7 @@ class CTCOffice(QWidget):
         self.selectedTrainLine = self.greenLineTrains
         self.selectedTrainStations = self.greenLineTrains.getDestination(self.selectedTrain)
         self.updateDestinationTable()
-        self.updateSuggestedSpeed()
+        self.updateTrainInfo()
 
     def updateBlockTable(self):
         item = QtWidgets.QTableWidgetItem()
