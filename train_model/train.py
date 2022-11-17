@@ -116,7 +116,7 @@ class PointMassModel():
         self.elapsed_time = self.curr_time-self.prev_time
 
         if self.curr_vel > 0:
-            print(f'Ebrake velocity before decleration:{self.curr_vel}')
+            print(f'Ebrake velocity before deceleration:{self.curr_vel}')
             self.prev_vel = self.curr_vel
             self.prev_accel = self.curr_accel
             self.curr_accel = self.dec_force()
@@ -207,7 +207,7 @@ class PointMassModel():
         else:
             self.force = 120000 * 2
             self.force -= static_friction_force
-            print(f'force - static force = {self.force}')
+            # print(f'force - static force = {self.force}')
 
                 
     
@@ -239,7 +239,7 @@ class PointMassModel():
             self.speed_limit = self.suggested_speed
 
         
-        print(f'-------------------Position: {self.curr_pos}-----------------------------')
+        # print(f'-------------------Position: {self.curr_pos}-----------------------------')
         if self.curr_pos >= self.curr_block_len:
             self.occ_list[self.occ_index] = 0
             
@@ -356,16 +356,16 @@ class Train():
             else:
                 self.pm.setPower(self.curr_power, time.time() )
 
-                print('\nTrain Model Object Values')
-                print(f'time_elapsed: {self.pm.elapsed_time}')
-                print(f'Current Power: {self.curr_power}')
-                # print(f'Previous Vel:{self.pm.prev_vel}')
-                # print(f'Force: {self.pm.force}')
-                # print(f'Previous Accel:{self.pm.prev_accel}')
-                # print(f'Current Accel:{self.pm.curr_accel}')
-                print(f'Current_Vel: {self.pm.curr_vel}')
-                print(f'Current Speed: {self.pm.curr_speed} mph')
-                # print(f'Current Position: {self.pm.curr_pos} m \n')
+                # print('\nTrain Model Object Values')
+                # print(f'time_elapsed: {self.pm.elapsed_time}')
+                # print(f'Current Power: {self.curr_power}')
+                # # print(f'Previous Vel:{self.pm.prev_vel}')
+                # # print(f'Force: {self.pm.force}')
+                # # print(f'Previous Accel:{self.pm.prev_accel}')
+                # # print(f'Current Accel:{self.pm.curr_accel}')
+                # print(f'Current_Vel: {self.pm.curr_vel}')
+                # print(f'Current Speed: {self.pm.curr_speed} mph')
+                # # print(f'Current Position: {self.pm.curr_pos} m \n')
             
                 
             

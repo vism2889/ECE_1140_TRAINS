@@ -45,19 +45,15 @@ class TrainModel(QtWidgets.QMainWindow):
         self.brake_update = time.time()
 
     def set_blocks(self,msg):
-        print('got blocks: ', msg[1])
         self.t.pm.glBlockModels = msg[1]
         # file = open('trackblocks', 'wb')
         # pickle.dump(self.t.pm.glBlockMOdels, file)
         # file.close()
 
     def dispatch(self, msg):
-        print(f'Dispatched, message: {msg}')
-        print('id is: ', {msg[0]})
-        print('line is: ', {msg[1]})
         self.t.id = msg[0]
         self.t.line = msg[1]
-        print(f'------------DISPATCHED!!!!!!!!!!!------------------')
+        # print(f'------------DISPATCHED!!!!!!!!!!!------------------')
         self.t.dispatch()
         self.last_update = time.time()
 
@@ -65,7 +61,7 @@ class TrainModel(QtWidgets.QMainWindow):
         # print(f'Message is:{msg}')
         # print(f'Message type is: {type(msg)}')
         p = msg['power']
-        print(f'---------RECEIVED POWER IS: {p}------------------')
+        # print(f'---------RECEIVED POWER IS: {p}------------------')
         self.t.pm.power = msg['power']
 
     def UI(self):
@@ -105,31 +101,31 @@ class TrainModel(QtWidgets.QMainWindow):
     
     def train_eng_failure(self):
         if self.t.train_engine_failure:
-            print('Train Engine Failure Pressed Again! removing failure')
+            # print('Train Engine Failure Pressed Again! removing failure')
             self.t.train_engine_failure = False
             self.train_eng_fail.setStyleSheet("background-color: gray")
         else:
-            print('Train Engine Failure Triggered')
+            # print('Train Engine Failure Triggered')
             self.t.train_engine_failure = True
             self.train_eng_fail.setStyleSheet("background-color: red")
 
     def sig_failure(self):
         if self.t.signal_pickup_failure:
-            print('Signal Failure Pressed Again! removing failure')
+            # print('Signal Failure Pressed Again! removing failure')
             self.t.signal_pickup_failure = False
             self.sig_fail.setStyleSheet("background-color: gray")
         else:
-            print('Signal Failure Triggered')
+            # print('Signal Failure Triggered')
             self.t.signal_pickup_failure = True
             self.sig_fail.setStyleSheet("background-color: red")
     
     def brake_failure(self):
         if self.t.brake_failure:
-            print('Brake Failure Pressed Again! removing failure')
+            # print('Brake Failure Pressed Again! removing failure')
             self.t.brake_failure = False
             self.brake_fail.setStyleSheet("background-color: gray")
         else:
-            print("Brake Failure Triggered")
+            # print("Brake Failure Triggered")
             self.t.brake_failure = True
             self.brake_fail.setStyleSheet("background-color: red")
     
@@ -190,12 +186,12 @@ class TrainModel(QtWidgets.QMainWindow):
             if self.t.e_brake == False and self.t.service_brake == False and self.t.dispatched:
                 self.t.set_power(self.t.pm.power)
                 self.signals.currentSpeedOfTrainModel.emit(self.t.pm.curr_vel)
-                print(f'Occ_list is: {self.t.pm.occ_list}')
+                # print(f'Occ_list is: {self.t.pm.occ_list}')
                 # print(f'Curr Pos in block {self.qt.t.pm.curr_block} is: {self.qt.t.pm.curr_pos}')
                 self.signals.occupancyFromTrainSignal.emit(self.t.pm.occ_list)
                 self.signals.commandedSpeedSignal.emit(self.t.pm.speed_limit)
                 self.last_update = time.time()
-                print('PUBLISHING!!!')
+                # print('PUBLISHING!!!')
                 self.mp.publish()
 
         if time.time()-self.brake_update > 0.5:
