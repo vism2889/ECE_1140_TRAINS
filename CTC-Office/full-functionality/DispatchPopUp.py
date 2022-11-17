@@ -56,6 +56,7 @@ class DispatchPopUp(object):
         # set red line destination list 
         self.index = 0
         self.destinationList = self.redLineStations
+        self.trainList = self.redLineTrains
         for key in self.redLineStations.keys():
             item = QtWidgets.QTableWidgetItem()
             item.setText(_translate("MainWindow", key))
@@ -70,6 +71,7 @@ class DispatchPopUp(object):
         self.stationTable.clear()
 
         if (self.currentLine == "Red Line"):
+            self.trainList = self.redLineTrains
             self.destinationList = self.redLineStations
             self.stationTable.setRowCount(len(self.redLineStations))
 
@@ -84,6 +86,7 @@ class DispatchPopUp(object):
                 self.index += 1
 
         elif (self.currentLine == "Green Line"):
+            self.trainList = self.greenLineTrains
             self.destinationList = self.greenLineStations
             self.stationTable.setRowCount(len(self.greenLineStations))
             
@@ -107,23 +110,17 @@ class DispatchPopUp(object):
             spinBox = self.stationTable.cellWidget(row, 1)
             TTS = spinBox.value()
             self.totalTTS += int(TTS)
-            print(self.totalTTS)
 
-        if (self.currentLine == "Red Line"):
-            self.redLineTrains.addTrain(self.trainName, self.destinationList, 0, 0)
-            self.redLineTrains.setSuggestedSpeed(self.trainName, self.totalTTS)
-            self.suggestedSpeed = self.redLineTrains.getSuggestedSpeed(self.trainName)
-        elif (self.currentLine == "Green Line"):
-            self.greenLineTrains.addTrain(self.trainName, self.destinationList, 0, 0)
-            self.greenLineTrains.setSuggestedSpeed(self.trainName, self.totalTTS)
-            self.suggestedSpeed = self.greenLineTrains.getSuggestedSpeed(self.trainName)
+        self.trainList.addTrain(self.trainName, self.destinationList, 0, 0)
+        self.trainList.setSuggestedSpeed(self.trainName, self.totalTTS)
+        self.suggestedSpeed = self.trainList.getSuggestedSpeed(self.trainName)
 
         # add dispatch destinations to list
         for destination in self.selectedDestinations:
-            if (self.currentLine == "Red Line"):
-                self.redLineTrains.toggleDestination(self.trainName, destination.text(), False)
-            elif (self.currentLine == "Green Line"):
-                self.greenLineTrains.toggleDestination(self.trainName, destination.text(), False)
+            self.trainList.toggleDestination(self.trainName, destination.text(), False)
 
+        self.trainList.sendAuthority(self.trainName, self.signals)
         self.signals.dispatchTrainSignal.emit([self.trainName, self.currentLine, self.suggestedSpeed])
+
+        
 
