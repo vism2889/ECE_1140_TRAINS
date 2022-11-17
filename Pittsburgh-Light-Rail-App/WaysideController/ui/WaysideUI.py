@@ -51,17 +51,14 @@ class TrackControllerWindow(QtWidgets.QWidget):
         self.toolBox.setObjectName("toolBox")
         self.toolBox.setFont(QtGui.QFont())
 
-        # path = os.getcwd()
-        # jsonPath = os.getcwd()
-        path = os.path.abspath(__file__.replace(__name__.replace('.', '/')+'.py', ''))
-        # print(path)
-        # jsonPath = os.path.abspath(__file__.replace(__name__.replace('.', '/')+'.py', ''))
-        jsonPath = path
-
         if os.name == 'nt':
+            path = os.path.abspath(__file__.replace(__name__.replace('.', '\\')+'.py', ''))
+            jsonPath = path
             path += "\\track_layout\\Track Layout & Vehicle Data vF.xlsx - Red Line.csv"
             jsonPath += "\\track_layout\\redline-layout.json"
         elif os.name == 'posix':
+            path = os.path.abspath(__file__.replace(__name__.replace('.', '/')+'.py', ''))
+            jsonPath = path
             path += "/track_layout/Track Layout & Vehicle Data vF.xlsx - Red Line.csv"
             jsonPath += "/track_layout/redline-layout.json"
 
@@ -89,15 +86,14 @@ class TrackControllerWindow(QtWidgets.QWidget):
         self.toolBox.addItem(self.redline_tab, "")
 
         ######## Green Line ########
-
-        path = os.path.abspath(__file__.replace(__name__.replace('.', '/')+'.py', ''))
-        # jsonPath = os.path.abspath(__file__)
-        jsonPath = path
-
         if os.name == 'nt':
+            path = os.path.abspath(__file__.replace(__name__.replace('.', '\\')+'.py', ''))
+            jsonPath = path
             path += "\\track_layout\\Track Layout & Vehicle Data vF.xlsx - Green Line.csv"
             jsonPath += "\\track_layout\\greenline-layout.json"
         elif os.name == 'posix':
+            path = os.path.abspath(__file__.replace(__name__.replace('.', '/')+'.py', ''))
+            jsonPath = path
             path += "/track_layout/Track Layout & Vehicle Data vF.xlsx - Green Line.csv"
             jsonPath += "/track_layout/greenline-layout.json"
 
@@ -380,9 +376,9 @@ class TrackControllerWindow(QtWidgets.QWidget):
                         item = QtWidgets.QTableWidgetItem(value)
                         item.setTextAlignment(4)
                         if not j:
-                            item.setBackground(QtGui.QColor(0xbf, 0xe3, 0xb4))
-                        else:
                             item.setBackground(QtGui.QColor(0xf4, 0x71, 0x74))
+                        else:
+                            item.setBackground(QtGui.QColor(0xbf, 0xe3, 0xb4))
 
                     switch_table.setItem(row_idx, i.index(j), item)
 
@@ -635,10 +631,10 @@ class TrackControllerWindow(QtWidgets.QWidget):
                 item = QtWidgets.QTableWidgetItem(str(value))
                 item.setTextAlignment(4)
 
-                if value:
-                    item.setBackground(QtGui.QColor(0xf4, 0x71, 0x74))
-                else:
+                if state:
                     item.setBackground(QtGui.QColor(0xbf, 0xe3, 0xb4))
+                else:
+                    item.setBackground(QtGui.QColor(0xf4, 0x71, 0x74))
 
                 controller_table = self.redline_reference['controllers'][i[0]]
                 if 'switch-table' in controller_table:
@@ -652,10 +648,10 @@ class TrackControllerWindow(QtWidgets.QWidget):
                 item = QtWidgets.QTableWidgetItem(str(value))
                 item.setTextAlignment(4)
 
-                if value:
-                    item.setBackground(QtGui.QColor(0xf4, 0x71, 0x74))
-                else:
+                if state:
                     item.setBackground(QtGui.QColor(0xbf, 0xe3, 0xb4))
+                else:
+                    item.setBackground(QtGui.QColor(0xf4, 0x71, 0x74))
                 controller_table = self.greenline_reference['controllers'][i[0]]
 
                 if 'switch-table' in controller_table:
@@ -666,8 +662,7 @@ class TrackControllerWindow(QtWidgets.QWidget):
 
     def setCrossingState(self, line, block_num, state):
         controller_indices = self.waysideio_ref.lookupBlock(line, block_num)['controller']
-        # controller_idx = int((block_num-1)/self.numBlocksPerController)
-
+    
         value = ""
         if state:
             value = "ON"

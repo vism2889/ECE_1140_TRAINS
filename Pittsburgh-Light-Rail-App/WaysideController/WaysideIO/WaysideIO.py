@@ -10,7 +10,7 @@ from track_layout import extract_layout
 
 class Controller():
     def __init__(self, line, controllerNum, layout, ui, parent):
-        print(f"loading controller {controllerNum}")
+        
         self.line = line
         self.layout = layout
         self.ui = ui
@@ -18,16 +18,16 @@ class Controller():
 
         ## Function to run PLC program
         self.plc = None
-        self.plcGood = False
+        self.plcGood = True
 
         ##
         self.maintenance = True
 
         ## Setup layout
         self.track = {
-            'blocks' : {}, ## block occupancy
-            'switches' : {}, ##
-            'crossings': {},
+            'block' : {}, ## block occupancy
+            'switch' : {}, ##
+            'crossing': {},
             'block-states' : {}, ## block failures as one-hot encoded
             'block-maintenance': {},
             'sections' : {}
@@ -36,19 +36,25 @@ class Controller():
         for section in self.layout['sections']:
             ## Blocks
             for block in self.layout['sections'][section]['blocks']:
-                self.track['blocks'][block[0]] = block[1]
+                self.track['block'][block[0]] = block[2]
                 self.track['block-states'][block[0]] = 0x00
 
             ## Switches
             for switch in self.layout['sections'][section]['switches']:
-                self.track['switches'][switch] = False
+                self.track['switch'][switch] = False
 
             ## Crossings
             for crossing in self.layout['sections'][section]['crossing']:
-                self.track['crossings'][crossing] = False
+                self.track['crossing'][crossing] = False
 
         self.id = controllerNum
+
+        ## Setup PLC interface
         self.parser = PLCParser(controllerNum)
+        if self.id == 4 and self.line == 'green':
+            file = open("plc/controller4.plc")
+            self.uploadPLC(file)
+            self.maintenance = False
 
     ## Get Current Track State ##
     def getTrack(self):
@@ -57,13 +63,13 @@ class Controller():
     ## Update block occupancies
     def updateOccupancy(self, blockNum, state):
         ## Update block
-        self.track['blocks'][blockNum] = state
+        self.track['block'][str(blockNum)] = state
         self.ui.setBlockState(self.line, blockNum, state)
 
         ## Run PLC program
         self.run()
         self.updateSwitch()
-        return self.track['blocks']
+        return self.track['block']
 
     ## Update block failures
     def updateFailures(self, blockNum, failures):
@@ -82,19 +88,19 @@ class Controller():
 
     def updateSwitch(self):
         ## Run PLC program ##
-        for switch in self.track['switches']:
-            self.parent.setSwitch(self.line, switch, self.track['switches'][switch])
-            self.ui.setSwitchState(self.line, int(switch), self.track['switches'][switch])
+        for switch in self.track['switch']:
+            self.parent.setSwitch(self.line, switch, self.track['switch'][switch])
+            self.ui.setSwitchState(self.line, int(switch), self.track['switch'][switch])
 
-        return self.track['switches']
+        return self.track['switch']
 
     def updateCrossing(self, blockNum, state):
-        self.track['crossings'][blockNum] = state
+        self.track['crossing'][blockNum] = state
         self.ui.setCrossingState(self.line, blockNum, state)
 
         ## Run PLC program
         self.run()
-        return self.track['crossings']
+        return self.track['crossing']
 
     ## Toggle maintenance mode FOR THE CONTROLLER ##
     def toggleMaintence(self):
@@ -106,21 +112,22 @@ class Controller():
         if self.plcGood:
             try:
                 self.plc(self.track)
-                # self.thread.start()
             except:
+                print(f'Error: PLC script cannot run (controller{self.id})')
                 self.plcGood = False
-                # self.thread.join()
 
     ## Upload a PLC ##
     def uploadPLC(self, file):
         if self.maintenance:
             modname = self.parser.parseFile(file)
             try:
-                mod = importlib.import_module("plc."+modname)
+                mod = importlib.import_module("plc."+modname) 
+                mod.run(self.track)
             except ImportError:
-                print("Err in importing PLC program")
+                print(f"Errror: Could not import plc script for controller {self.id}")
                 self.plcGood = False
             else:
+                print(f'Plc has been loaded for controller {self.id}')
                 self.plc = mod.run
                 self.plcGood = True
         else:
