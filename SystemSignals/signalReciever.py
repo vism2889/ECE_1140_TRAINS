@@ -8,8 +8,8 @@
 #   Test case for Signals.py: listens to occupancySignal
 ##############################################################################
 
-from PyQt5.QtWidgets import * 
-from PyQt5.QtGui import * 
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 
 class signalReciever(QMainWindow):

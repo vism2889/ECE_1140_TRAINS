@@ -2,9 +2,8 @@ from PyQt5 import QtCore, QtGui, QtWidgets, Qt
 import os
 from track_layout import extract_layout
 
-class TrackControllerWindow(object):
+class TrackControllerWindow(QtWidgets.QWidget):
     def __init__(self, waysideio):
-
         self.redline_maintenance_mode = []
         self.greenline_maintenance_mode = []
         self.numBlocksPerController = 12
@@ -30,7 +29,6 @@ class TrackControllerWindow(object):
 
 
         self.waysideio_ref = waysideio
-        
         self.FAULTS = ["UNDEFINED", "BROKEN RAIL", "CIRCUIT FAILURE", "POWER FAILURE", "OK"]
 
     ## Main window generation
@@ -53,13 +51,14 @@ class TrackControllerWindow(object):
         self.toolBox.setObjectName("toolBox")
         self.toolBox.setFont(QtGui.QFont())
 
-        path = os.getcwd()
-        jsonPath = os.getcwd()
-
         if os.name == 'nt':
+            path = os.path.abspath(__file__.replace(__name__.replace('.', '\\')+'.py', ''))
+            jsonPath = path
             path += "\\track_layout\\Track Layout & Vehicle Data vF.xlsx - Red Line.csv"
             jsonPath += "\\track_layout\\redline-layout.json"
         elif os.name == 'posix':
+            path = os.path.abspath(__file__.replace(__name__.replace('.', '/')+'.py', ''))
+            jsonPath = path
             path += "/track_layout/Track Layout & Vehicle Data vF.xlsx - Red Line.csv"
             jsonPath += "/track_layout/redline-layout.json"
 
@@ -87,13 +86,14 @@ class TrackControllerWindow(object):
         self.toolBox.addItem(self.redline_tab, "")
 
         ######## Green Line ########
-        path = os.getcwd()
-        jsonPath = os.getcwd()
-
         if os.name == 'nt':
+            path = os.path.abspath(__file__.replace(__name__.replace('.', '\\')+'.py', ''))
+            jsonPath = path
             path += "\\track_layout\\Track Layout & Vehicle Data vF.xlsx - Green Line.csv"
             jsonPath += "\\track_layout\\greenline-layout.json"
         elif os.name == 'posix':
+            path = os.path.abspath(__file__.replace(__name__.replace('.', '/')+'.py', ''))
+            jsonPath = path
             path += "/track_layout/Track Layout & Vehicle Data vF.xlsx - Green Line.csv"
             jsonPath += "/track_layout/greenline-layout.json"
 
@@ -376,9 +376,9 @@ class TrackControllerWindow(object):
                         item = QtWidgets.QTableWidgetItem(value)
                         item.setTextAlignment(4)
                         if not j:
-                            item.setBackground(QtGui.QColor(0xbf, 0xe3, 0xb4))
-                        else:
                             item.setBackground(QtGui.QColor(0xf4, 0x71, 0x74))
+                        else:
+                            item.setBackground(QtGui.QColor(0xbf, 0xe3, 0xb4))
 
                     switch_table.setItem(row_idx, i.index(j), item)
 
@@ -504,7 +504,7 @@ class TrackControllerWindow(object):
         if block_num <= 0:
             print("Err: invalid block number")
 
-        controller_indices = self.waysideio_ref.lookupBlock(line, block_num)['controller']        
+        controller_indices = self.waysideio_ref.lookupBlock(line, block_num)['controller']
 
         value = ""
         if state:
@@ -515,7 +515,7 @@ class TrackControllerWindow(object):
         if line == 'red':
             ## Calculate index
             for i in controller_indices:
-            
+
                 item = QtWidgets.QTableWidgetItem(str(value))
                 item.setTextAlignment(4)
 
@@ -550,7 +550,7 @@ class TrackControllerWindow(object):
         if block_num <= 0:
                 print("Err: invalid block number")
 
-        controller_indices = self.waysideio_ref.lookupBlock(line, block_num)['controller']        
+        controller_indices = self.waysideio_ref.lookupBlock(line, block_num)['controller']
         # controller_idx = int((block_num-1)/self.numBlocksPerController)
         # row_idx = (block_num-1) % self.numBlocksPerController
 
@@ -591,7 +591,7 @@ class TrackControllerWindow(object):
         self.checkFaults(line, block_num)
 
     def checkFaults(self, line, block_num):
-        controller_indices = self.waysideio_ref.lookupBlock(line, block_num)['controller']        
+        controller_indices = self.waysideio_ref.lookupBlock(line, block_num)['controller']
         good = True
 
         if line == 'red':
@@ -608,7 +608,7 @@ class TrackControllerWindow(object):
                 fault_table = self.greenline_reference['controllers'][i[0]]['fault-table']
                 if fault_table.item(i[1],2).text() != 'OK':
                     self.greenline_controllers.setTabIcon(i[0], QtGui.QIcon("warning.png"))
-                    good = False            
+                    good = False
             if good: self.greenline_controllers.setTabIcon(i[0], QtGui.QIcon())
         if good:
             self.checkMaintenance(line, block_num)
@@ -617,7 +617,7 @@ class TrackControllerWindow(object):
 
 
     def setSwitchState(self, line, block_num, state):
-        controller_indices = self.waysideio_ref.lookupBlock(line, block_num)['controller']        
+        controller_indices = self.waysideio_ref.lookupBlock(line, block_num)['controller']
 
         value = ""
         if state:
@@ -631,10 +631,10 @@ class TrackControllerWindow(object):
                 item = QtWidgets.QTableWidgetItem(str(value))
                 item.setTextAlignment(4)
 
-                if value:
-                    item.setBackground(QtGui.QColor(0xf4, 0x71, 0x74))
-                else:
+                if state:
                     item.setBackground(QtGui.QColor(0xbf, 0xe3, 0xb4))
+                else:
+                    item.setBackground(QtGui.QColor(0xf4, 0x71, 0x74))
 
                 controller_table = self.redline_reference['controllers'][i[0]]
                 if 'switch-table' in controller_table:
@@ -648,10 +648,10 @@ class TrackControllerWindow(object):
                 item = QtWidgets.QTableWidgetItem(str(value))
                 item.setTextAlignment(4)
 
-                if value:
-                    item.setBackground(QtGui.QColor(0xf4, 0x71, 0x74))
-                else:
+                if state:
                     item.setBackground(QtGui.QColor(0xbf, 0xe3, 0xb4))
+                else:
+                    item.setBackground(QtGui.QColor(0xf4, 0x71, 0x74))
                 controller_table = self.greenline_reference['controllers'][i[0]]
 
                 if 'switch-table' in controller_table:
@@ -661,9 +661,8 @@ class TrackControllerWindow(object):
                             break
 
     def setCrossingState(self, line, block_num, state):
-        controller_indices = self.waysideio_ref.lookupBlock(line, block_num)['controller']        
-        # controller_idx = int((block_num-1)/self.numBlocksPerController)
-
+        controller_indices = self.waysideio_ref.lookupBlock(line, block_num)['controller']
+    
         value = ""
         if state:
             value = "ON"
@@ -677,7 +676,7 @@ class TrackControllerWindow(object):
 
                 item = QtWidgets.QTableWidgetItem(str(value))
                 item.setTextAlignment(4)
-                
+
                 if value:
                     item.setBackground(QtGui.QColor(0xf4, 0x71, 0x74))
                 else:
@@ -697,7 +696,7 @@ class TrackControllerWindow(object):
 
                 item = QtWidgets.QTableWidgetItem(str(value))
                 item.setTextAlignment(4)
-                
+
                 if value:
                     item.setBackground(QtGui.QColor(0xf4, 0x71, 0x74))
                 else:
@@ -711,8 +710,8 @@ class TrackControllerWindow(object):
                             break
 
     def setMaintenance(self, line, block_num, value):
-        
-        controller_indices = self.waysideio_ref.lookupBlock(line, block_num)['controller']        
+
+        controller_indices = self.waysideio_ref.lookupBlock(line, block_num)['controller']
         good = self.checkFaults(line, block_num)
 
         if line == 'red':
@@ -736,7 +735,7 @@ class TrackControllerWindow(object):
                     self.greenline_reference['controllers'][i[0]]['block-table'].item(i[1], 0).setIcon(QtGui.QIcon())
 
     def checkMaintenance(self, line, block_num):
-        controller_indices = self.waysideio_ref.lookupBlock(line, block_num)['controller']        
+        controller_indices = self.waysideio_ref.lookupBlock(line, block_num)['controller']
 
         if line == 'red':
             for i in controller_indices:
@@ -761,80 +760,6 @@ class TrackControllerWindow(object):
 
     def getNumGreenLineBlocks(self):
         return self.greenline_reference['total-blocks']
-
-    # def getBlockState(self, line, block_num):
-    #     controller_indices = self.waysideio_ref.lookupBlock(line, block_num)['controller']        
-    #     # controller_idx = int((block_num-1)/self.numBlocksPerController)
-
-    #     if line == 'red':
-    #         ## Get Maintenance
-    #         maintenance = self.redline_reference['maintenance'][controller_idx]
-
-    #         ## Get Block Occupancy
-    #         block_state = True if self.redline_reference['view'][0]['block-table'].item(block_num-1, 2).text() == "OCCUPIED" else False
-
-    #         ## Get Switch
-    #         switch_state = False
-    #         view_table = self.redline_reference['view'][0]['switch-table']
-    #         for row in range(view_table.rowCount()):
-    #             if view_table.item(row, 0).text() == str(block_num):
-    #                 switch_state = True if view_table.item(row, 2).text() == "ON" else False
-
-    #         ## Get Crossing
-    #         crossing_state = False
-    #         view_table = self.redline_reference['view'][0]['crossing-table']
-    #         for row in range(view_table.rowCount()):
-    #             if view_table.item(row, 0).text() == str(block_num):
-    #                 crossing_state = True if view_table.item(row, 2).text() == "ON" else False
-
-    #         ## Get Faults
-    #         row_idx = (block_num-1) % self.numBlocksPerController
-    #         state_str = self.redline_reference['controllers'][controller_idx]['fault-table'].item(row_idx, 2).text()
-
-    #         faults = []
-    #         if self.FAULTS[1] in state_str:
-    #             faults.append(1)
-    #         if self.FAULTS[2] in state_str:
-    #             faults.append(2)
-    #         if self.FAULTS[3] in state_str:
-    #             faults.append(3)
-
-    #         return {'faults': faults, 'crossing-state': crossing_state, 'switch-state': switch_state, 'block-state':block_state, 'maintenance':maintenance}
-
-    #     if line == 'green':
-    #         ## Get Maintenance
-    #         maintenance = self.greenline_reference['maintenance'][controller_idx]
-
-    #         ## Get Block Occupancy
-    #         block_state = True if self.greenline_reference['view'][0]['block-table'].item(block_num-1, 2).text() == "OCCUPIED" else False
-
-    #         ## Get Switch
-    #         switch_state = False
-    #         view_table = self.greenline_reference['view'][0]['switch-table']
-    #         for row in range(view_table.rowCount()):
-    #             if view_table.item(row, 0).text() == str(block_num):
-    #                 switch_state = True if view_table.item(row, 2).text() == "ON" else False
-
-    #         ## Get Crossing
-    #         crossing_state = False
-    #         view_table = self.greenline_reference['view'][0]['crossing-table']
-    #         for row in range(view_table.rowCount()):
-    #             if view_table.item(row, 0).text() == str(block_num):
-    #                 crossing_state = True if view_table.item(row, 2).text() == "ON" else False
-
-    #         ## Get Faults
-    #         row_idx = (block_num-1) % self.numBlocksPerController
-    #         state_str = self.greenline_reference['controllers'][controller_idx]['fault-table'].item(row_idx, 2).text()
-
-    #         faults = []
-    #         if self.FAULTS[1] in state_str:
-    #             faults.append(1)
-    #         if self.FAULTS[2] in state_str:
-    #             faults.append(2)
-    #         if self.FAULTS[3] in state_str:
-    #             faults.append(3)
-
-    #         return {'faults': faults, 'crossing-state': crossing_state, 'switch-state': switch_state, 'block-state':block_state, 'maintenance':maintenance}
 
     ## LOOKING TO GET RID OF THIS STUPID FUNCTION
     def retranslateUi(self, main_window):

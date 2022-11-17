@@ -1,0 +1,4 @@
+if #block_76 == True or #block_77 == True:
+    #switch_76 = True 
+else:
+    #switch_76 = False
