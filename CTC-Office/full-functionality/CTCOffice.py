@@ -28,6 +28,7 @@ class CTCOffice(QWidget):
 
         # connect to necessary signals
         self.signals.globalOccupancyFromTrackModelSignal.connect(self.readOccupancySignal)
+        self.signals.switchState.connect(self.updateSwitchState)
 
     def setupLayout(self):
         # getting lists of blocks
@@ -458,6 +459,11 @@ class CTCOffice(QWidget):
         state = self.selectedBlockLine.getMaintenanceState(str(self.selectedBlock))
         item.setText(str(state))
         self.blockInfoTable.setItem(4,0,item)
+
+    def updateSwitchState(self, switchSignal):
+        self.greenLineBlocks.toggleSwitchState(switchSignal[0], switchSignal[1])
+        item = QtWidgets.QTableWidgetItem()
+        item.setText(self.greenLineBlocks.switch(switchSignal[0])[0] + " " + str(self.greenLineBlocks.switch(switchSignal[0])[1]))
 
     def toggleMaintenance(self):
         self.selectedBlockLine.toggleMaintenanceState(str(self.selectedBlock))
