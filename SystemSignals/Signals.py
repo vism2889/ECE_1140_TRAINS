@@ -39,6 +39,7 @@ class Signals(QWidget):
     dispatchTrainSignal      = QtCore.pyqtSignal(list)
     suggestedSpeedSignal     = QtCore.pyqtSignal(list)
     ctcAuthoritySignal       = QtCore.pyqtSignal(list)
+    clockSpeedSignal         = QtCore.pyqtSignal(int)
 
     # Wayside Controller Signals
     switchState              = QtCore.pyqtSignal(list) # List of length two indicating a block and it's switch state [block #, boolean state]
