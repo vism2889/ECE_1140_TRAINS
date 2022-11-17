@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QFileDialog, QMainWindow, QApplication, QWidget, QAction, QTableWidget,QTableWidgetItem,QVBoxLayout, QAbstractItemView
 from PyQt5 import QtCore, QtGui, QtWidgets, QtWidgets
-from PyQt5.QtGui import QIcon
+from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtCore import pyqtSlot, QTime, pyqtSignal
 import sys, os
 
@@ -67,6 +67,12 @@ class CTCOffice(QWidget):
         self.clockLabel.setFont(font)
 
     ##################### RED LINE ##########################
+        self.redLineLabelTable = QTableWidget(self)
+        self.redLineLabelTable.setRowCount(0)
+        self.redLineLabelTable.setColumnCount(1)
+        self.redLineLabelTable.setGeometry(10,5,210,15)
+        self.redLineLabelTable.setColumnWidth(0, 210)
+        self.redLineLabelTable.setHorizontalHeaderLabels(['Red Line'])
         self.redLineBlockTable = QTableWidget(self)
         self.redLineBlockTable.setRowCount(self.redLineBlocks.len())
         self.redLineBlockTable.setColumnCount(3)
@@ -101,6 +107,12 @@ class CTCOffice(QWidget):
         self.redLineBacklogTable.show()
 
     ##################### GREEN LINE ########################
+        self.greenLineLabelTable = QTableWidget(self)
+        self.greenLineLabelTable.setRowCount(0)
+        self.greenLineLabelTable.setColumnCount(1)
+        self.greenLineLabelTable.setGeometry(230,5,210,15)
+        self.greenLineLabelTable.setColumnWidth(0, 210)
+        self.greenLineLabelTable.setHorizontalHeaderLabels(['Green Line'])
         self.greenLineBlockTable = QTableWidget(self)
         self.greenLineBlockTable.setRowCount(self.greenLineBlocks.len())
         self.greenLineBlockTable.setColumnCount(3)
@@ -186,6 +198,11 @@ class CTCOffice(QWidget):
         self.suggestedSpeedLabel.setGeometry(265, 510, 140, 20)
         self.suggestedSpeedLabel.setText("Suggested Speed: N/A")
         self.suggestedSpeedLabel.show()
+
+        self.trainImage          = QtWidgets.QLabel(self)
+        self.pixmap              = QPixmap('Train.png')
+        self.trainImage.setPixmap(self.pixmap)
+        self.trainImage.setGeometry(420,420,200,200)
 
         self.populateRedLineTable()
         self.populateGreenLineTable()
