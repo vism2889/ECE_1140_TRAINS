@@ -84,7 +84,7 @@ class AnalogGaugeWidget(QWidget):
         ])])
 
         self.value_min = 0
-        self.value_max = 1000
+        self.value_max = 50
         self.value = self.value_min
         self.value_offset = 0
         self.value_needle_snapzone = 0.05

@@ -52,9 +52,9 @@ class ManualControl():
 
     def setCommandedSpeed(self):
         if self.ebrake_state == False:
-            self.commandedSpeed = self.anal_in.getSpeedValue()
-            self.c.setSpeed(self.commandedSpeed)
-            return self.commandedSpeed
+            speed = self.anal_in.getSpeedValue()
+            self.commandedSpeed = speed / 2.3694
+            #print("\nManual Commanded Speed: %2d" % speed, end="", flush=True)
 
         else: self.commandedSpeed = 0
 

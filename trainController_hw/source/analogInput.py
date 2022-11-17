@@ -46,7 +46,7 @@ class AnalogIn():
             trim_pot_changed = True
 
         if trim_pot_changed:
-            set_value = self.remap_range(trim_pot, 0, 65535, 0, 100)
+            set_value = self.remap_range(trim_pot, 0, 65535, 0, 45)
 
         time.sleep(.1)
         return set_value

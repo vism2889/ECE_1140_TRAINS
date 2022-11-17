@@ -8,8 +8,6 @@
 
 # TODO:
 # - Generate new message files to take authority as a distance
-# - Change max speed value range to 43.5 MPH. 
-# - Change speedometer max display value to 50 MPH.
 # - implement failure states
 #   + failure indicators
 #   + stop train 
@@ -56,10 +54,10 @@ class Control():
         self.current_speed = 0
         self.speed_limit = 100
         self.temperature = 0
-        self.k_p = 1
-        self.k_i = 0.01
+        self.k_p = 24e3
+        self.k_i = 100
         self.pid = PID(self.k_p, self.k_i, 0, setpoint=self.commanded_speed) # initialize pid with fixed values
-        self.pid.outer_limits = (0, 120000) # clamp at max power output specified in datasheet 120kW
+        self.pid.output_limits = (0, 120000) # clamp at max power output specified in datasheet 120kW
         self.power = 0.0
         self.station_audio = ["shadyside_herron.mp3", "herron_swissvale.mp3", 
                               "swissvale_penn.mp3", "penn_steelplaza.mp3", 
@@ -73,7 +71,7 @@ class Control():
         self.k_p = kp_val
         self.k_i = ki_val
         self.pid = PID(self.k_p, self.k_i, 0, setpoint=self.commanded_speed)
-        self.pid.outer_limits = (0, 120000) # clamp at max power output specified in datasheet 120kW
+        self.pid.output_limits = (0, 120000) # clamp at max power output specified in datasheet 120kW
 
     # need to confirm what data type authority will be
     def setAuthority(self, authority=None):
@@ -163,6 +161,11 @@ class Control():
             return False
         
         else: return True
+
+    def getSpeedLimit(self):
+        limit = self.input.getSpeedLimit()
+        if limit != None:
+            print("\nSpeed Limit: %5.2f" % limit)
 
     # TODO: implement authority
     def checkAuthority(self):

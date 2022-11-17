@@ -205,7 +205,7 @@ class Ui_MainWindow():
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
         
-        self.speedometer.value_max = 100
+        self.speedometer.value_max = 50
         self.speedometer.value_min = 0
         self.speedometer.gauge_color_inner_radius_factor = .9
         self.speedometer.set_NeedleColor(R=255, G=0, B=0)
@@ -246,7 +246,9 @@ class Ui_MainWindow():
 
     def setCurrentSpeed(self):
         self.current_speed = self.c.setCurrentSpeed()
-        self.speedometer.update_value(self.current_speed)
+        #self.c.getSpeedLimit()
+        converted_speed = 2.3694 * self.current_speed
+        self.speedometer.update_value(converted_speed)
 
     def setCommandedSpeed(self):
         self.c.setSpeed()
@@ -301,7 +303,7 @@ class Ui_MainWindow():
         self.timer.timeout.connect(self.announce_manual)
         self.timer.timeout.connect(self.deploy_serviceBrake_manual)
         self.timer.timeout.connect(self.sendData)
-        self.timer.start(50)
+        self.timer.start(10)
 
     def auto_connect(self, MainWindow):
         self.timer.timeout.connect(self.setCommandedSpeed)
