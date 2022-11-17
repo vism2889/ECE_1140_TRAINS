@@ -1,1 +1,0 @@
-#switch_1 = True if #block_1 == True and #block_3 == True else False
