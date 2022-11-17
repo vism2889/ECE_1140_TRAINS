@@ -42,7 +42,7 @@ class TrainData():
 class PointMassModel():
     def __init__(self):
         self.ctc_authority = []
-        self.speed_up = 100
+        self.speed_up = 10
         self.train_authority = [True]
         
         self.suggested_speed = 0
