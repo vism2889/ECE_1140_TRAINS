@@ -77,7 +77,7 @@ class SendOccupancy():
         # Emit Occupancy    
         self.signals.occupancyFromTrainSignal.emit(self.occupancy)
         
-        print("Train on Block:", self.currBlockIndex+1)
-        print("FAULTS:\n", self.faults)
-        print("LineBlocks:\n", self.lineBlocks)
-        print("GREEN LINE", self.greenLineBlocks)
+        print("From sender: Train on Block:", self.currBlockIndex+1)
+        print("From sender: FAULTS:\n", self.faults)
+        print("From sender: LineBlocks:\n", self.lineBlocks)
+        print("From sender: GREEN LINE", self.greenLineBlocks)
