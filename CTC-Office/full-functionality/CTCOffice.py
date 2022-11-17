@@ -262,7 +262,7 @@ class CTCOffice(QWidget):
             self.minutes = current_time.toString('mm')
             self.hours   = current_time.toString('hh')
         
-        self.clockLabel.setText(f"{self.hours:02}" + ":" + f"{self.minutes:02}" + ":" + f"{self.seconds:02}")
+        self.clockLabel.setText(str(self.hours) + ":" + str(self.minutes) + ":" + str(self.seconds))
 
     def toggleTenTimeSpeed(self):
         self.tenTimeSpeed = not self.tenTimeSpeed
