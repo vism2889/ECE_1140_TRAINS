@@ -7,10 +7,12 @@ import sys, os
 sys.path.append('../train-functionality/')
 sys.path.append('../block-functionality/')
 sys.path.append('../schedule-functionality/')
+sys.path.append('../../SystemSignals/')
 from TrainDictionary import TrainDictionary
 from LayoutParser import LayoutParser
 from DispatchPopUp import DispatchPopUp
 from ScheduleParser import ScheduleParser
+#from Signals import Signals
 
 class CTCOffice(QWidget):
     dispatchSignal = QtCore.pyqtSignal(bool)
@@ -36,10 +38,10 @@ class CTCOffice(QWidget):
         # Create default station dictionary
         self.redLineStations = dict()
         self.greenLineStations = dict()
-        for value in self.redLineBlocks.stations().values():
-            self.redLineStations[value] = False
-        for value in self.greenLineBlocks.stations().values():
-            self.greenLineStations[value] = False
+        for key, value in self.redLineBlocks.stations().items():
+            self.redLineStations[value] = [key, False]
+        for key, value in self.greenLineBlocks.stations().items():
+            self.greenLineStations[value] = [key, False]
 
         # select default block
         self.selectedBlock = 1
@@ -180,6 +182,11 @@ class CTCOffice(QWidget):
         self.toggleDestinationsButton.clicked.connect(self.toggleDestinations)
         self.toggleDestinationsButton.show()
 
+        self.authorityLabel = QtWidgets.QLabel(self)
+        self.authorityLabel.setGeometry(265, 510, 120, 25)
+        self.authorityLabel.setText("Authority")
+        self.authorityLabel.show()
+
         self.populateRedLineTable()
         self.populateGreenLineTable()
 
@@ -192,7 +199,7 @@ class CTCOffice(QWidget):
         self.timer.timeout.connect(self.updateRedLineBacklog)
         self.timer.timeout.connect(self.updateGreenLineBacklog)
         self.timer.timeout.connect(self.checkForScheduledTrains)
-        self.timer.timeout.connect(self.updateAllOccupancies)
+        self.timer.timeout.connect(self.updateAllBlocks)
         self.timer.start(100)
         self.show()
 
@@ -309,7 +316,7 @@ class CTCOffice(QWidget):
             item1.setText(key)
             self.destinationTable.setItem(index, 0, item1)
             item2 = QtWidgets.QTableWidgetItem()
-            item2.setText(str(self.selectedTrainStations[key]))
+            item2.setText(str(self.selectedTrainStations[key][1]))
             self.destinationTable.setItem(index, 1, item2)
             index += 1
 
@@ -348,45 +355,48 @@ class CTCOffice(QWidget):
         self.updateFaultState()
         self.updateMaintenanceState()
 
-    def updateAllOccupancies(self):
+    def updateAllBlocks(self):
         for key in self.greenLineBlocks.keys():
-            if self.greenLineBlocks.getOccupancy(key):
+            if self.greenLineBlocks.getMaintenanceState(key):
+                self.greenLineBlockTable.item(int(key)-1,0).setBackground(QtGui.QColor(255,255,0))
+            elif self.greenLineBlocks.getFaultState(key):
+                self.greenLineBlockTable.item(int(key)-1,0).setBackground(QtGui.QColor(255,0,0))
+            elif self.greenLineBlocks.getOccupancy(key):
                 self.greenLineBlockTable.item(int(key)-1,0).setBackground(QtGui.QColor(0,255,0))
             else:
                 self.greenLineBlockTable.item(int(key)-1,0).setBackground(QtGui.QColor(255,255,255))       
+
+        for key in self.redLineBlocks.keys():
+            if self.redLineBlocks.getMaintenanceState(key):
+                self.redLineBlockTable.item(int(key)-1,0).setBackground(QtGui.QColor(255,255,0))
+            elif self.redLineBlocks.getFaultState(key):
+                self.redLineBlockTable.item(int(key)-1,0).setBackground(QtGui.QColor(255,0,0))
+            elif self.redLineBlocks.getOccupancy(key):
+                self.redLineBlockTable.item(int(key)-1,0).setBackground(QtGui.QColor(0,255,0))
+            else:
+                self.redLineBlockTable.item(int(key)-1,0).setBackground(QtGui.QColor(255,255,255))      
 
     def updateOccupancy(self):
         item = QtWidgets.QTableWidgetItem()
         state = self.selectedBlockLine.getOccupancy(str(self.selectedBlock))
         item.setText(str(state))
         self.blockInfoTable.setItem(2,0,item)
-        if state == True:
-            self.selectedBlockTable.item(self.selectedBlock-1,0).setBackground(QtGui.QColor(0,255,0))
-        else:
-            self.selectedBlockTable.item(self.selectedBlock-1,0).setBackground(QtGui.QColor(255,255,255))
 
     def updateFaultState(self):
         item = QtWidgets.QTableWidgetItem()
         state = self.selectedBlockLine.getFaultState(str(self.selectedBlock))
         item.setText(str(state))
         self.blockInfoTable.setItem(3,0,item)
-        if state == True:
-            self.selectedBlockTable.item(self.selectedBlock-1,0).setBackground(QtGui.QColor(255,0,0))
-        else:
-            self.selectedBlockTable.item(self.selectedBlock-1,0).setBackground(QtGui.QColor(255,255,255))
 
     def updateMaintenanceState(self):
         item = QtWidgets.QTableWidgetItem()
         state = self.selectedBlockLine.getMaintenanceState(str(self.selectedBlock))
         item.setText(str(state))
         self.blockInfoTable.setItem(4,0,item)
-        if state == True:
-            self.selectedBlockTable.item(self.selectedBlock-1,0).setBackground(QtGui.QColor(255,255,0))
-        else:
-            self.selectedBlockTable.item(self.selectedBlock-1,0).setBackground(QtGui.QColor(255,255,255))
 
     def toggleMaintenance(self):
         self.selectedBlockLine.toggleMaintenanceState(str(self.selectedBlock))
+        self.updateMaintenanceState()
 
     def launchDispatchPopUp(self):
         self.dispatchWidget = QtWidgets.QWidget()
@@ -418,6 +428,7 @@ class CTCOffice(QWidget):
             if (destination != "True" and destination != "False"):
                self.selectedTrainLine.toggleDestination(self.selectedTrain, destination, False)
         self.updateDestinationTable()
+        self.selectedTrainLine.sendAuthority(self.selectedTrain, self.signals)
 
     def readOccupancySignal(self, occupancySignal):
         for block in range(0, len(occupancySignal)):
@@ -427,7 +438,8 @@ class CTCOffice(QWidget):
 if __name__ == "__main__":
     import sys
 
-    app = QtWidgets.QApplication(sys.argv)
-    mainUi = CTCOffice()
+    app = QApplication(sys.argv)
+    signals = Signals()
+    mainUi = CTCOffice(signals)
     
     sys.exit(app.exec_())
