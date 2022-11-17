@@ -53,6 +53,10 @@ class PittsburghLightRail():
         self.signals    = Signals()
         self.trackModel = TrackModel(self.signals)
         self.CTCOffice = CTCOffice(self.signals)
+
+        ## Launch Wayside Controller
+        self.WaysideController = WaysideController(self.signals)
+
         if not hw:
             self.trainController = Ui_TrainControllerSW_MainWindow(self.signals)
 
