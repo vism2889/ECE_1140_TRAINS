@@ -2,7 +2,7 @@
 
 ##############################################################################
 # AUTHOR:   Morgan Visnesky
-# DATE:     11/13/2022
+# DATE:     11/17/2022
 # FILENAME: occupancySignalSender.py
 # DESCRIPTION:
 #   Used to send signal communications to the TrackModel UI
@@ -17,13 +17,29 @@ import time
 import random
 import threading
 
-class SendOccupancy():
+from PyQt5.QtWidgets import * 
+from PyQt5.QtGui import * 
+from PyQt5.QtCore import *
+import sys
+from TrackModelApp import TrackModel
+from occupancySignalSender import SendOccupancy
+sys.path.append("..\..\SystemSignals") # tell interpreter where to look for model files
+from Signals import Signals
+
+import multiprocessing
+
+
+class SignalSenderUI(QWidget):
     '''
     Class Description here
     '''
     def __init__(self, signals):
         super().__init__()
+        
+        self.UiComponents()
+        self.show()
         self.signals         = signals
+        
         self.blocks          = [i for i in range(150)]
         self.blockLens       = [random.randint(10,25) for i in range(150)]
         self.distance        = 0
@@ -36,18 +52,63 @@ class SendOccupancy():
         self.line            = "Green"
         self.lineBlocks      = []
         self.greenLineBlocks = [] 
+        self.breakThread = False
 
         # Signal Connections
         self.signals.greenLineTrackBlockSignal.connect(self.loadGreenLineBlocks)
         self.signals.trackFailuresSignal.connect(self.updateFaults)
         self.signals.trackBlocksToTrainModelSignal.connect(self.updateLineBlocks)
-        # self.signals.blockFaults.connect(self.updateBlockFaults)
+        
+    def UiComponents(self):
+        self.setWindowTitle("Python ")
+        self.setGeometry(500, 40, 400, 600)
+        self.startTestTrainButton = QPushButton("Start Train", self)
+        self.startTestTrainButton.setGeometry(25, 25, 150, 50)
+        self.startTestTrainButton.clicked.connect(self.startTimerThread)
 
+        self.startTestTrainButton = QPushButton("Stop Train", self)
+        self.startTestTrainButton.setGeometry(25, 80, 150, 50)
+        self.startTestTrainButton.clicked.connect(self.stopTimerThread)
+
+        self.currBlocklabel = QLineEdit("Curr Block: 1", self)
+        self.currBlocklabel.setGeometry(180, 25, 200, 50)
+        self.currBlocklabel.setFont(QFont("Arial",20))
+        self.currBlocklabel.setDisabled(True)
+
+        self.startTestTrainButton = QPushButton("Update Switch", self)
+        self.startTestTrainButton.setGeometry(25, 135, 150, 50)
+
+        self.label = QLabel("Block", self)
+        self.label.setGeometry(180, 135, 50, 50)
+        self.label.setFont(QFont("Arial",10))
+
+        self.label = QLineEdit(self)
+        self.label.setGeometry(220, 135, 50, 50)
+        self.label.setFont(QFont("Arial",20))
+
+        self.label = QLabel("State", self)
+        self.label.setGeometry(295, 135, 50, 50)
+        self.label.setFont(QFont("Arial",10))
+
+        self.label = QLineEdit(self)
+        self.label.setGeometry(335, 135, 50, 50)
+        self.label.setFont(QFont("Arial",20))
+
+    def stopTimerThread(self):
+        self.breakThread = True
+        self.occupancyThread.join()
+        # Terminate the process
+        #self.proc.terminate() 
+
+    def startTimerThread(self):
         self.occupancyThread = threading.Thread(target=self.timer)
         self.occupancyThread.start()
+        # self.proc = multiprocessing.Process(target=self.timer)
+        # self.proc.start()
         
+
     def timer(self):
-        while self.currBlockIndex < 5:
+        while self.currBlockIndex < 10 and self.breakThread == False:
             speed = 50
             self.timerr += .01
             self.distance = speed*self.timerr
@@ -72,6 +133,7 @@ class SendOccupancy():
             self.timerr                           = 0
             self.occupancy[1][self.currBlockIndex-1] = 0
             self.occupancy[1][self.currBlockIndex]   = 1
+            self.currBlocklabel.setText('Curr Block: '+str(self.currBlockIndex+1))
             
             print("NEW OCCUPANCY:", self.currBlockIndex)
 
@@ -82,3 +144,13 @@ class SendOccupancy():
         print("From sender: FAULTS:\n", self.faults)
         #print("From sender: LineBlocks:\n", self.lineBlocks)
         #print("From sender: GREEN LINE", self.greenLineBlocks)
+
+if __name__ == '__main__':
+    App = QApplication(sys.argv)
+    
+    signals = Signals()
+    x   = SignalSenderUI(signals)
+    
+    TrackModelUI    = TrackModel(signals)
+
+    sys.exit(App.exec())

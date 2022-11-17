@@ -55,6 +55,7 @@ class TrackModel(QWidget):
         # Variables to hold values for System Communication Signals  
         self.occupancy            = [[False for i in range(76)],[False for i in range(150)]] # only Green line for right not
         self.faults               = [[0 for i in range(76)],[0 for i in range(150)]]     # only Green line for right not
+        self.switches             = [[0 for i in range(76)],[0 for i in range(150)]]
         self.orderedGreenLineList = []
         self.orderedGreenLine()
         
@@ -63,21 +64,21 @@ class TrackModel(QWidget):
             self.signals = signals
             self.signals.occupancyFromTrainSignal.connect(self.getOccupancy)
             
-        print('ORDERED GREENLINE LIST:', self.orderedGreenLineList)
+        #print('ORDERED GREENLINE LIST:', self.orderedGreenLineList)
         self.initUI()
 
     def orderedGreenLine(self):
         '''
         Creates an green line for temporary use when presenting progress
         '''
-        print("Ordered green line being created")
+        #print("Ordered green line being created")
         sec1     = [i for i in range(63, 101)]
         sec2     = [i for i in range(85, 76, -1)]
         sec3     = [i for i in range(101, 151)]
         sec4     = [i for i in range(29, 0, -1)]
         sec5     = [i for i in range(13, 58)]
         self.orderedGreenLineList = sec1 + sec2 + sec3 + sec4 + sec5
-        print('FROM UI', self.orderedGreenLineList)
+        #print('FROM UI', self.orderedGreenLineList)
 
     def updateBlockCall(self):
         '''
@@ -216,22 +217,33 @@ class TrackModel(QWidget):
         '''
         Updates all the fault related information for a given block when a fault it triggered.
         '''
-        print(faultName)
+        #print(faultName)
+        faultNum = 0
+        if faultName == 'Track Fault':
+            faultNum = 1
+        elif faultName == 'Power Fault':
+            faultNum = 2
+        elif faultName == 'Circuit Fault':
+            faultNum = 4
+        else:
+            faultNum = 0
 
         if self.currBlock.faultPresence == False and faultName not in self.currBlock.faultsText:
             self.currBlock.faultsText        = []
             self.currBlock.faultPresence     = True
-            self.faults[self.currLineIndex][self.currBlockIndex] = 1
+            self.faults[self.currLineIndex][self.currBlockIndex] += faultNum
             self.currBlock.faultsText.append(faultName)
             self.blockslistwidget.item(int(self.currBlock.blockNumber)-1).setBackground(QColor(255,0,0))
             self.updateBlockInfo(self.currBlockIndex)
         
         elif self.currBlock.faultPresence == True and faultName not in self.currBlock.faultsText: 
             self.currBlock.faultsText.append(faultName)
+            self.faults[self.currLineIndex][self.currBlockIndex] += faultNum
             self.updateBlockInfo(self.currBlockIndex)
         
         elif self.currBlock.faultPresence == True and faultName in self.currBlock.faultsText:
             self.currBlock.faultsText.remove(faultName)
+            self.faults[self.currLineIndex][self.currBlockIndex] -= faultNum
             self.updateBlockInfo(self.currBlockIndex)
         
         if not self.currBlock.faultsText:
@@ -239,12 +251,14 @@ class TrackModel(QWidget):
             self.faults[self.currLineIndex][self.currBlockIndex] = 0
             self.blockslistwidget.item(int(self.currBlock.blockNumber)-1).setBackground(QColor(128, 128, 128))
             self.currBlockDisplay.setStyleSheet("background-color: cyan; color: black;")
+
+        #self.signals.blockFailures.emit(self.faults)
         
-        print(self.currBlock.faultPresence)
+        #print(self.currBlock.faultPresence)
         
-        for i in range(len(self.lineNames)):
-            print(self.lineNames[i], "Faults")
-            print(self.faults[i])
+        # for i in range(len(self.lineNames)):
+        #     print(self.lineNames[i], "Faults")
+        #     print(self.faults[i])
         if self.signals:
             self.signals.trackFailuresSignal.emit(self.faults)
 
@@ -270,7 +284,7 @@ class TrackModel(QWidget):
         self.lines = parser.process()
         for line in self.lines:
             self.lineNames.append(line.name)
-            print(line.name)
+            #print(line.name)
 
         self.loadLines()
         self.displayBlockInfoLabels()
@@ -325,11 +339,11 @@ class TrackModel(QWidget):
             i = 0
             for section in self.lines[k].sections:
                 for block in section.blocks:
-                    # vBlockNumber = str(block.blockNumber)
-                    #item = QListWidgetItem("BLOCK "+vBlockNumber)
-                    #self.blockslistwidget.insertItem(i+1, item)
                     self.lineBlocks[k].append(block)
                     i+=1
+                    if block.switch != "":
+                        self.switches[k][i] = [8,25]
+        #print("SWITCHES", self.switches)
 
     def loadBlocks(self):
         '''
@@ -347,7 +361,7 @@ class TrackModel(QWidget):
                     self.blockslistwidget.item(i).setBackground(QColor(255,0,0))
                 else:
                     self.blockslistwidget.item(i).setBackground(QColor(134, 132, 130))
-
+                
                 
                 i+=1
         self.blockslistwidget.itemClicked.connect(self.onClickedBlock)
@@ -362,12 +376,11 @@ class TrackModel(QWidget):
         Updates the background color of all the blocks in the current lines
         block selection list with colors reflecting thier fault and occupancy states.
         '''
-        
         print("Block Update Called")
-        for i in range(self.occupancy[self.currLineIndex]):
-            if self.faults[i] == True:
+        for i in range(len(self.occupancy[self.currLineIndex])):
+            if self.faults[self.currLineIndex][i] == True:
                 self.blockslistwidget.item(i).setBackground(QColor(255,0,0))
-            elif self.occupancy[i] == True:
+            elif self.occupancy[self.currLineIndex][i] == True:
                 self.blockslistwidget.item(i).setBackground(QColor(200,200,50))
                 if self.currBlockIndex == i: 
                     self.currBlockDisplay.setStyleSheet("background-color: rgb(200,200,50); color: black;")
@@ -383,7 +396,7 @@ class TrackModel(QWidget):
         '''
         currLine = item.text()
         self.currLineIndex = self.lineNames.index(currLine)
-        print(currLine, self.currLineIndex)
+        # print(currLine, self.currLineIndex)
         self.loadBlocks()
 
     def onClickedBlock(self, item):
