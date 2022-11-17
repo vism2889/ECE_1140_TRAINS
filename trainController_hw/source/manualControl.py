@@ -103,4 +103,5 @@ class ManualControl():
         self.c.setTemperature(temp)
 
     def calculatePower(self):
-        self.c.getPowerOutput(self.commandedSpeed)
+        power = self.c.getPowerOutput(self.commandedSpeed)
+        return power

@@ -241,7 +241,9 @@ class Ui_MainWindow():
         self.mc.setCommandedSpeed()
     
     def calculatePower_manual(self):
-        self.powerGauge.update_value(self.mc.calculatePower())
+        power = self.mc.calculatePower()
+        if power != None:
+            self.powerGauge.update_value(power)
 
     def announce_manual(self):
         self.mc.announceButton(0)
