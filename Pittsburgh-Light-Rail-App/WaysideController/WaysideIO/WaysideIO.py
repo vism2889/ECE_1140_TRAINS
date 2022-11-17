@@ -10,7 +10,7 @@ from track_layout import extract_layout
 
 class Controller():
     def __init__(self, line, controllerNum, layout, ui, parent):
-        
+
         self.line = line
         self.layout = layout
         self.ui = ui
@@ -51,8 +51,8 @@ class Controller():
 
         ## Setup PLC interface
         self.parser = PLCParser(controllerNum)
-        if self.id == 4 and self.line == 'green':
-            file = open("plc/controller4.plc")
+        if self.line == 'green':
+            file = open(f"plc/controller{self.id}.plc")
             self.uploadPLC(file)
             self.maintenance = False
 
@@ -94,12 +94,15 @@ class Controller():
 
         return self.track['switch']
 
-    def updateCrossing(self, blockNum, state):
-        self.track['crossing'][blockNum] = state
-        self.ui.setCrossingState(self.line, blockNum, state)
+    def updateCrossing(self):
+        for crossing in self.track['crossing']:
+            print(crossing)
+            if int(crossing) == 19:
+                print(self.track['crossing'][crossing])
+                exit()
+            self.parent.setCrossing(self.line, crossing, self.track['crossing'][crossing])
+            self.ui.setCrossingState(self.line, int(crossing), self.track['crossing'][crossing])
 
-        ## Run PLC program
-        self.run()
         return self.track['crossing']
 
     ## Toggle maintenance mode FOR THE CONTROLLER ##
@@ -121,7 +124,7 @@ class Controller():
         if self.maintenance:
             modname = self.parser.parseFile(file)
             try:
-                mod = importlib.import_module("plc."+modname) 
+                mod = importlib.import_module("plc."+modname)
                 mod.run(self.track)
             except ImportError:
                 print(f"Errror: Could not import plc script for controller {self.id}")
@@ -267,7 +270,7 @@ class WaysideIO(QWidget):
         if line.lower() == self.lines[1]:
             for i, c in enumerate(layout):
                 self.greenline_controllers.append(Controller(line.lower(), i, c, self.ui, self))
-                # if i == 
+                # if i ==
                 ## Populate lookup table
                 idx = 0
                 for sec in c['sections']:

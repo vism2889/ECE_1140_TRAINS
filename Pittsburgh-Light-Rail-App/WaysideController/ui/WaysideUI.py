@@ -662,8 +662,12 @@ class TrackControllerWindow(QtWidgets.QWidget):
 
     def setCrossingState(self, line, block_num, state):
         controller_indices = self.waysideio_ref.lookupBlock(line, block_num)['controller']
-    
+
         value = ""
+
+        if state == True:
+            exit(1)
+
         if state:
             value = "ON"
         else:
@@ -677,7 +681,7 @@ class TrackControllerWindow(QtWidgets.QWidget):
                 item = QtWidgets.QTableWidgetItem(str(value))
                 item.setTextAlignment(4)
 
-                if value:
+                if state:
                     item.setBackground(QtGui.QColor(0xf4, 0x71, 0x74))
                 else:
                     item.setBackground(QtGui.QColor(0xbf, 0xe3, 0xb4))
@@ -697,7 +701,7 @@ class TrackControllerWindow(QtWidgets.QWidget):
                 item = QtWidgets.QTableWidgetItem(str(value))
                 item.setTextAlignment(4)
 
-                if value:
+                if state:
                     item.setBackground(QtGui.QColor(0xf4, 0x71, 0x74))
                 else:
                     item.setBackground(QtGui.QColor(0xbf, 0xe3, 0xb4))

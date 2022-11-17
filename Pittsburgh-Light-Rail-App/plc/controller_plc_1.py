@@ -1,2 +1,8 @@
 def run(input):
-	input['switch']['76'][0] = True if input['block']['76'][0] == True and input['block']['77'][0] == True else False
+	if input['block']['18'] == True or input['block']['19'] == True or input['block']['20'] == True:
+	    print( input['crossing']['19'] )
+	    input['crossing']['19'] = True
+	    print( input['crossing']['19'] )
+	else:
+	    print("false")
+	    input['crossing']['19'] = False
