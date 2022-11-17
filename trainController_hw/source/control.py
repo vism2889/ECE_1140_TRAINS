@@ -182,7 +182,7 @@ class Control():
     def getPowerOutput(self, commanded_speed=None):
         if self.ebrakeCommand == True or self.brakeCommand == True:
             self.output.setPower(0.0)
-            return
+            return self.power
         
         if commanded_speed == None and self.input.getCommandedSpeed() != None:
             self.pid.setpoint = self.input.getCommandedSpeed()
@@ -194,6 +194,7 @@ class Control():
 
         self.power = self.pid(self.current_speed)
         self.output.setPower(self.power)
+        return self.power
 
     # used for server interface testing to send dummy data to a client acting as train model
     def sendRandom(self):
