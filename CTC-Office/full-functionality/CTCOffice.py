@@ -12,7 +12,7 @@ from TrainDictionary import TrainDictionary
 from LayoutParser import LayoutParser
 from DispatchPopUp import DispatchPopUp
 from ScheduleParser import ScheduleParser
-#from Signals import Signals
+from Signals import Signals
 
 class CTCOffice(QWidget):
     dispatchSignal = QtCore.pyqtSignal(bool)
@@ -177,15 +177,15 @@ class CTCOffice(QWidget):
         self.uploadScheduleButton.show()  
 
         self.toggleDestinationsButton = QtWidgets.QPushButton(self)
-        self.toggleDestinationsButton.setGeometry(265, 535, 120, 25)
+        self.toggleDestinationsButton.setGeometry(265, 535, 140, 20)
         self.toggleDestinationsButton.setText("Toggle Destinations")
         self.toggleDestinationsButton.clicked.connect(self.toggleDestinations)
         self.toggleDestinationsButton.show()
 
-        self.authorityLabel = QtWidgets.QLabel(self)
-        self.authorityLabel.setGeometry(265, 510, 120, 25)
-        self.authorityLabel.setText("Authority")
-        self.authorityLabel.show()
+        self.suggestedSpeedLabel = QtWidgets.QLabel(self)
+        self.suggestedSpeedLabel.setGeometry(265, 510, 140, 20)
+        self.suggestedSpeedLabel.setText("Suggested Speed: N/A")
+        self.suggestedSpeedLabel.show()
 
         self.populateRedLineTable()
         self.populateGreenLineTable()
@@ -320,6 +320,10 @@ class CTCOffice(QWidget):
             self.destinationTable.setItem(index, 1, item2)
             index += 1
 
+    def updateSuggestedSpeed(self):
+        speed = int(self.selectedTrainLine.getSuggestedSpeed(self.selectedTrain))
+        self.suggestedSpeedLabel.setText("Suggested Speed: " + str(speed) + " mph")
+
     def redBlockSelectionChanged(self):
         self.selectedBlock = self.redLineBlockTable.currentRow() + 1
         self.selectedBlockLine = self.redLineBlocks
@@ -331,6 +335,7 @@ class CTCOffice(QWidget):
         self.selectedTrainLine = self.redLineTrains
         self.selectedTrainStations = self.redLineTrains.getDestination(self.selectedTrain)
         self.updateDestinationTable()
+        self.updateSuggestedSpeed()
 
     def greenBlockSelectionChanged(self):
         self.selectedBlock = self.greenLineBlockTable.currentRow() + 1
@@ -343,6 +348,7 @@ class CTCOffice(QWidget):
         self.selectedTrainLine = self.greenLineTrains
         self.selectedTrainStations = self.greenLineTrains.getDestination(self.selectedTrain)
         self.updateDestinationTable()
+        self.updateSuggestedSpeed()
 
     def updateBlockTable(self):
         item = QtWidgets.QTableWidgetItem()

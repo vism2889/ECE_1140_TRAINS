@@ -62,7 +62,7 @@ class DispatchPopUp(object):
             item.setText(_translate("MainWindow", key))
             self.stationTable.setItem(self.index, 0, item)
             spinBox = QtWidgets.QSpinBox()
-            spinBox.setRange(3,5)
+            spinBox.setRange(2,5)
             self.stationTable.setCellWidget(self.index, 1, spinBox)
             self.index += 1
 
@@ -81,7 +81,7 @@ class DispatchPopUp(object):
                 item.setText(key)
                 self.stationTable.setItem(self.index, 0, item)
                 spinBox = QtWidgets.QSpinBox()
-                spinBox.setRange(3,5)
+                spinBox.setRange(2,5)
                 self.stationTable.setCellWidget(self.index, 1, spinBox)
                 self.index += 1
 
@@ -96,7 +96,7 @@ class DispatchPopUp(object):
                 item.setText(key)
                 self.stationTable.setItem(self.index, 0, item)
                 spinBox = QtWidgets.QSpinBox()
-                spinBox.setRange(3,5)
+                spinBox.setRange(2,5)
                 self.stationTable.setCellWidget(self.index, 1, spinBox)
                 self.index += 1
 
