@@ -74,12 +74,19 @@ class TrainModel(QtWidgets.QMainWindow):
     def tc_ebrake(self, msg):
         self.t.e_brake = msg
 
+    def non_vitals(self,msg):
+        for key in msg:
+            if key == 'ext_lights':
+                print(msg[key])
+            setattr(self.t, key, msg[key])
+        
     def UI(self):
         
         self.signals.dispatchTrainSignal.connect(self.dispatch)
         self.signals.powerSignal.connect(self.curr_t_power)
         self.signals.serviceBrakeSignal.connect(self.tc_servbrake)
         self.signals.emergencyBrakeSignal.connect(self.tc_ebrake)
+        self.signals.nonVitalDictSignal.connect(self.non_vitals)
         # if sys.argv[1] == 'user':
         #     self.test_win.setVisible(False)
         # else:
@@ -168,14 +175,14 @@ class TrainModel(QtWidgets.QMainWindow):
         #doors
         #lights
         if self.t.left_doors:
-            self.left_doors_disp.setText('On')
+            self.left_doors_disp.setText('Open')
         else:
-            self.left_doors_disp.setText('Off')
+            self.left_doors_disp.setText('Closed')
         
         if self.t.right_doors:
-            self.right_doors_disp.setText('On')
+            self.right_doors_disp.setText('Open')
         else:
-            self.right_doors_disp.setText('Off')
+            self.right_doors_disp.setText('Closed')
 
         
         
