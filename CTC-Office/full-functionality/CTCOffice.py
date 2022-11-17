@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QFileDialog, QMainWindow, QApplication, QWidget, QAction, QTableWidget,QTableWidgetItem,QVBoxLayout, QAbstractItemView
 from PyQt5 import QtCore, QtGui, QtWidgets, QtWidgets
-from PyQt5.QtGui import QIcon
+from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtCore import pyqtSlot, QTime, pyqtSignal
 import sys, os
 
@@ -28,6 +28,7 @@ class CTCOffice(QWidget):
 
         # connect to necessary signals
         self.signals.globalOccupancyFromTrackModelSignal.connect(self.readOccupancySignal)
+        self.signals.switchState.connect(self.updateSwitchState)
 
     def setupLayout(self):
         # getting lists of blocks
@@ -46,16 +47,18 @@ class CTCOffice(QWidget):
         # select default block
         self.selectedBlock = 1
         self.selectedBlockLine = self.redLineBlocks
-        self.redLineTrains = TrainDictionary()
-        self.greenLineTrains = TrainDictionary()
-        self.scheduleParser = ScheduleParser()
+        self.redLineTrains      = TrainDictionary()
+        self.greenLineTrains    = TrainDictionary()
+        self.scheduleParser     = ScheduleParser()
 
     def setupUi(self):
         self.setObjectName("self")
         self.setGeometry(10, 10, 600, 580)
         self.setMouseTracking(True)
-        self.redLineMaintenance = False
+        self.redLineMaintenance   = False
         self.greenLineMaintenance = False
+        self.manualMode           = True
+        self.tenTimeSpeed         = False
 
         font = QtGui.QFont()
         font.setPointSize(16)
@@ -66,7 +69,18 @@ class CTCOffice(QWidget):
         self.clockLabel.setAlignment(QtCore.Qt.AlignCenter)
         self.clockLabel.setFont(font)
 
+        self.changeClockSpeedButton = QtWidgets.QPushButton(self)
+        self.changeClockSpeedButton.setGeometry(450,5,140,15)
+        self.changeClockSpeedButton.setText("Change clock speed")
+        self.changeClockSpeedButton.clicked.connect(self.toggleTenTimeSpeed)
+
     ##################### RED LINE ##########################
+        self.redLineLabelTable = QTableWidget(self)
+        self.redLineLabelTable.setRowCount(0)
+        self.redLineLabelTable.setColumnCount(1)
+        self.redLineLabelTable.setGeometry(10,5,210,15)
+        self.redLineLabelTable.setColumnWidth(0, 210)
+        self.redLineLabelTable.setHorizontalHeaderLabels(['Red Line'])
         self.redLineBlockTable = QTableWidget(self)
         self.redLineBlockTable.setRowCount(self.redLineBlocks.len())
         self.redLineBlockTable.setColumnCount(3)
@@ -78,6 +92,7 @@ class CTCOffice(QWidget):
         self.redLineBlockTable.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.redLineBlockTable.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.redLineBlockTable.itemClicked.connect(self.redBlockSelectionChanged)
+        self.redLineBlockTable.clicked.connect(self.redBlockSelectionChanged)
         self.selectedBlockTable = self.redLineBlockTable
 
         for row in range(0,self.redLineBlockTable.rowCount()):
@@ -101,6 +116,12 @@ class CTCOffice(QWidget):
         self.redLineBacklogTable.show()
 
     ##################### GREEN LINE ########################
+        self.greenLineLabelTable = QTableWidget(self)
+        self.greenLineLabelTable.setRowCount(0)
+        self.greenLineLabelTable.setColumnCount(1)
+        self.greenLineLabelTable.setGeometry(230,5,210,15)
+        self.greenLineLabelTable.setColumnWidth(0, 210)
+        self.greenLineLabelTable.setHorizontalHeaderLabels(['Green Line'])
         self.greenLineBlockTable = QTableWidget(self)
         self.greenLineBlockTable.setRowCount(self.greenLineBlocks.len())
         self.greenLineBlockTable.setColumnCount(3)
@@ -154,7 +175,7 @@ class CTCOffice(QWidget):
 
     ##################### TRAIN INFO ########################
         self.destinationTable = QtWidgets.QTableWidget(self)
-        self.destinationTable.setGeometry(10, 440, 250, 120)
+        self.destinationTable.setGeometry(10,440,250,120)
         self.destinationTable.setColumnCount(2)
         self.destinationTable.setColumnWidth(0, 160)
         self.destinationTable.setColumnWidth(1, 88)
@@ -165,27 +186,43 @@ class CTCOffice(QWidget):
         self.destinationTable.show()
 
         self.dispatchTrainButton = QtWidgets.QPushButton(self)
-        self.dispatchTrainButton.setGeometry(450, 55, 140, 25)
+        self.dispatchTrainButton.setGeometry(450,55,140,25)
         self.dispatchTrainButton.setText("Dispatch")
         self.dispatchTrainButton.show()
         self.dispatchTrainButton.clicked.connect(self.launchDispatchPopUp)
 
         self.uploadScheduleButton = QtWidgets.QPushButton(self)
-        self.uploadScheduleButton.setGeometry(450, 90, 140, 25)
+        self.uploadScheduleButton.setGeometry(450,55,140,25)
         self.uploadScheduleButton.setText("Upload Schedule")
         self.uploadScheduleButton.clicked.connect(self.uploadSchedule)
-        self.uploadScheduleButton.show()  
+        self.uploadScheduleButton.hide()  
+
+        self.toggleDispatchModeButton = QtWidgets.QPushButton(self)
+        self.toggleDispatchModeButton.setGeometry(450,90,140,25)
+        self.toggleDispatchModeButton.setText("Toggle Dispatch Mode")
+        self.toggleDispatchModeButton.show()
+        self.toggleDispatchModeButton.clicked.connect(self.toggleDispatchMode)
 
         self.toggleDestinationsButton = QtWidgets.QPushButton(self)
-        self.toggleDestinationsButton.setGeometry(265, 535, 120, 25)
+        self.toggleDestinationsButton.setGeometry(265,535,140,20)
         self.toggleDestinationsButton.setText("Toggle Destinations")
         self.toggleDestinationsButton.clicked.connect(self.toggleDestinations)
         self.toggleDestinationsButton.show()
 
-        self.authorityLabel = QtWidgets.QLabel(self)
-        self.authorityLabel.setGeometry(265, 510, 120, 25)
-        self.authorityLabel.setText("Authority")
-        self.authorityLabel.show()
+        self.suggestedSpeedLabel = QtWidgets.QLabel(self)
+        self.suggestedSpeedLabel.setGeometry(265,510,140,20)
+        self.suggestedSpeedLabel.setText("Suggested Speed: N/A")
+        self.suggestedSpeedLabel.show()
+
+        self.selectedTrainLabel = QtWidgets.QLabel(self)
+        self.selectedTrainLabel.setGeometry(265,485,140,20)
+        self.selectedTrainLabel.setText("Selected Train: N/A")
+        self.selectedTrainLabel.show()
+
+        self.trainImage          = QtWidgets.QLabel(self)
+        self.pixmap              = QPixmap('Train.png')
+        self.trainImage.setPixmap(self.pixmap)
+        self.trainImage.setGeometry(420,420,200,200)
 
         self.populateRedLineTable()
         self.populateGreenLineTable()
@@ -205,8 +242,37 @@ class CTCOffice(QWidget):
 
     def showTime(self):
         current_time = QTime.currentTime()
-        self.label_time = current_time.toString('hh:mm:ss')
-        self.clockLabel.setText(self.label_time)
+
+        if self.tenTimeSpeed:
+            self.seconds = int(self.seconds)
+            self.minutes = int(self.minutes)
+            self.hours   = int(self.hours)
+
+            self.seconds += 1
+            if self.seconds == 60:
+                self.seconds = 0
+                self.minutes += 1
+            if self.minutes == 60:
+                self.hours += 1
+                self.minutes = 0
+            if self.hours == 24:
+                self.hours = 0
+
+            self.signals.clockSpeedSignal.emit(10)
+
+        else:
+
+            self.seconds = current_time.toString('ss')
+            self.minutes = current_time.toString('mm')
+            self.hours   = current_time.toString('hh')
+
+            self.signals.clockSpeedSignal.emit(1)
+        
+        secs = ('%02d' % int(self.seconds))
+        self.clockLabel.setText(str(self.hours) + ":" + str(self.minutes) + ":" + str(secs))
+
+    def toggleTenTimeSpeed(self):
+        self.tenTimeSpeed = not self.tenTimeSpeed
 
     def populateRedLineTable(self):
         for key in self.redLineBlocks.keys():
@@ -320,6 +386,11 @@ class CTCOffice(QWidget):
             self.destinationTable.setItem(index, 1, item2)
             index += 1
 
+    def updateTrainInfo(self):
+        speed = int(self.selectedTrainLine.getSuggestedSpeed(self.selectedTrain))
+        self.suggestedSpeedLabel.setText("Suggested Speed: " + str(speed) + " mph")
+        self.selectedTrainLabel.setText("Selected Train: " + self.selectedTrain)
+
     def redBlockSelectionChanged(self):
         self.selectedBlock = self.redLineBlockTable.currentRow() + 1
         self.selectedBlockLine = self.redLineBlocks
@@ -331,6 +402,7 @@ class CTCOffice(QWidget):
         self.selectedTrainLine = self.redLineTrains
         self.selectedTrainStations = self.redLineTrains.getDestination(self.selectedTrain)
         self.updateDestinationTable()
+        self.updateTrainInfo()
 
     def greenBlockSelectionChanged(self):
         self.selectedBlock = self.greenLineBlockTable.currentRow() + 1
@@ -343,6 +415,7 @@ class CTCOffice(QWidget):
         self.selectedTrainLine = self.greenLineTrains
         self.selectedTrainStations = self.greenLineTrains.getDestination(self.selectedTrain)
         self.updateDestinationTable()
+        self.updateTrainInfo()
 
     def updateBlockTable(self):
         item = QtWidgets.QTableWidgetItem()
@@ -394,6 +467,11 @@ class CTCOffice(QWidget):
         item.setText(str(state))
         self.blockInfoTable.setItem(4,0,item)
 
+    def updateSwitchState(self, switchSignal):
+        self.greenLineBlocks.setSwitchState(switchSignal[0], switchSignal[1])
+        item = QtWidgets.QTableWidgetItem()
+        #item.setText(self.greenLineBlocks.switch(switchSignal[0])[0] + " " + str(self.greenLineBlocks.switch(switchSignal[0])[1]))
+
     def toggleMaintenance(self):
         self.selectedBlockLine.toggleMaintenanceState(str(self.selectedBlock))
         self.updateMaintenanceState()
@@ -433,6 +511,18 @@ class CTCOffice(QWidget):
     def readOccupancySignal(self, occupancySignal):
         for block in range(0, len(occupancySignal)):
             self.greenLineBlocks.setOccupancy(str(block+1), occupancySignal[block])
+
+    def toggleDispatchMode(self):
+        if self.manualMode:
+            self.dispatchTrainButton.hide()
+            self.toggleMaintenanceButton.hide()
+            self.uploadScheduleButton.show()
+            self.manualMode = False
+        else:
+            self.dispatchTrainButton.show()
+            self.toggleMaintenanceButton.show()
+            self.uploadScheduleButton.hide()
+            self.manualMode = True
             
 
 if __name__ == "__main__":
