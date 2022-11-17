@@ -41,8 +41,9 @@ class TrainData():
 
 class PointMassModel():
     def __init__(self):
-
-        self.speed_up = 1
+        self.ctc_authority = []
+        self.speed_up = 100
+        self.train_authority = [True]
         
         self.suggested_speed = 0
         #track model to train comms
@@ -226,7 +227,7 @@ class PointMassModel():
     def calcVel(self):
 
         self.prev_vel = self.curr_vel
-        self.curr_vel = self.prev_vel + (self.elapsed_time/2)*(self.prev_accel+self.curr_accel)
+        self.curr_vel = self.prev_vel + (self.elapsed_time/2)*(self.prev_accel+self.curr_accel)*(1/self.speed_up)
         if self.curr_vel < 0:
             self.curr_vel = 0
         if self.curr_vel > 19.444444:
@@ -235,6 +236,9 @@ class PointMassModel():
         self.curr_speed = round(self.curr_vel * (1/1000) * (0.62) * (3600))
         if self.curr_speed < 0:
             self.curr_speed = 0
+        if self.curr_speed > 45:
+            self.curr_speed = 45
+
 
     
     def calcPos(self):
@@ -266,12 +270,56 @@ class PointMassModel():
 
             #incrementing curr_block
             self.curr_block += 1
-        
-        if self.occ_index > 147:
-            print(self.occ_index)
 
         self.occ_index = self.blocks[self.curr_block]
         self.occ_list[self.occ_index] = 1
+
+        for authority in self.ctc_authority:
+            if authority == self.blocks[self.curr_block]:
+                self.train_authority = [False]
+                self.ctc_authority.remove(authority)
+            else:
+                self.train_authority = [True]
+
+            
+        # self.calc_authority()
+    
+    # def calc_authority(self):
+    #     Length = 0
+    #     i = self.curr_block
+    #     occ_index = self.blocks[i]
+    #     temp_ctc_authority = self.ctc_authority
+
+    #     while i < len(self.blocks)-1:
+            
+    #         curr_block_object = self.glBlockModels[occ_index]
+    #         Length += float(curr_block_object.blockLength)
+
+    #         if Length < 0:
+    #             print("NO")
+
+    #         occ_index = self.blocks[i]
+    #         i += 1
+    #         for nums in temp_ctc_authority:
+    #             if self.blocks[i] == nums:
+    #                 break
+            
+    #         if i >= len(self.blocks):
+    #             i = 0
+    #             while i < len(self.blocks) -1:
+    #                 curr_block_object = self.glBlockModels[occ_index]
+    #                 Length += float(curr_block_object.blockLength)
+    #                 occ_index = self.blocks[i]
+    #                 i += 1
+    #                 for nums in temp_ctc_authority:
+    #                     if self.blocks[i] == nums:
+    #                         break
+
+        
+    #     distTravelled = self.curr_pos/1609.34
+    #     self.train_authority = round(float( (Length/1609.34) - distTravelled), 2)
+    #     if self.train_authority < 0:
+    #         print("NO")
         
         
         
@@ -286,8 +334,8 @@ class Train():
         self.speed_limit = 0
         
         #block list
-        self.blocks          = [i for i in range(150)]
-        self.blockLens       = [random.randint(10,25) for i in range(150)]
+        # self.blocks          = [i for i in range(150)]
+        # self.blockLens       = [random.randint(10,25) for i in range(150)]
 
         #point Mass model
         self.pm = PointMassModel()
@@ -325,7 +373,8 @@ class Train():
         self.last_station = 'Pitt'
         self.next_station = 'Phil'
 
-        self.authority = [False,False,False,False,False,True,False,False]
+        self.ctcAuthority = []
+        self.authority = 20
         self.grade = 0
         self.switch = 0
 

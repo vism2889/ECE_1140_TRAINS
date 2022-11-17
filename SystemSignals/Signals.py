@@ -38,6 +38,7 @@ class Signals(QWidget):
     # CTC Office Signals
     dispatchTrainSignal      = QtCore.pyqtSignal(list)
     suggestedSpeedSignal     = QtCore.pyqtSignal(list)
+    ctcAuthoritySignal       = QtCore.pyqtSignal(list)
     clockSpeedSignal         = QtCore.pyqtSignal(int)
 
     # Wayside Controller Signals
