@@ -30,13 +30,17 @@ class TrainModel(QtWidgets.QMainWindow):
     '''Primary Train Model UI Window that contains all childs/widgets'''
     train_dict = {}
 
-    def __init__(self, ui,signals):
+    def __init__(self, ui, hw, signals):
         super().__init__()
         # path = os.getcwd()+'\\train_model\\train.ui'
         uic.loadUi(ui, self)
         self.t = Train()
-        self.mp = MyPub(self.t)
-        self.ms = MySub(self.t)
+        self.hw = hw
+
+        if self.hw:
+            self.mp = MyPub(self.t)
+            self.ms = MySub(self.t)
+
         self.signals = signals
         self.last_update = 0
         self.UI()
@@ -63,11 +67,19 @@ class TrainModel(QtWidgets.QMainWindow):
         p = msg['power']
         # print(f'---------RECEIVED POWER IS: {p}------------------')
         self.t.pm.power = msg['power']
+    
+    def tc_servbrake(self, msg):
+        self.t.service_brake = msg   
+         
+    def tc_ebrake(self, msg):
+        self.t.e_brake = msg
 
     def UI(self):
         
         self.signals.dispatchTrainSignal.connect(self.dispatch)
         self.signals.powerSignal.connect(self.curr_t_power)
+        self.signals.serviceBrakeSignal.connect(self.tc_servbrake)
+        self.signals.emergencyBrakeSignal.connect(self.tc_ebrake)
         # if sys.argv[1] == 'user':
         #     self.test_win.setVisible(False)
         # else:
@@ -130,7 +142,8 @@ class TrainModel(QtWidgets.QMainWindow):
             self.brake_fail.setStyleSheet("background-color: red")
     
     def update_display(self):
-        self.ms.spinOnce()
+        if self.hw:
+            self.ms.spinOnce()
         #lights
         if self.t.int_lights:
             self.int_lights_disp.setText('On')
@@ -192,19 +205,26 @@ class TrainModel(QtWidgets.QMainWindow):
                 self.signals.commandedSpeedSignal.emit(self.t.pm.speed_limit)
                 self.last_update = time.time()
                 # print('PUBLISHING!!!')
-                self.mp.publish()
+                if self.hw:
+                    self.mp.publish()
 
         if time.time()-self.brake_update > 0.5:
             if self.t.service_brake == True:
                 self.t.pm.brake(0)
-                self.mp.publish()
+
+                if self.hw:
+                    self.mp.publish()
+
                 self.signals.currentSpeedOfTrainModel.emit(self.t.pm.curr_vel)
                 self.signals.occupancyFromTrainSignal.emit(self.t.pm.occ_list)
                 self.signals.commandedSpeedSignal.emit(self.t.pm.speed_limit)
                 self.brake_update = time.time()
             elif self.t.e_brake == True:
                 self.t.pm.brake(1)
-                self.mp.publish()
+
+                if self.hw:
+                    self.mp.publish()
+
                 self.signals.currentSpeedOfTrainModel.emit(self.t.pm.curr_vel)
                 self.signals.occupancyFromTrainSignal.emit(self.t.pm.occ_list)
                 self.signals.commandedSpeedSignal.emit(self.t.pm.speed_limit)

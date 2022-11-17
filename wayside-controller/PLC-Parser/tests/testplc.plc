@@ -1,0 +1,2 @@
+#crossing_2 = True if #block_1 == True and #block_2 == False else False
+    #crossing_1=1
