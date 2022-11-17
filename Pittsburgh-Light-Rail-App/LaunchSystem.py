@@ -46,18 +46,19 @@ from trainControllerSoftware_MainWindow import Ui_TrainControllerSW_MainWindow
 # Signal IMPORTS
 sys.path.append("../SystemSignals")
 from Signals import Signals
+import sys
 
 class PittsburghLightRail():
-    def __init__(self):
+    def __init__(self, hw):
         self.signals    = Signals()
         self.trackModel = TrackModel(self.signals)
         self.CTCOffice = CTCOffice(self.signals)
-        self.trainController = Ui_TrainControllerSW_MainWindow(self.signals)
-        self.waysideController = WaysideController(self.signals)
+        if not hw:
+            self.trainController = Ui_TrainControllerSW_MainWindow(self.signals)
 
         #train model
         file = f'{os.getcwd()}/train.ui'
-        self.trainModel = TrainModel(file, self.signals)
+        self.trainModel = TrainModel(file, hw, self.signals)
         self.globalOcc = []
         self.signals.globalOccupancyFromTrackModelSignal.connect(self.getOcc) # just for testing
 
@@ -75,6 +76,13 @@ def handler(signum, frame):
 signal.signal(signal.SIGINT, handler)
 
 if __name__ == '__main__':
+
+    if len(sys.argv) > 1:
+        hardWare = True
+    else:
+        print('Hardware is False')
+        hardWare = False
+
     app = QApplication(sys.argv)
-    ex = PittsburghLightRail()
+    ex = PittsburghLightRail(hardWare)
     sys.exit(app.exec_())

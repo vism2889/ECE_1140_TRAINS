@@ -50,9 +50,12 @@ class PointMassModel():
 
         self._td = TrainData()
 
-        self.glBlockMOdels = None
+        self.glBlockModels = None
+        # fname = open(f'{os.getcwd()}/trackblocks', 'rb')
+        # self.glBlockMOdels = pickle.load(fname)
+        # fname.close()
 
-        #self.blocks          = [i for i in range(150)]
+        # self.blocks          = [i for i in range(150)]
         self.curr_block = 0
         sec1 = [i for i in range(63, 101)]
         sec2 = [i for i in range(85, 76, -1)]
@@ -61,7 +64,7 @@ class PointMassModel():
         sec5 = [i for i in range(13, 58)]
 
         self.blocks = sec1 + sec2 + sec3 + sec4 + sec5
-        self.blockLens = [random.randint(10,25) for i in range(len(self.blocks))]        
+        # self.blockLens = [random.randint(10,25) for i in range(len(self.blocks))]        
         self.occ_list = [0 for i in range(150)]
         self.occ_index = self.blocks[0]
 
@@ -95,7 +98,7 @@ class PointMassModel():
             self.prev_time = self.curr_time
             self.curr_time = t
 
-        self.elapsed_time = (self.curr_time-self.prev_time)*500
+        self.elapsed_time = (self.curr_time-self.prev_time)
 
         self.power = power
         
@@ -104,16 +107,16 @@ class PointMassModel():
         self.calcVel()
         self.calcPos()
 
-    def e_brake(self, t):
+    def e_brake(self):
         self.curr_accel = self._td.emergency_brake
         
         #setting time values
         self.prev_time = self.curr_time
-        self.curr_time = t
+        self.curr_time = time.time()
         self.elapsed_time = self.curr_time-self.prev_time
 
-        while self.curr_vel > 0:
-            print(f'Ebrake velocity before decleration:{self.curr_vel}')
+        if self.curr_vel > 0:
+            print(f'Ebrake velocity before deceleration:{self.curr_vel}')
             self.prev_vel = self.curr_vel
             self.prev_accel = self.curr_accel
             self.curr_accel = self.dec_force()
@@ -136,12 +139,13 @@ class PointMassModel():
         self.prev_accel = 0
         self.curr_accel = 0
     
-    def serv_brake(self, t):
+    def brake(self, val):
+
         self.power = 0
 
         #setting time values
         self.prev_time = self.curr_time
-        self.curr_time = t
+        self.curr_time = time.time()
         self.elapsed_time = self.curr_time-self.prev_time
 
         temp_start_t = 0
@@ -150,13 +154,10 @@ class PointMassModel():
         print(f'Deceleration force is: {self._td.mass_empty * self._td.serv_brake}')
         print(f'Train acceleration before stop seqeuence: {self.curr_accel}')
         print(f'Friction Force: {self._td.mass_empty*self._td.kinetic_fric_constant}\n')
-        while self.curr_vel > 0:
-
+        if self.curr_vel > 0:
             self.prev_accel = self.curr_accel
-            
-
             if self.elapsed_time > 0.5:
-                self.curr_accel = self.dec_force()
+                self.curr_accel = self.dec_force(val)
                 self.calcVel()
                 self.calcPos()
                 
@@ -175,22 +176,26 @@ class PointMassModel():
                 print(f'Current Force is: {self.force}')
                 print(f'Current Acceleration is: {self.curr_accel}')
                 print(f'Current Velocity is: {self.curr_vel}')
-                print(f'Serv Brake decreasing velocity:{self.curr_speed} in {time.time() - temp_start_t}\n')
+                print(f'Serv Brake decreasing velocity:{self.curr_speed} in {self.elapsed_time}\n')
                 temp_start_t = time.time()
                     
         self.force = 0
         self.prev_accel = 0
         self.curr_accel = 0
 
-    def dec_force(self):
+    def dec_force(self, val):
         # print(f"Current force is: {self.force}")
-        dec_force = self._td.mass_empty * self._td.serv_brake
+        if val == 0:
+            dec_force = self._td.mass_empty * self._td.serv_brake
+        else:
+            dec_force = self._td.mass_empty * self._td.emergency_brake
+
         kinetic_friction_force = self._td.mass_empty*9.8*self._td.kinetic_fric_constant
 
-        if self.force > 0: 
-            self.force = self.force-dec_force
-        else:
-            self.force -= kinetic_friction_force*0.25
+        # if self.force > 0: 
+        self.force = self.force-dec_force
+        # else:
+        #     self.force -= kinetic_friction_force
             
         self.curr_accel = self.force/self._td.mass_empty
         return self.curr_accel
@@ -202,7 +207,7 @@ class PointMassModel():
         else:
             self.force = 120000 * 2
             self.force -= static_friction_force
-            print(f'force - static force = {self.force}')
+            # print(f'force - static force = {self.force}')
 
                 
     
@@ -222,7 +227,7 @@ class PointMassModel():
         self.curr_pos = self.prev_pos + (self.elapsed_time/2)*(self.prev_vel +self.curr_vel)
 
         #block object length calculation
-        curr_block_object = self.glBlockMOdels[self.occ_index]
+        curr_block_object = self.glBlockModels[self.occ_index]
         self.curr_block_len = curr_block_object.blockLength
         self.curr_block_len = float(self.curr_block_len)
 
@@ -234,7 +239,7 @@ class PointMassModel():
             self.speed_limit = self.suggested_speed
 
         
-        print(f'-------------------Position: {self.curr_pos}-----------------------------')
+        # print(f'-------------------Position: {self.curr_pos}-----------------------------')
         if self.curr_pos >= self.curr_block_len:
             self.occ_list[self.occ_index] = 0
             
@@ -260,6 +265,8 @@ class PointMassModel():
 
 class Train():
     def __init__ (self):
+
+        self.speed_limit = 0
         
         #block list
         self.blocks          = [i for i in range(150)]
@@ -270,7 +277,6 @@ class Train():
 
         #dispatch
         self.dispatched = False
-        self.speed_limit = 0
         #Failure States
         self.brake_failure = False
         self.signal_pickup_failure = False
@@ -281,44 +287,51 @@ class Train():
         self.line = 'blue'
         
         #Brake Values
-        self.e_brake = 'Off'
-        self.service_brake = 'Off'
+        self.e_brake = False
+        self.service_brake = False
 
         self.curr_power = 0
         self.curr_speed = 0
-        self.cmd_speed = 0
+        self.cmd_speed = 30.22
 
 
-        self.int_lights = 'ON'
-        self.ext_lights = 'ON'
+        self.int_lights = False
+        self.ext_lights = False
         self.crew_count = 0
         self.curr_speed = self.pm.curr_speed
         self.passenger_count = 0
         self.temperature = 0
-        self.left_doors = 'Closed'
-        self.right_doors = 'Closed'
+        self.left_doors = False
+        self.right_doors = False
+        self.announcements = False
 
         self.last_station = 'Pitt'
         self.next_station = 'Phil'
 
-        self.authority = []
+        self.authority = [False,False,False,False,False,True,False,False]
         self.grade = 0
         self.switch = 0
+
+        currentTime = time.time() * 10
         
     # def launch_ui(self):
     #     app = QtWidgets.QApplication(sys.argv)
     #     window = TrainModel(self)
     #     app.exec_()
-          
+    def get_temperature(self):
+        return self.temperature
+
+    def get_int_light_state(self):
+        return self.int
 
     def e_brake_func(self):
-        if self.e_brake == 'On' and self.pm.curr_vel > 0:
-            self.pm.e_brake(time.time())
+        if self.e_brake == True and self.pm.curr_vel > 0:
+            self.pm.e_brake()
     
     def serv_brake_func(self):
         print('inside service brake')
-        if self.service_brake == 'On' and self.pm.curr_vel > 0:
-            self.pm.serv_brake(time.time())
+        if self.service_brake == True and self.pm.curr_vel > 0:
+            self.pm.serv_brake()
 
     def dispatch(self):
         self.dispatched = True
@@ -336,23 +349,23 @@ class Train():
                 return 
         
         if(self.dispatched):
-            if self.service_brake == 'On' and self.pm.curr_vel > 0:
+            if self.service_brake == True and self.pm.curr_vel > 0:
                 self.serv_brake_func()
-            elif self.e_brake == 'On' and self.pm.curr_vel>0:
+            elif self.e_brake == True and self.pm.curr_vel>0:
                 self.e_brake_func()
             else:
                 self.pm.setPower(self.curr_power, time.time() )
 
-                print('\nTrain Model Object Values')
-                print(f'time_elapsed: {self.pm.elapsed_time}')
-                print(f'Current Power: {self.curr_power}')
-                print(f'Previous Vel:{self.pm.prev_vel}')
-                print(f'Force: {self.pm.force}')
-                print(f'Previous Accel:{self.pm.prev_accel}')
-                print(f'Current Accel:{self.pm.curr_accel}')
-                print(f'Current_Vel: {self.pm.curr_vel}')
-                print(f'Current Speed: {self.pm.curr_speed} mph')
-                print(f'Current Position: {self.pm.curr_pos} m \n')
+                # print('\nTrain Model Object Values')
+                # print(f'time_elapsed: {self.pm.elapsed_time}')
+                # print(f'Current Power: {self.curr_power}')
+                # # print(f'Previous Vel:{self.pm.prev_vel}')
+                # # print(f'Force: {self.pm.force}')
+                # # print(f'Previous Accel:{self.pm.prev_accel}')
+                # # print(f'Current Accel:{self.pm.curr_accel}')
+                # print(f'Current_Vel: {self.pm.curr_vel}')
+                # print(f'Current Speed: {self.pm.curr_speed} mph')
+                # # print(f'Current Position: {self.pm.curr_pos} m \n')
             
                 
             

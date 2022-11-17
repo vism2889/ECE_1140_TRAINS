@@ -32,10 +32,14 @@ while True:
     count += 2
     if time.time()-start_time > 15:
         print("Turning on service brake")
-        t.service_brake = 'On'
+        t.service_brake = True
         t.set_power(120000)
         int_time = time.time()
 
+        while True:
+            time.sleep(0.5)
+            if t.pm.curr_vel >0:
+                t.pm.serv_brake()
         # while True:
 
         #     if time.time() - int_time > 1:

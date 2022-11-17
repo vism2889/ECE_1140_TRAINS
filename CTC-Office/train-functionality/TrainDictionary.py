@@ -30,14 +30,19 @@ class TrainDictionary:
     def getSuggestedSpeed(self, name):
         return self.trainList[name].suggestedSpeed
 
-    def getAuthority(self, name):
-        return self.trainList[name].authority
+    def sendAuthority(self, name, signals):
+        destinationList = self.trainList[name].destinations
+        stops = []
+        for destination in destinationList.keys():
+            if destinationList[destination][1]:
+                stops.append(destinationList[destination][0])
+        signals.authoritySignal.emit(stops)
 
     def getDestination(self, name):
         return self.trainList[name].destinations
 
     def toggleDestination(self, name, destination, scheduled):
         if scheduled:
-            self.backLog[name].destinations[destination] = not self.backLog[name].destinations[destination]
+            self.backLog[name].destinations[destination][1] = not self.backLog[name].destinations[destination][1]
         else:
-            self.trainList[name].destinations[destination] = not self.trainList[name].destinations[destination]
+            self.trainList[name].destinations[destination][1] = not self.trainList[name].destinations[destination][1]

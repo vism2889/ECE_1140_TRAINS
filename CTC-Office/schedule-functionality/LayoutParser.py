@@ -26,29 +26,29 @@ class LayoutParser:
         self.lines     = [] # List of list's len of self.lineNames, holding BlockModel objects for each line
 
     def process(self):
-        print("\n\tPITTSBURGH LIGHT RAIL TRACK-LAYOUT PARSER")
-        print("\t*****************************************")
+        # print("\n\tPITTSBURGH LIGHT RAIL TRACK-LAYOUT PARSER")
+        # print("\t*****************************************")
         with open(self.filename, 'r') as csvfile:
-            print("\tParsing Track Layout File: ", self.filename)
+            # print("\tParsing Track Layout File: ", self.filename)
             csvreader   = csv.reader(csvfile)
             self.fields = next(csvreader)
             for row in csvreader:
                 self.rows.append(row)
-            print("\tFile Parsing Complete\n")
-            print("\t\tTotal no. of rows: %d"%(csvreader.line_num))
+        #     print("\tFile Parsing Complete\n")
+        #     print("\t\tTotal no. of rows: %d"%(csvreader.line_num))
         
-        print('\t\tField names are:')
-        print('\t\t\t->',', '.join(field for field in self.fields))
-        print("\t\tThe number of Track Blocks are: ", len(self.rows))
-        print("\t\tExample data:")
-        print("\t\t\t-> Row1 = ", self.rows[0])
+        # print('\t\tField names are:')
+        # print('\t\t\t->',', '.join(field for field in self.fields))
+        # print("\t\tThe number of Track Blocks are: ", len(self.rows))
+        # print("\t\tExample data:")
+        # print("\t\t\t-> Row1 = ", self.rows[0])
 
         self.lineNames = set()
         for row in self.rows:
             self.lineNames.add(row[0])
         self.lineNames = list(self.lineNames)
-        print("\t\tThere are", len(self.lineNames), "rail lines in this layout")
-        print("\t\t\t-> Lines:", self.lineNames)
+        # print("\t\tThere are", len(self.lineNames), "rail lines in this layout")
+        # print("\t\t\t-> Lines:", self.lineNames)
 
         self.redLineBlockDict = BlockDictionary()
         self.greenLineBlockDict = BlockDictionary()
@@ -64,8 +64,8 @@ class LayoutParser:
             elif row[0] =="Green":
                 self.greenLineBlockDict.addBlock(block)
 
-        print("\t\tThe Red line has", str(self.redLineBlockDict.len()), "blocks.")
-        print("\t\tThe Green line has", str(self.greenLineBlockDict.len()), "blocks.")
+        # print("\t\tThe Red line has", str(self.redLineBlockDict.len()), "blocks.")
+        # print("\t\tThe Green line has", str(self.greenLineBlockDict.len()), "blocks.")
 
         return self.redLineBlockDict, self.greenLineBlockDict
     

@@ -64,13 +64,16 @@ class Signals(QWidget):
 
     # Train Controller (SW) Ouputs to Train Model Signals
     powerSignal              = QtCore.pyqtSignal(dict)
-    lightSignal              = QtCore.pyqtSignal(list)
-    doorSignal               = QtCore.pyqtSignal(list)
-    temperatureSignal        = QtCore.pyqtSignal(list)
-    announcementsSignal      = QtCore.pyqtSignal(list)
-    advertisementsSignals    = QtCore.pyqtSignal(list)
-    serviceBrakeSignal       = QtCore.pyqtSignal(list)
-    emergencyBrakeSignal     = QtCore.pyqtSignal(list)
+    # lightSignal              = QtCore.pyqtSignal(int)
+    # doorSignal               = QtCore.pyqtSignal(int)
+    # temperatureSignal        = QtCore.pyqtSignal(int)
+    # announcementsSignal      = QtCore.pyqtSignal(bool)
+    # advertisementsSignals    = QtCore.pyqtSignal(list)
+    serviceBrakeSignal       = QtCore.pyqtSignal(bool)
+    emergencyBrakeSignal     = QtCore.pyqtSignal(bool)
+
+
+    nonVitalDictSignal       = QtCore.pyqtSignal(dict)
 
     # Train Controller (HW) Signals
 

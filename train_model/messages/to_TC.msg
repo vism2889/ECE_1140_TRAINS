@@ -1,4 +1,4 @@
-int current_speed
+float current_speed
 int commanded_speed
 int speed_limit
 bool[] authority
