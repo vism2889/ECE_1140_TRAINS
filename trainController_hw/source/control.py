@@ -54,7 +54,6 @@ class Control():
         self.ebrakeCommand = False
         self.brakeCommand = False
         self.current_speed = 0
-        self.suggested_speed = 0
         self.speed_limit = 100
         self.temperature = 0
         self.k_p = 1
@@ -191,13 +190,8 @@ class Control():
             self.pid.setpoint = self.commanded_speed
 
         self.power = self.pid(self.current_speed)
+        self.output.setPower(self.power)
 
-        if self.power >= 0:
-            self.output.setPower(self.power)
-
-        else:
-            self.output.setPower(0.0)
-    
     # used for server interface testing to send dummy data to a client acting as train model
     def sendRandom(self):
         self.output.randomize()

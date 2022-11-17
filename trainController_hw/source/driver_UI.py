@@ -270,9 +270,6 @@ class Ui_MainWindow():
     def deployEbrake(self):
         self.c.deployEbrake()
 
-    def setSuggestedSpeed(self):
-        self.c.setSuggestedSpeed()
-
     def checkAuthority(self):
         self.c.checkAuthority()
 
@@ -296,7 +293,6 @@ class Ui_MainWindow():
         self.timer.timeout.connect(self.setSpeed_manual)
         self.timer.timeout.connect(self.setCurrentSpeed)
         self.timer.timeout.connect(self.checkAuthority)
-        self.timer.timeout.connect(self.setSuggestedSpeed)
         self.timer.timeout.connect(self.calculatePower_manual)
         self.timer.timeout.connect(self.setTemperature_manual)
         self.timer.timeout.connect(self.toggle_lights_manual)
