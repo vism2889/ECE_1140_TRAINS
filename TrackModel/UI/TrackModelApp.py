@@ -55,6 +55,7 @@ class TrackModel(QWidget):
         # Variables to hold values for System Communication Signals  
         self.occupancy            = [False for i in range(150)] # only Green line for right not
         self.faults               = [0 for i in range(150)]     # only Green line for right not
+        self.lineswitches         = [0 for i in range(150)]
         self.orderedGreenLineList = []
         self.orderedGreenLine()
         
@@ -62,9 +63,14 @@ class TrackModel(QWidget):
         if signals:
             self.signals = signals
             self.signals.occupancyFromTrainSignal.connect(self.getOccupancy)
+            self.signals.switchState.connect(self.updateSwitchState)
             
         print('ORDERED GREENLINE LIST:', self.orderedGreenLineList)
         self.initUI()
+
+    def updateSwitchState(self, switch):
+        self.lineswitches[switch[0]] = switch[1]
+        self.lineBlocks[1][switch[0]-1].switchState = switch[1]
 
     def orderedGreenLine(self):
         '''
@@ -308,7 +314,7 @@ class TrackModel(QWidget):
         self.blockInfolistwidget.insertItem(20, "Switch:               ")
         self.blockInfolistwidget.insertItem(21, "Underground:          ")
         self.blockInfolistwidget.insertItem(22, "Track Heater:         ")
-        self.blockInfolistwidget.insertItem(23, "Beacon:               ")
+        self.blockInfolistwidget.insertItem(23, "Switch STATE:         ")
 
     def loadBlocks(self):
         '''
@@ -464,6 +470,9 @@ class TrackModel(QWidget):
             self.blockVallistwidget.item(20).setForeground(QtCore.Qt.red)
             self.blockVallistwidget.insertItem(21,str(currBlock.underground))
             self.blockVallistwidget.item(21).setForeground(QtCore.Qt.red)
+            
+            self.blockVallistwidget.insertItem(22,'')
+            self.blockVallistwidget.insertItem(23, str(self.lineBlocks[1][self.currBlockIndex].switchState))
         
     def displayBeaconInformationLabels(self):
         '''

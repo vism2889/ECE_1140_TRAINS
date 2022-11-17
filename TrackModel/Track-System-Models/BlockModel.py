@@ -37,6 +37,7 @@ class BlockModel:
         self.crossingSignalPresence = False
         self.crossingSignalState    = False
         self.underground            = False
+        self.switchState            = ''
 
 
 
