@@ -9,11 +9,12 @@ from PyQt5.QtWidgets import QWidget
 from track_layout import extract_layout
 
 class Controller():
-    def __init__(self, line, controllerNum, layout, ui):
-
+    def __init__(self, line, controllerNum, layout, ui, parent):
+        print(f"loading controller {controllerNum}")
         self.line = line
         self.layout = layout
         self.ui = ui
+        self.parent = parent
 
         ## Function to run PLC program
         self.plc = None
@@ -58,11 +59,11 @@ class Controller():
         ## Update block
         self.track['blocks'][blockNum] = state
         self.ui.setBlockState(self.line, blockNum, state)
+
         ## Run PLC program
         self.run()
-
+        self.updateSwitch()
         return self.track['blocks']
-
 
     ## Update block failures
     def updateFailures(self, blockNum, failures):
@@ -79,12 +80,12 @@ class Controller():
         self.run()
         return self.track['block-maintenance']
 
-    def updateSwitch(self, blockNum, state):
-        self.track['switches'][blockNum] = state
-        self.ui.setSwitchState(self.line, blockNum, state)
+    def updateSwitch(self):
+        ## Run PLC program ##
+        for switch in self.track['switches']:
+            self.parent.setSwitch(self.line, switch, self.track['switches'][switch])
+            self.ui.setSwitchState(self.line, int(switch), self.track['switches'][switch])
 
-        ## Run PLC program
-        self.run()
         return self.track['switches']
 
     def updateCrossing(self, blockNum, state):
@@ -127,10 +128,10 @@ class Controller():
 
 class WaysideIO(QWidget):
     def __init__(self, signals):
+        super().__init__()
 
         ## Signals ##
         self.signals = signals
-        self.signals.globalOccupancyFromTrackModelSignal.connect(self.blockOccupancyCallback)
         #############
 
         self.ui = None
@@ -150,8 +151,8 @@ class WaysideIO(QWidget):
 
     ## Callback for block occupancies from track ##
     def blockOccupancyCallback(self, occupancy):
-        print(occupancy)
-
+        for i, block in enumerate(occupancy):
+            self.setBlockOccupancy('green', i+1, block)
 
     ## Setup and reference to UI ##
     def setUI(self, ui):
@@ -199,14 +200,16 @@ class WaysideIO(QWidget):
 
     def setSwitch(self, line, blockNum, state):
         if self.lines[0] == line.lower():
+            self.signals.switchState.emit([int(blockNum), state])
             controllers = self.lookupBlock(self.lines[0], blockNum)['controller']
-            for c in controllers:
-                self.redline_controllers[c[0]].updateSwitch(blockNum, state)
+            # for c in controllers:
+                # self.redline_controllers[c[0]].updateSwitch(blockNum, state)
 
         if self.lines[1] == line.lower():
+            self.signals.switchState.emit([int(blockNum), state])
             controllers = self.lookupBlock(self.lines[1], blockNum)['controller']
-            for c in controllers:
-                self.greenline_controllers[c[0]].updateSwitch(blockNum, state)
+            # for c in controllers:
+                # self.greenline_controllers[c[0]].updateSwitch(blockNum, state)
 
     def setCrossing(self, line, blockNum, state):
         if self.lines[0] == line.lower():
@@ -236,7 +239,7 @@ class WaysideIO(QWidget):
         ## Redline
         if line.lower() == self.lines[0]:
             for i, c in enumerate(layout):
-                self.redline_controllers.append(Controller(line.lower(), i, c, self.ui))
+                self.redline_controllers.append(Controller(line.lower(), i, c, self.ui, self))
 
                 ## Populate lookup table
                 idx = 0
@@ -256,8 +259,8 @@ class WaysideIO(QWidget):
         ## Greenline
         if line.lower() == self.lines[1]:
             for i, c in enumerate(layout):
-                self.greenline_controllers.append(Controller(line.lower(), i, c, self.ui))
-
+                self.greenline_controllers.append(Controller(line.lower(), i, c, self.ui, self))
+                # if i == 
                 ## Populate lookup table
                 idx = 0
                 for sec in c['sections']:
@@ -274,14 +277,20 @@ class WaysideIO(QWidget):
                         entry[block[0]]['speed-limit'] = block[1]
                         idx+=1
 
+        self.signals.globalOccupancyFromTrackModelSignal.connect(self.blockOccupancyCallback)
         # print(self.lookupTable['green'])
 
 if __name__ == '__main__':
     w = WaysideIO(1)
 
     ## Testing configuration
-    csvPath = os.getcwd()
-    jsonPath = os.getcwd()
+    # csvPath = os.getcwd()
+    # jsonPath = os.getcwd()
+
+    csvPath = os.path.abspath(__file__)
+    jsonPath = os.path.abspath(__file__)
+
+    # print(csvPath)
 
     if os.name == 'nt':
         csvPath += "\\track_layout\\Track Layout & Vehicle Data vF.xlsx - Green Line.csv"
