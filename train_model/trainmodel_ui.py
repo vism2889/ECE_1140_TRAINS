@@ -19,6 +19,9 @@ import sys
 import os
 import time
 from train import Train
+from Server_Comm import MyPub, MySub
+
+
 
 
 
@@ -32,23 +35,25 @@ class TrainModel(QtWidgets.QMainWindow):
         # path = os.getcwd()+'\\train_model\\train.ui'
         uic.loadUi(ui, self)
         self.t = Train()
+        self.mp = MyPub(self.t)
+        self.ms = MySub(self.t)
         self.signals = signals
         self.last_update = 0
         self.UI()
         self.show()
         self.signals.trackBlocksToTrainModelSignal.connect(self.set_blocks)
+        self.brake_update = time.time()
 
     def set_blocks(self,msg):
-        print('got blocks: ', msg[1])
-        self.t.pm.glBlockMOdels = msg[1]
+        self.t.pm.glBlockModels = msg[1]
+        # file = open('trackblocks', 'wb')
+        # pickle.dump(self.t.pm.glBlockMOdels, file)
+        # file.close()
 
     def dispatch(self, msg):
-        print(f'Dispatched, message: {msg}')
-        print('id is: ', {msg[0]})
-        print('line is: ', {msg[1]})
         self.t.id = msg[0]
         self.t.line = msg[1]
-        print(f'------------DISPATCHED!!!!!!!!!!!------------------')
+        # print(f'------------DISPATCHED!!!!!!!!!!!------------------')
         self.t.dispatch()
         self.last_update = time.time()
 
@@ -56,7 +61,7 @@ class TrainModel(QtWidgets.QMainWindow):
         # print(f'Message is:{msg}')
         # print(f'Message type is: {type(msg)}')
         p = msg['power']
-        print(f'---------RECEIVED POWER IS: {p}------------------')
+        # print(f'---------RECEIVED POWER IS: {p}------------------')
         self.t.pm.power = msg['power']
 
     def UI(self):
@@ -80,8 +85,6 @@ class TrainModel(QtWidgets.QMainWindow):
         self.sig_fail.setStyleSheet("background-color: gray")
         self.brake_fail.setStyleSheet("background-color: gray")
 
-        self.int_lights_disp.setText(self.t.int_lights)
-
         self.timer = QtCore.QTimer()
         self.timer.timeout.connect(self.update_display)
         self.timer.start(100)
@@ -98,39 +101,46 @@ class TrainModel(QtWidgets.QMainWindow):
     
     def train_eng_failure(self):
         if self.t.train_engine_failure:
-            print('Train Engine Failure Pressed Again! removing failure')
+            # print('Train Engine Failure Pressed Again! removing failure')
             self.t.train_engine_failure = False
             self.train_eng_fail.setStyleSheet("background-color: gray")
         else:
-            print('Train Engine Failure Triggered')
+            # print('Train Engine Failure Triggered')
             self.t.train_engine_failure = True
             self.train_eng_fail.setStyleSheet("background-color: red")
 
     def sig_failure(self):
         if self.t.signal_pickup_failure:
-            print('Signal Failure Pressed Again! removing failure')
+            # print('Signal Failure Pressed Again! removing failure')
             self.t.signal_pickup_failure = False
             self.sig_fail.setStyleSheet("background-color: gray")
         else:
-            print('Signal Failure Triggered')
+            # print('Signal Failure Triggered')
             self.t.signal_pickup_failure = True
             self.sig_fail.setStyleSheet("background-color: red")
     
     def brake_failure(self):
         if self.t.brake_failure:
-            print('Brake Failure Pressed Again! removing failure')
+            # print('Brake Failure Pressed Again! removing failure')
             self.t.brake_failure = False
             self.brake_fail.setStyleSheet("background-color: gray")
         else:
-            print("Brake Failure Triggered")
+            # print("Brake Failure Triggered")
             self.t.brake_failure = True
             self.brake_fail.setStyleSheet("background-color: red")
     
     def update_display(self):
-        
+        self.ms.spinOnce()
         #lights
-        self.int_lights_disp.setText(self.t.int_lights)
-        self.ext_lights_disp.setText(self.t.ext_lights)
+        if self.t.int_lights:
+            self.int_lights_disp.setText('On')
+        else:
+            self.int_lights_disp.setText('Off')
+        
+        if self.t.ext_lights:
+            self.ext_lights_disp.setText('On')
+        else:
+            self.ext_lights_disp.setText('Off')
         
         #power
         self.cmd_pwr_disp.setText(f'{round(float(self.t.pm.power)/1000)} kW')
@@ -143,9 +153,18 @@ class TrainModel(QtWidgets.QMainWindow):
         self.temp_disp.setText(f'{self.t.temperature} F')
 
         #doors
+        #lights
+        if self.t.left_doors:
+            self.left_doors_disp.setText('On')
+        else:
+            self.left_doors_disp.setText('Off')
         
-        self.left_doors_disp.setText(self.t.left_doors)
-        self.right_doors_disp.setText(self.t.right_doors)
+        if self.t.right_doors:
+            self.right_doors_disp.setText('On')
+        else:
+            self.right_doors_disp.setText('Off')
+
+        
         
         
         self.pass_disp.setText(f'{self.t.passenger_count}')
@@ -162,16 +181,34 @@ class TrainModel(QtWidgets.QMainWindow):
         self.last_st_disp.setText(f'{self.t.last_station}')
         self.next_st_disp.setText(f'{self.t.next_station}')
         
-        if time.time()-self.last_update > 0.5:
-            if self.t.e_brake == 'Off' and self.t.service_brake == 'Off' and self.t.dispatched:
-                # print('Setting Train Power')
+        if time.time()-self.last_update > 0.1:
+            # print("inside if statement")
+            if self.t.e_brake == False and self.t.service_brake == False and self.t.dispatched:
                 self.t.set_power(self.t.pm.power)
                 self.signals.currentSpeedOfTrainModel.emit(self.t.pm.curr_vel)
-                print(f'Occ_list is: {self.t.pm.occ_list}')
+                # print(f'Occ_list is: {self.t.pm.occ_list}')
                 # print(f'Curr Pos in block {self.qt.t.pm.curr_block} is: {self.qt.t.pm.curr_pos}')
                 self.signals.occupancyFromTrainSignal.emit(self.t.pm.occ_list)
                 self.signals.commandedSpeedSignal.emit(self.t.pm.speed_limit)
                 self.last_update = time.time()
+                # print('PUBLISHING!!!')
+                self.mp.publish()
+
+        if time.time()-self.brake_update > 0.5:
+            if self.t.service_brake == True:
+                self.t.pm.brake(0)
+                self.mp.publish()
+                self.signals.currentSpeedOfTrainModel.emit(self.t.pm.curr_vel)
+                self.signals.occupancyFromTrainSignal.emit(self.t.pm.occ_list)
+                self.signals.commandedSpeedSignal.emit(self.t.pm.speed_limit)
+                self.brake_update = time.time()
+            elif self.t.e_brake == True:
+                self.t.pm.brake(1)
+                self.mp.publish()
+                self.signals.currentSpeedOfTrainModel.emit(self.t.pm.curr_vel)
+                self.signals.occupancyFromTrainSignal.emit(self.t.pm.occ_list)
+                self.signals.commandedSpeedSignal.emit(self.t.pm.speed_limit)
+                self.brake_update = time.time()
 
 
     def update_model(self, dict):
@@ -240,8 +277,8 @@ class ServBrake(QObject):
         self.qt = qt
     
     def run(self):
-        if self.qt.t.service_brake == 'On' and self.qt.t.pm.curr_vel > 0:
-            self.qt.t.serv_brake_func()
+        if self.qt.t.service_brake == True and self.qt.t.pm.curr_vel > 0:
+            self.qt.t.pm.serv_brake()
         
         print('train stopped')
         self.stopped.emit()
@@ -255,7 +292,7 @@ class Ebrake(QObject):
     
     def run(self):
         print('EBrake initiated')
-        if self.qt.t.e_brake == 'On' and self.qt.t.curr_vel > 0:
+        if self.qt.t.e_brake == True and self.qt.t.pm.curr_vel > 0:
             self.qt.t.e_brake_func()
 
         print('train stopped')
