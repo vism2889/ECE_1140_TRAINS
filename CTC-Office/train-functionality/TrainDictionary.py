@@ -36,7 +36,7 @@ class TrainDictionary:
         for destination in destinationList.keys():
             if destinationList[destination][1]:
                 stops.append(destinationList[destination][0])
-        signals.authoritySignal.emit(stops)
+        signals.ctcAuthoritySignal.emit(stops)
 
     def getDestination(self, name):
         return self.trainList[name].destinations
