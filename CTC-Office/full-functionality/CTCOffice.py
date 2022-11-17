@@ -461,7 +461,7 @@ class CTCOffice(QWidget):
         self.blockInfoTable.setItem(4,0,item)
 
     def updateSwitchState(self, switchSignal):
-        self.greenLineBlocks.toggleSwitchState(switchSignal[0], switchSignal[1])
+        self.greenLineBlocks.setSwitchState(switchSignal[0], switchSignal[1])
         item = QtWidgets.QTableWidgetItem()
         item.setText(self.greenLineBlocks.switch(switchSignal[0])[0] + " " + str(self.greenLineBlocks.switch(switchSignal[0])[1]))
 
