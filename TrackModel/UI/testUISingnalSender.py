@@ -3,43 +3,46 @@
 ##############################################################################
 # AUTHOR:   Morgan Visnesky
 # DATE:     11/17/2022
-# FILENAME: occupancySignalSender.py
+# FILENAME: testUISignalSender.py
 # DESCRIPTION:
 #   Used to send signal communications to the TrackModel UI
 #   Emulates:
 #       - Occupancy
 #       - Track Faults
 #       - Block Maintenance
+#   Has functionality to hide and show the TrackModelApp UI, as to better navigate other system modules
+#   and to optionally reduce clutter on smaller screens.
 ##############################################################################
 
 # Python Imports
 import time
 import random
 import threading
-
-from PyQt5.QtWidgets import * 
-from PyQt5.QtGui import * 
-from PyQt5.QtCore import *
 import sys
-from TrackModelApp import TrackModel
-from occupancySignalSender import SendOccupancy
-sys.path.append("..\..\SystemSignals") # tell interpreter where to look for model files
-from Signals import Signals
 
-import multiprocessing
+# PyQt5 Imports
+from   PyQt5.QtWidgets import * 
+from   PyQt5.QtGui import * 
+from   PyQt5.QtCore import *
+
+# Developer Imports
+from   TrackModelApp import TrackModel
+from   occupancySignalSender import SendOccupancy
+sys.path.append("..\..\SystemSignals") # tell interpreter where to look for model files
+from   Signals import Signals
 
 
 class SignalSenderUI(QWidget):
     '''
     Class Description here
     '''
-    def __init__(self, signals):
+    def __init__(self, signals, TrackModelUI):
         super().__init__()
         
         self.UiComponents()
-        self.show()
+        #self.show()
         self.signals         = signals
-        
+        self.modelUI         = TrackModelUI
         self.blocks          = [i for i in range(150)]
         self.blockLens       = [random.randint(10,25) for i in range(150)]
         self.distance        = 0
@@ -78,6 +81,10 @@ class SignalSenderUI(QWidget):
         self.startTestTrainButton = QPushButton("Update Switch", self)
         self.startTestTrainButton.setGeometry(25, 135, 150, 50)
 
+        self.startTestTrainButton = QPushButton("Launch Track Model", self)
+        self.startTestTrainButton.setGeometry(25, 190, 150, 50)
+        self.startTestTrainButton.clicked.connect(self.launchModelUI)
+
         self.label = QLabel("Block", self)
         self.label.setGeometry(180, 135, 50, 50)
         self.label.setFont(QFont("Arial",10))
@@ -94,19 +101,17 @@ class SignalSenderUI(QWidget):
         self.label.setGeometry(335, 135, 50, 50)
         self.label.setFont(QFont("Arial",20))
 
+    def launchModelUI(self):
+        self.modelUI.show()
+
     def stopTimerThread(self):
         self.breakThread = True
         self.occupancyThread.join()
-        # Terminate the process
-        #self.proc.terminate() 
 
     def startTimerThread(self):
         self.occupancyThread = threading.Thread(target=self.timer)
         self.occupancyThread.start()
-        # self.proc = multiprocessing.Process(target=self.timer)
-        # self.proc.start()
         
-
     def timer(self):
         while self.currBlockIndex < 10 and self.breakThread == False:
             speed = 50
@@ -129,8 +134,8 @@ class SignalSenderUI(QWidget):
     def getOccupancy(self):
         if self.distance >= self.blockLens[self.currBlockIndex]:
             self.currBlockIndex += 1
-            self.distance                         = 0
-            self.timerr                           = 0
+            self.distance                            = 0
+            self.timerr                              = 0
             self.occupancy[1][self.currBlockIndex-1] = 0
             self.occupancy[1][self.currBlockIndex]   = 1
             self.currBlocklabel.setText('Curr Block: '+str(self.currBlockIndex+1))
@@ -146,11 +151,9 @@ class SignalSenderUI(QWidget):
         #print("From sender: GREEN LINE", self.greenLineBlocks)
 
 if __name__ == '__main__':
-    App = QApplication(sys.argv)
-    
-    signals = Signals()
-    x   = SignalSenderUI(signals)
-    
-    TrackModelUI    = TrackModel(signals)
-
+    App          = QApplication(sys.argv)
+    signals      = Signals()
+    TrackModelUI = TrackModel(signals)
+    signalSender = SignalSenderUI(signals, TrackModelUI)
+    signalSender.show()
     sys.exit(App.exec())

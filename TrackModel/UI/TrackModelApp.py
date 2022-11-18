@@ -12,7 +12,7 @@
 import sys
 
 # PyQt5 Imports
-from PyQt5.QtWidgets import QListWidgetItem, QWidget, QApplication, QFileDialog, QPushButton, QListWidget, QLabel
+from PyQt5.QtWidgets import QTableWidgetItem, QAbstractItemView, QListWidgetItem, QWidget, QApplication, QFileDialog, QPushButton, QListWidget, QLabel, QLineEdit, QTableWidget, QTableView
 from PyQt5.QtGui import QFont, QColor
 from PyQt5 import QtCore
 
@@ -20,43 +20,40 @@ from PyQt5 import QtCore
 sys.path.append("..\parsers") # tell interpreter where to look for parser files
 from LayoutParser2 import LayoutParser
 
-
 class TrackModel(QWidget):
     '''
     Class Description here
     '''
-
     def __init__(self, signals=None):
         '''
         Description here
         '''
         super().__init__()
-        # Pyqt Window Properties
-        self.title         = 'Track Model - Pittsburgh Light Rail'
-        self.left          = 40
-        self.top           = 40
-        self.width         = 450
-        self.height        = 750
-
+        
         # Current Selections
-        self.currBlock      = None
-        self.currBlockIndex = None
-        self.currLineIndex  = None
+        self.currBlock           = None
+        self.currBlockIndex      = None
+        self.currLineIndex       = None
 
         # Layout Information
-        self.lineNames     = []    # List of Strings holding line names
-        self.lines         = []    # List of TrackLine Objects
-        self.lineBlocks    = []    # 2D List of blocks, each list representing a line
-        self.blocksLoaded  = False # Bool to represent wether the TrackBlocks for a given line have been loaded
-        self.layoutFile    = None
-        self.testList      = []
-        self.signals       = None
+        self.lineNames           = []    # List of Strings holding line names
+        self.lines               = []    # List of TrackLine Objects
+        self.lineBlocks          = []    # 2D List of blocks, each list representing a line
+        self.blocksLoaded        = False # Bool to represent wether the TrackBlocks for a given line have been loaded
+        self.layoutFile          = None
+        self.testList            = []
+        self.signals             = None
 
-        # Variables to hold values for System Communication Signals  
-        # For final presentation
-        self.occupancy            = [[False for i in range(76)],[False for i in range(150)]] # only Green line for right not
-        self.faults               = [[0 for i in range(76)],[0 for i in range(150)]]     # only Green line for right not
-        self.switches             = [[0 for i in range(76)],[0 for i in range(150)]]
+        # Variables to hold values for System Communication Signals For final presentation
+        self.occupancy           = [[False for i in range(76)],[False for i in range(150)]] # only Green line for right not
+        self.faults              = [[0 for i in range(76)],[0 for i in range(150)]]     # only Green line for right not
+        self.switches            = [[0 for i in range(76)],[0 for i in range(150)]]
+
+        # Variables to hold values for displaying stations and switches on a selected line
+        self.switchText          = []
+        self.stations            = []
+        self.boardingPassengers  = []
+        self.departingPassengers = []
         
         # For iteration presentation
         # self.occupancy            = [False for i in range(150)] # only Green line for right not
@@ -71,9 +68,93 @@ class TrackModel(QWidget):
             self.signals = signals
             self.signals.occupancyFromTrainSignal.connect(self.getOccupancy)
             self.signals.switchState.connect(self.updateSwitchState)
-            
-        #print('ORDERED GREENLINE LIST:', self.orderedGreenLineList)
+
         self.initUI()
+    
+    def initUI(self):
+        '''
+        Description here
+        '''
+        # Pyqt Window Properties
+        self.title               = 'Track Model - Pittsburgh Light Rail'
+        self.left                = 40
+        self.top                 = 40
+        self.width               = 750
+        self.height              = 750
+        self.setWindowTitle(self.title)
+        self.setGeometry(self.left, self.top, self.width, self.height)
+        self.setStyleSheet("background-color: rgb(150,137,130);")
+        self.displayLoadLayoutButton()
+        # self.center() # Opens UI in the center of the current screen
+        self.displayTrackBlockList()
+        self.displayBlockInformationSection()
+        self.displayLargeSelectedBlockLabel()
+        self.displayTrackLineList()
+        self.displayFaultButtons()
+        self.displayBeaconInformationLabels()
+        self.displayStationList()
+        self.displaySwitchList()
+        self.diasplayTemperatureButton()
+
+    def diasplayTemperatureButton(self):
+        self.temperatureDisplay = QPushButton("Set Temperature:", self)
+        self.temperatureDisplay.move(440, 40)
+        self.temperatureDisplay.resize(200, 50)
+        self.temperatureDisplay.setStyleSheet("background-color: cyan; color: black;")
+        self.temperatureDisplay.setFont(QFont('Arial', 10))
+
+        self.temperatureVal = QLineEdit("", self)
+        self.temperatureVal.move(650, 40)
+        self.temperatureVal.resize(95, 50)
+        self.temperatureVal.setFont(QFont('Arial', 10))
+
+    def displaySwitchList(self):
+        # Switch Information / State Label
+        self.switchInfoLabel = QLabel("Switch Information", self)
+        self.switchInfoLabel.move(440, 370)
+        self.switchInfoLabel.resize(300, 50)
+        self.switchInfoLabel.setStyleSheet("background-color: cyan; color: black;")
+        self.switchInfoLabel.setFont(QFont('Arial', 10))
+
+        # Switch State Table
+        self.switchInfoTable = QTableWidget(self)
+        self.switchInfoTable.move(440, 430)
+        self.switchInfoTable.resize(300, 300)
+        self.switchInfoTable.setStyleSheet("background-color: gray; color: black;")
+        self.switchInfoTable.setFont(QFont('Arial', 10))
+        self.switchInfoTable.setColumnCount(3)
+        self.switchInfoTable.setHorizontalHeaderLabels(['BLOCK','FORWARD', 'REVERSE'])
+        self.switchInfoTable.setColumnWidth(0, 40)
+        self.switchInfoTable.setColumnWidth(1, 120)
+        self.switchInfoTable.setColumnWidth(2, 120)
+        self.switchInfoTable.setRowCount(10) 
+        self.switchInfoTable.verticalHeader().hide()
+        self.switchInfoTable.horizontalHeader().setStretchLastSection(True)
+        self.switchInfoTable.setSelectionMode(QAbstractItemView.NoSelection)
+
+    def displayStationList(self):
+        self.stationInfoLabel = QLabel("Station Information", self)
+        self.stationInfoLabel.move(440, 100)
+        self.stationInfoLabel.resize(300, 50)
+        self.stationInfoLabel.setStyleSheet("background-color: cyan; color: black;")
+        self.stationInfoLabel.setFont(QFont('Arial', 10))
+
+        # Switch State Table
+        self.stationInfoTable = QTableWidget(self)
+        self.stationInfoTable.move(440, 160)
+        self.stationInfoTable.resize(300, 200)
+        self.stationInfoTable.setStyleSheet("background-color: gray; color: black;")
+        self.stationInfoTable.setFont(QFont('Arial', 10))
+        self.stationInfoTable.setColumnCount(4)
+        self.stationInfoTable.setHorizontalHeaderLabels(['BLOCK', 'STATION','+', '-'])
+        self.stationInfoTable.setColumnWidth(0, 40)
+        self.stationInfoTable.setColumnWidth(1, 150)
+        self.stationInfoTable.setColumnWidth(2, 50)
+        self.stationInfoTable.setColumnWidth(3, 30)
+        self.stationInfoTable.setRowCount(10) 
+        self.stationInfoTable.verticalHeader().hide()
+        self.stationInfoTable.horizontalHeader().setStretchLastSection(True)
+        self.stationInfoTable.setSelectionMode(QAbstractItemView.NoSelection)
 
     def updateSwitchState(self, switch):
         self.lineswitches[switch[0]] = switch[1]
@@ -90,7 +171,6 @@ class TrackModel(QWidget):
         sec4     = [i for i in range(29, 0, -1)]
         sec5     = [i for i in range(13, 58)]
         self.orderedGreenLineList = sec1 + sec2 + sec3 + sec4 + sec5
-        #print('FROM UI', self.orderedGreenLineList)
 
     def updateBlockCall(self):
         '''
@@ -98,22 +178,6 @@ class TrackModel(QWidget):
         '''
         if self.currLineIndex != None and self.blocksLoaded == True:
             self.updateBlocks()
-
-    def initUI(self):
-        '''
-        Description here
-        '''
-        self.setWindowTitle(self.title)
-        self.setGeometry(self.left, self.top, self.width, self.height)
-        self.displayLoadLayoutButton()
-        # self.center() # Opens UI in the center of the current screen
-        self.displayTrackBlockList()
-        self.displayBlockInformationSection()
-        self.displayLargeSelectedBlockLabel()
-        self.displayTrackLineList()
-        self.displayFaultButtons()
-        self.displayBeaconInformationLabels()
-        self.show()
 
     def displayLoadLayoutButton(self):
         '''
@@ -193,21 +257,21 @@ class TrackModel(QWidget):
         '''
         Displays the buttons for triggering the three possible trackmodel related faults
         '''
-        self.trackFault1 = QPushButton("Toggle Track Fault", self)
+        self.trackFault1 = QPushButton("Track Fault", self)
         self.trackFault1.move(130, 690)
-        self.trackFault1.resize(100,50)
+        self.trackFault1.resize(90,50)
         self.trackFault1.setStyleSheet("background-color: orange ; color: black;")
         self.trackFault1.clicked.connect(lambda : self.updateFaults("Track Fault"))
 
-        self.trackFault2 = QPushButton("Toggle Power Fault", self)
+        self.trackFault2 = QPushButton("Power Fault", self)
         self.trackFault2.move(235, 690)
-        self.trackFault2.resize(100,50)
+        self.trackFault2.resize(90,50)
         self.trackFault2.setStyleSheet("background-color: orange ; color: black;")
         self.trackFault2.clicked.connect(lambda : self.updateFaults("Power Fault"))
 
-        self.trackFault3 = QPushButton("Toggle Circuit Fault", self)
+        self.trackFault3 = QPushButton("Circuit Fault", self)
         self.trackFault3.move(340, 690)
-        self.trackFault3.resize(100,50)
+        self.trackFault3.resize(90,50)
         self.trackFault3.setStyleSheet("background-color: orange ; color: black;")
         self.trackFault3.clicked.connect(lambda : self.updateFaults("Circuit Fault"))
 
@@ -265,12 +329,6 @@ class TrackModel(QWidget):
             self.currBlockDisplay.setStyleSheet("background-color: cyan; color: black;")
 
         #self.signals.blockFailures.emit(self.faults)
-        
-        #print(self.currBlock.faultPresence)
-        
-        # for i in range(len(self.lineNames)):
-        #     print(self.lineNames[i], "Faults")
-        #     print(self.faults[i])
         if self.signals:
             self.signals.trackFailuresSignal.emit(self.faults)
 
@@ -278,7 +336,8 @@ class TrackModel(QWidget):
         '''
         Launchs the file dialog allowing a user to load a trackline diagram.
         '''
-        options = QFileDialog.Options()
+        dial = QFileDialog()
+        options = dial.Options()
         options |= QFileDialog.DontUseNativeDialog
         fileName, _ = QFileDialog.getOpenFileName(self,"Track Layout Selection", "../Layout-Files","All Files (*);;Python Files (*.py)", options=options)
         if fileName:
@@ -306,9 +365,13 @@ class TrackModel(QWidget):
         Loads the names of the track lines parsed from the layout file into the 
         lines selection list.
         '''
-        
         for i in range(len(self.lines)):
             self.lineBlocks.append([])
+
+            self.switchText.append([])
+            self.stations.append([])
+            self.departingPassengers.append([])
+            self.boardingPassengers.append([])
             self.linelistwidget.insertItem(i, self.lines[i].name)
         self.linelistwidget.itemClicked.connect(self.onClickedLine)
         self.loadAllLinesBlocks()
@@ -355,7 +418,11 @@ class TrackModel(QWidget):
                     i+=1
                     if block.switch != "":
                         self.switches[k][i] = [8,25]
-        #print("SWITCHES", self.switches)
+                        self.switchText[k].append([block.blockNumber, block.switch])
+                    if block.station:
+                        self.stations[k].append([block.blockNumber, block.station])
+                        self.departingPassengers[k].append(0)
+                        self.boardingPassengers[k].append(0)
 
     def loadBlocks(self):
         '''
@@ -373,8 +440,6 @@ class TrackModel(QWidget):
                     self.blockslistwidget.item(i).setBackground(QColor(255,0,0))
                 else:
                     self.blockslistwidget.item(i).setBackground(QColor(134, 132, 130))
-                
-                
                 i+=1
         self.blockslistwidget.itemClicked.connect(self.onClickedBlock)
         self.blocksLoaded = True
@@ -398,8 +463,19 @@ class TrackModel(QWidget):
                     self.currBlockDisplay.setStyleSheet("background-color: rgb(200,200,50); color: black;")
             else:
                 self.blockslistwidget.item(i).setBackground(QColor(134, 132, 130))
-
         self.updateBlockInfo(self.currBlockIndex)
+
+    def displayLineStations(self):
+        for i in range(len(self.stations[self.currLineIndex])):
+            self.stationInfoTable.setItem(i, 0, QTableWidgetItem(self.stations[self.currLineIndex][i][0]))
+            self.stationInfoTable.setItem(i, 1, QTableWidgetItem(self.stations[self.currLineIndex][i][1]))
+            self.stationInfoTable.setItem(i, 2, QTableWidgetItem(str(self.boardingPassengers[self.currLineIndex][i])))
+            self.stationInfoTable.setItem(i, 3, QTableWidgetItem(str(self.departingPassengers[self.currLineIndex][i])))
+
+    def displayLineSwitches(self):
+        for i in range(len(self.switchText[self.currLineIndex])):
+            self.switchInfoTable.setItem(i, 0, QTableWidgetItem(str(self.switchText[self.currLineIndex][i][0])))
+            self.switchInfoTable.setItem(i, 1, QTableWidgetItem(str(self.switchText[self.currLineIndex][i][1])))
 
     def onClickedLine(self, item):
         '''
@@ -409,7 +485,14 @@ class TrackModel(QWidget):
         currLine = item.text()
         self.currLineIndex = self.lineNames.index(currLine)
         # print(currLine, self.currLineIndex)
+        
+        self.switchInfoLabel.setText(self.lineNames[self.currLineIndex] + " Line Switch Information")
+        self.stationInfoLabel.setText(self.lineNames[self.currLineIndex] + " Line Station Information")
+        self.displayLineStations()
+        self.displayLineSwitches()
         self.loadBlocks()
+        print(self.boardingPassengers)
+        print(self.stations)
 
     def onClickedBlock(self, item):
         '''
@@ -513,7 +596,7 @@ class TrackModel(QWidget):
             self.blockVallistwidget.item(19).setForeground(QtCore.Qt.yellow)
 
             if self.currBlock.switch:
-                self.blockSwitchIndicator.setText('SWITCH STATE: '+str(self.currBlock.switch))
+                self.blockSwitchIndicator.setText('SWITCH STATE: '+str(self.lineBlocks[1][self.currBlockIndex].switchState))
                 self.blockSwitchIndicator.show()
                 self.blockSwitchIndicator.move(130, 120)
                 self.blockSwitchIndicator.resize(300, 20)
@@ -576,4 +659,5 @@ class TrackModel(QWidget):
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     ex = TrackModel()
+    ex.show()
     sys.exit(app.exec_())
