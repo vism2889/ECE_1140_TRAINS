@@ -21,16 +21,15 @@ import threading
 import sys
 
 # PyQt5 Imports
-from   PyQt5.QtWidgets import * 
-from   PyQt5.QtGui import * 
-from   PyQt5.QtCore import *
+from   PyQt5.QtWidgets       import * 
+from   PyQt5.QtGui           import * 
+from   PyQt5.QtCore          import *
 
 # Developer Imports
-from   TrackModelApp import TrackModel
+from   TrackModelApp         import TrackModel
 from   occupancySignalSender import SendOccupancy
 sys.path.append("..\..\SystemSignals") # tell interpreter where to look for model files
 from   Signals import Signals
-
 
 class SignalSenderUI(QWidget):
     '''
