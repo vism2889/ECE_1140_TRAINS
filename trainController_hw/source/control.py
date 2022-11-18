@@ -1,3 +1,26 @@
+##############################################################################
+# AUTHOR:   Juin Sommer
+# DATE:     11/17/2022
+# FILENAME: control.py
+# DESCRIPTION:
+# Class to define the Train Controller functionality and define GPIO outputs
+# for the RPi
+
+# TODO:
+# - Generate new message files to take authority as a distance
+# - implement failure states
+#   + failure indicators
+#   + stop train 
+# - Implement speed limit 
+#   + train cannot exceed speed limit
+# - Implement next station
+#   + display next station
+#   + use next station for announcements 
+# - Implement authority
+#   + stop train when authority is reached
+# - Implement station announcement audio for green line
+##############################################################################
+
 import RPi.GPIO as GPIO
 from simple_pid import PID
 from pygame import mixer
@@ -29,13 +52,12 @@ class Control():
         self.ebrakeCommand = False
         self.brakeCommand = False
         self.current_speed = 0
-        self.suggested_speed = 0
         self.speed_limit = 100
         self.temperature = 0
-        self.k_p = 1
-        self.k_i = 0.01
+        self.k_p = 24e3
+        self.k_i = 100
         self.pid = PID(self.k_p, self.k_i, 0, setpoint=self.commanded_speed) # initialize pid with fixed values
-        self.pid.outer_limits = (0, 120000) # clamp at max power output specified in datasheet 120kW
+        self.pid.output_limits = (0, 120000) # clamp at max power output specified in datasheet 120kW
         self.power = 0.0
         self.station_audio = ["shadyside_herron.mp3", "herron_swissvale.mp3", 
                               "swissvale_penn.mp3", "penn_steelplaza.mp3", 
@@ -49,7 +71,7 @@ class Control():
         self.k_p = kp_val
         self.k_i = ki_val
         self.pid = PID(self.k_p, self.k_i, 0, setpoint=self.commanded_speed)
-        self.pid.outer_limits = (0, 120000) # clamp at max power output specified in datasheet 120kW
+        self.pid.output_limits = (0, 120000) # clamp at max power output specified in datasheet 120kW
 
     # need to confirm what data type authority will be
     def setAuthority(self, authority=None):
@@ -123,26 +145,16 @@ class Control():
         if(not start) : mixer.music.stop()
 
     def deployEbrake(self, deploy=None):
-        # may have to consider case where if in auto mode and ebrake is deployed, stop taking in commanded speed data
-        if(deploy == None):
-            self.ebrakeCommand = self.input.getEbrakeCommand()
-            self.output.setEbrakeState(self.ebrakeCommand)
-        
-        else:
+        if deploy != None:
             self.ebrakeCommand = deploy
             self.output.setEbrakeState(self.ebrakeCommand)
 
-    def deployServiceBrake(self, state=None):
-        if state != None:
-            self.brakeCommand = state
+    def deployServiceBrake(self, deploy=None):
+        if deploy != None:
+            self.brakeCommand = deploy
             self.output.setServiceBrakeState(self.brakeCommand)
 
-        else:
-            brake = self.input.getServiceBrakeCommand()
-            if brake != None:
-                self.brakeCommand = brake
-            self.output.setServiceBrakeState(self.brakeCommand)
-
+    # TODO: implement speed limit
     def limitSpeed(self, speed):
         speed_limit = self.input.getSpeedLimit()
         if(speed > speed_limit):
@@ -150,6 +162,12 @@ class Control():
         
         else: return True
 
+    def getSpeedLimit(self):
+        limit = self.input.getSpeedLimit()
+        if limit != None:
+            print("\nSpeed Limit: %5.2f" % limit)
+
+    # TODO: implement authority
     def checkAuthority(self):
         if self.authority == 0:
             self.deployEbrake(self)
@@ -162,9 +180,9 @@ class Control():
         return self.k_p, self.k_i
 
     def getPowerOutput(self, commanded_speed=None):
-        if self.ebrakeCommand == True:
+        if self.ebrakeCommand == True or self.brakeCommand == True:
             self.output.setPower(0.0)
-            return
+            return self.power
         
         if commanded_speed == None and self.input.getCommandedSpeed() != None:
             self.pid.setpoint = self.input.getCommandedSpeed()
@@ -175,13 +193,10 @@ class Control():
             self.pid.setpoint = self.commanded_speed
 
         self.power = self.pid(self.current_speed)
+        self.output.setPower(self.power)
+        return self.power
 
-        if self.power >= 0:
-            self.output.setPower(self.power)
-
-        else:
-            self.output.setPower(0.0)
-
+    # used for server interface testing to send dummy data to a client acting as train model
     def sendRandom(self):
         self.output.randomize()
         self.output.publish()

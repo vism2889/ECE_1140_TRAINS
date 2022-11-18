@@ -1,13 +1,24 @@
+##############################################################################
+# AUTHOR:   Juin Sommer
+# DATE:     11/17/2022
+# FILENAME: outputData.py
+# DESCRIPTION:
+# Class to handle Train Controller output data to send to Train Model with
+# the winserver using TCP/IP via ethernet.
+##############################################################################
+
 import random
 import time
 from winserver import winserver
+import sys
+sys.path.append("../server_interfaces")
 from out_msg import out_msg
 
 class OutputData():
     def __init__(self):
         self.node = winserver('my_publisher', "192.168.0.15")
         self.message = out_msg()
-        self.pub = self.node.advertise('my_topic', out_msg , 1, "192.168.0.10")
+        self.pub = self.node.advertise('To_Train_Model', out_msg , 1, "192.168.0.10")
 
     def setPower(self, power):
         self.message.power = power
@@ -39,7 +50,7 @@ class OutputData():
     def publish(self):
         self.pub.publish(self.message)
 
-        # print("Power: %5.2f" % self.message.power, end="", flush=True )
+        # print("\nPower: %5.2f" % self.message.power, end="", flush=True )
         # print("\nTemperature: %2d" % self.message.temperature, end="", flush=True )
         # print("\nService Brake: %i" % self.message.service_brake_command, end="", flush=True )
         # print("\nEmergencyBrake: %i" % self.message.ebrake_command, end="", flush=True )
