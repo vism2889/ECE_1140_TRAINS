@@ -19,6 +19,8 @@ import time
 import random
 import threading
 import sys
+import logging
+import argparse
 
 # PyQt5 Imports
 from   PyQt5.QtWidgets       import * 
@@ -37,7 +39,20 @@ class SignalSenderUI(QWidget):
     '''
     def __init__(self, signals, TrackModelUI):
         super().__init__()
+        self.logHeader = "FILE: SignalSenderUI:: "
         
+        self.parser = argparse.ArgumentParser()
+        self.parser.add_argument( '-log',
+                            '--loglevel',
+                            default='warning',
+                            help='Provide logging level. Example --loglevel debug, default=warning' )
+
+        args = self.parser.parse_args()
+
+        logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.INFO)
+        self.logger = logging.getLogger('SignalSenderUI')
+        self.logger.warning(self.logHeader+"WARNING")
+
         self.UiComponents()
         #self.show()
         self.signals         = signals
@@ -54,7 +69,7 @@ class SignalSenderUI(QWidget):
         self.line            = "Green"
         self.lineBlocks      = []
         self.greenLineBlocks = [] 
-        self.breakThread = False
+        self.breakThread     = False
 
         # Signal Connections
         self.signals.greenLineTrackBlockSignal.connect(self.loadGreenLineBlocks)
@@ -62,6 +77,7 @@ class SignalSenderUI(QWidget):
         self.signals.trackBlocksToTrainModelSignal.connect(self.updateLineBlocks)
         
     def UiComponents(self):
+        self.logger.info(self.logHeader + " Creating UI Components...")
         self.setWindowTitle("Python ")
         self.setGeometry(500, 40, 400, 600)
         self.startTestTrainButton = QPushButton("Start Train", self)
@@ -99,6 +115,7 @@ class SignalSenderUI(QWidget):
         self.label = QLineEdit(self)
         self.label.setGeometry(335, 135, 50, 50)
         self.label.setFont(QFont("Arial",20))
+        self.logger.info(self.logHeader + " Finished Creating UI Components...")
 
     def launchModelUI(self):
         self.modelUI.show()
@@ -116,15 +133,17 @@ class SignalSenderUI(QWidget):
             speed = 50
             self.timerr += .01
             self.distance = speed*self.timerr
-            print("distance:", self.distance)
+            self.logger.info(self.logHeader + " Current Distance Since Last Block:" + str(self.distance))
             self.getOccupancy()
             time.sleep(0.1)
 
     def loadGreenLineBlocks(self, blockNums):
+        self.logger.info(self.logHeader + " Loading Blocks For the Green Line...")
         self.greenLineBlocks = blockNums
-        print("LOADING GREEN LINE BLOCKS:", self.greenLineBlocks)
+        self.logger.info(self.logHeader + " Green Line Blocks Loaded...")
 
     def updateFaults(self, faults):
+        self.logger.info(self.logHeader + " Updating faults from"+ str(self.faults) + " to " + str(faults))
         self.faults = faults
 
     def updateLineBlocks(self, blocks):
@@ -139,13 +158,13 @@ class SignalSenderUI(QWidget):
             self.occupancy[1][self.currBlockIndex]   = 1
             self.currBlocklabel.setText('Curr Block: '+str(self.currBlockIndex+1))
             
-            print("NEW OCCUPANCY:", self.currBlockIndex)
+            self.logger.info("NEW OCCUPANCY: " + str(self.currBlockIndex))
 
         # Emit Occupancy    
         self.signals.occupancyFromTrainSignal.emit(self.occupancy)
         
-        print("From sender: Train on Block:", self.currBlockIndex+1)
-        print("From sender: FAULTS:\n", self.faults)
+        self.logger.info("From sender: Train on Block: " + str(self.currBlockIndex+1))
+        self.logger.info("From sender: FAULTS:\n" + str(self.faults))
         #print("From sender: LineBlocks:\n", self.lineBlocks)
         #print("From sender: GREEN LINE", self.greenLineBlocks)
 
