@@ -458,9 +458,9 @@ class TrackControllerWindow(QtWidgets.QWidget):
                         item = QtWidgets.QTableWidgetItem(value)
                         item.setTextAlignment(4)
                         if not j:
-                            item.setBackground(QtGui.QColor(0xbf, 0xe3, 0xb4))
-                        else:
                             item.setBackground(QtGui.QColor(0xf4, 0x71, 0x74))
+                        else:
+                            item.setBackground(QtGui.QColor(0xbf, 0xe3, 0xb4))
 
                     crossing_table.setItem(row_idx, i.index(j), item)
 
@@ -662,7 +662,7 @@ class TrackControllerWindow(QtWidgets.QWidget):
 
     def setCrossingState(self, line, block_num, state):
         controller_indices = self.waysideio_ref.lookupBlock(line, block_num)['controller']
-    
+
         value = ""
         if state:
             value = "ON"
@@ -677,10 +677,10 @@ class TrackControllerWindow(QtWidgets.QWidget):
                 item = QtWidgets.QTableWidgetItem(str(value))
                 item.setTextAlignment(4)
 
-                if value:
-                    item.setBackground(QtGui.QColor(0xf4, 0x71, 0x74))
-                else:
+                if state:
                     item.setBackground(QtGui.QColor(0xbf, 0xe3, 0xb4))
+                else:
+                    item.setBackground(QtGui.QColor(0xf4, 0x71, 0x74))
 
                 controller_table = self.redline_reference['controllers'][i[0]]
                 if 'crossing-table' in controller_table:
@@ -697,10 +697,10 @@ class TrackControllerWindow(QtWidgets.QWidget):
                 item = QtWidgets.QTableWidgetItem(str(value))
                 item.setTextAlignment(4)
 
-                if value:
-                    item.setBackground(QtGui.QColor(0xf4, 0x71, 0x74))
-                else:
+                if state:
                     item.setBackground(QtGui.QColor(0xbf, 0xe3, 0xb4))
+                else:
+                    item.setBackground(QtGui.QColor(0xf4, 0x71, 0x74))
 
                 controller_table = self.greenline_reference['controllers'][i[0]]
                 if 'crossing-table' in controller_table:

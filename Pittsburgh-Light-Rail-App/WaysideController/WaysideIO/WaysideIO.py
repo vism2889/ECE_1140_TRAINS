@@ -10,7 +10,7 @@ from track_layout import extract_layout
 
 class Controller():
     def __init__(self, line, controllerNum, layout, ui, parent):
-        
+
         self.line = line
         self.layout = layout
         self.ui = ui
@@ -51,8 +51,8 @@ class Controller():
 
         ## Setup PLC interface
         self.parser = PLCParser(controllerNum)
-        if self.id == 4 and self.line == 'green':
-            file = open("plc/controller4.plc")
+        if self.line == 'green':
+            file = open(f"plc/controller{self.id}.plc")
             self.uploadPLC(file)
             self.maintenance = False
 
@@ -68,38 +68,46 @@ class Controller():
 
         ## Run PLC program
         self.run()
+
+        ## update outputs
         self.updateSwitch()
+        self.updateCrossing()
+
         return self.track['block']
 
     ## Update block failures
     def updateFailures(self, blockNum, failures):
         self.track['block-states'][blockNum] = failures
         self.ui.setFaultState(self.line, blockNum, failures)
+
         ## Run PLC program
         self.run()
+
         return self.track['block-states']
 
     def updateMaintenance(self, blockNum, state):
         self.track['block-maintenance'][blockNum] = state
         self.ui.setMaintenance(self.line, blockNum, state)
+
         ## Run PLC program
         self.run()
+
         return self.track['block-maintenance']
 
+    ## Switches and crossing only get update with the PLC program
     def updateSwitch(self):
-        ## Run PLC program ##
         for switch in self.track['switch']:
             self.parent.setSwitch(self.line, switch, self.track['switch'][switch])
             self.ui.setSwitchState(self.line, int(switch), self.track['switch'][switch])
 
         return self.track['switch']
 
-    def updateCrossing(self, blockNum, state):
-        self.track['crossing'][blockNum] = state
-        self.ui.setCrossingState(self.line, blockNum, state)
+    def updateCrossing(self):
+        for crossing in self.track['crossing']:
+            self.parent.setCrossing(self.line, crossing, self.track['crossing'][crossing])
+            self.ui.setCrossingState(self.line, int(crossing), self.track['crossing'][crossing])
 
         ## Run PLC program
-        self.run()
         return self.track['crossing']
 
     ## Toggle maintenance mode FOR THE CONTROLLER ##
@@ -121,7 +129,7 @@ class Controller():
         if self.maintenance:
             modname = self.parser.parseFile(file)
             try:
-                mod = importlib.import_module("plc."+modname) 
+                mod = importlib.import_module("plc."+modname)
                 mod.run(self.track)
             except ImportError:
                 print(f"Errror: Could not import plc script for controller {self.id}")
@@ -221,13 +229,13 @@ class WaysideIO(QWidget):
     def setCrossing(self, line, blockNum, state):
         if self.lines[0] == line.lower():
             controllers = self.lookupBlock(self.lines[0], blockNum)['controller']
-            for c in controllers:
-                self.redline_controllers[c[0]].updateCrossing(blockNum, state)
+            # for c in controllers:
+            #     self.redline_controllers[c[0]].updateCrossing(blockNum, state)
 
         if self.lines[1] == line.lower():
             controllers = self.lookupBlock(self.lines[1], blockNum)['controller']
-            for c in controllers:
-                self.greenline_controllers[c[0]].updateCrossing(blockNum, state)
+            # for c in controllers:
+            #     self.greenline_controllers[c[0]].updateCrossing(blockNum, state)
     #############   #############   #############   #############   #############
 
     def lookupBlock(self, line, blockNum):
@@ -267,7 +275,7 @@ class WaysideIO(QWidget):
         if line.lower() == self.lines[1]:
             for i, c in enumerate(layout):
                 self.greenline_controllers.append(Controller(line.lower(), i, c, self.ui, self))
-                # if i == 
+                # if i ==
                 ## Populate lookup table
                 idx = 0
                 for sec in c['sections']:
@@ -285,14 +293,10 @@ class WaysideIO(QWidget):
                         idx+=1
 
         self.signals.globalOccupancyFromTrackModelSignal.connect(self.blockOccupancyCallback)
-        # print(self.lookupTable['green'])
+
 
 if __name__ == '__main__':
     w = WaysideIO(1)
-
-    ## Testing configuration
-    # csvPath = os.getcwd()
-    # jsonPath = os.getcwd()
 
     csvPath = os.path.abspath(__file__)
     jsonPath = os.path.abspath(__file__)
