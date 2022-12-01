@@ -42,6 +42,7 @@ class Control():
     def __init__(self):
         self.output = OutputData()
         self.input = TrainData()
+        self.vital_override = False
         self.authority = 0
         self.light_state_internal = False
         self.light_state_external = False
@@ -146,6 +147,7 @@ class Control():
 
     def deployEbrake(self, deploy=None):
         if deploy != None:
+            print("deploy: ", deploy)
             self.ebrakeCommand = deploy
             self.output.setEbrakeState(self.ebrakeCommand)
 
@@ -170,7 +172,7 @@ class Control():
     # TODO: implement authority
     def checkAuthority(self):
         if self.authority == 0:
-            self.deployEbrake(self)
+            self.deployEbrake(True)
     
     def set_kp_ki(kp_val, ki_val, self):
         self.k_p = kp_val
@@ -180,6 +182,7 @@ class Control():
         return self.k_p, self.k_i
 
     def getPowerOutput(self, commanded_speed=None):
+        #print("ebrake: ", self.ebrakeCommand)
         if self.ebrakeCommand == True or self.brakeCommand == True:
             self.output.setPower(0.0)
             return self.power
@@ -194,8 +197,23 @@ class Control():
 
         self.power = self.pid(self.current_speed)
         self.output.setPower(self.power)
+
         return self.power
 
+    def checkFailures(self):
+        failures = self.input.getFailures()
+        brakeFailure = failures[0]
+        engineFailure = failures[1]
+        pickupFailure = failures[2]
+
+        if brakeFailure == True or engineFailure == True or pickupFailure == True:
+            self.vital_override = True
+            return True
+        
+        else:
+            self.vital_override = False
+            return False
+                  
     # used for server interface testing to send dummy data to a client acting as train model
     def sendRandom(self):
         self.output.randomize()

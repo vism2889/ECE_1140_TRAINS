@@ -48,7 +48,7 @@ class TrainData:
     def getAuthority(self):
         return self.authority
 
-    def getFailure(self):
+    def getFailures(self):
         failure_states = [self.brake_failure, self.engine_failure, self.signalPickup_failure]
         return failure_states
 
