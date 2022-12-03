@@ -72,7 +72,7 @@ def parseTrackLayout(path, jsonPath):
 
                 ## End of populating trackLayout
             #####################
-        ## 
+        ##
         checkedSections = []
         ## Open json file
         jsonFile = open(jsonPath)
@@ -101,25 +101,25 @@ def parseTrackLayout(path, jsonPath):
                     "crossing-state" : [],
                     "total-blocks" : 0
                 }
-            
+
             for s in c['sections']:
                 sec = trackLayout['sections'][s]
                 controller['sections'][s] = sec
-                
+
                 ## UI info
                 ## Block Occupancy
                 for block in sec['blocks']:
-                    ui_controller['block-occupancy'].append((block[0], s, block[2], block[1]))      
+                    ui_controller['block-occupancy'].append((block[0], s, block[2], block[1]))
                     ui_controller['total-blocks'] += 1
-                    
-                    if s not in checkedSections: 
-                        VIEW['block-occupancy'].append((block[0], s, block[2], block[1]))      
+
+                    if s not in checkedSections:
+                        VIEW['block-occupancy'].append((block[0], s, block[2], block[1]))
                         VIEW['total-blocks'] += 1
-                
+
                 ## Switch info
                 for switch in sec['switches']:
                     ui_controller['switch-state'].append((switch, s, False))
-                    if s not in checkedSections: VIEW['switch-state'].append((switch, s, False)) 
+                    if s not in checkedSections: VIEW['switch-state'].append((switch, s, False))
 
                 ## Crossing info
                 for crossing in sec['crossing']:
