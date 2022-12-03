@@ -19,10 +19,6 @@ import sys
 import os
 import time
 from train import Train
-from Server_Comm import MyPub, MySub
-
-
-
 
 
 
@@ -38,6 +34,7 @@ class TrainModel(QtWidgets.QMainWindow):
         self.hw = hw
 
         if self.hw:
+            from Server_Comm import MyPub, MySub
             self.mp = MyPub(self.t)
             self.ms = MySub(self.t)
 
