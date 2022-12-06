@@ -25,7 +25,7 @@ class TrainData():
     max_passengers = int = 148
 
     #limits
-    max_gradient = int = 60 #Percentage
+    max_gradient = int = 0.06 #Percentage
     motor_pwr = float = 120000  #Watts
     max_speed = float = 70000/3600  #m/s
     
@@ -210,9 +210,6 @@ class PointMassModel():
 
         if self.curr_vel > 0:
             self.force = float(self.power)/float(self.curr_vel)
-
-            # if self.speed_limit > self.curr_speed:
-            #     self.force -= kinetic_friction_force
         else:
             self.force = 120000 * 2
             self.force -= static_friction_force
