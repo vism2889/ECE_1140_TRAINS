@@ -20,12 +20,6 @@ class Block():
                 return
         self.left.append(block)
 
-    def getRightNode(self):
-        return self.right
-    
-    def getLeftNode(self):
-        return self.left
-
     def printBlock(self):
         print("Left")
         for i in self.left:
@@ -79,14 +73,10 @@ class Track():
             if val != None:
                 block.switch = val 
             else: 
-                # print(f"toggling track for block {block.id}")
-                # print(f'Block switch state for {block.id} is {block.switch}')
                 block.switch = not block.switch
 
     def getNextBlock(self, curr, prev):
         neighbors = self.blocks[curr-1].getNeighbors()
-        # print(f'{curr}')
-        # print(f'{neighbors[0].id}\t{neighbors[1].id}')
         if neighbors[0].id == prev: 
             return neighbors[1]
         
