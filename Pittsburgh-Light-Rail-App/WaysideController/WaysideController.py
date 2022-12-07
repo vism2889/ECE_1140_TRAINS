@@ -4,10 +4,10 @@ import sys
 sys.path.append('track_layout')
 sys.path.append("../../SystemSignals")
 
-## PyQt comms and widgets 
+## PyQt comms and widgets
 from  PyQt5 import QtWidgets
 if __name__ == '__main__': from Signals import Signals
-## Wayside controller library 
+## Wayside controller library
 from ui.WaysideUI import TrackControllerWindow
 from WaysideIO.WaysideIO import WaysideIO
 from ui.WCTestWindow import Ui_test_window
@@ -31,14 +31,14 @@ class WaysideController():
 
         ## Main Wayside Controller class
         wayside = WaysideIO(signals, logger)
-        
+
         ## UI
         w = QtWidgets.QWidget()
         wTest = QtWidgets.QWidget()
         main = TrackControllerWindow(wayside)
         main.setupUi(w)
 
-        if launchTestWindow: 
+        if launchTestWindow:
             test = Ui_test_window(main)
             test.setupUi(wTest)
             w.show()
@@ -48,7 +48,7 @@ class WaysideController():
 
         ## Set UI reference
         wayside.setUI(main)
-        self.active = True 
+        self.active = True
 
 ## Commandline CTRL-C ##
 def handler(signum, frame):
@@ -63,15 +63,15 @@ if __name__ == '__main__':
     signals = Signals() ## COMMENT OUT FOR FINAL PRODUCT
     wayside = WaysideController(signals)
 
-    ## Testing 
+    ## Testing
     blockFailures = []
-    for i in range(150): 
+    for i in range(150):
         blockFailures.append(0)
-        
+
     blockFailures[0] = 0x01
     blockFailures[5] = 0x03
-    blockFailures[149] = 0x02 
-    signals.blockFailures.emit(blockFailures)  
+    blockFailures[149] = 0x02
+    signals.blockFailures.emit(blockFailures)
 
     ## Exit
     sys.exit(app.exec_()) ## COMMENT OUT FOR FINAL PRODUCT

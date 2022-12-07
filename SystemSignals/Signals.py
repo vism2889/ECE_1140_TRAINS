@@ -34,23 +34,23 @@ class Signals(QWidget):
     # Above could be a single list signal formatted as below:
     # ["TrackLineName", [lineOccupancy], [lineSwitchStates], [lineMaintenance], [lineFailures]]
 
-
     # CTC Office Signals
     dispatchTrainSignal      = QtCore.pyqtSignal(list)
-    suggestedSpeedSignal     = QtCore.pyqtSignal(list) # List of length 2 @first - (int)unique train id, @second - (int)suggested speed
+    suggestedSpeedSignal     = QtCore.pyqtSignal(list) # List of length 2 [(int) train id, (int) suggested speed]
     ctcAuthoritySignal       = QtCore.pyqtSignal(list)
     clockSpeedSignal         = QtCore.pyqtSignal(int)
+    signalMaintenance        = QtCore.pyqtSignal(list) # List of length 2 [(int) block #, (bool) maintenance state]
 
     # Wayside Controller Signals
-    switchState              = QtCore.pyqtSignal(list) # List of length two indicating a block and it's switch state [block #, boolean state]
-    crossingState            = QtCore.pyqtSignal(list) # List of length two indicating a block and it's crossing state [block #, boolean state]
-    waysideAuthority         = QtCore.pyqtSignal(list) # List of variable length N. Each index holds a block number identifying that block as a "do not pass" mark
+    switchState              = QtCore.pyqtSignal(list) # List of length two indicating a block and it's switch state [(int) block #, (bool) state]
+    crossingState            = QtCore.pyqtSignal(list) # List of length two indicating a block and it's crossing state [(int) block #, (bool) state]
+    waysideAuthority         = QtCore.pyqtSignal(list) # List of length 2 that specifices the authority for an individual train [(int) train id, (int) block #]
 
     # Train Model Signals
     blockListSignal          = QtCore.pyqtSignal(list)
     blockLengthSignal        = QtCore.pyqtSignal(list)
     gradeSignal              = QtCore.pyqtSignal(list)
-
+    trainLocation            = QtCore.pyqtSignal(list) # List of length 4 that identifies a unique trains location in the track [(str) line, (int) train id, (int) previos block, (int) current block]
 
     # Train Controller (SW) Inputs Signals
     authoritySignal          = QtCore.pyqtSignal(list)

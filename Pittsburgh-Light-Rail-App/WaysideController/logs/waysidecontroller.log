@@ -1,18 +1,18 @@
-[2022-12-07 13:19:18,477] WAYSIDE-MODULE (DEBUG): Creating Wayside Controller
-[2022-12-07 13:19:18,696] WAYSIDE-MODULE (DEBUG): Plc has been loaded for controller 0
-[2022-12-07 13:19:18,698] WAYSIDE-MODULE (DEBUG): Plc has been loaded for controller 1
-[2022-12-07 13:19:18,701] WAYSIDE-MODULE (DEBUG): Plc has been loaded for controller 2
-[2022-12-07 13:19:18,704] WAYSIDE-MODULE (DEBUG): Plc has been loaded for controller 3
-[2022-12-07 13:19:18,706] WAYSIDE-MODULE (DEBUG): Plc has been loaded for controller 4
-[2022-12-07 13:19:18,760] WAYSIDE-MODULE (DEBUG): track failure on block 1
-[2022-12-07 13:19:18,773] WAYSIDE-MODULE (DEBUG): track failure on block 1
-[2022-12-07 13:19:18,778] WAYSIDE-MODULE (DEBUG): track failure on block 6
-[2022-12-07 13:19:18,778] WAYSIDE-MODULE (DEBUG): circuit failure on block 6
-[2022-12-07 13:19:18,782] WAYSIDE-MODULE (DEBUG): circuit failure on block 150
-[2022-12-07 13:19:18,787] WAYSIDE-MODULE (DEBUG): circuit failure on block 150
-[2022-12-07 13:19:18,792] WAYSIDE-MODULE (DEBUG): track failure on block 1
-[2022-12-07 13:19:18,796] WAYSIDE-MODULE (DEBUG): track failure on block 1
-[2022-12-07 13:19:18,801] WAYSIDE-MODULE (DEBUG): track failure on block 6
-[2022-12-07 13:19:18,801] WAYSIDE-MODULE (DEBUG): circuit failure on block 6
-[2022-12-07 13:19:18,806] WAYSIDE-MODULE (DEBUG): circuit failure on block 150
-[2022-12-07 13:19:18,810] WAYSIDE-MODULE (DEBUG): circuit failure on block 150
+[2022-12-07 13:41:35,744] WAYSIDE-MODULE (DEBUG): Creating Wayside Controller
+[2022-12-07 13:41:35,967] WAYSIDE-MODULE (DEBUG): Plc has been loaded for controller 0
+[2022-12-07 13:41:35,972] WAYSIDE-MODULE (DEBUG): Plc has been loaded for controller 1
+[2022-12-07 13:41:35,975] WAYSIDE-MODULE (DEBUG): Plc has been loaded for controller 2
+[2022-12-07 13:41:35,978] WAYSIDE-MODULE (DEBUG): Plc has been loaded for controller 3
+[2022-12-07 13:41:35,984] WAYSIDE-MODULE (DEBUG): Plc has been loaded for controller 4
+[2022-12-07 13:41:36,034] WAYSIDE-MODULE (DEBUG): track failure on block 1
+[2022-12-07 13:41:36,047] WAYSIDE-MODULE (DEBUG): track failure on block 1
+[2022-12-07 13:41:36,051] WAYSIDE-MODULE (DEBUG): track failure on block 6
+[2022-12-07 13:41:36,051] WAYSIDE-MODULE (DEBUG): circuit failure on block 6
+[2022-12-07 13:41:36,056] WAYSIDE-MODULE (DEBUG): circuit failure on block 150
+[2022-12-07 13:41:36,060] WAYSIDE-MODULE (DEBUG): circuit failure on block 150
+[2022-12-07 13:41:36,065] WAYSIDE-MODULE (DEBUG): track failure on block 1
+[2022-12-07 13:41:36,069] WAYSIDE-MODULE (DEBUG): track failure on block 1
+[2022-12-07 13:41:36,074] WAYSIDE-MODULE (DEBUG): track failure on block 6
+[2022-12-07 13:41:36,074] WAYSIDE-MODULE (DEBUG): circuit failure on block 6
+[2022-12-07 13:41:36,078] WAYSIDE-MODULE (DEBUG): circuit failure on block 150
+[2022-12-07 13:41:36,083] WAYSIDE-MODULE (DEBUG): circuit failure on block 150

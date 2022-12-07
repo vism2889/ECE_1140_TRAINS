@@ -95,7 +95,7 @@ class Controller():
         if 0x04 & failures:
             self.logger.debug(f'power failure on block {blockNum}')
             faults.append(0x03)
-        
+
         self.ui.setFaultState(self.line, blockNum, faults)
         ## Run PLC program
         # self.run()
@@ -185,7 +185,7 @@ class WaysideIO(QWidget):
             'red' : {},
             'green' : {}
         }
-    
+
     ###############
     ## CALLBACKS ##
     ###############

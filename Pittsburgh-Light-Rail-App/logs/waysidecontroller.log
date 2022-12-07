@@ -1,343 +1,343 @@
-[2022-12-07 12:52:18,743] WAYSIDE-MODULE (DEBUG): Creating Wayside Controller
-[2022-12-07 12:52:18,793] WAYSIDE-MODULE (DEBUG): Plc has been loaded for controller 0
-[2022-12-07 12:52:18,796] WAYSIDE-MODULE (DEBUG): Plc has been loaded for controller 1
-[2022-12-07 12:52:18,799] WAYSIDE-MODULE (DEBUG): Plc has been loaded for controller 2
-[2022-12-07 12:52:18,801] WAYSIDE-MODULE (DEBUG): Plc has been loaded for controller 3
-[2022-12-07 12:52:18,804] WAYSIDE-MODULE (DEBUG): Plc has been loaded for controller 4
-[2022-12-07 12:52:18,832] PyQt5.uic.uiparser (DEBUG): uiname is TrainModel
-[2022-12-07 12:52:18,832] PyQt5.uic.uiparser (DEBUG): toplevel widget is TrainModel
-[2022-12-07 12:52:18,832] PyQt5.uic.properties (DEBUG): setting property geometry
-[2022-12-07 12:52:18,832] PyQt5.uic.properties (DEBUG): setting property windowTitle
-[2022-12-07 12:52:18,833] PyQt5.uic.properties (DEBUG): setting property unifiedTitleAndToolBarOnMac
-[2022-12-07 12:52:18,833] PyQt5.uic.uiparser (DEBUG): push TrainModel TrainModel
-[2022-12-07 12:52:18,833] PyQt5.uic.uiparser (DEBUG): push QWidget centralwidget
-[2022-12-07 12:52:18,833] PyQt5.uic.properties (DEBUG): setting property geometry
-[2022-12-07 12:52:18,833] PyQt5.uic.properties (DEBUG): setting property palette
-[2022-12-07 12:52:18,833] PyQt5.uic.properties (DEBUG): setting property font
-[2022-12-07 12:52:18,833] PyQt5.uic.properties (DEBUG): setting property text
-[2022-12-07 12:52:18,833] PyQt5.uic.uiparser (DEBUG): push QPushButton train_eng_fail
-[2022-12-07 12:52:18,833] PyQt5.uic.uiparser (DEBUG): pop widget QPushButton train_eng_fail
-[2022-12-07 12:52:18,833] PyQt5.uic.uiparser (DEBUG): new topwidget <PyQt5.QtWidgets.QWidget object at 0x0000019EB1F68AF0>
-[2022-12-07 12:52:18,833] PyQt5.uic.properties (DEBUG): setting property geometry
-[2022-12-07 12:52:18,833] PyQt5.uic.properties (DEBUG): setting property font
-[2022-12-07 12:52:18,833] PyQt5.uic.properties (DEBUG): setting property frameShape
-[2022-12-07 12:52:18,833] PyQt5.uic.properties (DEBUG): setting property lineWidth
-[2022-12-07 12:52:18,833] PyQt5.uic.properties (DEBUG): setting property text
-[2022-12-07 12:52:18,834] PyQt5.uic.uiparser (DEBUG): push QLabel label
-[2022-12-07 12:52:18,834] PyQt5.uic.uiparser (DEBUG): pop widget QLabel label
-[2022-12-07 12:52:18,834] PyQt5.uic.uiparser (DEBUG): new topwidget <PyQt5.QtWidgets.QWidget object at 0x0000019EB1F68AF0>
-[2022-12-07 12:52:18,834] PyQt5.uic.properties (DEBUG): setting property geometry
-[2022-12-07 12:52:18,834] PyQt5.uic.properties (DEBUG): setting property font
-[2022-12-07 12:52:18,834] PyQt5.uic.properties (DEBUG): setting property text
-[2022-12-07 12:52:18,834] PyQt5.uic.uiparser (DEBUG): push QLabel label_2
-[2022-12-07 12:52:18,834] PyQt5.uic.uiparser (DEBUG): pop widget QLabel label_2
-[2022-12-07 12:52:18,835] PyQt5.uic.uiparser (DEBUG): new topwidget <PyQt5.QtWidgets.QWidget object at 0x0000019EB1F68AF0>
-[2022-12-07 12:52:18,835] PyQt5.uic.properties (DEBUG): setting property geometry
-[2022-12-07 12:52:18,835] PyQt5.uic.properties (DEBUG): setting property font
-[2022-12-07 12:52:18,835] PyQt5.uic.properties (DEBUG): setting property text
-[2022-12-07 12:52:18,835] PyQt5.uic.uiparser (DEBUG): push QLabel label_3
-[2022-12-07 12:52:18,835] PyQt5.uic.uiparser (DEBUG): pop widget QLabel label_3
-[2022-12-07 12:52:18,835] PyQt5.uic.uiparser (DEBUG): new topwidget <PyQt5.QtWidgets.QWidget object at 0x0000019EB1F68AF0>
-[2022-12-07 12:52:18,835] PyQt5.uic.properties (DEBUG): setting property geometry
-[2022-12-07 12:52:18,835] PyQt5.uic.properties (DEBUG): setting property font
-[2022-12-07 12:52:18,835] PyQt5.uic.properties (DEBUG): setting property text
-[2022-12-07 12:52:18,835] PyQt5.uic.uiparser (DEBUG): push QLabel label_4
-[2022-12-07 12:52:18,835] PyQt5.uic.uiparser (DEBUG): pop widget QLabel label_4
-[2022-12-07 12:52:18,835] PyQt5.uic.uiparser (DEBUG): new topwidget <PyQt5.QtWidgets.QWidget object at 0x0000019EB1F68AF0>
-[2022-12-07 12:52:18,835] PyQt5.uic.properties (DEBUG): setting property geometry
-[2022-12-07 12:52:18,835] PyQt5.uic.properties (DEBUG): setting property font
-[2022-12-07 12:52:18,835] PyQt5.uic.properties (DEBUG): setting property text
-[2022-12-07 12:52:18,836] PyQt5.uic.uiparser (DEBUG): push QLabel label_5
-[2022-12-07 12:52:18,836] PyQt5.uic.uiparser (DEBUG): pop widget QLabel label_5
-[2022-12-07 12:52:18,836] PyQt5.uic.uiparser (DEBUG): new topwidget <PyQt5.QtWidgets.QWidget object at 0x0000019EB1F68AF0>
-[2022-12-07 12:52:18,836] PyQt5.uic.properties (DEBUG): setting property geometry
-[2022-12-07 12:52:18,836] PyQt5.uic.properties (DEBUG): setting property font
-[2022-12-07 12:52:18,836] PyQt5.uic.properties (DEBUG): setting property text
-[2022-12-07 12:52:18,836] PyQt5.uic.uiparser (DEBUG): push QLabel label_6
-[2022-12-07 12:52:18,836] PyQt5.uic.uiparser (DEBUG): pop widget QLabel label_6
-[2022-12-07 12:52:18,836] PyQt5.uic.uiparser (DEBUG): new topwidget <PyQt5.QtWidgets.QWidget object at 0x0000019EB1F68AF0>
-[2022-12-07 12:52:18,836] PyQt5.uic.properties (DEBUG): setting property geometry
-[2022-12-07 12:52:18,836] PyQt5.uic.properties (DEBUG): setting property font
-[2022-12-07 12:52:18,836] PyQt5.uic.properties (DEBUG): setting property text
-[2022-12-07 12:52:18,836] PyQt5.uic.uiparser (DEBUG): push QLabel label_7
-[2022-12-07 12:52:18,836] PyQt5.uic.uiparser (DEBUG): pop widget QLabel label_7
-[2022-12-07 12:52:18,836] PyQt5.uic.uiparser (DEBUG): new topwidget <PyQt5.QtWidgets.QWidget object at 0x0000019EB1F68AF0>
-[2022-12-07 12:52:18,837] PyQt5.uic.properties (DEBUG): setting property geometry
-[2022-12-07 12:52:18,837] PyQt5.uic.properties (DEBUG): setting property font
-[2022-12-07 12:52:18,837] PyQt5.uic.properties (DEBUG): setting property text
-[2022-12-07 12:52:18,837] PyQt5.uic.uiparser (DEBUG): push QPushButton brake_fail
-[2022-12-07 12:52:18,837] PyQt5.uic.uiparser (DEBUG): pop widget QPushButton brake_fail
-[2022-12-07 12:52:18,837] PyQt5.uic.uiparser (DEBUG): new topwidget <PyQt5.QtWidgets.QWidget object at 0x0000019EB1F68AF0>
-[2022-12-07 12:52:18,837] PyQt5.uic.properties (DEBUG): setting property geometry
-[2022-12-07 12:52:18,837] PyQt5.uic.properties (DEBUG): setting property font
-[2022-12-07 12:52:18,837] PyQt5.uic.properties (DEBUG): setting property text
-[2022-12-07 12:52:18,837] PyQt5.uic.uiparser (DEBUG): push QLabel label_8
-[2022-12-07 12:52:18,837] PyQt5.uic.uiparser (DEBUG): pop widget QLabel label_8
-[2022-12-07 12:52:18,837] PyQt5.uic.uiparser (DEBUG): new topwidget <PyQt5.QtWidgets.QWidget object at 0x0000019EB1F68AF0>
-[2022-12-07 12:52:18,837] PyQt5.uic.properties (DEBUG): setting property geometry
-[2022-12-07 12:52:18,837] PyQt5.uic.properties (DEBUG): setting property font
-[2022-12-07 12:52:18,837] PyQt5.uic.properties (DEBUG): setting property text
-[2022-12-07 12:52:18,838] PyQt5.uic.uiparser (DEBUG): push QLabel label_9
-[2022-12-07 12:52:18,838] PyQt5.uic.uiparser (DEBUG): pop widget QLabel label_9
-[2022-12-07 12:52:18,838] PyQt5.uic.uiparser (DEBUG): new topwidget <PyQt5.QtWidgets.QWidget object at 0x0000019EB1F68AF0>
-[2022-12-07 12:52:18,838] PyQt5.uic.properties (DEBUG): setting property geometry
-[2022-12-07 12:52:18,838] PyQt5.uic.properties (DEBUG): setting property font
-[2022-12-07 12:52:18,838] PyQt5.uic.properties (DEBUG): setting property text
-[2022-12-07 12:52:18,838] PyQt5.uic.uiparser (DEBUG): push QLabel label_10
-[2022-12-07 12:52:18,838] PyQt5.uic.uiparser (DEBUG): pop widget QLabel label_10
-[2022-12-07 12:52:18,838] PyQt5.uic.uiparser (DEBUG): new topwidget <PyQt5.QtWidgets.QWidget object at 0x0000019EB1F68AF0>
-[2022-12-07 12:52:18,838] PyQt5.uic.properties (DEBUG): setting property geometry
-[2022-12-07 12:52:18,838] PyQt5.uic.properties (DEBUG): setting property font
-[2022-12-07 12:52:18,838] PyQt5.uic.properties (DEBUG): setting property text
-[2022-12-07 12:52:18,838] PyQt5.uic.uiparser (DEBUG): push QLabel label_11
-[2022-12-07 12:52:18,838] PyQt5.uic.uiparser (DEBUG): pop widget QLabel label_11
-[2022-12-07 12:52:18,838] PyQt5.uic.uiparser (DEBUG): new topwidget <PyQt5.QtWidgets.QWidget object at 0x0000019EB1F68AF0>
-[2022-12-07 12:52:18,838] PyQt5.uic.properties (DEBUG): setting property geometry
-[2022-12-07 12:52:18,838] PyQt5.uic.properties (DEBUG): setting property font
-[2022-12-07 12:52:18,839] PyQt5.uic.properties (DEBUG): setting property text
-[2022-12-07 12:52:18,839] PyQt5.uic.uiparser (DEBUG): push QLabel label_12
-[2022-12-07 12:52:18,839] PyQt5.uic.uiparser (DEBUG): pop widget QLabel label_12
-[2022-12-07 12:52:18,839] PyQt5.uic.uiparser (DEBUG): new topwidget <PyQt5.QtWidgets.QWidget object at 0x0000019EB1F68AF0>
-[2022-12-07 12:52:18,839] PyQt5.uic.properties (DEBUG): setting property geometry
-[2022-12-07 12:52:18,839] PyQt5.uic.properties (DEBUG): setting property font
-[2022-12-07 12:52:18,839] PyQt5.uic.properties (DEBUG): setting property text
-[2022-12-07 12:52:18,839] PyQt5.uic.uiparser (DEBUG): push QLabel label_13
-[2022-12-07 12:52:18,839] PyQt5.uic.uiparser (DEBUG): pop widget QLabel label_13
-[2022-12-07 12:52:18,839] PyQt5.uic.uiparser (DEBUG): new topwidget <PyQt5.QtWidgets.QWidget object at 0x0000019EB1F68AF0>
-[2022-12-07 12:52:18,839] PyQt5.uic.properties (DEBUG): setting property geometry
-[2022-12-07 12:52:18,839] PyQt5.uic.properties (DEBUG): setting property font
-[2022-12-07 12:52:18,839] PyQt5.uic.properties (DEBUG): setting property text
-[2022-12-07 12:52:18,839] PyQt5.uic.uiparser (DEBUG): push QLabel label_14
-[2022-12-07 12:52:18,840] PyQt5.uic.uiparser (DEBUG): pop widget QLabel label_14
-[2022-12-07 12:52:18,840] PyQt5.uic.uiparser (DEBUG): new topwidget <PyQt5.QtWidgets.QWidget object at 0x0000019EB1F68AF0>
-[2022-12-07 12:52:18,840] PyQt5.uic.properties (DEBUG): setting property geometry
-[2022-12-07 12:52:18,840] PyQt5.uic.properties (DEBUG): setting property font
-[2022-12-07 12:52:18,840] PyQt5.uic.properties (DEBUG): setting property text
-[2022-12-07 12:52:18,840] PyQt5.uic.uiparser (DEBUG): push QLabel label_15
-[2022-12-07 12:52:18,840] PyQt5.uic.uiparser (DEBUG): pop widget QLabel label_15
-[2022-12-07 12:52:18,840] PyQt5.uic.uiparser (DEBUG): new topwidget <PyQt5.QtWidgets.QWidget object at 0x0000019EB1F68AF0>
-[2022-12-07 12:52:18,840] PyQt5.uic.properties (DEBUG): setting property geometry
-[2022-12-07 12:52:18,840] PyQt5.uic.properties (DEBUG): setting property font
-[2022-12-07 12:52:18,841] PyQt5.uic.properties (DEBUG): setting property text
-[2022-12-07 12:52:18,841] PyQt5.uic.uiparser (DEBUG): push QLabel label_16
-[2022-12-07 12:52:18,841] PyQt5.uic.uiparser (DEBUG): pop widget QLabel label_16
-[2022-12-07 12:52:18,841] PyQt5.uic.uiparser (DEBUG): new topwidget <PyQt5.QtWidgets.QWidget object at 0x0000019EB1F68AF0>
-[2022-12-07 12:52:18,841] PyQt5.uic.properties (DEBUG): setting property geometry
-[2022-12-07 12:52:18,841] PyQt5.uic.properties (DEBUG): setting property font
-[2022-12-07 12:52:18,841] PyQt5.uic.properties (DEBUG): setting property text
-[2022-12-07 12:52:18,841] PyQt5.uic.uiparser (DEBUG): push QLabel label_17
-[2022-12-07 12:52:18,841] PyQt5.uic.uiparser (DEBUG): pop widget QLabel label_17
-[2022-12-07 12:52:18,841] PyQt5.uic.uiparser (DEBUG): new topwidget <PyQt5.QtWidgets.QWidget object at 0x0000019EB1F68AF0>
-[2022-12-07 12:52:18,841] PyQt5.uic.properties (DEBUG): setting property geometry
-[2022-12-07 12:52:18,841] PyQt5.uic.properties (DEBUG): setting property font
-[2022-12-07 12:52:18,841] PyQt5.uic.properties (DEBUG): setting property text
-[2022-12-07 12:52:18,842] PyQt5.uic.uiparser (DEBUG): push QLabel label_18
-[2022-12-07 12:52:18,842] PyQt5.uic.uiparser (DEBUG): pop widget QLabel label_18
-[2022-12-07 12:52:18,842] PyQt5.uic.uiparser (DEBUG): new topwidget <PyQt5.QtWidgets.QWidget object at 0x0000019EB1F68AF0>
-[2022-12-07 12:52:18,842] PyQt5.uic.properties (DEBUG): setting property geometry
-[2022-12-07 12:52:18,842] PyQt5.uic.properties (DEBUG): setting property palette
-[2022-12-07 12:52:18,842] PyQt5.uic.properties (DEBUG): setting property font
-[2022-12-07 12:52:18,842] PyQt5.uic.properties (DEBUG): setting property text
-[2022-12-07 12:52:18,842] PyQt5.uic.uiparser (DEBUG): push QPushButton sig_fail
-[2022-12-07 12:52:18,842] PyQt5.uic.uiparser (DEBUG): pop widget QPushButton sig_fail
-[2022-12-07 12:52:18,842] PyQt5.uic.uiparser (DEBUG): new topwidget <PyQt5.QtWidgets.QWidget object at 0x0000019EB1F68AF0>
-[2022-12-07 12:52:18,842] PyQt5.uic.properties (DEBUG): setting property geometry
-[2022-12-07 12:52:18,842] PyQt5.uic.properties (DEBUG): setting property font
-[2022-12-07 12:52:18,842] PyQt5.uic.properties (DEBUG): setting property frameShape
-[2022-12-07 12:52:18,842] PyQt5.uic.properties (DEBUG): setting property frameShadow
-[2022-12-07 12:52:18,842] PyQt5.uic.properties (DEBUG): setting property lineWidth
-[2022-12-07 12:52:18,842] PyQt5.uic.properties (DEBUG): setting property midLineWidth
-[2022-12-07 12:52:18,842] PyQt5.uic.properties (DEBUG): setting property text
-[2022-12-07 12:52:18,843] PyQt5.uic.uiparser (DEBUG): push QLabel int_lights_disp
-[2022-12-07 12:52:18,843] PyQt5.uic.uiparser (DEBUG): pop widget QLabel int_lights_disp
-[2022-12-07 12:52:18,843] PyQt5.uic.uiparser (DEBUG): new topwidget <PyQt5.QtWidgets.QWidget object at 0x0000019EB1F68AF0>
-[2022-12-07 12:52:18,843] PyQt5.uic.properties (DEBUG): setting property geometry
-[2022-12-07 12:52:18,843] PyQt5.uic.properties (DEBUG): setting property font
-[2022-12-07 12:52:18,843] PyQt5.uic.properties (DEBUG): setting property frameShape
-[2022-12-07 12:52:18,843] PyQt5.uic.properties (DEBUG): setting property frameShadow
-[2022-12-07 12:52:18,843] PyQt5.uic.properties (DEBUG): setting property lineWidth
-[2022-12-07 12:52:18,843] PyQt5.uic.properties (DEBUG): setting property midLineWidth
-[2022-12-07 12:52:18,843] PyQt5.uic.properties (DEBUG): setting property text
-[2022-12-07 12:52:18,844] PyQt5.uic.uiparser (DEBUG): push QLabel temp_disp
-[2022-12-07 12:52:18,844] PyQt5.uic.uiparser (DEBUG): pop widget QLabel temp_disp
-[2022-12-07 12:52:18,844] PyQt5.uic.uiparser (DEBUG): new topwidget <PyQt5.QtWidgets.QWidget object at 0x0000019EB1F68AF0>
-[2022-12-07 12:52:18,844] PyQt5.uic.properties (DEBUG): setting property geometry
-[2022-12-07 12:52:18,844] PyQt5.uic.properties (DEBUG): setting property font
-[2022-12-07 12:52:18,844] PyQt5.uic.properties (DEBUG): setting property frameShape
-[2022-12-07 12:52:18,844] PyQt5.uic.properties (DEBUG): setting property frameShadow
-[2022-12-07 12:52:18,844] PyQt5.uic.properties (DEBUG): setting property lineWidth
-[2022-12-07 12:52:18,844] PyQt5.uic.properties (DEBUG): setting property midLineWidth
-[2022-12-07 12:52:18,844] PyQt5.uic.properties (DEBUG): setting property text
-[2022-12-07 12:52:18,845] PyQt5.uic.uiparser (DEBUG): push QLabel left_doors_disp
-[2022-12-07 12:52:18,845] PyQt5.uic.uiparser (DEBUG): pop widget QLabel left_doors_disp
-[2022-12-07 12:52:18,845] PyQt5.uic.uiparser (DEBUG): new topwidget <PyQt5.QtWidgets.QWidget object at 0x0000019EB1F68AF0>
-[2022-12-07 12:52:18,845] PyQt5.uic.properties (DEBUG): setting property geometry
-[2022-12-07 12:52:18,845] PyQt5.uic.properties (DEBUG): setting property font
-[2022-12-07 12:52:18,845] PyQt5.uic.properties (DEBUG): setting property frameShape
-[2022-12-07 12:52:18,845] PyQt5.uic.properties (DEBUG): setting property frameShadow
-[2022-12-07 12:52:18,845] PyQt5.uic.properties (DEBUG): setting property lineWidth
-[2022-12-07 12:52:18,845] PyQt5.uic.properties (DEBUG): setting property midLineWidth
-[2022-12-07 12:52:18,845] PyQt5.uic.properties (DEBUG): setting property text
-[2022-12-07 12:52:18,845] PyQt5.uic.uiparser (DEBUG): push QLabel right_doors_disp
-[2022-12-07 12:52:18,845] PyQt5.uic.uiparser (DEBUG): pop widget QLabel right_doors_disp
-[2022-12-07 12:52:18,845] PyQt5.uic.uiparser (DEBUG): new topwidget <PyQt5.QtWidgets.QWidget object at 0x0000019EB1F68AF0>
-[2022-12-07 12:52:18,845] PyQt5.uic.properties (DEBUG): setting property geometry
-[2022-12-07 12:52:18,845] PyQt5.uic.properties (DEBUG): setting property font
-[2022-12-07 12:52:18,846] PyQt5.uic.properties (DEBUG): setting property frameShape
-[2022-12-07 12:52:18,846] PyQt5.uic.properties (DEBUG): setting property frameShadow
-[2022-12-07 12:52:18,846] PyQt5.uic.properties (DEBUG): setting property lineWidth
-[2022-12-07 12:52:18,846] PyQt5.uic.properties (DEBUG): setting property midLineWidth
-[2022-12-07 12:52:18,846] PyQt5.uic.properties (DEBUG): setting property text
-[2022-12-07 12:52:18,846] PyQt5.uic.uiparser (DEBUG): push QLabel pass_disp
-[2022-12-07 12:52:18,846] PyQt5.uic.uiparser (DEBUG): pop widget QLabel pass_disp
-[2022-12-07 12:52:18,846] PyQt5.uic.uiparser (DEBUG): new topwidget <PyQt5.QtWidgets.QWidget object at 0x0000019EB1F68AF0>
-[2022-12-07 12:52:18,846] PyQt5.uic.properties (DEBUG): setting property geometry
-[2022-12-07 12:52:18,846] PyQt5.uic.properties (DEBUG): setting property font
-[2022-12-07 12:52:18,846] PyQt5.uic.properties (DEBUG): setting property frameShape
-[2022-12-07 12:52:18,846] PyQt5.uic.properties (DEBUG): setting property frameShadow
-[2022-12-07 12:52:18,846] PyQt5.uic.properties (DEBUG): setting property lineWidth
-[2022-12-07 12:52:18,846] PyQt5.uic.properties (DEBUG): setting property midLineWidth
-[2022-12-07 12:52:18,846] PyQt5.uic.properties (DEBUG): setting property text
-[2022-12-07 12:52:18,847] PyQt5.uic.uiparser (DEBUG): push QLabel crew_disp
-[2022-12-07 12:52:18,847] PyQt5.uic.uiparser (DEBUG): pop widget QLabel crew_disp
-[2022-12-07 12:52:18,847] PyQt5.uic.uiparser (DEBUG): new topwidget <PyQt5.QtWidgets.QWidget object at 0x0000019EB1F68AF0>
-[2022-12-07 12:52:18,847] PyQt5.uic.properties (DEBUG): setting property geometry
-[2022-12-07 12:52:18,847] PyQt5.uic.properties (DEBUG): setting property font
-[2022-12-07 12:52:18,847] PyQt5.uic.properties (DEBUG): setting property frameShape
-[2022-12-07 12:52:18,847] PyQt5.uic.properties (DEBUG): setting property frameShadow
-[2022-12-07 12:52:18,847] PyQt5.uic.properties (DEBUG): setting property lineWidth
-[2022-12-07 12:52:18,847] PyQt5.uic.properties (DEBUG): setting property midLineWidth
-[2022-12-07 12:52:18,847] PyQt5.uic.properties (DEBUG): setting property text
-[2022-12-07 12:52:18,847] PyQt5.uic.uiparser (DEBUG): push QLabel auth_disp
-[2022-12-07 12:52:18,847] PyQt5.uic.uiparser (DEBUG): pop widget QLabel auth_disp
-[2022-12-07 12:52:18,847] PyQt5.uic.uiparser (DEBUG): new topwidget <PyQt5.QtWidgets.QWidget object at 0x0000019EB1F68AF0>
-[2022-12-07 12:52:18,847] PyQt5.uic.properties (DEBUG): setting property geometry
-[2022-12-07 12:52:18,847] PyQt5.uic.properties (DEBUG): setting property font
-[2022-12-07 12:52:18,847] PyQt5.uic.properties (DEBUG): setting property frameShape
-[2022-12-07 12:52:18,847] PyQt5.uic.properties (DEBUG): setting property frameShadow
-[2022-12-07 12:52:18,847] PyQt5.uic.properties (DEBUG): setting property lineWidth
-[2022-12-07 12:52:18,848] PyQt5.uic.properties (DEBUG): setting property midLineWidth
-[2022-12-07 12:52:18,848] PyQt5.uic.properties (DEBUG): setting property text
-[2022-12-07 12:52:18,848] PyQt5.uic.uiparser (DEBUG): push QLabel grade_disp
-[2022-12-07 12:52:18,848] PyQt5.uic.uiparser (DEBUG): pop widget QLabel grade_disp
-[2022-12-07 12:52:18,848] PyQt5.uic.uiparser (DEBUG): new topwidget <PyQt5.QtWidgets.QWidget object at 0x0000019EB1F68AF0>
-[2022-12-07 12:52:18,848] PyQt5.uic.properties (DEBUG): setting property geometry
-[2022-12-07 12:52:18,848] PyQt5.uic.properties (DEBUG): setting property font
-[2022-12-07 12:52:18,848] PyQt5.uic.properties (DEBUG): setting property frameShape
-[2022-12-07 12:52:18,848] PyQt5.uic.properties (DEBUG): setting property frameShadow
-[2022-12-07 12:52:18,848] PyQt5.uic.properties (DEBUG): setting property lineWidth
-[2022-12-07 12:52:18,848] PyQt5.uic.properties (DEBUG): setting property midLineWidth
-[2022-12-07 12:52:18,848] PyQt5.uic.properties (DEBUG): setting property text
-[2022-12-07 12:52:18,848] PyQt5.uic.uiparser (DEBUG): push QLabel switch_disp
-[2022-12-07 12:52:18,848] PyQt5.uic.uiparser (DEBUG): pop widget QLabel switch_disp
-[2022-12-07 12:52:18,848] PyQt5.uic.uiparser (DEBUG): new topwidget <PyQt5.QtWidgets.QWidget object at 0x0000019EB1F68AF0>
-[2022-12-07 12:52:18,848] PyQt5.uic.properties (DEBUG): setting property geometry
-[2022-12-07 12:52:18,848] PyQt5.uic.properties (DEBUG): setting property font
-[2022-12-07 12:52:18,849] PyQt5.uic.properties (DEBUG): setting property frameShape
-[2022-12-07 12:52:18,849] PyQt5.uic.properties (DEBUG): setting property frameShadow
-[2022-12-07 12:52:18,849] PyQt5.uic.properties (DEBUG): setting property lineWidth
-[2022-12-07 12:52:18,849] PyQt5.uic.properties (DEBUG): setting property midLineWidth
-[2022-12-07 12:52:18,849] PyQt5.uic.properties (DEBUG): setting property text
-[2022-12-07 12:52:18,849] PyQt5.uic.uiparser (DEBUG): push QLabel ext_lights_disp
-[2022-12-07 12:52:18,849] PyQt5.uic.uiparser (DEBUG): pop widget QLabel ext_lights_disp
-[2022-12-07 12:52:18,849] PyQt5.uic.uiparser (DEBUG): new topwidget <PyQt5.QtWidgets.QWidget object at 0x0000019EB1F68AF0>
-[2022-12-07 12:52:18,849] PyQt5.uic.properties (DEBUG): setting property geometry
-[2022-12-07 12:52:18,849] PyQt5.uic.properties (DEBUG): setting property font
-[2022-12-07 12:52:18,849] PyQt5.uic.properties (DEBUG): setting property frameShape
-[2022-12-07 12:52:18,849] PyQt5.uic.properties (DEBUG): setting property frameShadow
-[2022-12-07 12:52:18,849] PyQt5.uic.properties (DEBUG): setting property lineWidth
-[2022-12-07 12:52:18,849] PyQt5.uic.properties (DEBUG): setting property midLineWidth
-[2022-12-07 12:52:18,849] PyQt5.uic.properties (DEBUG): setting property text
-[2022-12-07 12:52:18,849] PyQt5.uic.uiparser (DEBUG): push QLabel cmd_pwr_disp
-[2022-12-07 12:52:18,849] PyQt5.uic.uiparser (DEBUG): pop widget QLabel cmd_pwr_disp
-[2022-12-07 12:52:18,850] PyQt5.uic.uiparser (DEBUG): new topwidget <PyQt5.QtWidgets.QWidget object at 0x0000019EB1F68AF0>
-[2022-12-07 12:52:18,850] PyQt5.uic.properties (DEBUG): setting property geometry
-[2022-12-07 12:52:18,850] PyQt5.uic.properties (DEBUG): setting property font
-[2022-12-07 12:52:18,850] PyQt5.uic.properties (DEBUG): setting property frameShape
-[2022-12-07 12:52:18,850] PyQt5.uic.properties (DEBUG): setting property frameShadow
-[2022-12-07 12:52:18,850] PyQt5.uic.properties (DEBUG): setting property lineWidth
-[2022-12-07 12:52:18,850] PyQt5.uic.properties (DEBUG): setting property midLineWidth
-[2022-12-07 12:52:18,850] PyQt5.uic.properties (DEBUG): setting property text
-[2022-12-07 12:52:18,850] PyQt5.uic.uiparser (DEBUG): push QLabel cmd_speed_disp
-[2022-12-07 12:52:18,850] PyQt5.uic.uiparser (DEBUG): pop widget QLabel cmd_speed_disp
-[2022-12-07 12:52:18,850] PyQt5.uic.uiparser (DEBUG): new topwidget <PyQt5.QtWidgets.QWidget object at 0x0000019EB1F68AF0>
-[2022-12-07 12:52:18,850] PyQt5.uic.properties (DEBUG): setting property geometry
-[2022-12-07 12:52:18,850] PyQt5.uic.properties (DEBUG): setting property font
-[2022-12-07 12:52:18,850] PyQt5.uic.properties (DEBUG): setting property frameShape
-[2022-12-07 12:52:18,850] PyQt5.uic.properties (DEBUG): setting property frameShadow
-[2022-12-07 12:52:18,850] PyQt5.uic.properties (DEBUG): setting property lineWidth
-[2022-12-07 12:52:18,850] PyQt5.uic.properties (DEBUG): setting property midLineWidth
-[2022-12-07 12:52:18,850] PyQt5.uic.properties (DEBUG): setting property text
-[2022-12-07 12:52:18,851] PyQt5.uic.uiparser (DEBUG): push QLabel curr_speed_disp
-[2022-12-07 12:52:18,851] PyQt5.uic.uiparser (DEBUG): pop widget QLabel curr_speed_disp
-[2022-12-07 12:52:18,851] PyQt5.uic.uiparser (DEBUG): new topwidget <PyQt5.QtWidgets.QWidget object at 0x0000019EB1F68AF0>
-[2022-12-07 12:52:18,851] PyQt5.uic.properties (DEBUG): setting property geometry
-[2022-12-07 12:52:18,851] PyQt5.uic.properties (DEBUG): setting property font
-[2022-12-07 12:52:18,851] PyQt5.uic.properties (DEBUG): setting property frameShape
-[2022-12-07 12:52:18,851] PyQt5.uic.properties (DEBUG): setting property frameShadow
-[2022-12-07 12:52:18,851] PyQt5.uic.properties (DEBUG): setting property lineWidth
-[2022-12-07 12:52:18,851] PyQt5.uic.properties (DEBUG): setting property midLineWidth
-[2022-12-07 12:52:18,851] PyQt5.uic.properties (DEBUG): setting property text
-[2022-12-07 12:52:18,851] PyQt5.uic.uiparser (DEBUG): push QLabel last_st_disp
-[2022-12-07 12:52:18,851] PyQt5.uic.uiparser (DEBUG): pop widget QLabel last_st_disp
-[2022-12-07 12:52:18,851] PyQt5.uic.uiparser (DEBUG): new topwidget <PyQt5.QtWidgets.QWidget object at 0x0000019EB1F68AF0>
-[2022-12-07 12:52:18,851] PyQt5.uic.properties (DEBUG): setting property geometry
-[2022-12-07 12:52:18,851] PyQt5.uic.properties (DEBUG): setting property font
-[2022-12-07 12:52:18,851] PyQt5.uic.properties (DEBUG): setting property frameShape
-[2022-12-07 12:52:18,852] PyQt5.uic.properties (DEBUG): setting property frameShadow
-[2022-12-07 12:52:18,852] PyQt5.uic.properties (DEBUG): setting property lineWidth
-[2022-12-07 12:52:18,852] PyQt5.uic.properties (DEBUG): setting property midLineWidth
-[2022-12-07 12:52:18,852] PyQt5.uic.properties (DEBUG): setting property text
-[2022-12-07 12:52:18,852] PyQt5.uic.uiparser (DEBUG): push QLabel next_st_disp
-[2022-12-07 12:52:18,852] PyQt5.uic.uiparser (DEBUG): pop widget QLabel next_st_disp
-[2022-12-07 12:52:18,852] PyQt5.uic.uiparser (DEBUG): new topwidget <PyQt5.QtWidgets.QWidget object at 0x0000019EB1F68AF0>
-[2022-12-07 12:52:18,852] PyQt5.uic.properties (DEBUG): setting property geometry
-[2022-12-07 12:52:18,852] PyQt5.uic.properties (DEBUG): setting property palette
-[2022-12-07 12:52:18,852] PyQt5.uic.properties (DEBUG): setting property font
-[2022-12-07 12:52:18,852] PyQt5.uic.properties (DEBUG): setting property text
-[2022-12-07 12:52:18,852] PyQt5.uic.uiparser (DEBUG): push QPushButton test_win
-[2022-12-07 12:52:18,852] PyQt5.uic.uiparser (DEBUG): pop widget QPushButton test_win
-[2022-12-07 12:52:18,852] PyQt5.uic.uiparser (DEBUG): new topwidget <PyQt5.QtWidgets.QWidget object at 0x0000019EB1F68AF0>
-[2022-12-07 12:52:18,852] PyQt5.uic.properties (DEBUG): setting property geometry
-[2022-12-07 12:52:18,852] PyQt5.uic.properties (DEBUG): setting property font
-[2022-12-07 12:52:18,853] PyQt5.uic.properties (DEBUG): setting property text
-[2022-12-07 12:52:18,853] PyQt5.uic.uiparser (DEBUG): push QLabel label_19
-[2022-12-07 12:52:18,853] PyQt5.uic.uiparser (DEBUG): pop widget QLabel label_19
-[2022-12-07 12:52:18,853] PyQt5.uic.uiparser (DEBUG): new topwidget <PyQt5.QtWidgets.QWidget object at 0x0000019EB1F68AF0>
-[2022-12-07 12:52:18,853] PyQt5.uic.properties (DEBUG): setting property geometry
-[2022-12-07 12:52:18,853] PyQt5.uic.properties (DEBUG): setting property font
-[2022-12-07 12:52:18,853] PyQt5.uic.properties (DEBUG): setting property frameShape
-[2022-12-07 12:52:18,853] PyQt5.uic.properties (DEBUG): setting property frameShadow
-[2022-12-07 12:52:18,853] PyQt5.uic.properties (DEBUG): setting property lineWidth
-[2022-12-07 12:52:18,853] PyQt5.uic.properties (DEBUG): setting property midLineWidth
-[2022-12-07 12:52:18,853] PyQt5.uic.properties (DEBUG): setting property text
-[2022-12-07 12:52:18,853] PyQt5.uic.uiparser (DEBUG): push QLabel ebrake_disp
-[2022-12-07 12:52:18,853] PyQt5.uic.uiparser (DEBUG): pop widget QLabel ebrake_disp
-[2022-12-07 12:52:18,853] PyQt5.uic.uiparser (DEBUG): new topwidget <PyQt5.QtWidgets.QWidget object at 0x0000019EB1F68AF0>
-[2022-12-07 12:52:18,853] PyQt5.uic.properties (DEBUG): setting property geometry
-[2022-12-07 12:52:18,853] PyQt5.uic.properties (DEBUG): setting property font
-[2022-12-07 12:52:18,853] PyQt5.uic.properties (DEBUG): setting property text
-[2022-12-07 12:52:18,854] PyQt5.uic.uiparser (DEBUG): push QLabel label_20
-[2022-12-07 12:52:18,854] PyQt5.uic.uiparser (DEBUG): pop widget QLabel label_20
-[2022-12-07 12:52:18,854] PyQt5.uic.uiparser (DEBUG): new topwidget <PyQt5.QtWidgets.QWidget object at 0x0000019EB1F68AF0>
-[2022-12-07 12:52:18,854] PyQt5.uic.properties (DEBUG): setting property geometry
-[2022-12-07 12:52:18,854] PyQt5.uic.properties (DEBUG): setting property font
-[2022-12-07 12:52:18,854] PyQt5.uic.properties (DEBUG): setting property frameShape
-[2022-12-07 12:52:18,854] PyQt5.uic.properties (DEBUG): setting property frameShadow
-[2022-12-07 12:52:18,854] PyQt5.uic.properties (DEBUG): setting property lineWidth
-[2022-12-07 12:52:18,854] PyQt5.uic.properties (DEBUG): setting property midLineWidth
-[2022-12-07 12:52:18,854] PyQt5.uic.properties (DEBUG): setting property text
-[2022-12-07 12:52:18,854] PyQt5.uic.uiparser (DEBUG): push QLabel serv_brake_disp
-[2022-12-07 12:52:18,854] PyQt5.uic.uiparser (DEBUG): pop widget QLabel serv_brake_disp
-[2022-12-07 12:52:18,854] PyQt5.uic.uiparser (DEBUG): new topwidget <PyQt5.QtWidgets.QWidget object at 0x0000019EB1F68AF0>
-[2022-12-07 12:52:18,854] PyQt5.uic.uiparser (DEBUG): pop widget QWidget centralwidget
-[2022-12-07 12:52:18,854] PyQt5.uic.uiparser (DEBUG): new topwidget <trainmodel_ui.TrainModel object at 0x0000019EB1F68A60>
-[2022-12-07 12:52:18,856] PyQt5.uic.properties (DEBUG): setting property geometry
-[2022-12-07 12:52:18,856] PyQt5.uic.uiparser (DEBUG): push QMenuBar menubar
-[2022-12-07 12:52:18,856] PyQt5.uic.uiparser (DEBUG): pop widget QMenuBar menubar
-[2022-12-07 12:52:18,856] PyQt5.uic.uiparser (DEBUG): new topwidget <trainmodel_ui.TrainModel object at 0x0000019EB1F68A60>
-[2022-12-07 12:52:18,856] PyQt5.uic.uiparser (DEBUG): push QStatusBar statusbar
-[2022-12-07 12:52:18,856] PyQt5.uic.uiparser (DEBUG): pop widget QStatusBar statusbar
-[2022-12-07 12:52:18,856] PyQt5.uic.uiparser (DEBUG): new topwidget <trainmodel_ui.TrainModel object at 0x0000019EB1F68A60>
-[2022-12-07 12:52:18,856] PyQt5.uic.uiparser (DEBUG): pop widget TrainModel TrainModel
-[2022-12-07 12:52:18,856] PyQt5.uic.uiparser (DEBUG): new topwidget None
+[2022-12-07 13:41:42,233] WAYSIDE-MODULE (DEBUG): Creating Wayside Controller
+[2022-12-07 13:41:42,278] WAYSIDE-MODULE (DEBUG): Plc has been loaded for controller 0
+[2022-12-07 13:41:42,292] WAYSIDE-MODULE (DEBUG): Plc has been loaded for controller 1
+[2022-12-07 13:41:42,295] WAYSIDE-MODULE (DEBUG): Plc has been loaded for controller 2
+[2022-12-07 13:41:42,297] WAYSIDE-MODULE (DEBUG): Plc has been loaded for controller 3
+[2022-12-07 13:41:42,300] WAYSIDE-MODULE (DEBUG): Plc has been loaded for controller 4
+[2022-12-07 13:41:42,328] PyQt5.uic.uiparser (DEBUG): uiname is TrainModel
+[2022-12-07 13:41:42,328] PyQt5.uic.uiparser (DEBUG): toplevel widget is TrainModel
+[2022-12-07 13:41:42,328] PyQt5.uic.properties (DEBUG): setting property geometry
+[2022-12-07 13:41:42,328] PyQt5.uic.properties (DEBUG): setting property windowTitle
+[2022-12-07 13:41:42,328] PyQt5.uic.properties (DEBUG): setting property unifiedTitleAndToolBarOnMac
+[2022-12-07 13:41:42,328] PyQt5.uic.uiparser (DEBUG): push TrainModel TrainModel
+[2022-12-07 13:41:42,328] PyQt5.uic.uiparser (DEBUG): push QWidget centralwidget
+[2022-12-07 13:41:42,328] PyQt5.uic.properties (DEBUG): setting property geometry
+[2022-12-07 13:41:42,328] PyQt5.uic.properties (DEBUG): setting property palette
+[2022-12-07 13:41:42,329] PyQt5.uic.properties (DEBUG): setting property font
+[2022-12-07 13:41:42,329] PyQt5.uic.properties (DEBUG): setting property text
+[2022-12-07 13:41:42,329] PyQt5.uic.uiparser (DEBUG): push QPushButton train_eng_fail
+[2022-12-07 13:41:42,329] PyQt5.uic.uiparser (DEBUG): pop widget QPushButton train_eng_fail
+[2022-12-07 13:41:42,329] PyQt5.uic.uiparser (DEBUG): new topwidget <PyQt5.QtWidgets.QWidget object at 0x0000018FD0F608B0>
+[2022-12-07 13:41:42,329] PyQt5.uic.properties (DEBUG): setting property geometry
+[2022-12-07 13:41:42,329] PyQt5.uic.properties (DEBUG): setting property font
+[2022-12-07 13:41:42,329] PyQt5.uic.properties (DEBUG): setting property frameShape
+[2022-12-07 13:41:42,329] PyQt5.uic.properties (DEBUG): setting property lineWidth
+[2022-12-07 13:41:42,329] PyQt5.uic.properties (DEBUG): setting property text
+[2022-12-07 13:41:42,330] PyQt5.uic.uiparser (DEBUG): push QLabel label
+[2022-12-07 13:41:42,330] PyQt5.uic.uiparser (DEBUG): pop widget QLabel label
+[2022-12-07 13:41:42,330] PyQt5.uic.uiparser (DEBUG): new topwidget <PyQt5.QtWidgets.QWidget object at 0x0000018FD0F608B0>
+[2022-12-07 13:41:42,330] PyQt5.uic.properties (DEBUG): setting property geometry
+[2022-12-07 13:41:42,330] PyQt5.uic.properties (DEBUG): setting property font
+[2022-12-07 13:41:42,330] PyQt5.uic.properties (DEBUG): setting property text
+[2022-12-07 13:41:42,330] PyQt5.uic.uiparser (DEBUG): push QLabel label_2
+[2022-12-07 13:41:42,330] PyQt5.uic.uiparser (DEBUG): pop widget QLabel label_2
+[2022-12-07 13:41:42,330] PyQt5.uic.uiparser (DEBUG): new topwidget <PyQt5.QtWidgets.QWidget object at 0x0000018FD0F608B0>
+[2022-12-07 13:41:42,330] PyQt5.uic.properties (DEBUG): setting property geometry
+[2022-12-07 13:41:42,330] PyQt5.uic.properties (DEBUG): setting property font
+[2022-12-07 13:41:42,330] PyQt5.uic.properties (DEBUG): setting property text
+[2022-12-07 13:41:42,330] PyQt5.uic.uiparser (DEBUG): push QLabel label_3
+[2022-12-07 13:41:42,330] PyQt5.uic.uiparser (DEBUG): pop widget QLabel label_3
+[2022-12-07 13:41:42,330] PyQt5.uic.uiparser (DEBUG): new topwidget <PyQt5.QtWidgets.QWidget object at 0x0000018FD0F608B0>
+[2022-12-07 13:41:42,331] PyQt5.uic.properties (DEBUG): setting property geometry
+[2022-12-07 13:41:42,331] PyQt5.uic.properties (DEBUG): setting property font
+[2022-12-07 13:41:42,331] PyQt5.uic.properties (DEBUG): setting property text
+[2022-12-07 13:41:42,331] PyQt5.uic.uiparser (DEBUG): push QLabel label_4
+[2022-12-07 13:41:42,331] PyQt5.uic.uiparser (DEBUG): pop widget QLabel label_4
+[2022-12-07 13:41:42,331] PyQt5.uic.uiparser (DEBUG): new topwidget <PyQt5.QtWidgets.QWidget object at 0x0000018FD0F608B0>
+[2022-12-07 13:41:42,331] PyQt5.uic.properties (DEBUG): setting property geometry
+[2022-12-07 13:41:42,331] PyQt5.uic.properties (DEBUG): setting property font
+[2022-12-07 13:41:42,331] PyQt5.uic.properties (DEBUG): setting property text
+[2022-12-07 13:41:42,331] PyQt5.uic.uiparser (DEBUG): push QLabel label_5
+[2022-12-07 13:41:42,331] PyQt5.uic.uiparser (DEBUG): pop widget QLabel label_5
+[2022-12-07 13:41:42,331] PyQt5.uic.uiparser (DEBUG): new topwidget <PyQt5.QtWidgets.QWidget object at 0x0000018FD0F608B0>
+[2022-12-07 13:41:42,331] PyQt5.uic.properties (DEBUG): setting property geometry
+[2022-12-07 13:41:42,331] PyQt5.uic.properties (DEBUG): setting property font
+[2022-12-07 13:41:42,332] PyQt5.uic.properties (DEBUG): setting property text
+[2022-12-07 13:41:42,332] PyQt5.uic.uiparser (DEBUG): push QLabel label_6
+[2022-12-07 13:41:42,332] PyQt5.uic.uiparser (DEBUG): pop widget QLabel label_6
+[2022-12-07 13:41:42,332] PyQt5.uic.uiparser (DEBUG): new topwidget <PyQt5.QtWidgets.QWidget object at 0x0000018FD0F608B0>
+[2022-12-07 13:41:42,332] PyQt5.uic.properties (DEBUG): setting property geometry
+[2022-12-07 13:41:42,332] PyQt5.uic.properties (DEBUG): setting property font
+[2022-12-07 13:41:42,332] PyQt5.uic.properties (DEBUG): setting property text
+[2022-12-07 13:41:42,332] PyQt5.uic.uiparser (DEBUG): push QLabel label_7
+[2022-12-07 13:41:42,332] PyQt5.uic.uiparser (DEBUG): pop widget QLabel label_7
+[2022-12-07 13:41:42,332] PyQt5.uic.uiparser (DEBUG): new topwidget <PyQt5.QtWidgets.QWidget object at 0x0000018FD0F608B0>
+[2022-12-07 13:41:42,332] PyQt5.uic.properties (DEBUG): setting property geometry
+[2022-12-07 13:41:42,332] PyQt5.uic.properties (DEBUG): setting property font
+[2022-12-07 13:41:42,332] PyQt5.uic.properties (DEBUG): setting property text
+[2022-12-07 13:41:42,332] PyQt5.uic.uiparser (DEBUG): push QPushButton brake_fail
+[2022-12-07 13:41:42,332] PyQt5.uic.uiparser (DEBUG): pop widget QPushButton brake_fail
+[2022-12-07 13:41:42,332] PyQt5.uic.uiparser (DEBUG): new topwidget <PyQt5.QtWidgets.QWidget object at 0x0000018FD0F608B0>
+[2022-12-07 13:41:42,332] PyQt5.uic.properties (DEBUG): setting property geometry
+[2022-12-07 13:41:42,333] PyQt5.uic.properties (DEBUG): setting property font
+[2022-12-07 13:41:42,333] PyQt5.uic.properties (DEBUG): setting property text
+[2022-12-07 13:41:42,333] PyQt5.uic.uiparser (DEBUG): push QLabel label_8
+[2022-12-07 13:41:42,333] PyQt5.uic.uiparser (DEBUG): pop widget QLabel label_8
+[2022-12-07 13:41:42,333] PyQt5.uic.uiparser (DEBUG): new topwidget <PyQt5.QtWidgets.QWidget object at 0x0000018FD0F608B0>
+[2022-12-07 13:41:42,333] PyQt5.uic.properties (DEBUG): setting property geometry
+[2022-12-07 13:41:42,333] PyQt5.uic.properties (DEBUG): setting property font
+[2022-12-07 13:41:42,333] PyQt5.uic.properties (DEBUG): setting property text
+[2022-12-07 13:41:42,333] PyQt5.uic.uiparser (DEBUG): push QLabel label_9
+[2022-12-07 13:41:42,333] PyQt5.uic.uiparser (DEBUG): pop widget QLabel label_9
+[2022-12-07 13:41:42,333] PyQt5.uic.uiparser (DEBUG): new topwidget <PyQt5.QtWidgets.QWidget object at 0x0000018FD0F608B0>
+[2022-12-07 13:41:42,333] PyQt5.uic.properties (DEBUG): setting property geometry
+[2022-12-07 13:41:42,333] PyQt5.uic.properties (DEBUG): setting property font
+[2022-12-07 13:41:42,333] PyQt5.uic.properties (DEBUG): setting property text
+[2022-12-07 13:41:42,334] PyQt5.uic.uiparser (DEBUG): push QLabel label_10
+[2022-12-07 13:41:42,334] PyQt5.uic.uiparser (DEBUG): pop widget QLabel label_10
+[2022-12-07 13:41:42,334] PyQt5.uic.uiparser (DEBUG): new topwidget <PyQt5.QtWidgets.QWidget object at 0x0000018FD0F608B0>
+[2022-12-07 13:41:42,334] PyQt5.uic.properties (DEBUG): setting property geometry
+[2022-12-07 13:41:42,334] PyQt5.uic.properties (DEBUG): setting property font
+[2022-12-07 13:41:42,334] PyQt5.uic.properties (DEBUG): setting property text
+[2022-12-07 13:41:42,334] PyQt5.uic.uiparser (DEBUG): push QLabel label_11
+[2022-12-07 13:41:42,334] PyQt5.uic.uiparser (DEBUG): pop widget QLabel label_11
+[2022-12-07 13:41:42,334] PyQt5.uic.uiparser (DEBUG): new topwidget <PyQt5.QtWidgets.QWidget object at 0x0000018FD0F608B0>
+[2022-12-07 13:41:42,334] PyQt5.uic.properties (DEBUG): setting property geometry
+[2022-12-07 13:41:42,334] PyQt5.uic.properties (DEBUG): setting property font
+[2022-12-07 13:41:42,334] PyQt5.uic.properties (DEBUG): setting property text
+[2022-12-07 13:41:42,334] PyQt5.uic.uiparser (DEBUG): push QLabel label_12
+[2022-12-07 13:41:42,334] PyQt5.uic.uiparser (DEBUG): pop widget QLabel label_12
+[2022-12-07 13:41:42,334] PyQt5.uic.uiparser (DEBUG): new topwidget <PyQt5.QtWidgets.QWidget object at 0x0000018FD0F608B0>
+[2022-12-07 13:41:42,335] PyQt5.uic.properties (DEBUG): setting property geometry
+[2022-12-07 13:41:42,335] PyQt5.uic.properties (DEBUG): setting property font
+[2022-12-07 13:41:42,335] PyQt5.uic.properties (DEBUG): setting property text
+[2022-12-07 13:41:42,335] PyQt5.uic.uiparser (DEBUG): push QLabel label_13
+[2022-12-07 13:41:42,335] PyQt5.uic.uiparser (DEBUG): pop widget QLabel label_13
+[2022-12-07 13:41:42,335] PyQt5.uic.uiparser (DEBUG): new topwidget <PyQt5.QtWidgets.QWidget object at 0x0000018FD0F608B0>
+[2022-12-07 13:41:42,335] PyQt5.uic.properties (DEBUG): setting property geometry
+[2022-12-07 13:41:42,335] PyQt5.uic.properties (DEBUG): setting property font
+[2022-12-07 13:41:42,335] PyQt5.uic.properties (DEBUG): setting property text
+[2022-12-07 13:41:42,335] PyQt5.uic.uiparser (DEBUG): push QLabel label_14
+[2022-12-07 13:41:42,335] PyQt5.uic.uiparser (DEBUG): pop widget QLabel label_14
+[2022-12-07 13:41:42,335] PyQt5.uic.uiparser (DEBUG): new topwidget <PyQt5.QtWidgets.QWidget object at 0x0000018FD0F608B0>
+[2022-12-07 13:41:42,335] PyQt5.uic.properties (DEBUG): setting property geometry
+[2022-12-07 13:41:42,335] PyQt5.uic.properties (DEBUG): setting property font
+[2022-12-07 13:41:42,335] PyQt5.uic.properties (DEBUG): setting property text
+[2022-12-07 13:41:42,336] PyQt5.uic.uiparser (DEBUG): push QLabel label_15
+[2022-12-07 13:41:42,336] PyQt5.uic.uiparser (DEBUG): pop widget QLabel label_15
+[2022-12-07 13:41:42,336] PyQt5.uic.uiparser (DEBUG): new topwidget <PyQt5.QtWidgets.QWidget object at 0x0000018FD0F608B0>
+[2022-12-07 13:41:42,336] PyQt5.uic.properties (DEBUG): setting property geometry
+[2022-12-07 13:41:42,336] PyQt5.uic.properties (DEBUG): setting property font
+[2022-12-07 13:41:42,336] PyQt5.uic.properties (DEBUG): setting property text
+[2022-12-07 13:41:42,336] PyQt5.uic.uiparser (DEBUG): push QLabel label_16
+[2022-12-07 13:41:42,336] PyQt5.uic.uiparser (DEBUG): pop widget QLabel label_16
+[2022-12-07 13:41:42,336] PyQt5.uic.uiparser (DEBUG): new topwidget <PyQt5.QtWidgets.QWidget object at 0x0000018FD0F608B0>
+[2022-12-07 13:41:42,336] PyQt5.uic.properties (DEBUG): setting property geometry
+[2022-12-07 13:41:42,336] PyQt5.uic.properties (DEBUG): setting property font
+[2022-12-07 13:41:42,337] PyQt5.uic.properties (DEBUG): setting property text
+[2022-12-07 13:41:42,337] PyQt5.uic.uiparser (DEBUG): push QLabel label_17
+[2022-12-07 13:41:42,337] PyQt5.uic.uiparser (DEBUG): pop widget QLabel label_17
+[2022-12-07 13:41:42,337] PyQt5.uic.uiparser (DEBUG): new topwidget <PyQt5.QtWidgets.QWidget object at 0x0000018FD0F608B0>
+[2022-12-07 13:41:42,337] PyQt5.uic.properties (DEBUG): setting property geometry
+[2022-12-07 13:41:42,337] PyQt5.uic.properties (DEBUG): setting property font
+[2022-12-07 13:41:42,337] PyQt5.uic.properties (DEBUG): setting property text
+[2022-12-07 13:41:42,337] PyQt5.uic.uiparser (DEBUG): push QLabel label_18
+[2022-12-07 13:41:42,337] PyQt5.uic.uiparser (DEBUG): pop widget QLabel label_18
+[2022-12-07 13:41:42,337] PyQt5.uic.uiparser (DEBUG): new topwidget <PyQt5.QtWidgets.QWidget object at 0x0000018FD0F608B0>
+[2022-12-07 13:41:42,337] PyQt5.uic.properties (DEBUG): setting property geometry
+[2022-12-07 13:41:42,337] PyQt5.uic.properties (DEBUG): setting property palette
+[2022-12-07 13:41:42,337] PyQt5.uic.properties (DEBUG): setting property font
+[2022-12-07 13:41:42,338] PyQt5.uic.properties (DEBUG): setting property text
+[2022-12-07 13:41:42,338] PyQt5.uic.uiparser (DEBUG): push QPushButton sig_fail
+[2022-12-07 13:41:42,338] PyQt5.uic.uiparser (DEBUG): pop widget QPushButton sig_fail
+[2022-12-07 13:41:42,338] PyQt5.uic.uiparser (DEBUG): new topwidget <PyQt5.QtWidgets.QWidget object at 0x0000018FD0F608B0>
+[2022-12-07 13:41:42,338] PyQt5.uic.properties (DEBUG): setting property geometry
+[2022-12-07 13:41:42,338] PyQt5.uic.properties (DEBUG): setting property font
+[2022-12-07 13:41:42,338] PyQt5.uic.properties (DEBUG): setting property frameShape
+[2022-12-07 13:41:42,338] PyQt5.uic.properties (DEBUG): setting property frameShadow
+[2022-12-07 13:41:42,338] PyQt5.uic.properties (DEBUG): setting property lineWidth
+[2022-12-07 13:41:42,338] PyQt5.uic.properties (DEBUG): setting property midLineWidth
+[2022-12-07 13:41:42,338] PyQt5.uic.properties (DEBUG): setting property text
+[2022-12-07 13:41:42,338] PyQt5.uic.uiparser (DEBUG): push QLabel int_lights_disp
+[2022-12-07 13:41:42,339] PyQt5.uic.uiparser (DEBUG): pop widget QLabel int_lights_disp
+[2022-12-07 13:41:42,339] PyQt5.uic.uiparser (DEBUG): new topwidget <PyQt5.QtWidgets.QWidget object at 0x0000018FD0F608B0>
+[2022-12-07 13:41:42,339] PyQt5.uic.properties (DEBUG): setting property geometry
+[2022-12-07 13:41:42,339] PyQt5.uic.properties (DEBUG): setting property font
+[2022-12-07 13:41:42,339] PyQt5.uic.properties (DEBUG): setting property frameShape
+[2022-12-07 13:41:42,339] PyQt5.uic.properties (DEBUG): setting property frameShadow
+[2022-12-07 13:41:42,339] PyQt5.uic.properties (DEBUG): setting property lineWidth
+[2022-12-07 13:41:42,339] PyQt5.uic.properties (DEBUG): setting property midLineWidth
+[2022-12-07 13:41:42,339] PyQt5.uic.properties (DEBUG): setting property text
+[2022-12-07 13:41:42,339] PyQt5.uic.uiparser (DEBUG): push QLabel temp_disp
+[2022-12-07 13:41:42,339] PyQt5.uic.uiparser (DEBUG): pop widget QLabel temp_disp
+[2022-12-07 13:41:42,339] PyQt5.uic.uiparser (DEBUG): new topwidget <PyQt5.QtWidgets.QWidget object at 0x0000018FD0F608B0>
+[2022-12-07 13:41:42,339] PyQt5.uic.properties (DEBUG): setting property geometry
+[2022-12-07 13:41:42,339] PyQt5.uic.properties (DEBUG): setting property font
+[2022-12-07 13:41:42,339] PyQt5.uic.properties (DEBUG): setting property frameShape
+[2022-12-07 13:41:42,340] PyQt5.uic.properties (DEBUG): setting property frameShadow
+[2022-12-07 13:41:42,340] PyQt5.uic.properties (DEBUG): setting property lineWidth
+[2022-12-07 13:41:42,340] PyQt5.uic.properties (DEBUG): setting property midLineWidth
+[2022-12-07 13:41:42,340] PyQt5.uic.properties (DEBUG): setting property text
+[2022-12-07 13:41:42,340] PyQt5.uic.uiparser (DEBUG): push QLabel left_doors_disp
+[2022-12-07 13:41:42,340] PyQt5.uic.uiparser (DEBUG): pop widget QLabel left_doors_disp
+[2022-12-07 13:41:42,340] PyQt5.uic.uiparser (DEBUG): new topwidget <PyQt5.QtWidgets.QWidget object at 0x0000018FD0F608B0>
+[2022-12-07 13:41:42,340] PyQt5.uic.properties (DEBUG): setting property geometry
+[2022-12-07 13:41:42,340] PyQt5.uic.properties (DEBUG): setting property font
+[2022-12-07 13:41:42,340] PyQt5.uic.properties (DEBUG): setting property frameShape
+[2022-12-07 13:41:42,340] PyQt5.uic.properties (DEBUG): setting property frameShadow
+[2022-12-07 13:41:42,341] PyQt5.uic.properties (DEBUG): setting property lineWidth
+[2022-12-07 13:41:42,341] PyQt5.uic.properties (DEBUG): setting property midLineWidth
+[2022-12-07 13:41:42,341] PyQt5.uic.properties (DEBUG): setting property text
+[2022-12-07 13:41:42,341] PyQt5.uic.uiparser (DEBUG): push QLabel right_doors_disp
+[2022-12-07 13:41:42,341] PyQt5.uic.uiparser (DEBUG): pop widget QLabel right_doors_disp
+[2022-12-07 13:41:42,341] PyQt5.uic.uiparser (DEBUG): new topwidget <PyQt5.QtWidgets.QWidget object at 0x0000018FD0F608B0>
+[2022-12-07 13:41:42,341] PyQt5.uic.properties (DEBUG): setting property geometry
+[2022-12-07 13:41:42,341] PyQt5.uic.properties (DEBUG): setting property font
+[2022-12-07 13:41:42,341] PyQt5.uic.properties (DEBUG): setting property frameShape
+[2022-12-07 13:41:42,341] PyQt5.uic.properties (DEBUG): setting property frameShadow
+[2022-12-07 13:41:42,341] PyQt5.uic.properties (DEBUG): setting property lineWidth
+[2022-12-07 13:41:42,341] PyQt5.uic.properties (DEBUG): setting property midLineWidth
+[2022-12-07 13:41:42,341] PyQt5.uic.properties (DEBUG): setting property text
+[2022-12-07 13:41:42,341] PyQt5.uic.uiparser (DEBUG): push QLabel pass_disp
+[2022-12-07 13:41:42,341] PyQt5.uic.uiparser (DEBUG): pop widget QLabel pass_disp
+[2022-12-07 13:41:42,341] PyQt5.uic.uiparser (DEBUG): new topwidget <PyQt5.QtWidgets.QWidget object at 0x0000018FD0F608B0>
+[2022-12-07 13:41:42,341] PyQt5.uic.properties (DEBUG): setting property geometry
+[2022-12-07 13:41:42,342] PyQt5.uic.properties (DEBUG): setting property font
+[2022-12-07 13:41:42,342] PyQt5.uic.properties (DEBUG): setting property frameShape
+[2022-12-07 13:41:42,342] PyQt5.uic.properties (DEBUG): setting property frameShadow
+[2022-12-07 13:41:42,342] PyQt5.uic.properties (DEBUG): setting property lineWidth
+[2022-12-07 13:41:42,342] PyQt5.uic.properties (DEBUG): setting property midLineWidth
+[2022-12-07 13:41:42,342] PyQt5.uic.properties (DEBUG): setting property text
+[2022-12-07 13:41:42,342] PyQt5.uic.uiparser (DEBUG): push QLabel crew_disp
+[2022-12-07 13:41:42,342] PyQt5.uic.uiparser (DEBUG): pop widget QLabel crew_disp
+[2022-12-07 13:41:42,342] PyQt5.uic.uiparser (DEBUG): new topwidget <PyQt5.QtWidgets.QWidget object at 0x0000018FD0F608B0>
+[2022-12-07 13:41:42,342] PyQt5.uic.properties (DEBUG): setting property geometry
+[2022-12-07 13:41:42,342] PyQt5.uic.properties (DEBUG): setting property font
+[2022-12-07 13:41:42,342] PyQt5.uic.properties (DEBUG): setting property frameShape
+[2022-12-07 13:41:42,342] PyQt5.uic.properties (DEBUG): setting property frameShadow
+[2022-12-07 13:41:42,342] PyQt5.uic.properties (DEBUG): setting property lineWidth
+[2022-12-07 13:41:42,342] PyQt5.uic.properties (DEBUG): setting property midLineWidth
+[2022-12-07 13:41:42,342] PyQt5.uic.properties (DEBUG): setting property text
+[2022-12-07 13:41:42,342] PyQt5.uic.uiparser (DEBUG): push QLabel auth_disp
+[2022-12-07 13:41:42,343] PyQt5.uic.uiparser (DEBUG): pop widget QLabel auth_disp
+[2022-12-07 13:41:42,343] PyQt5.uic.uiparser (DEBUG): new topwidget <PyQt5.QtWidgets.QWidget object at 0x0000018FD0F608B0>
+[2022-12-07 13:41:42,343] PyQt5.uic.properties (DEBUG): setting property geometry
+[2022-12-07 13:41:42,343] PyQt5.uic.properties (DEBUG): setting property font
+[2022-12-07 13:41:42,343] PyQt5.uic.properties (DEBUG): setting property frameShape
+[2022-12-07 13:41:42,343] PyQt5.uic.properties (DEBUG): setting property frameShadow
+[2022-12-07 13:41:42,343] PyQt5.uic.properties (DEBUG): setting property lineWidth
+[2022-12-07 13:41:42,343] PyQt5.uic.properties (DEBUG): setting property midLineWidth
+[2022-12-07 13:41:42,343] PyQt5.uic.properties (DEBUG): setting property text
+[2022-12-07 13:41:42,343] PyQt5.uic.uiparser (DEBUG): push QLabel grade_disp
+[2022-12-07 13:41:42,343] PyQt5.uic.uiparser (DEBUG): pop widget QLabel grade_disp
+[2022-12-07 13:41:42,343] PyQt5.uic.uiparser (DEBUG): new topwidget <PyQt5.QtWidgets.QWidget object at 0x0000018FD0F608B0>
+[2022-12-07 13:41:42,343] PyQt5.uic.properties (DEBUG): setting property geometry
+[2022-12-07 13:41:42,343] PyQt5.uic.properties (DEBUG): setting property font
+[2022-12-07 13:41:42,343] PyQt5.uic.properties (DEBUG): setting property frameShape
+[2022-12-07 13:41:42,343] PyQt5.uic.properties (DEBUG): setting property frameShadow
+[2022-12-07 13:41:42,343] PyQt5.uic.properties (DEBUG): setting property lineWidth
+[2022-12-07 13:41:42,343] PyQt5.uic.properties (DEBUG): setting property midLineWidth
+[2022-12-07 13:41:42,344] PyQt5.uic.properties (DEBUG): setting property text
+[2022-12-07 13:41:42,344] PyQt5.uic.uiparser (DEBUG): push QLabel switch_disp
+[2022-12-07 13:41:42,344] PyQt5.uic.uiparser (DEBUG): pop widget QLabel switch_disp
+[2022-12-07 13:41:42,344] PyQt5.uic.uiparser (DEBUG): new topwidget <PyQt5.QtWidgets.QWidget object at 0x0000018FD0F608B0>
+[2022-12-07 13:41:42,344] PyQt5.uic.properties (DEBUG): setting property geometry
+[2022-12-07 13:41:42,344] PyQt5.uic.properties (DEBUG): setting property font
+[2022-12-07 13:41:42,344] PyQt5.uic.properties (DEBUG): setting property frameShape
+[2022-12-07 13:41:42,344] PyQt5.uic.properties (DEBUG): setting property frameShadow
+[2022-12-07 13:41:42,344] PyQt5.uic.properties (DEBUG): setting property lineWidth
+[2022-12-07 13:41:42,344] PyQt5.uic.properties (DEBUG): setting property midLineWidth
+[2022-12-07 13:41:42,344] PyQt5.uic.properties (DEBUG): setting property text
+[2022-12-07 13:41:42,344] PyQt5.uic.uiparser (DEBUG): push QLabel ext_lights_disp
+[2022-12-07 13:41:42,344] PyQt5.uic.uiparser (DEBUG): pop widget QLabel ext_lights_disp
+[2022-12-07 13:41:42,344] PyQt5.uic.uiparser (DEBUG): new topwidget <PyQt5.QtWidgets.QWidget object at 0x0000018FD0F608B0>
+[2022-12-07 13:41:42,344] PyQt5.uic.properties (DEBUG): setting property geometry
+[2022-12-07 13:41:42,344] PyQt5.uic.properties (DEBUG): setting property font
+[2022-12-07 13:41:42,345] PyQt5.uic.properties (DEBUG): setting property frameShape
+[2022-12-07 13:41:42,345] PyQt5.uic.properties (DEBUG): setting property frameShadow
+[2022-12-07 13:41:42,345] PyQt5.uic.properties (DEBUG): setting property lineWidth
+[2022-12-07 13:41:42,345] PyQt5.uic.properties (DEBUG): setting property midLineWidth
+[2022-12-07 13:41:42,345] PyQt5.uic.properties (DEBUG): setting property text
+[2022-12-07 13:41:42,345] PyQt5.uic.uiparser (DEBUG): push QLabel cmd_pwr_disp
+[2022-12-07 13:41:42,345] PyQt5.uic.uiparser (DEBUG): pop widget QLabel cmd_pwr_disp
+[2022-12-07 13:41:42,345] PyQt5.uic.uiparser (DEBUG): new topwidget <PyQt5.QtWidgets.QWidget object at 0x0000018FD0F608B0>
+[2022-12-07 13:41:42,345] PyQt5.uic.properties (DEBUG): setting property geometry
+[2022-12-07 13:41:42,345] PyQt5.uic.properties (DEBUG): setting property font
+[2022-12-07 13:41:42,345] PyQt5.uic.properties (DEBUG): setting property frameShape
+[2022-12-07 13:41:42,345] PyQt5.uic.properties (DEBUG): setting property frameShadow
+[2022-12-07 13:41:42,345] PyQt5.uic.properties (DEBUG): setting property lineWidth
+[2022-12-07 13:41:42,345] PyQt5.uic.properties (DEBUG): setting property midLineWidth
+[2022-12-07 13:41:42,345] PyQt5.uic.properties (DEBUG): setting property text
+[2022-12-07 13:41:42,345] PyQt5.uic.uiparser (DEBUG): push QLabel cmd_speed_disp
+[2022-12-07 13:41:42,346] PyQt5.uic.uiparser (DEBUG): pop widget QLabel cmd_speed_disp
+[2022-12-07 13:41:42,346] PyQt5.uic.uiparser (DEBUG): new topwidget <PyQt5.QtWidgets.QWidget object at 0x0000018FD0F608B0>
+[2022-12-07 13:41:42,346] PyQt5.uic.properties (DEBUG): setting property geometry
+[2022-12-07 13:41:42,346] PyQt5.uic.properties (DEBUG): setting property font
+[2022-12-07 13:41:42,346] PyQt5.uic.properties (DEBUG): setting property frameShape
+[2022-12-07 13:41:42,346] PyQt5.uic.properties (DEBUG): setting property frameShadow
+[2022-12-07 13:41:42,346] PyQt5.uic.properties (DEBUG): setting property lineWidth
+[2022-12-07 13:41:42,346] PyQt5.uic.properties (DEBUG): setting property midLineWidth
+[2022-12-07 13:41:42,346] PyQt5.uic.properties (DEBUG): setting property text
+[2022-12-07 13:41:42,346] PyQt5.uic.uiparser (DEBUG): push QLabel curr_speed_disp
+[2022-12-07 13:41:42,346] PyQt5.uic.uiparser (DEBUG): pop widget QLabel curr_speed_disp
+[2022-12-07 13:41:42,346] PyQt5.uic.uiparser (DEBUG): new topwidget <PyQt5.QtWidgets.QWidget object at 0x0000018FD0F608B0>
+[2022-12-07 13:41:42,346] PyQt5.uic.properties (DEBUG): setting property geometry
+[2022-12-07 13:41:42,346] PyQt5.uic.properties (DEBUG): setting property font
+[2022-12-07 13:41:42,346] PyQt5.uic.properties (DEBUG): setting property frameShape
+[2022-12-07 13:41:42,346] PyQt5.uic.properties (DEBUG): setting property frameShadow
+[2022-12-07 13:41:42,347] PyQt5.uic.properties (DEBUG): setting property lineWidth
+[2022-12-07 13:41:42,347] PyQt5.uic.properties (DEBUG): setting property midLineWidth
+[2022-12-07 13:41:42,347] PyQt5.uic.properties (DEBUG): setting property text
+[2022-12-07 13:41:42,347] PyQt5.uic.uiparser (DEBUG): push QLabel last_st_disp
+[2022-12-07 13:41:42,347] PyQt5.uic.uiparser (DEBUG): pop widget QLabel last_st_disp
+[2022-12-07 13:41:42,347] PyQt5.uic.uiparser (DEBUG): new topwidget <PyQt5.QtWidgets.QWidget object at 0x0000018FD0F608B0>
+[2022-12-07 13:41:42,347] PyQt5.uic.properties (DEBUG): setting property geometry
+[2022-12-07 13:41:42,347] PyQt5.uic.properties (DEBUG): setting property font
+[2022-12-07 13:41:42,347] PyQt5.uic.properties (DEBUG): setting property frameShape
+[2022-12-07 13:41:42,347] PyQt5.uic.properties (DEBUG): setting property frameShadow
+[2022-12-07 13:41:42,347] PyQt5.uic.properties (DEBUG): setting property lineWidth
+[2022-12-07 13:41:42,347] PyQt5.uic.properties (DEBUG): setting property midLineWidth
+[2022-12-07 13:41:42,347] PyQt5.uic.properties (DEBUG): setting property text
+[2022-12-07 13:41:42,347] PyQt5.uic.uiparser (DEBUG): push QLabel next_st_disp
+[2022-12-07 13:41:42,347] PyQt5.uic.uiparser (DEBUG): pop widget QLabel next_st_disp
+[2022-12-07 13:41:42,347] PyQt5.uic.uiparser (DEBUG): new topwidget <PyQt5.QtWidgets.QWidget object at 0x0000018FD0F608B0>
+[2022-12-07 13:41:42,347] PyQt5.uic.properties (DEBUG): setting property geometry
+[2022-12-07 13:41:42,348] PyQt5.uic.properties (DEBUG): setting property palette
+[2022-12-07 13:41:42,348] PyQt5.uic.properties (DEBUG): setting property font
+[2022-12-07 13:41:42,348] PyQt5.uic.properties (DEBUG): setting property text
+[2022-12-07 13:41:42,348] PyQt5.uic.uiparser (DEBUG): push QPushButton test_win
+[2022-12-07 13:41:42,348] PyQt5.uic.uiparser (DEBUG): pop widget QPushButton test_win
+[2022-12-07 13:41:42,348] PyQt5.uic.uiparser (DEBUG): new topwidget <PyQt5.QtWidgets.QWidget object at 0x0000018FD0F608B0>
+[2022-12-07 13:41:42,348] PyQt5.uic.properties (DEBUG): setting property geometry
+[2022-12-07 13:41:42,348] PyQt5.uic.properties (DEBUG): setting property font
+[2022-12-07 13:41:42,348] PyQt5.uic.properties (DEBUG): setting property text
+[2022-12-07 13:41:42,348] PyQt5.uic.uiparser (DEBUG): push QLabel label_19
+[2022-12-07 13:41:42,348] PyQt5.uic.uiparser (DEBUG): pop widget QLabel label_19
+[2022-12-07 13:41:42,348] PyQt5.uic.uiparser (DEBUG): new topwidget <PyQt5.QtWidgets.QWidget object at 0x0000018FD0F608B0>
+[2022-12-07 13:41:42,348] PyQt5.uic.properties (DEBUG): setting property geometry
+[2022-12-07 13:41:42,348] PyQt5.uic.properties (DEBUG): setting property font
+[2022-12-07 13:41:42,348] PyQt5.uic.properties (DEBUG): setting property frameShape
+[2022-12-07 13:41:42,348] PyQt5.uic.properties (DEBUG): setting property frameShadow
+[2022-12-07 13:41:42,349] PyQt5.uic.properties (DEBUG): setting property lineWidth
+[2022-12-07 13:41:42,349] PyQt5.uic.properties (DEBUG): setting property midLineWidth
+[2022-12-07 13:41:42,349] PyQt5.uic.properties (DEBUG): setting property text
+[2022-12-07 13:41:42,349] PyQt5.uic.uiparser (DEBUG): push QLabel ebrake_disp
+[2022-12-07 13:41:42,349] PyQt5.uic.uiparser (DEBUG): pop widget QLabel ebrake_disp
+[2022-12-07 13:41:42,349] PyQt5.uic.uiparser (DEBUG): new topwidget <PyQt5.QtWidgets.QWidget object at 0x0000018FD0F608B0>
+[2022-12-07 13:41:42,349] PyQt5.uic.properties (DEBUG): setting property geometry
+[2022-12-07 13:41:42,349] PyQt5.uic.properties (DEBUG): setting property font
+[2022-12-07 13:41:42,349] PyQt5.uic.properties (DEBUG): setting property text
+[2022-12-07 13:41:42,349] PyQt5.uic.uiparser (DEBUG): push QLabel label_20
+[2022-12-07 13:41:42,349] PyQt5.uic.uiparser (DEBUG): pop widget QLabel label_20
+[2022-12-07 13:41:42,349] PyQt5.uic.uiparser (DEBUG): new topwidget <PyQt5.QtWidgets.QWidget object at 0x0000018FD0F608B0>
+[2022-12-07 13:41:42,349] PyQt5.uic.properties (DEBUG): setting property geometry
+[2022-12-07 13:41:42,349] PyQt5.uic.properties (DEBUG): setting property font
+[2022-12-07 13:41:42,349] PyQt5.uic.properties (DEBUG): setting property frameShape
+[2022-12-07 13:41:42,349] PyQt5.uic.properties (DEBUG): setting property frameShadow
+[2022-12-07 13:41:42,350] PyQt5.uic.properties (DEBUG): setting property lineWidth
+[2022-12-07 13:41:42,350] PyQt5.uic.properties (DEBUG): setting property midLineWidth
+[2022-12-07 13:41:42,350] PyQt5.uic.properties (DEBUG): setting property text
+[2022-12-07 13:41:42,350] PyQt5.uic.uiparser (DEBUG): push QLabel serv_brake_disp
+[2022-12-07 13:41:42,350] PyQt5.uic.uiparser (DEBUG): pop widget QLabel serv_brake_disp
+[2022-12-07 13:41:42,350] PyQt5.uic.uiparser (DEBUG): new topwidget <PyQt5.QtWidgets.QWidget object at 0x0000018FD0F608B0>
+[2022-12-07 13:41:42,350] PyQt5.uic.uiparser (DEBUG): pop widget QWidget centralwidget
+[2022-12-07 13:41:42,350] PyQt5.uic.uiparser (DEBUG): new topwidget <trainmodel_ui.TrainModel object at 0x0000018FD0F60820>
+[2022-12-07 13:41:42,351] PyQt5.uic.properties (DEBUG): setting property geometry
+[2022-12-07 13:41:42,351] PyQt5.uic.uiparser (DEBUG): push QMenuBar menubar
+[2022-12-07 13:41:42,351] PyQt5.uic.uiparser (DEBUG): pop widget QMenuBar menubar
+[2022-12-07 13:41:42,351] PyQt5.uic.uiparser (DEBUG): new topwidget <trainmodel_ui.TrainModel object at 0x0000018FD0F60820>
+[2022-12-07 13:41:42,351] PyQt5.uic.uiparser (DEBUG): push QStatusBar statusbar
+[2022-12-07 13:41:42,351] PyQt5.uic.uiparser (DEBUG): pop widget QStatusBar statusbar
+[2022-12-07 13:41:42,351] PyQt5.uic.uiparser (DEBUG): new topwidget <trainmodel_ui.TrainModel object at 0x0000018FD0F60820>
+[2022-12-07 13:41:42,352] PyQt5.uic.uiparser (DEBUG): pop widget TrainModel TrainModel
+[2022-12-07 13:41:42,352] PyQt5.uic.uiparser (DEBUG): new topwidget None

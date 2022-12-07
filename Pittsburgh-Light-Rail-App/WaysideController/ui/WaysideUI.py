@@ -525,39 +525,28 @@ class TrackControllerWindow(QtWidgets.QWidget):
 
                 if state:
                     item.setBackground(QtGui.QColor(0xf4, 0x71, 0x74))
-                    # item2.setBackground(QtGui.QColor(0xf4, 0x71, 0x74))
                 else:
                     item.setBackground(QtGui.QColor(0xbf, 0xe3, 0xb4))
-                    # item2.setBackground(QtGui.QColor(0xbf, 0xe3, 0xb4))
+
                 self.redline_reference['controllers'][i[0]]['block-table'].setItem(i[1], 2, item)
-            # self.redline_reference['view'][0]['block-table'].setItem(block_num-1, 2, item2)
 
         if line == 'green':
             for i in controller_indices:
 
                 item = QtWidgets.QTableWidgetItem(str(value))
                 item.setTextAlignment(4)
-                # item2 = QtWidgets.QTableWidgetItem(str(value))
-                # item2.setTextAlignment(4)
 
                 if state:
                     item.setBackground(QtGui.QColor(0xf4, 0x71, 0x74))
-                    # item2.setBackground(QtGui.QColor(0xf4, 0x71, 0x74))
                 else:
                     item.setBackground(QtGui.QColor(0xbf, 0xe3, 0xb4))
-                    # item2.setBackground(QtGui.QColor(0xbf, 0xe3, 0xb4))
                 self.greenline_reference['controllers'][i[0]]['block-table'].setItem(i[1], 2, item)
-            # self.greenline_reference['view'][0]['block-table'].setItem(block_num-1, 2, item2)
-
 
     def setFaultState(self, line, block_num, fault_ids=[]):
         if block_num <= 0:
                 print("Err: invalid block number")
 
         controller_indices = self.waysideio_ref.lookupBlock(line, block_num)['controller']
-        # controller_idx = int((block_num-1)/self.numBlocksPerController)
-        # row_idx = (block_num-1) % self.numBlocksPerController
-
         text_str=""
 
         for i,fault in enumerate(fault_ids):
@@ -630,7 +619,6 @@ class TrackControllerWindow(QtWidgets.QWidget):
             value = "OFF"
 
         if line == 'red':
-            # for i in self.redline_reference['controllers'][controller_idx]
             for i in controller_indices:
                 item = QtWidgets.QTableWidgetItem(str(value))
                 item.setTextAlignment(4)
