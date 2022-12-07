@@ -187,11 +187,12 @@ class WaysideIO(QWidget):
 
     def blockFailureCallback(self, blockFailures):
         if len(blockFailures) == 150:
+            print("Got signal for the greenline")
             for i, failure in enumerate(blockFailures):
-                self.setFaults('red', i, failure)
+                self.setFaults('green', i+1, failure)
         else:
             for i, failure in enumerate(blockFailures):
-                self.setFaults('green', i, failure)
+                self.setFaults('red', i+1, failure)
 
     def filterSpeed(self, line, blockNum, speed):
         if int(self.lookupTable[line.lower()][str(blockNum)]['speed-limit']) < speed:
@@ -313,7 +314,11 @@ class WaysideIO(QWidget):
                 self.greenlineControllers.append(Controller(line.lower(), i, c, self.ui, self))
                 self.populateTable(i,c)
 
+        print(self.lookupTable['green'])
+        ## Registering signal callbacks
+        self.signals.blockFailures.connect(self.blockFailureCallback)
         self.signals.globalOccupancyFromTrackModelSignal.connect(self.blockOccupancyCallback)
+
 
 if __name__ == '__main__':
     w = WaysideIO(1)
