@@ -536,9 +536,9 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
         self.Manual_Annoucements_CheckBox.stateChanged.connect(self.setManualControl_Announcements)
         ##
         
-        ## Connect to Train Model
+        ## Inputs from Train Model
         self.signals.currentSpeedOfTrainModel.connect(self.setPID)
-        
+        self.signals.authoritySignal.connect(self.setAuthority)
         ##
                 
         self.retranslateUi()
@@ -620,69 +620,7 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
         self.label_25.setText(_translate("self", "Current Speed(mph):"))
         self.label_26.setText(_translate("self", "Power (hp):"))
         self.label_33.setText(_translate("self", "Emergency Brake"))
-        
-####### Set Automatic/Main Displays
-####### Input = trainData
-####### Output = outputData
-    # def AuthorityDisplay(self):
-    #     #self.milesValue = pValue * 0.621371
-    #     # this is a bool array need ot display some other way
-    #     print("Authority: ", self.c.getAuthority())
-    #     #self.Authority_lcdDisplay.display(self.c.getAuthority())
-    
-    # def AutoSpeed(self):
-    #     #self.milesValue = pValue * 0.621371
-    #     self.c.setSpeed()
-    #     print("Commanded Speed: ", self.c.getCommandedSpeed())
-    #     self.Auto_SpeedDisplay.display(self.c.getCommandedSpeed())
-        
-    # def AutoCommandedSpeed(self):
-    #     #self.milesValue = pValue * 0.621371
-    #     self.Auto_CommandedSpeedDisplay.display(self.c.getCommandedSpeed())    
 
-    # def AutoBraking(self): 
-    #     self.Auto_BrakingDisplay.display(self.c.getServiceBrake())
-        
-    # def AutoInternalLights(self):
-    #     print("Internal Lights: ", self.c.getInternalLights())
-    #     self.InternalLights_DisplayBox.setCheckState(self.c.getInternalLights())
-    
-    # def AutoExternalLights(self):
-    #     self.ExternalLights_DisplayBox.setCheckState(self.c.getExternalLights())
-    
-    # def AutoLeftDoors(self):
-    #     self.LeftDoors_DisplayBox.setCheckState(self.c.getLeftDoor())
-    
-    # def AutoRightDoors(self):
-    #     self.RightDoors_DisplayBox.setCheckState(self.c.getRightDoor())
-
-    # def AutoAdvertisements(self):
-    #     self.Advertisements_DisplayBox.setCheckState(self.c.getAdvertisements())
-    
-    # def AutoAnnouncements(self):
-    #     self.Announcements_DisplayBox.setCheckState(self.c.getAnnouncements())
-    
-    # def AutoTemperature(self):
-    #     self.Temperature_DisplayBox.display(self.c.getTemperature())
-    
-    # def AutoEngineFault(self):
-    #     self.EngineFault_DisplayBox.setCheckable(True)
-    #     #self.EngineFault_DisplayBox.setCheckState(pValue)  
-    #     self.ActivateEmergencyBrake()
-        
-    # def AutoPowerFault(self):
-    #     self.PowerFault_DisplayBox.setCheckable(True)
-    #     #self.PowerFault_DisplayBox.setCheckState(pValue)
-    #     self.ActivateEmergencyBrake()
-        
-    # def AutoCircuitFault(self, pValue):
-    #     self.CircuitFault_DisplayBox.setCheckable(True)
-    #     self.CircuitFault_DisplayBox.setCheckState(pValue)
-    #     self.ActivateEmergencyBrake()
-        
-    # def AutoTrackFault(self, pValue):
-    #     self.TrackFault_DisplayBox.setCheckable(True)
-    #     self.TrackFault_DisplayBox.setCheckState(pValue)
         
     def EmergencyBrakeDisplay(self):
         self.EmergencyBrakeDisplayBox.setCheckable(True)
@@ -708,16 +646,18 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
         if(self.EmergencyBrakeDisplayBox.isChecked() == True):
             self.EmergencyBrakeDisplayBox.setCheckState(False)           
             self.emergency_brake = False
-            #self.signals.emergencyBrakeSignal.emit(False)
+            self.signals.emergencyBrakeSignal.emit(False)
+
         elif(self.EmergencyBrakeDisplayBox.isChecked() == False):
             self.currentSpeed_lcdDisplay.display(0)
             self.speed_Slider.setValue(0)
             self.EmergencyBrakeDisplayBox.setCheckState(True)
             self.emergency_brake = True
-            #self.signals.emergencyBrakeSignal.emit(True)
+            self.signals.emergencyBrakeSignal.emit(True)
         
     def setManualControl_Temperature(self):
         self.temperature = self.Manual_temperature_box.value()
+        self.emitNonVital() 
     
     def setManualControl_Lights(self):
         if(self.Manual_lights_ComboBox.currentIndex() == 0):
@@ -731,25 +671,27 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
             self.external_light_state = True
         elif(self.Manual_lights_ComboBox.currentIndex() == 3):
             self.internal_light_state = True
-            self.external_light_state = True                
+            self.external_light_state = True    
+        self.emitNonVital()           
     
     def setManualControl_Doors(self):
         if(self.Manual_doors_ComboBox.currentIndex() == 0):
             self.left_door_state = False
             self.right_door_state = False
-        elif(self.Manual_doors_ComboBox.currentIndex() == 0):
+        elif(self.Manual_doors_ComboBox.currentIndex() == 1):
             self.left_door_state = True
             self.right_door_state = False
-        elif(self.Manual_doors_ComboBox.currentIndex() == 0):
+        elif(self.Manual_doors_ComboBox.currentIndex() == 2):
             self.left_door_state = False
             self.right_door_state = True
-        elif(self.Manual_doors_ComboBox.currentIndex() == 0):
+        elif(self.Manual_doors_ComboBox.currentIndex() == 3):
             self.left_door_state = True
             self.right_door_state = True
+        self.emitNonVital() 
     
     def setManualControl_Advertisements(self):
         self.advertisement_state = self.Manual_Advertisements_CheckBox.checkState()
-    
+
     def setManualControl_Announcements(self):
         self.announce_state = self.Manual_Annoucements_CheckBox.checkState()
 
@@ -774,12 +716,8 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
         # Km/hr to mph
         # msg input as m/s
         # msg = current speed
-        print("Train Controller msg input: ", msg)
-        print("Train Controller commanded speed: ", self.commanded_speed)
-        
         self.current_speed = msg
-        
-        if((self.EmergencyBrakeDisplayBox.isChecked() == True) or (msg >= self.commanded_speed)):
+        if((self.EmergencyBrakeDisplayBox.isChecked() == True) or (msg >= self.commanded_speed) or (self.service_brake == 1)):
             self.power = 0
             self.powerDict['power'] = self.power
         else:
@@ -793,25 +731,36 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
     
     # Signals Functions
     def setAuthority(self, msg):
-        self.authority = msg
-        self.Authority_lcdDisplay.display(self.authority) #need to convert from ? to miles
-        if(self.authority <= 2):
-            self.signals.serviceBrakeSignal.emit(True) #its a list in the signals class
-            self.waitUntilStopped()          
+        self.authority = msg[0]
+        if(self.authority == False):
+            self.Authority_lcdDisplay.display(0)
+            self.braking_Slider.setValue(1)
+            self.signals.emergencyBrakeSignal.emit(True)
+            self.EmergencyBrakeDisplayBox.setCheckState(True)
+        elif(self.authority == True):
+            self.Authority_lcdDisplay.display(1)                     
     
     def waitUntilStopped(self):
         while(self.current_speed != 0):
             time.sleep(0.001)
-            self.signals.serviceBrakeSignal.emit(True)
+            self.signals.serviceBrakeSignal.emit(1)
         else:
             #wait 30 seconds at station
+            print("STOPPED AT STAION")
             time.sleep(30) 
             self.signals.serviceBrakeSignal.emit(False)
 
     def emitPower(self):
         self.signals.powerSignal.emit(self.powerDict)     
             
-        
+    def emitNonVital(self):
+        self.nonVitalDict['temperature'] = self.temperature
+        self.nonVitalDict['int_lights'] = self.internal_light_state  
+        self.nonVitalDict['ext_lights'] = self.external_light_state
+        self.nonVitalDict['left_doors'] = self.left_door_state
+        self.nonVitalDict['right_doors'] = self.right_door_state
+        self.signals.nonVitalDictSignal.emit(self.nonVitalDict) 
+ 
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)

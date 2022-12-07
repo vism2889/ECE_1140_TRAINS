@@ -74,12 +74,29 @@ class TrainModel(QtWidgets.QMainWindow):
     def tc_ebrake(self, msg):
         self.t.e_brake = msg
 
+    def non_vitals(self,msg):
+        for key in msg:
+            if key == 'ext_lights':
+                print(msg[key])
+            setattr(self.t, key, msg[key])
+    
+    def ctc_authority(self, msg):
+        
+        for i,m in enumerate(msg):
+            msg[i] = int(m)
+
+        self.t.pm.ctc_authority = msg
+
+        pass
+        
     def UI(self):
         
         self.signals.dispatchTrainSignal.connect(self.dispatch)
         self.signals.powerSignal.connect(self.curr_t_power)
         self.signals.serviceBrakeSignal.connect(self.tc_servbrake)
         self.signals.emergencyBrakeSignal.connect(self.tc_ebrake)
+        self.signals.nonVitalDictSignal.connect(self.non_vitals)
+        self.signals.ctcAuthoritySignal.connect(self.ctc_authority)
         # if sys.argv[1] == 'user':
         #     self.test_win.setVisible(False)
         # else:
@@ -168,14 +185,14 @@ class TrainModel(QtWidgets.QMainWindow):
         #doors
         #lights
         if self.t.left_doors:
-            self.left_doors_disp.setText('On')
+            self.left_doors_disp.setText('Open')
         else:
-            self.left_doors_disp.setText('Off')
+            self.left_doors_disp.setText('Closed')
         
         if self.t.right_doors:
-            self.right_doors_disp.setText('On')
+            self.right_doors_disp.setText('Open')
         else:
-            self.right_doors_disp.setText('Off')
+            self.right_doors_disp.setText('Closed')
 
         
         
@@ -186,7 +203,7 @@ class TrainModel(QtWidgets.QMainWindow):
         #critical info
         self.serv_brake_disp.setText(f'{self.t.service_brake}')
         self.ebrake_disp.setText(f'{self.t.e_brake}')
-        self.auth_disp.setText(f'{self.t.authority}')
+        self.auth_disp.setText(f'{self.t.pm.train_authority[0]}')
         self.grade_disp.setText(f'{self.t.grade} %')
         self.switch_disp.setText(f'{self.t.switch} miles')
 
@@ -203,6 +220,7 @@ class TrainModel(QtWidgets.QMainWindow):
                 # print(f'Curr Pos in block {self.qt.t.pm.curr_block} is: {self.qt.t.pm.curr_pos}')
                 self.signals.occupancyFromTrainSignal.emit(self.t.pm.occ_list)
                 self.signals.commandedSpeedSignal.emit(self.t.pm.speed_limit)
+                self.signals.authoritySignal.emit(self.t.pm.train_authority)
                 self.last_update = time.time()
                 # print('PUBLISHING!!!')
                 if self.hw:
