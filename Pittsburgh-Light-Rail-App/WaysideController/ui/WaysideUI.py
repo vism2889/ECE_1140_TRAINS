@@ -54,15 +54,22 @@ class TrackControllerWindow(QtWidgets.QWidget):
         if os.name == 'nt':
             path = os.path.abspath(__file__.replace(__name__.replace('.', '\\')+'.py', ''))
             jsonPath = path
+            trackLayoutPath = path
             path += "\\track_layout\\Track Layout & Vehicle Data vF.xlsx - Red Line.csv"
             jsonPath += "\\track_layout\\redline-layout.json"
+            trackLayoutPath += "\\track_layout\\Trains Layout - Red Line.csv"
         elif os.name == 'posix':
             path = os.path.abspath(__file__.replace(__name__.replace('.', '/')+'.py', ''))
             jsonPath = path
+            trackLayoutPath = path
             path += "/track_layout/Track Layout & Vehicle Data vF.xlsx - Red Line.csv"
             jsonPath += "/track_layout/redline-layout.json"
+            trackLayoutPath += "/track_layout/Trains Layout - Red Line.csv"
 
-        redline_view_layout, redline_layout, redline_io_layout = extract_layout.parseTrackLayout(path, jsonPath)
+        ## Extracting configuration for the red line
+        redline_view_layout, redline_layout, redlineIOLayout = extract_layout.parseTrackLayout(path, jsonPath)
+        redlineTrack = extract_layout.generateTrackPath(trackLayoutPath, "redline")
+
         self.redline_reference['total-blocks'] = redline_view_layout[0]['total-blocks']
 
         ######## Red Line ########
@@ -73,10 +80,6 @@ class TrackControllerWindow(QtWidgets.QWidget):
         self.verticalLayout_2.setObjectName("verticalLayout_2")
         self.redline_controllers = QtWidgets.QTabWidget(self.redline_tab)
         self.redline_controllers.setObjectName("redline_controllers")
-
-        # for controller in redline_view_layout:
-        #     ## Creating a view tab
-        #     self.addTab("redline_view", self.redline_controllers, controller, redline_view_layout, self.redline_reference, True)
 
         for controller in redline_layout:
             ## Creating a controller tab
@@ -89,15 +92,21 @@ class TrackControllerWindow(QtWidgets.QWidget):
         if os.name == 'nt':
             path = os.path.abspath(__file__.replace(__name__.replace('.', '\\')+'.py', ''))
             jsonPath = path
+            trackLayoutPath = path
             path += "\\track_layout\\Track Layout & Vehicle Data vF.xlsx - Green Line.csv"
             jsonPath += "\\track_layout\\greenline-layout.json"
+            trackLayoutPath += "\\track_layout\\Trains Layout - Green Line.csv"
         elif os.name == 'posix':
             path = os.path.abspath(__file__.replace(__name__.replace('.', '/')+'.py', ''))
             jsonPath = path
+            trackLayoutPath = path
             path += "/track_layout/Track Layout & Vehicle Data vF.xlsx - Green Line.csv"
             jsonPath += "/track_layout/greenline-layout.json"
+            trackLayoutPath += "/track_layout/Trains Layout - Green Line.csv"
 
-        greenline_view_layout, greenline_layout, greenline_io_layout = extract_layout.parseTrackLayout(path, jsonPath)
+        ## Extract configuration for the greenline
+        greenline_view_layout, greenline_layout, greenlineIOLayout = extract_layout.parseTrackLayout(path, jsonPath)
+        greenlineTrack = extract_layout.generateTrackPath(trackLayoutPath, "greenline")
 
         self.greenline_reference['total-blocks'] = greenline_view_layout[0]['total-blocks']
 
@@ -108,10 +117,6 @@ class TrackControllerWindow(QtWidgets.QWidget):
         self.verticalLayout_7.setObjectName("verticalLayout_7")
         self.greenline_controllers = QtWidgets.QTabWidget(self.greenline_tab)
         self.greenline_controllers.setObjectName("greenline_controllers")
-
-        # for controller in greenline_view_layout:
-        #     ## Creating a view tab
-        #     self.addTab("greenline_view", self.greenline_controllers, controller, greenline_view_layout, self.greenline_reference, True)
 
         for controller in greenline_layout:
             ## Creating a controller tab
@@ -128,10 +133,9 @@ class TrackControllerWindow(QtWidgets.QWidget):
         QtCore.QMetaObject.connectSlotsByName(main_window)
 
         ## Setup the WaysideIO class
-        # if self.waysideio_ref != None:
         self.waysideio_ref.setUI(self)
-        self.waysideio_ref.setupLine('red', redline_io_layout)
-        self.waysideio_ref.setupLine('green', greenline_io_layout)
+        self.waysideio_ref.setupLine('red', redlineIOLayout, redlineTrack)
+        self.waysideio_ref.setupLine('green', greenlineIOLayout, greenlineTrack)
 
     ## Open up a file explorer
     def dialog(self):

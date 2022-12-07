@@ -56,7 +56,7 @@ class Controller():
             self.uploadPLC(file)
             self.maintenance = False
 
-    ## Get Current Track State ##
+    ## Get Current Track State 
     def getTrack(self):
         return self.track
 
@@ -115,7 +115,7 @@ class Controller():
         self.maintenance != self.maintenance
         return self.maintenance
 
-    ## Run the PLCs ##
+    ## Run the PLCs 
     def run(self):
         if self.plcGood:
             try:
@@ -145,16 +145,16 @@ class WaysideIO(QWidget):
     def __init__(self, signals):
         super().__init__()
 
-        ## Signals ##
+        ## Signals
         self.signals = signals
-        #############
 
+        ## UI reference
         self.ui = None
 
-        self.track = {}
+        # self.track = {}
         self.lines = ['red', 'green']
 
-        ## Hold each controller
+        ## List for each controller 
         self.redline_controllers = []
         self.greenline_controllers = []
 
@@ -164,14 +164,14 @@ class WaysideIO(QWidget):
             'green' : {}
         }
 
-    ## Callback for block occupancies from track ##
+    ###############
+    ## CALLBACKS ## 
+    ###############
     def blockOccupancyCallback(self, occupancy):
         for i, block in enumerate(occupancy):
             self.setBlockOccupancy('green', i+1, block)
 
-    ## Setup and reference to UI ##
-    def setUI(self, ui):
-        self.ui = ui
+    # def blockFailurCallback(self, )
 
     def filterSpeed(self, line, blockNum, speed):
         if int(self.lookupTable[line.lower()][str(blockNum)]['speed-limit']) < speed:
@@ -179,7 +179,9 @@ class WaysideIO(QWidget):
         else:
             return speed
 
-    #############   ## SETTERS ##   #############   #############
+    #############
+    ## SETTERS ##
+    #############
     def setFaults(self, line, blockNum, failures):
         if self.lines[0] == line.lower():
             controllers = self.lookupBlock(self.lines[0], blockNum)['controller']
@@ -236,8 +238,11 @@ class WaysideIO(QWidget):
             controllers = self.lookupBlock(self.lines[1], blockNum)['controller']
             # for c in controllers:
             #     self.greenline_controllers[c[0]].updateCrossing(blockNum, state)
-    #############   #############   #############   #############   #############
-
+    
+    #############
+    ## HELPERS ##
+    #############
+    ## Lookup table
     def lookupBlock(self, line, blockNum):
         return self.lookupTable[line.lower()][str(blockNum)]
 
@@ -250,57 +255,79 @@ class WaysideIO(QWidget):
         if line.lower() == self.lines[1]:
             self.greenline_controllers[controllerNum].uploadPLC(file)
 
-    def setupLine(self, line, layout):
+    def populateTable(self, i, c):
+        idx = 0
+        for sec in c['sections']:
+            for block in c['sections'][sec]['blocks']:
+                entry = self.lookupTable[self.lines[0]]
+                if block[0] not in entry:
+                    entry[block[0]] = {
+                        'controller' : [],
+                    }
+                ## Mapped data for a block
+                entry[block[0]]['controller'].append((i,idx))
+                entry[block[0]]['section'] = sec
+                entry[block[0]]['speed-limit'] = block[1]
+                idx+=1
+
+
+    ###########
+    ## SETUP ##
+    ########### 
+    ## Setting a UI reference
+    def setUI(self, ui):
+        self.ui = ui
+
+    ## Setting up the configuration for the redline
+    def setupLine(self, line, layout, track):
         ## Redline
         if line.lower() == self.lines[0]:
             for i, c in enumerate(layout):
                 self.redline_controllers.append(Controller(line.lower(), i, c, self.ui, self))
-
+                self.populateTable(i, c)
                 ## Populate lookup table
-                idx = 0
-                for sec in c['sections']:
-                    for block in c['sections'][sec]['blocks']:
-                        entry = self.lookupTable[self.lines[0]]
-                        if block[0] not in entry:
-                            entry[block[0]] = {
-                                'controller' : [],
-                            }
-                        ## Mapped data for a block
-                        entry[block[0]]['controller'].append((i,idx))
-                        entry[block[0]]['section'] = sec
-                        entry[block[0]]['speed-limit'] = block[1]
-                        idx+=1
+                # idx = 0
+                # for sec in c['sections']:
+                #     for block in c['sections'][sec]['blocks']:
+                #         entry = self.lookupTable[self.lines[0]]
+                #         if block[0] not in entry:
+                #             entry[block[0]] = {
+                #                 'controller' : [],
+                #             }
+                #         ## Mapped data for a block
+                #         entry[block[0]]['controller'].append((i,idx))
+                #         entry[block[0]]['section'] = sec
+                #         entry[block[0]]['speed-limit'] = block[1]
+                #         idx+=1
 
         ## Greenline
         if line.lower() == self.lines[1]:
             for i, c in enumerate(layout):
                 self.greenline_controllers.append(Controller(line.lower(), i, c, self.ui, self))
+                self.populateTable(i,c)
                 ## Populate lookup table
-                idx = 0
-                for sec in c['sections']:
-                    for block in c['sections'][sec]['blocks']:
-                        entry = self.lookupTable[self.lines[1]]
-                        if block[0] not in entry:
-                            entry[block[0]] = {
-                                'controller' : [],
-                            }
+                # idx = 0
+                # for sec in c['sections']:
+                #     for block in c['sections'][sec]['blocks']:
+                #         entry = self.lookupTable[self.lines[1]]
+                #         if block[0] not in entry:
+                #             entry[block[0]] = {
+                #                 'controller' : [],
+                #             }
 
-                        ## Mapped data for a block
-                        entry[block[0]]['controller'].append((i,idx))
-                        entry[block[0]]['section'] = sec
-                        entry[block[0]]['speed-limit'] = block[1]
-                        idx+=1
+                #         ## Mapped data for a block
+                #         entry[block[0]]['controller'].append((i,idx))
+                #         entry[block[0]]['section'] = sec
+                #         entry[block[0]]['speed-limit'] = block[1]
+                #         idx+=1
 
         self.signals.globalOccupancyFromTrackModelSignal.connect(self.blockOccupancyCallback)
-
 
 if __name__ == '__main__':
     w = WaysideIO(1)
 
     csvPath = os.path.abspath(__file__)
     jsonPath = os.path.abspath(__file__)
-
-    # print(csvPath)
 
     if os.name == 'nt':
         csvPath += "\\track_layout\\Track Layout & Vehicle Data vF.xlsx - Green Line.csv"
