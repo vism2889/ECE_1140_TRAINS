@@ -2,6 +2,9 @@ from  PyQt5 import QtWidgets
 # from PyQt5.QtWidgets import QWidget
 import sys
 import os
+sys.path.append('track_layout')
+sys.path.append("../../SystemSignals")
+from Signals import Signals
 
 from ui.WaysideUI import TrackControllerWindow
 from WaysideIO.WaysideIO import WaysideIO
@@ -9,11 +12,11 @@ from WaysideIO.WaysideIO import WaysideIO
 # from track_layout import extract_layout
 
 class WaysideController():
-    def __init__(self, signals):
-
+    def __init__(self, signals=None):
+    
         wayside = WaysideIO(signals)
         ## UI
-        # app = QtWidgets.QApplication(sys.argv)
+        
         w = QtWidgets.QWidget()
         main = TrackControllerWindow(wayside)
         main.setupUi(w)
@@ -22,9 +25,10 @@ class WaysideController():
         ## Set UI reference
         wayside.setUI(main)
 
-        ## Exit
-        # sys.exit(app.exec_())
-
-
 if __name__ == '__main__':
-    WaysideController()
+    app = QtWidgets.QApplication(sys.argv) ## COMMENT OUT FOR FINAL PRODUCT
+    signals = Signals() ## COMMENT OUT FOR FINAL PRODUCT
+    WaysideController(signals)
+
+    ## Exit
+    sys.exit(app.exec_()) ## COMMENT OUT FOR FINAL PRODUCT

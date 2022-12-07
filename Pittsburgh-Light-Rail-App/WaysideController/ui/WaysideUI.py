@@ -29,7 +29,7 @@ class TrackControllerWindow(QtWidgets.QWidget):
 
 
         self.waysideio_ref = waysideio
-        self.FAULTS = ["UNDEFINED", "BROKEN RAIL", "CIRCUIT FAILURE", "POWER FAILURE", "OK"]
+        self.FAULTS = ["OK", "BROKEN RAIL", "CIRCUIT FAILURE", "POWER FAILURE","UNDEFINED"]
 
     ## Main window generation
     def setupUi(self, main_window):
