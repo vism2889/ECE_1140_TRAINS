@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 
 ##############################################################################
-# AUTHOR(S):    Morgan Visnesky, Garrett Marcinak
+# AUTHOR(S):    Morgan Visnesky, Garrett Marcinak, Nathaniel Mallick
 # DATE:         11/13/2022
 # FILENAME:     occupancySignalSender.py
 # DESCRIPTION:
 #   Used to hold all signals used for inter-module communications in the
 #   Pittsburgh Light Rail Track System
+# Last Updated: 12/7/2022 - Nathaniel Mallick 
 ##############################################################################
 
 from PyQt5 import QtCore
