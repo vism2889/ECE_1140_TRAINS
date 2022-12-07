@@ -275,7 +275,6 @@ class WaysideIO(QWidget):
         if line.lower() == self.lines[1]:
             for i, c in enumerate(layout):
                 self.greenline_controllers.append(Controller(line.lower(), i, c, self.ui, self))
-                # if i ==
                 ## Populate lookup table
                 idx = 0
                 for sec in c['sections']:
