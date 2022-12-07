@@ -33,6 +33,7 @@ from TrackModelApp import TrackModel
 
 # Wayside IMPORTS
 sys.path.append("WaysideController")
+sys.path.append("WaysideController/track_layout")
 from WaysideController import WaysideController
 
 # TrainModel IMPORTS

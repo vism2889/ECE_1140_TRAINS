@@ -1,0 +1,9 @@
+{
+    "track" : "redline",
+    "controllers":[
+        {"sections" : ["A", "B", "C", "D", "E", "F"]},
+        {"sections" : ["G", "H", "R", "S", "T"]},
+        {"sections" : ["H", "I", "O", "P", "Q"]},
+        {"sections" : ["J", "K", "L", "M","N"]}
+    ]
+}
