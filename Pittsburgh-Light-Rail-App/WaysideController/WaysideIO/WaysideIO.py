@@ -15,6 +15,7 @@ class Controller():
         self.layout = layout
         self.ui = ui
         self.parent = parent
+        self.logger = parent.logger
 
         ## Function to run PLC program
         self.plc = None
@@ -80,17 +81,21 @@ class Controller():
         self.track['block-states'][blockNum] = failures
 
         ## Extract the individual faults
-
         faults = []
+
         ## Track Failure (0x01)
         if 0x01 & failures:
+            self.logger.debug(f'track failure on block {blockNum}')
             faults.append(0x01)
         ## Circuit Failure
         if 0x02 & failures:
+            self.logger.debug(f'circuit failure on block {blockNum}')
             faults.append(0x02)
         ## Power Failure
-        if 0x03 & failures:
+        if 0x04 & failures:
+            self.logger.debug(f'power failure on block {blockNum}')
             faults.append(0x03)
+        
         self.ui.setFaultState(self.line, blockNum, faults)
         ## Run PLC program
         # self.run()
@@ -146,14 +151,18 @@ class Controller():
                 print(f"Errror: Could not import plc script for controller {self.id}")
                 self.plcGood = False
             else:
-                print(f'Plc has been loaded for controller {self.id}')
+                self.parent.logger.debug(f'Plc has been loaded for controller {self.id}')
+                # print(f'Plc has been loaded for controller {self.id}')
                 self.plc = mod.run
                 self.plcGood = True
         else:
             print(f"Error: Controller {self.id} not in maintenance mode for PLC upload")
 
 class WaysideIO(QWidget):
-    def __init__(self, signals):
+    def __init__(self, signals, logger):
+        self.logger = logger
+        self.logger.debug("Creating Wayside Controller")
+
         super().__init__()
 
         ## Signals
@@ -176,7 +185,6 @@ class WaysideIO(QWidget):
             'red' : {},
             'green' : {}
         }
-
     
     ###############
     ## CALLBACKS ##
@@ -187,7 +195,6 @@ class WaysideIO(QWidget):
 
     def blockFailureCallback(self, blockFailures):
         if len(blockFailures) == 150:
-            print("Got signal for the greenline")
             for i, failure in enumerate(blockFailures):
                 self.setFaults('green', i+1, failure)
         else:
@@ -276,11 +283,11 @@ class WaysideIO(QWidget):
         if line.lower() == self.lines[1]:
             self.greenlineControllers[controllerNum].uploadPLC(file)
 
-    def populateTable(self, i, c):
+    def populateTable(self, i, c, line):
         idx = 0
         for sec in c['sections']:
             for block in c['sections'][sec]['blocks']:
-                entry = self.lookupTable[self.lines[0]]
+                entry = self.lookupTable[self.lines[line]]
                 if block[0] not in entry:
                     entry[block[0]] = {
                         'controller' : [],
@@ -305,20 +312,18 @@ class WaysideIO(QWidget):
             self.redlineTrack = track
             for i, c in enumerate(layout):
                 self.redlineControllers.append(Controller(line.lower(), i, c, self.ui, self))
-                self.populateTable(i, c)
+                self.populateTable(i, c, 0)
 
         ## Greenline
         if line.lower() == self.lines[1]:
             self.greenlineTrack = track
             for i, c in enumerate(layout):
                 self.greenlineControllers.append(Controller(line.lower(), i, c, self.ui, self))
-                self.populateTable(i,c)
+                self.populateTable(i,c, 1)
 
-        print(self.lookupTable['green'])
         ## Registering signal callbacks
         self.signals.blockFailures.connect(self.blockFailureCallback)
         self.signals.globalOccupancyFromTrackModelSignal.connect(self.blockOccupancyCallback)
-
 
 if __name__ == '__main__':
     w = WaysideIO(1)
