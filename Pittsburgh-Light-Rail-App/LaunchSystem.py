@@ -33,6 +33,7 @@ from TrackModelApp import TrackModel
 
 # Wayside IMPORTS
 sys.path.append("WaysideController")
+sys.path.append("WaysideController/track_layout/")
 from WaysideController import WaysideController
 
 # TrainModel IMPORTS
@@ -64,13 +65,6 @@ class PittsburghLightRail():
         file = f'{os.getcwd()}/train.ui'
         self.trainModel = TrainModel(file, hw, self.signals)
         self.globalOcc = []
-        self.signals.globalOccupancyFromTrackModelSignal.connect(self.getOcc) # just for testing
-
-    # just for testing
-    def getOcc(self, occ):
-        self.globalOcc = occ
-        print("Master Luanch Global Occ:", self.globalOcc)
-
 
 ## Commandline CTRL-C ##
 def handler(signum, frame):
