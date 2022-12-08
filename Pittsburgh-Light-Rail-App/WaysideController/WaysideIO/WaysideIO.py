@@ -23,6 +23,7 @@ class Controller():
 
         ##
         self.maintenance = True
+        self.numBlocks = 0
 
         ## Setup layout
         self.track = {
@@ -39,6 +40,7 @@ class Controller():
             for block in self.layout['sections'][section]['blocks']:
                 self.track['block'][block[0]] = block[2]
                 self.track['block-states'][block[0]] = 0x00
+                self.numBlocks+=1
 
             ## Switches
             for switch in self.layout['sections'][section]['switches']:
@@ -56,7 +58,10 @@ class Controller():
             file = open(f"plc/controller{self.id}.plc")
             self.uploadPLC(file)
             self.maintenance = False
-
+    
+    ###############
+    ## BLOCK OPS ##
+    ###############
     ## Get Current Track State
     def getTrack(self):
         return self.track
@@ -78,6 +83,8 @@ class Controller():
 
     ## Update block failures
     def updateFailures(self, blockNum, failures):
+        # if failures!= 0x00:
+        #     print(f'Updating failures for line {self.line} and block {blockNum}')
         self.track['block-states'][blockNum] = failures
 
         ## Extract the individual faults
@@ -85,28 +92,28 @@ class Controller():
 
         ## Track Failure (0x01)
         if 0x01 & failures:
-            self.logger.debug(f'track failure on block {blockNum}')
-            faults.append(0x01)
+            self.logger.debug(f'track failure on block {blockNum} in line {self.line}')
+            faults.append(1)
         ## Circuit Failure
         if 0x02 & failures:
-            self.logger.debug(f'circuit failure on block {blockNum}')
-            faults.append(0x02)
+            self.logger.debug(f'circuit failure on block {blockNum} in line {self.line}')
+            faults.append(2)
         ## Power Failure
         if 0x04 & failures:
-            self.logger.debug(f'power failure on block {blockNum}')
-            faults.append(0x03)
+            self.logger.debug(f'power failure on block {blockNum} in line {self.line}')
+            faults.append(3)
 
-        self.ui.setFaultState(self.line, blockNum, faults)
+        self.parent.ui.setFaultState(self.line, blockNum, faults)
         ## Run PLC program
         # self.run()
         return self.track['block-states']
 
     def updateMaintenance(self, blockNum, state):
         self.track['block-maintenance'][blockNum] = state
-        self.ui.setMaintenance(self.line, blockNum, state)
+        self.parent.ui.setMaintenance(self.line, blockNum, state)
 
         ## Run PLC program
-        self.run()
+        # self.run()
 
         return self.track['block-maintenance']
 
@@ -158,6 +165,10 @@ class Controller():
         else:
             print(f"Error: Controller {self.id} not in maintenance mode for PLC upload")
 
+    ## (TODO) Return if a block, in maintenance or has  fault 
+    def blockState(self, blockNum):
+        return
+
 class WaysideIO(QWidget):
     def __init__(self, signals, logger):
         self.logger = logger
@@ -186,20 +197,56 @@ class WaysideIO(QWidget):
             'green' : {}
         }
 
+        self.test = False
+
     ###############
     ## CALLBACKS ##
     ###############
+    def trainLocationCallback(self, loc):
+
+        if len(loc) != 4:
+            self.logger.warn(f'invalid signal size (trainLocationCallback)')
+            return
+
+        ## Figure out what line its
+        line = loc[0]
+        id = loc[1] ## train id
+
+        prev = loc[2]
+        curr = loc[3]
+
+        authority = []
+
+        if line.lower() == 'red':
+            ## look at the next 5 blocks in the redline
+            ## append it to auth
+            pass
+        
+        if line.lower() == 'green':
+            ##  Look at the next 5 blocks in the greenline
+            ## append it to auth
+            pass
+
+        ## pub to train controller
+        self.signals.waysideAuthority.emit(id, authority)
+        pass
+
     def blockOccupancyCallback(self, occupancy):
         for i, block in enumerate(occupancy):
             self.setBlockOccupancy('green', i+1, block)
 
-    def blockFailureCallback(self, blockFailures):
-        if len(blockFailures) == 150:
-            for i, failure in enumerate(blockFailures):
-                self.setFaults('green', i+1, failure)
-        else:
-            for i, failure in enumerate(blockFailures):
-                self.setFaults('red', i+1, failure)
+    def blockFailureCallback(self, failures):
+        if not self.test:
+            ## Extract the individual faults
+            if len(failures) == 150:
+                for i, failure in enumerate(failures):
+                    self.setFaults('green', i+1, failure)
+            else:
+                for i, failure in enumerate(failures):
+                    self.setFaults('red', i+1, failure)
+    
+    def maintenanceCallback(self, msg):
+        self.setBlockMaintenance(msg[0], msg[1], [msg[2]])
 
     def filterSpeed(self, line, blockNum, speed):
         if int(self.lookupTable[line.lower()][str(blockNum)]['speed-limit']) < speed:
@@ -270,6 +317,20 @@ class WaysideIO(QWidget):
     #############
     ## HELPERS ##
     #############
+    # Check the block occupancy
+    def checkOccupancy(self, line, blockNum):
+    
+        return 
+
+    ## Get the number of blocks in a controller
+    def getNumBlocks(self, line, controller):
+        if line.lower() == 'red':
+            return self.redlineControllers[controller].numBlocks
+        if line.lower() == 'green':
+            return self.greenlineControllers[controller].numBlocks
+        
+        return -1
+
     ## Lookup table
     def lookupBlock(self, line, blockNum):
         return self.lookupTable[line.lower()][str(blockNum)]
@@ -304,11 +365,12 @@ class WaysideIO(QWidget):
     ## Setting a UI reference
     def setUI(self, ui):
         self.ui = ui
-
+        
     ## Setting up the configuration for the redline
     def setupLine(self, line, layout, track):
         ## Redline
         if line.lower() == self.lines[0]:
+            self.logger.debug(f'setting up {line.lower()} controllers')
             self.redlineTrack = track
             for i, c in enumerate(layout):
                 self.redlineControllers.append(Controller(line.lower(), i, c, self.ui, self))
@@ -316,14 +378,19 @@ class WaysideIO(QWidget):
 
         ## Greenline
         if line.lower() == self.lines[1]:
+            self.logger.debug(f'setting up {line.lower()}line controllers')
             self.greenlineTrack = track
             for i, c in enumerate(layout):
                 self.greenlineControllers.append(Controller(line.lower(), i, c, self.ui, self))
                 self.populateTable(i,c, 1)
 
+        
+        # self.ui.setFaultState('red', 1, [1,2,3])
         ## Registering signal callbacks
         self.signals.blockFailures.connect(self.blockFailureCallback)
         self.signals.globalOccupancyFromTrackModelSignal.connect(self.blockOccupancyCallback)
+        self.signals.signalMaintenance.connect(self.maintenanceCallback)
+        self.signals.trainLocation.connect(self.trainLocationCallback)
 
 if __name__ == '__main__':
     w = WaysideIO(1)
