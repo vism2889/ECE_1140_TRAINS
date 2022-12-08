@@ -29,7 +29,7 @@ class TrackControllerWindow(QtWidgets.QWidget):
 
 
         self.waysideio_ref = waysideio
-        self.FAULTS = ["UNDEFINED", "BROKEN RAIL", "CIRCUIT FAILURE", "POWER FAILURE", "OK"]
+        self.FAULTS = ["OK", "BROKEN RAIL", "CIRCUIT FAILURE", "POWER FAILURE","UNDEFINED"]
 
     ## Main window generation
     def setupUi(self, main_window):
@@ -54,15 +54,22 @@ class TrackControllerWindow(QtWidgets.QWidget):
         if os.name == 'nt':
             path = os.path.abspath(__file__.replace(__name__.replace('.', '\\')+'.py', ''))
             jsonPath = path
+            trackLayoutPath = path
             path += "\\track_layout\\Track Layout & Vehicle Data vF.xlsx - Red Line.csv"
             jsonPath += "\\track_layout\\redline-layout.json"
+            trackLayoutPath += "\\track_layout\\Trains Layout - Red Line.csv"
         elif os.name == 'posix':
             path = os.path.abspath(__file__.replace(__name__.replace('.', '/')+'.py', ''))
             jsonPath = path
+            trackLayoutPath = path
             path += "/track_layout/Track Layout & Vehicle Data vF.xlsx - Red Line.csv"
             jsonPath += "/track_layout/redline-layout.json"
+            trackLayoutPath += "/track_layout/Trains Layout - Red Line.csv"
 
-        redline_view_layout, redline_layout, redline_io_layout = extract_layout.parseTrackLayout(path, jsonPath)
+        ## Extracting configuration for the red line
+        redline_view_layout, redline_layout, redlineIOLayout = extract_layout.parseTrackLayout(path, jsonPath)
+        redlineTrack = extract_layout.generateTrackPath(trackLayoutPath, "redline")
+
         self.redline_reference['total-blocks'] = redline_view_layout[0]['total-blocks']
 
         ######## Red Line ########
@@ -73,10 +80,6 @@ class TrackControllerWindow(QtWidgets.QWidget):
         self.verticalLayout_2.setObjectName("verticalLayout_2")
         self.redline_controllers = QtWidgets.QTabWidget(self.redline_tab)
         self.redline_controllers.setObjectName("redline_controllers")
-
-        # for controller in redline_view_layout:
-        #     ## Creating a view tab
-        #     self.addTab("redline_view", self.redline_controllers, controller, redline_view_layout, self.redline_reference, True)
 
         for controller in redline_layout:
             ## Creating a controller tab
@@ -89,15 +92,21 @@ class TrackControllerWindow(QtWidgets.QWidget):
         if os.name == 'nt':
             path = os.path.abspath(__file__.replace(__name__.replace('.', '\\')+'.py', ''))
             jsonPath = path
+            trackLayoutPath = path
             path += "\\track_layout\\Track Layout & Vehicle Data vF.xlsx - Green Line.csv"
             jsonPath += "\\track_layout\\greenline-layout.json"
+            trackLayoutPath += "\\track_layout\\Trains Layout - Green Line.csv"
         elif os.name == 'posix':
             path = os.path.abspath(__file__.replace(__name__.replace('.', '/')+'.py', ''))
             jsonPath = path
+            trackLayoutPath = path
             path += "/track_layout/Track Layout & Vehicle Data vF.xlsx - Green Line.csv"
             jsonPath += "/track_layout/greenline-layout.json"
+            trackLayoutPath += "/track_layout/Trains Layout - Green Line.csv"
 
-        greenline_view_layout, greenline_layout, greenline_io_layout = extract_layout.parseTrackLayout(path, jsonPath)
+        ## Extract configuration for the greenline
+        greenline_view_layout, greenline_layout, greenlineIOLayout = extract_layout.parseTrackLayout(path, jsonPath)
+        greenlineTrack = extract_layout.generateTrackPath(trackLayoutPath, "greenline")
 
         self.greenline_reference['total-blocks'] = greenline_view_layout[0]['total-blocks']
 
@@ -108,10 +117,6 @@ class TrackControllerWindow(QtWidgets.QWidget):
         self.verticalLayout_7.setObjectName("verticalLayout_7")
         self.greenline_controllers = QtWidgets.QTabWidget(self.greenline_tab)
         self.greenline_controllers.setObjectName("greenline_controllers")
-
-        # for controller in greenline_view_layout:
-        #     ## Creating a view tab
-        #     self.addTab("greenline_view", self.greenline_controllers, controller, greenline_view_layout, self.greenline_reference, True)
 
         for controller in greenline_layout:
             ## Creating a controller tab
@@ -128,10 +133,9 @@ class TrackControllerWindow(QtWidgets.QWidget):
         QtCore.QMetaObject.connectSlotsByName(main_window)
 
         ## Setup the WaysideIO class
-        # if self.waysideio_ref != None:
         self.waysideio_ref.setUI(self)
-        self.waysideio_ref.setupLine('red', redline_io_layout)
-        self.waysideio_ref.setupLine('green', greenline_io_layout)
+        self.waysideio_ref.setupLine('red', redlineIOLayout, redlineTrack)
+        self.waysideio_ref.setupLine('green', greenlineIOLayout, greenlineTrack)
 
     ## Open up a file explorer
     def dialog(self):
@@ -458,9 +462,9 @@ class TrackControllerWindow(QtWidgets.QWidget):
                         item = QtWidgets.QTableWidgetItem(value)
                         item.setTextAlignment(4)
                         if not j:
-                            item.setBackground(QtGui.QColor(0xbf, 0xe3, 0xb4))
-                        else:
                             item.setBackground(QtGui.QColor(0xf4, 0x71, 0x74))
+                        else:
+                            item.setBackground(QtGui.QColor(0xbf, 0xe3, 0xb4))
 
                     crossing_table.setItem(row_idx, i.index(j), item)
 
@@ -521,39 +525,28 @@ class TrackControllerWindow(QtWidgets.QWidget):
 
                 if state:
                     item.setBackground(QtGui.QColor(0xf4, 0x71, 0x74))
-                    # item2.setBackground(QtGui.QColor(0xf4, 0x71, 0x74))
                 else:
                     item.setBackground(QtGui.QColor(0xbf, 0xe3, 0xb4))
-                    # item2.setBackground(QtGui.QColor(0xbf, 0xe3, 0xb4))
+
                 self.redline_reference['controllers'][i[0]]['block-table'].setItem(i[1], 2, item)
-            # self.redline_reference['view'][0]['block-table'].setItem(block_num-1, 2, item2)
 
         if line == 'green':
             for i in controller_indices:
 
                 item = QtWidgets.QTableWidgetItem(str(value))
                 item.setTextAlignment(4)
-                # item2 = QtWidgets.QTableWidgetItem(str(value))
-                # item2.setTextAlignment(4)
 
                 if state:
                     item.setBackground(QtGui.QColor(0xf4, 0x71, 0x74))
-                    # item2.setBackground(QtGui.QColor(0xf4, 0x71, 0x74))
                 else:
                     item.setBackground(QtGui.QColor(0xbf, 0xe3, 0xb4))
-                    # item2.setBackground(QtGui.QColor(0xbf, 0xe3, 0xb4))
                 self.greenline_reference['controllers'][i[0]]['block-table'].setItem(i[1], 2, item)
-            # self.greenline_reference['view'][0]['block-table'].setItem(block_num-1, 2, item2)
-
 
     def setFaultState(self, line, block_num, fault_ids=[]):
         if block_num <= 0:
                 print("Err: invalid block number")
 
         controller_indices = self.waysideio_ref.lookupBlock(line, block_num)['controller']
-        # controller_idx = int((block_num-1)/self.numBlocksPerController)
-        # row_idx = (block_num-1) % self.numBlocksPerController
-
         text_str=""
 
         for i,fault in enumerate(fault_ids):
@@ -626,7 +619,6 @@ class TrackControllerWindow(QtWidgets.QWidget):
             value = "OFF"
 
         if line == 'red':
-            # for i in self.redline_reference['controllers'][controller_idx]
             for i in controller_indices:
                 item = QtWidgets.QTableWidgetItem(str(value))
                 item.setTextAlignment(4)
@@ -662,7 +654,7 @@ class TrackControllerWindow(QtWidgets.QWidget):
 
     def setCrossingState(self, line, block_num, state):
         controller_indices = self.waysideio_ref.lookupBlock(line, block_num)['controller']
-    
+
         value = ""
         if state:
             value = "ON"
@@ -677,10 +669,10 @@ class TrackControllerWindow(QtWidgets.QWidget):
                 item = QtWidgets.QTableWidgetItem(str(value))
                 item.setTextAlignment(4)
 
-                if value:
-                    item.setBackground(QtGui.QColor(0xf4, 0x71, 0x74))
-                else:
+                if state:
                     item.setBackground(QtGui.QColor(0xbf, 0xe3, 0xb4))
+                else:
+                    item.setBackground(QtGui.QColor(0xf4, 0x71, 0x74))
 
                 controller_table = self.redline_reference['controllers'][i[0]]
                 if 'crossing-table' in controller_table:
@@ -697,10 +689,10 @@ class TrackControllerWindow(QtWidgets.QWidget):
                 item = QtWidgets.QTableWidgetItem(str(value))
                 item.setTextAlignment(4)
 
-                if value:
-                    item.setBackground(QtGui.QColor(0xf4, 0x71, 0x74))
-                else:
+                if state:
                     item.setBackground(QtGui.QColor(0xbf, 0xe3, 0xb4))
+                else:
+                    item.setBackground(QtGui.QColor(0xf4, 0x71, 0x74))
 
                 controller_table = self.greenline_reference['controllers'][i[0]]
                 if 'crossing-table' in controller_table:
