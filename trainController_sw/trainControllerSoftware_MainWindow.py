@@ -538,7 +538,7 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
         
         ## Inputs from Train Model
         self.signals.currentSpeedOfTrainModel.connect(self.setPID)
-        
+        self.signals.authoritySignal.connect(self.setAuthority)
         ##
                 
         self.retranslateUi()
@@ -731,18 +731,22 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
     
     # Signals Functions
     def setAuthority(self, msg):
-        self.authority = msg
-        self.Authority_lcdDisplay.display(self.authority) #need to convert from ? to miles
-        if(self.authority <= 2):
-            self.signals.serviceBrakeSignal.emit(True) #its a list in the signals class
-            self.waitUntilStopped()          
+        self.authority = msg[0]
+        if(self.authority == False):
+            self.Authority_lcdDisplay.display(0)
+            self.braking_Slider.setValue(1)
+            self.signals.emergencyBrakeSignal.emit(True)
+            self.EmergencyBrakeDisplayBox.setCheckState(True)
+        elif(self.authority == True):
+            self.Authority_lcdDisplay.display(1)                     
     
     def waitUntilStopped(self):
         while(self.current_speed != 0):
             time.sleep(0.001)
-            self.signals.serviceBrakeSignal.emit(True)
+            self.signals.serviceBrakeSignal.emit(1)
         else:
             #wait 30 seconds at station
+            print("STOPPED AT STAION")
             time.sleep(30) 
             self.signals.serviceBrakeSignal.emit(False)
 
