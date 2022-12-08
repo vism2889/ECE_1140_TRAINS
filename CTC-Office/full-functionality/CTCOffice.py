@@ -50,10 +50,24 @@ class CTCOffice(QWidget):
         for key, value in self.redLineBlocks.stations().items():
             self.redLineStations[value]     = [key, False]
 
-        self.greenLineStations["GLENBURY"]      = "65"
-        self.greenLineStations["DORMONT"]       = "76"
-        self.greenLineStations["MT-LEBANON"]    = "77"
-        #self.greenLineStations[ ]
+        self.greenLineStations["GLENBURY"]      = ["65", False]
+        self.greenLineStations["DORMONT"]       = ["76", False]
+        self.greenLineStations["MT-LEBANON"]    = ["77", False]
+        self.greenLineStations["POPLAR"]        = ["88", False]
+        self.greenLineStations["CASTE SHANNON"] = ["77", False]
+        self.greenLineStations["MT-LEBANON"]    = ["77", False]
+        self.greenLineStations["GLENBURY"]      = ["114", False]
+        self.greenLineStations["OVERBROOK"]     = ["122", False]
+        self.greenLineStations["INGLEWOOD"]     = ["131", False]
+        self.greenLineStations["CENTRAL"]       = ["140", False]
+        self.greenLineStations["WHITED"]        = ["22", False]
+        self.greenLineStations["SUSHVILLE"]     = ["16", False]
+        self.greenLineStations["EDGEBROOK"]     = ["9", False]
+        self.greenLineStations["PIONEER"]       = ["2", False]
+        self.greenLineStations["SOUTH BANK"]    = ["31", False]
+        self.greenLineStations["CENTRAL"]       = ["38", False]
+        self.greenLineStations["INGLEWOOD"]     = ["47", False]
+        self.greenLineStations["OVERBROOK"]     = ["56", False]
 
         # select default block
         self.selectedBlock      = 1
