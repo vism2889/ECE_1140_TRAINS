@@ -375,10 +375,11 @@ class WaysideIO(QWidget):
             return self.greenlineControllers[controller].numBlocks
         return -1
 
-    ## Lookup table
+    ## Lookup table (TODO) either keep this or remove it
     def lookupBlock(self, line, blockNum):
         return self.lookupTable[line.lower()][str(blockNum)]
 
+    ## Set a controllers PLC program 
     def uploadPLC(self, line, controllerNum, file):
         ## Redline
         if line.lower() == self.lines[0]:
