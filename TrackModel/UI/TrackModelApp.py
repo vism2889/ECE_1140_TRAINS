@@ -12,10 +12,14 @@
 import sys
 
 # PyQt5 Imports
-from PyQt5.QtWidgets import QInputDialog, QTableWidgetItem, QAbstractItemView, QListWidgetItem, QWidget, QApplication, QFileDialog, QPushButton, QListWidget, QLabel, QLineEdit, QTableWidget, QTableView
+from PyQt5.QtWidgets import QApplication, QInputDialog, QTableWidgetItem, QAbstractItemView, QListWidgetItem, QWidget, QApplication, QFileDialog, QPushButton, QListWidget, QLabel, QLineEdit, QTableWidget, QTableView
 from PyQt5.QtGui import QFont, QColor, QIcon
 from PyQt5 import QtCore
+# if hasattr(QtCore.Qt, 'AA_EnableHighDpiScaling'):
+#     QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling, True)
 
+# if hasattr(QtCore.Qt, 'AA_UseHighDpiPixmaps'):
+#     QApplication.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps, True)
 
 # Developer Imports
 sys.path.append("..\parsers") # tell interpreter where to look for parser files
@@ -85,6 +89,8 @@ class TrackModel(QWidget):
         self.height              = 750
         self.setWindowTitle(self.title)
         self.setGeometry(self.left, self.top, self.width, self.height)
+        #self.setFixedHeight(self.height)
+        #self.setFixedWidth(self.width)
         self.setStyleSheet("background-color: rgb(150,137,130);")
         self.displayLoadLayoutButton()
         # self.center() # Opens UI in the center of the current screen
