@@ -432,7 +432,7 @@ class CTCOffice(QWidget):
 
     def updateTrainInfo(self):
         speed = int(self.selectedTrainLine.getSuggestedSpeed(self.selectedTrain))
-        self.suggestedSpeedLabel.setText("Suggested Speed: " + str(speed) + " mph")
+        self.suggestedSpeedLabel.setText("Suggested Speed: " + str(speed*2.23694) + " mph")
         self.selectedTrainLabel.setText("Selected Train: " + self.selectedTrain)
 
     def redBlockSelectionChanged(self):
