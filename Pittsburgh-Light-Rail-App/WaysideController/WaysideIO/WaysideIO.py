@@ -17,7 +17,6 @@ class Controller():
         self.layout = layout
         self.ui = ui
         self.parent = parent
-        self.logger = parent.logger
 
         ## Function to run PLC program
         self.plc = None
@@ -94,15 +93,12 @@ class Controller():
 
         ## Track Failure (0x01)
         if 0x01 & failures:
-            self.logger.debug(f'track failure on block {blockNum} in line {self.line}')
             faults.append(1)
         ## Circuit Failure
         if 0x02 & failures:
-            self.logger.debug(f'circuit failure on block {blockNum} in line {self.line}')
             faults.append(2)
         ## Power Failure
         if 0x04 & failures:
-            self.logger.debug(f'power failure on block {blockNum} in line {self.line}')
             faults.append(3)
 
         self.parent.ui.setFaultState(self.line, blockNum, faults)
@@ -156,7 +152,6 @@ class Controller():
                 print(f"Errror: Could not import plc script for controller {self.id}")
                 self.plcGood = False
             else:
-                self.parent.logger.debug(f'Plc has been loaded for controller {self.id}')
                 self.plc = mod.run
                 self.plcGood = True
         else:
@@ -174,10 +169,7 @@ class Controller():
         return flag
 
 class WaysideIO(QWidget):
-    def __init__(self, signals, logger):
-        self.logger = logger
-        self.logger.debug("Creating Wayside Controller")
-
+    def __init__(self, signals):
         super().__init__()
 
         ## Signals
@@ -209,7 +201,6 @@ class WaysideIO(QWidget):
     ## Train Location callback that determines authority
     def trainLocationCallback(self, loc):
         if len(loc) != 4:
-            self.logger.warn(f'invalid signal size (trainLocationCallback)')
             return
 
         ## Figure out what line its
@@ -301,19 +292,11 @@ class WaysideIO(QWidget):
         if self.lines[0] == line.lower():
             self.signals.switchState.emit([int(blockNum), state])
             res = self.redlineTrack.setSwitch(int(blockNum), state)
-            if res:
-                self.logger.error(f'could not set switch {blockNum}({res})')
-            else:
-                self.logger.debug(f'({line}line) switch {blockNum} set to {state}')
 
         ## greenline
         if self.lines[1] == line.lower():
             self.signals.switchState.emit([int(blockNum), state])
             res = self.greenlineTrack.setSwitch(int(blockNum), state)
-            if res:
-                self.logger.error(f'could not set switch {blockNum}({res})')
-            else:
-                self.logger.debug(f'({line}line) switch {blockNum} set to {state}')
 
     def setCrossing(self, line, blockNum, state):
         if self.lines[0] == line.lower():
@@ -423,7 +406,6 @@ class WaysideIO(QWidget):
     def setupLine(self, line, layout, track):
         ## Redline
         if line.lower() == self.lines[0]:
-            self.logger.debug(f'setting up {line.lower()} controllers')
             self.redlineTrack = track
             for i, c in enumerate(layout):
                 self.redlineControllers.append(Controller(line.lower(), i, c, self.ui, self))
@@ -431,7 +413,6 @@ class WaysideIO(QWidget):
 
         ## Greenline
         if line.lower() == self.lines[1]:
-            self.logger.debug(f'setting up {line.lower()}line controllers')
             self.greenlineTrack = track
             for i, c in enumerate(layout):
                 self.greenlineControllers.append(Controller(line.lower(), i, c, self.ui, self))
