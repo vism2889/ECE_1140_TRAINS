@@ -18,6 +18,10 @@ import sys
 import os
 import signal
 
+# Signal IMPORTS
+sys.path.append("../SystemSignals")
+from Signals import Signals
+
 # CTC Office IMPORTS
 sys.path.append("../CTC-Office/full-functionality")
 sys.path.append("../CTC-Office/train-functionality")
@@ -44,10 +48,6 @@ from trainmodel_ui import TrainModel
 sys.path.append("../trainController_sw/")
 from trainControllerSoftware_MainWindow import Ui_TrainControllerSW_MainWindow
 
-# Signal IMPORTS
-sys.path.append("../SystemSignals")
-from Signals import Signals
-import sys
 
 class PittsburghLightRail(QWidget):
     def __init__(self, hw):
