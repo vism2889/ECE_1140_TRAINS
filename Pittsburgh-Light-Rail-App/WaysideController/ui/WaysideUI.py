@@ -663,6 +663,10 @@ class TrackControllerWindow(QtWidgets.QWidget):
         controller_indices = self.waysideio_ref.lookupBlock(line, block_num)['controller']
 
         value = ""
+
+        if state == True:
+            exit(1)
+
         if state:
             value = "ON"
         else:
@@ -676,9 +680,7 @@ class TrackControllerWindow(QtWidgets.QWidget):
                 item = QtWidgets.QTableWidgetItem(str(value))
                 item.setTextAlignment(4)
 
-                if state:
-                    item.setBackground(QtGui.QColor(0xbf, 0xe3, 0xb4))
-                else:
+                if value:
                     item.setBackground(QtGui.QColor(0xf4, 0x71, 0x74))
 
                 controller_table = self.redline_reference['controllers'][i[0]]
@@ -696,9 +698,7 @@ class TrackControllerWindow(QtWidgets.QWidget):
                 item = QtWidgets.QTableWidgetItem(str(value))
                 item.setTextAlignment(4)
 
-                if state:
-                    item.setBackground(QtGui.QColor(0xbf, 0xe3, 0xb4))
-                else:
+                if value:
                     item.setBackground(QtGui.QColor(0xf4, 0x71, 0x74))
 
                 controller_table = self.greenline_reference['controllers'][i[0]]

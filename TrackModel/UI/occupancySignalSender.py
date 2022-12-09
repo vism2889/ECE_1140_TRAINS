@@ -30,9 +30,9 @@ class SendOccupancy():
         self.currBlockIndex  = 0
         self.timerr          = 0
         
-        self.occupancy       = [0 for i in range(150)]
-        self.faults          = [0 for i in range(150)]
-        self.maintenance     = [0 for i in range(150)]
+        self.occupancy       = [[False for i in range(76)],[False for i in range(150)]] # only Green line for right not
+        self.faults          = [[0 for i in range(76)],[0 for i in range(150)]]     # only Green line for right not
+        self.maintenance     = [[0 for i in range(76)],[0 for i in range(150)]]
         self.line            = "Green"
         self.lineBlocks      = []
         self.greenLineBlocks = [] 
@@ -41,6 +41,7 @@ class SendOccupancy():
         self.signals.greenLineTrackBlockSignal.connect(self.loadGreenLineBlocks)
         self.signals.trackFailuresSignal.connect(self.updateFaults)
         self.signals.trackBlocksToTrainModelSignal.connect(self.updateLineBlocks)
+        # self.signals.blockFaults.connect(self.updateBlockFaults)
 
         self.occupancyThread = threading.Thread(target=self.timer)
         self.occupancyThread.start()
@@ -69,15 +70,15 @@ class SendOccupancy():
             self.currBlockIndex += 1
             self.distance                         = 0
             self.timerr                           = 0
-            self.occupancy[self.currBlockIndex-1] = 0
-            self.occupancy[self.currBlockIndex]   = 1
+            self.occupancy[1][self.currBlockIndex-1] = 0
+            self.occupancy[1][self.currBlockIndex]   = 1
             
             print("NEW OCCUPANCY:", self.currBlockIndex)
 
         # Emit Occupancy    
         self.signals.occupancyFromTrainSignal.emit(self.occupancy)
         
-        print("Train on Block:", self.currBlockIndex+1)
-        print("FAULTS:\n", self.faults)
-        print("LineBlocks:\n", self.lineBlocks)
-        print("GREEN LINE", self.greenLineBlocks)
+        print("From sender: Train on Block:", self.currBlockIndex+1)
+        print("From sender: FAULTS:\n", self.faults)
+        #print("From sender: LineBlocks:\n", self.lineBlocks)
+        #print("From sender: GREEN LINE", self.greenLineBlocks)
