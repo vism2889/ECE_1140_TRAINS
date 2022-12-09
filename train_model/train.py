@@ -45,16 +45,17 @@ class PointMassModel():
         self.count = 0
         self.ctc_authority = []
         self.speed_up = 1
+        self.waysideAuthority = []
         self.train_authority = [True]
         
         self.suggested_speed = 0
         #track model to train comms
         self.speed_limit = 0
-        
-        self.id = None
 
         self._td = TrainData()
 
+        self.prev_block = None
+        self.curr_block = None
         self.BlockModels = None
         # fname = open(f'{os.getcwd()}/trackblocks', 'rb')
         # self.glBlockMOdels = pickle.load(fname)
@@ -71,7 +72,7 @@ class PointMassModel():
         self.blocks = sec1 + sec2 + sec3 + sec4 + sec5
         # self.blockLens = [random.randint(10,25) for i in range(len(self.blocks))]        
         self.occ_list = [0 for i in range(150)]
-        self.occ_index = self.blocks[0]
+        self.occ_index = 0
 
 
         #time independent values
@@ -262,7 +263,7 @@ class PointMassModel():
         # self.brake_pos = (self.elapsed_time/2)*(self.prev_vel + self.curr_vel)
 
         #block object length calculation
-        curr_block_object = self.BlockModels[self.occ_index]
+        curr_block_object = self.BlockModels[self.curr_block-1]
         self.curr_block_len = curr_block_object.blockLength
         self.curr_block_len = float(self.curr_block_len)
 
@@ -276,16 +277,16 @@ class PointMassModel():
         
         # print(f'-------------------Position: {self.curr_pos}-----------------------------')
         if self.curr_pos >= self.curr_block_len:
-            self.occ_list[self.occ_index] = 0
+            # self.occ_list[self.occ_index] = 0
             #resetting position
             self.curr_pos = self.curr_pos-self.curr_block_len
             self.prev_pos = 0
-
             #incrementing curr_block
-            self.curr_block += 1
+            self.curr_block = self.waysideAuthority[1]
+            self.prev_block = self.waysideAuthority[0]
 
-        self.occ_index = self.blocks[self.curr_block]
-        self.occ_list[self.occ_index] = 1
+        # self.occ_index = self.blocks[self.curr_block-1]
+        # self.occ_list[self.occ_index] = 1
 
         # for authority in self.ctc_authority:
         #     if authority == self.blocks[self.curr_block]:
@@ -347,6 +348,7 @@ class PointMassModel():
 class Train():
     def __init__ (self):
 
+        self.id = None
         self.speed_limit = 0
         
         #block list

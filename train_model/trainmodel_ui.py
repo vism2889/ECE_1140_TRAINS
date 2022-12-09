@@ -47,14 +47,19 @@ class TrainModel(QtWidgets.QMainWindow):
 
     def set_blocks(self,msg):
         #red is msg[0] and green is msg[1]
-        self.t.pm.glBlockModels = msg[1]
-        # file = open('trackblocks', 'wb')
-        # pickle.dump(self.t.pm.glBlockMOdels, file)
-        # file.close()
+        self.t.pm.BlockModels = msg[1]
 
     def dispatch(self, msg):
         self.t.id = msg[0]
-        self.t.line = msg[1]
+        if msg[1] == 'Green Line':
+            self.t.line = 1
+            self.t.pm.prev_block = 0
+            self.t.pm.curr_block = 63
+        else:
+            self.t.pm.prev_block = 0
+            self.t.pm.curr_block = 9
+            self.t.line = 0
+
         # print(f'------------DISPATCHED!!!!!!!!!!!------------------')
         self.t.dispatch()
         self.last_update = time.time()
@@ -62,7 +67,6 @@ class TrainModel(QtWidgets.QMainWindow):
     def curr_t_power(self, msg):
         # print(f'Message is:{msg}')
         # print(f'Message type is: {type(msg)}')
-        p = msg['power']
         # print(f'---------RECEIVED POWER IS: {p}------------------')
         self.t.pm.power = msg['power']
     
@@ -87,6 +91,10 @@ class TrainModel(QtWidgets.QMainWindow):
 
         pass
     
+    def wayside_authority(self,msg):
+        self.t.pm.waysideAuthority = msg[1]
+        print(msg)
+    
     def speedup(self, msg):
         self.t.pm.speed_up = int(msg)
     def UI(self):
@@ -98,6 +106,7 @@ class TrainModel(QtWidgets.QMainWindow):
         self.signals.nonVitalDictSignal.connect(self.non_vitals)
         self.signals.ctcAuthoritySignal.connect(self.ctc_authority)
         self.signals.clockSpeedSignal.connect(self.speedup)
+        self.signals.waysideAuthority.connect(self.wayside_authority)
         # if sys.argv[1] == 'user':
         #     self.test_win.setVisible(False)
         # else:
@@ -226,6 +235,8 @@ class TrainModel(QtWidgets.QMainWindow):
                 # print('PUBLISHING!!!')
                 if self.hw:
                     self.mp.publish()
+            
+            self.signals.trainLocation.emit([self.t.line, self.t.id, self.t.pm.prev_block, self.t.pm.curr_block])
 
         if time.time()-self.brake_update > 0.5:
             if self.t.service_brake == True:
