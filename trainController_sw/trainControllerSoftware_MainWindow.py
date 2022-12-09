@@ -735,8 +735,7 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
         if(self.authority == False):
             self.Authority_lcdDisplay.display(0)
             self.braking_Slider.setValue(1)
-            self.signals.emergencyBrakeSignal.emit(True)
-            self.EmergencyBrakeDisplayBox.setCheckState(True)
+            self.signals.serviceBrakeSignal.emit(True)
         elif(self.authority == True):
             self.Authority_lcdDisplay.display(1)                     
     
