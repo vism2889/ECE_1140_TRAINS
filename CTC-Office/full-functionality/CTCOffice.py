@@ -12,7 +12,7 @@ from TrainDictionary import TrainDictionary
 from LayoutParser import LayoutParser
 from DispatchPopUp import DispatchPopUp
 from ScheduleParser import ScheduleParser
-#from Signals import Signals
+from Signals import Signals
 
 class CTCOffice(QWidget):
     dispatchSignal = QtCore.pyqtSignal(bool)
@@ -24,7 +24,13 @@ class CTCOffice(QWidget):
 
         self.setupLayout()
         self.setupUi()
-        self.signals = signals
+        self.signals        = signals
+        self.trainCount     = 1
+
+        current_time        = QTime.currentTime()
+        self.seconds        = current_time.toString('ss')
+        self.minutes        = current_time.toString('mm')
+        self.hours          = current_time.toString('hh')
 
         # connect to necessary signals
         self.signals.globalOccupancyFromTrackModelSignal.connect(self.readOccupancySignal)
@@ -32,21 +38,40 @@ class CTCOffice(QWidget):
 
     def setupLayout(self):
         # getting lists of blocks
-        layoutFile = 'Track_Layout_PGH_Light_Rail.csv'
-        trackLayout = LayoutParser(layoutFile)
+        layoutFile              = 'Track_Layout_PGH_Light_Rail.csv'
+        trackLayout             = LayoutParser(layoutFile)
         self.redLineBlocks, self.greenLineBlocks = trackLayout.process()
 
         # Create default station dictionary
-        self.redLineStations = dict()
-        self.greenLineStations = dict()
+        self.redLineStations    = dict()
+        self.greenLineStations  = dict()
+
+        # define station lists in order    
         for key, value in self.redLineBlocks.stations().items():
-            self.redLineStations[value] = [key, False]
-        for key, value in self.greenLineBlocks.stations().items():
-            self.greenLineStations[value] = [key, False]
+            self.redLineStations[value]     = [key, False]
+
+        self.greenLineStations["GLENBURY"]       = ["65", False]
+        self.greenLineStations["DORMONT"]        = ["76", False]
+        self.greenLineStations["MT-LEBANON"]     = ["77", False]
+        self.greenLineStations["POPLAR"]         = ["88", False]
+        self.greenLineStations["CASTE SHANNON"]  = ["77", False]
+        self.greenLineStations["MT-LEBANON"]     = ["77", False]
+        self.greenLineStations["GLENBURY"]       = ["114", False]
+        self.greenLineStations["OVERBROOK (OUT)"]= ["122", False]
+        self.greenLineStations["INGLEWOOD (OUT)"]= ["131", False]
+        self.greenLineStations["CENTRAL (OUT)"]  = ["140", False]
+        self.greenLineStations["WHITED"]         = ["22", False]
+        self.greenLineStations["SUSHVILLE"]      = ["16", False]
+        self.greenLineStations["EDGEBROOK"]      = ["9", False]
+        self.greenLineStations["PIONEER"]        = ["2", False]
+        self.greenLineStations["SOUTH BANK"]     = ["31", False]
+        self.greenLineStations["CENTRAL (IN)"]   = ["38", False]
+        self.greenLineStations["INGLEWOOD (IN)"] = ["47", False]
+        self.greenLineStations["OVERBROOK (IN)"] = ["56", False]
 
         # select default block
-        self.selectedBlock = 1
-        self.selectedBlockLine = self.redLineBlocks
+        self.selectedBlock      = 1
+        self.selectedBlockLine  = self.redLineBlocks
         self.redLineTrains      = TrainDictionary()
         self.greenLineTrains    = TrainDictionary()
         self.scheduleParser     = ScheduleParser()
@@ -59,6 +84,7 @@ class CTCOffice(QWidget):
         self.greenLineMaintenance = False
         self.manualMode           = True
         self.tenTimeSpeed         = False
+        self.clockSpeed           = 1000
 
         font = QtGui.QFont()
         font.setPointSize(16)
@@ -231,50 +257,55 @@ class CTCOffice(QWidget):
         self.timer = QtCore.QTimer()
         self.timer.timeout.connect(self.updateRedLineTrainTable)
         self.timer.timeout.connect(self.updateGreenLineTrainTable)
-        self.timer.timeout.connect(self.showTime)
         self.timer.timeout.connect(self.updateBlockTable)
         self.timer.timeout.connect(self.updateRedLineBacklog)
         self.timer.timeout.connect(self.updateGreenLineBacklog)
         self.timer.timeout.connect(self.checkForScheduledTrains)
         self.timer.timeout.connect(self.updateAllBlocks)
-        self.timer.start(100)
+        self.timer.timeout.connect(self.showTime)
+        self.timer.start(10)
+
+        # set up clock timer
+        self.clock = QtCore.QTimer()
+        self.clock.timeout.connect(self.tickClock)
+        self.startClock()
         self.show()
 
+    def tickClock(self):
+        self.seconds = int(self.seconds)
+        self.minutes = int(self.minutes)
+        self.hours   = int(self.hours)
+
+        self.seconds += 1
+        if self.seconds == 60:
+            self.seconds = 0
+            self.minutes += 1
+        if self.minutes == 60:
+            self.hours += 1
+            self.minutes = 0
+        if self.hours == 24:
+            self.hours = 0
+
     def showTime(self):
-        current_time = QTime.currentTime()
-
-        if self.tenTimeSpeed:
-            self.seconds = int(self.seconds)
-            self.minutes = int(self.minutes)
-            self.hours   = int(self.hours)
-
-            self.seconds += 1
-            if self.seconds == 60:
-                self.seconds = 0
-                self.minutes += 1
-            if self.minutes == 60:
-                self.hours += 1
-                self.minutes = 0
-            if self.hours == 24:
-                self.hours = 0
-
-            self.signals.clockSpeedSignal.emit(10)
-
-        else:
-
-            self.seconds = current_time.toString('ss')
-            self.minutes = current_time.toString('mm')
-            self.hours   = current_time.toString('hh')
-
-            self.signals.clockSpeedSignal.emit(1)
-        
         secs = ('%02d' % int(self.seconds))
         mins = ('%02d' % int(self.minutes))
         hours = ('%02d' % int(self.hours))
-        self.clockLabel.setText(str(hours) + ":" + str(mins) + ":" + str(secs))
+        self.clockLabel.setText(str(hours) + ":" + str(mins))
+        self.signals.timeSignal.emit([self.hours, self.minutes])
 
     def toggleTenTimeSpeed(self):
         self.tenTimeSpeed = not self.tenTimeSpeed
+        if self.tenTimeSpeed:
+            self.clockSpeed = 10
+            self.signals.clockSpeedSignal.emit(10)
+        else:
+            self.clockSpeed = 1000
+            self.signals.clockSpeedSignal.emit(1)
+
+        self.startClock()
+
+    def startClock(self):
+        self.clock.start(self.clockSpeed)
 
     def populateRedLineTable(self):
         for key in self.redLineBlocks.keys():
@@ -476,20 +507,26 @@ class CTCOffice(QWidget):
 
     def toggleMaintenance(self):
         self.selectedBlockLine.toggleMaintenanceState(str(self.selectedBlock))
+        maintenanceState = self.selectedBlockLine.getMaintenanceState(str(self.selectedBlock))
+        if self.selectedBlockLine == self.greenLineBlocks:
+            self.signals.signalMaintenance.emit(["Green", self.selectedBlock, maintenanceState])
+        else:
+            self.signals.signalMaintenance.emit(["Red", self.selectedBlock, maintenanceState])
         self.updateMaintenanceState()
 
     def launchDispatchPopUp(self):
         self.dispatchWidget = QtWidgets.QWidget()
         self.dispatchPopUp = DispatchPopUp(self.signals)
-        self.dispatchPopUp.setupUi(self.dispatchWidget, self.redLineStations, self.greenLineStations, self.redLineTrains, self.greenLineTrains)
+        self.dispatchPopUp.setupUi(self.dispatchWidget, self.redLineStations, self.greenLineStations, self.redLineTrains, self.greenLineTrains, self.trainCount)
         self.dispatchPopUp.dispatch.clicked.connect(self.closeDispatchPopUp)
         self.dispatchWidget.show()
     
     def closeDispatchPopUp(self):
         self.dispatchWidget.close()
+        self.trainCount += 1
 
     def uploadSchedule(self):
-        fileName = QFileDialog.getOpenFileName(QtWidgets.QStackedWidget(), 'open file', '/home/garrett/git/ECE_1140_TRAINS/CTC-Office', 'xlsx files (*.xlsx)')
+        fileName = QFileDialog.getOpenFileName(QtWidgets.QStackedWidget(), 'open file', '/home/garrett/git/ECE_1140_TRAINS/CTC-Office', 'csv files (*.csv)')
         self.scheduleParser.loadSchedule(fileName[0], self.redLineStations, self.greenLineStations, self.redLineTrains, self.greenLineTrains)
 
     def checkForScheduledTrains(self):

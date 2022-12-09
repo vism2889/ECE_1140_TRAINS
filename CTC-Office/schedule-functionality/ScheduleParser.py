@@ -1,6 +1,5 @@
-import re
-import pandas as pd
 import csv
+import re
 
 class ScheduleParser:
 
@@ -8,12 +7,7 @@ class ScheduleParser:
         self.readSchedule = csv.reader
 
     def loadSchedule(self, scheduleFile, redLineStations, greenLineStations, redLineTrains, greenLineTrains):
-        self.readFile = pd.read_excel(scheduleFile)
-        self.readFile.to_csv("schedule.csv",
-                            index = None,
-                            header = True)
-
-        with open("schedule.csv") as file:
+        with open(scheduleFile) as file:
             self.readSchedule = csv.reader(file)
 
             for row in self.readSchedule:
