@@ -64,7 +64,7 @@ class Control():
         self.temperature = 0
         self.k_p = 24e3
         self.k_i = 100
-        self.pid = PID(self.k_p, self.k_i, 0, setpoint=self.commanded_speed) # initialize pid with fixed values
+        self.pid = PID(self.k_p, self.k_i, 0, setpoint=0) # initialize pid with fixed values
         self.pid.output_limits = (0, 120000) # clamp at max power output specified in datasheet 120kW
         self.power = 0.0
         self.station_audio = ["shadyside_herron.mp3", "herron_swissvale.mp3", 
@@ -151,7 +151,6 @@ class Control():
 
     def deployEbrake(self, deploy=None):
         if deploy != None:
-            print("deploy: ", deploy)
             self.ebrakeCommand = deploy
             self.output.setEbrakeState(self.ebrakeCommand)
 

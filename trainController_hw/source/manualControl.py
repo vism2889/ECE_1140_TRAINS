@@ -32,7 +32,7 @@ class ManualControl():
         self.c = obj
         self.anal_in = AnalogIn()
         self.commandedSpeed = 0
-        self.service_brake_state = False
+        self.service_brake_state = False 
         self.light_state_internal = False
         self.light_state_external = False
         self.door_state_left = False
@@ -90,7 +90,7 @@ class ManualControl():
             sleep(.5)
 
     def ebrake_button(self):
-        if self.c.vital_override == False:
+        if self.c.vital_override == True:
             if GPIO.input(5) == GPIO.LOW:
                 self.c.ebrakeCommand = True
                 self.c.deployEbrake(True)
