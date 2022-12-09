@@ -106,10 +106,9 @@ class Controller():
             faults.append(3)
 
         self.parent.ui.setFaultState(self.line, blockNum, faults)
-        ## Run PLC program
-        # self.run()
         return self.track['block-states']
 
+    ## Updates the controller maintenance state
     def updateMaintenance(self, blockNum, state):
         self.track['block-maintenance'][blockNum] = state
         self.parent.ui.setMaintenance(self.line, blockNum, state)
@@ -123,6 +122,7 @@ class Controller():
 
         return self.track['switch']
 
+    ## Updates the crossing state of the controller
     def updateCrossing(self):
         for crossing in self.track['crossing']:
             self.parent.setCrossing(self.line, crossing, self.track['crossing'][crossing])
