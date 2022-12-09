@@ -221,12 +221,12 @@ class WaysideIO(QWidget):
         if line.lower() == 'red':
             controllers = self.lookupTable[line.lower()][str(curr)]['controller']
             authority = self.planAuthority(self.redlineControllers[controllers[0][0]], self.redlineTrack, curr, prev)
-            self.signals.waysideAuthority.emit(line.lower(), id, authority)
+            self.signals.waysideAuthority.emit([line.lower(), id, authority])
 
         if line.lower() == 'green':
             controllers = self.lookupTable[line.lower()][str(curr)]['controller']
             authority = self.planAuthority(self.greenlineControllers[controllers[0][0]], self.greenlineTrack, curr, prev)
-            self.signals.waysideAuthority.emit(line.lower(), id, authority)
+            self.signals.waysideAuthority.emit([line.lower(), id, authority])
 
     ##  Driver for most of the logic
     #       Sets block occupancy and eventually runs
