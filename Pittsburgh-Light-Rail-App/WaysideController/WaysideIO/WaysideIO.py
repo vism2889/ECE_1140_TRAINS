@@ -223,6 +223,8 @@ class WaysideIO(QWidget):
     #       Sets block occupancy and eventually runs
     #       the PLC program loaded into the controller
     def blockOccupancyCallback(self, occupancy):
+        print("Occupancy:")
+        print(occupancy)
         redLine = occupancy[0]
         greenLine = occupancy[1]
 
