@@ -30,7 +30,7 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
         #self.connect()
         #self.ManualControl_Connect()
         
-        self.show()
+        #self.show()
         
 
     def setupUi(self):

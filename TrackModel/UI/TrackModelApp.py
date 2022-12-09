@@ -107,7 +107,7 @@ class TrackModel(QWidget):
         self.displayTrackLineList()
         self.displayFaultButtons()
         self.displayBeaconInformationLabels()
-        self.show()
+        #self.show()
 
     def displayLoadLayoutButton(self):
         '''
