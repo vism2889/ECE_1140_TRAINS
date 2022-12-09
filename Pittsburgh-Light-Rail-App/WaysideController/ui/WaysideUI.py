@@ -86,8 +86,6 @@ class TrackControllerWindow(QtWidgets.QWidget):
             ## Creating a controller tab
             self.addTab("redline", self.redline_controllers, controller, redline_layout, self.redline_reference)
 
-        for c in self.redline_reference:
-            print(c)
         self.verticalLayout_2.addWidget(self.redline_controllers)
         self.toolBox.addItem(self.redline_tab, "")
 
@@ -270,7 +268,7 @@ class TrackControllerWindow(QtWidgets.QWidget):
         fault_table.setObjectName(f"{prefix}_{layout.index(controller)}_fault_table")
         fault_table.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
         fault_table.setSelectionMode(QtWidgets.QTableWidget.NoSelection)
-        
+
         fault_table.size()
         if isView:
             fault_table.setColumnCount(4)
@@ -590,7 +588,7 @@ class TrackControllerWindow(QtWidgets.QWidget):
     def checkFaults(self, line, block_num):
         controller_indices = self.waysideio_ref.lookupBlock(line, block_num)['controller']
         good = True
-        
+
         if line == 'red':
             for i in controller_indices:
                 fault_table = self.redline_reference['controllers'][i[0]]['fault-table']
@@ -598,11 +596,11 @@ class TrackControllerWindow(QtWidgets.QWidget):
                 for j in range(size):
                     # if fault_table.item(j[1],2).text() != 'OK':
                     if fault_table.item(j,2).text() != 'OK':
-                        self.redline_controllers.setTabIcon(i[0], QtGui.QIcon("warning.png"))                        
+                        self.redline_controllers.setTabIcon(i[0], QtGui.QIcon("warning.png"))
                         good = False
-            if good: 
+            if good:
                 self.redline_controllers.setTabIcon(i[0], QtGui.QIcon())
-        
+
         if line == 'green':
             for i in controller_indices:
                 fault_table = self.greenline_reference['controllers'][i[0]]['fault-table']
@@ -611,7 +609,7 @@ class TrackControllerWindow(QtWidgets.QWidget):
                     if fault_table.item(j,2).text() != 'OK':
                         self.greenline_controllers.setTabIcon(i[0], QtGui.QIcon("warning.png"))
                         good = False
-            if good: 
+            if good:
                 self.greenline_controllers.setTabIcon(i[0], QtGui.QIcon())
         if good:
             self.checkMaintenance(line, block_num)
@@ -714,7 +712,6 @@ class TrackControllerWindow(QtWidgets.QWidget):
 
         controller_indices = self.waysideio_ref.lookupBlock(line, block_num)['controller']
         good = self.checkFaults(line, block_num)
-        print(f"setting maintenance for {line}:{block_num}, {good}")
 
         if line == 'red':
             for i in controller_indices:
@@ -749,8 +746,6 @@ class TrackControllerWindow(QtWidgets.QWidget):
         if line == 'green':
             for i in controller_indices:
                 value = self.greenline_reference['maintenance'][i[0]]
-                if block_num == 1:
-                    print("aposdijfasdpoifj")
                 if value:
                     self.greenline_controllers.setTabIcon(i[0], QtGui.QIcon("alert.png"))
                 else:

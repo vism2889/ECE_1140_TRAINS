@@ -1,32 +1,8 @@
-[2022-12-08 13:35:30,279] WAYSIDE-MODULE (DEBUG): Creating Wayside Controller
-[2022-12-08 13:35:30,498] WAYSIDE-MODULE (DEBUG): setting up red controllers
-[2022-12-08 13:35:30,499] WAYSIDE-MODULE (DEBUG): setting up greenline controllers
-[2022-12-08 13:35:30,503] WAYSIDE-MODULE (DEBUG): Plc has been loaded for controller 0
-[2022-12-08 13:35:30,506] WAYSIDE-MODULE (DEBUG): Plc has been loaded for controller 1
-[2022-12-08 13:35:30,508] WAYSIDE-MODULE (DEBUG): Plc has been loaded for controller 2
-[2022-12-08 13:35:30,511] WAYSIDE-MODULE (DEBUG): Plc has been loaded for controller 3
-[2022-12-08 13:35:30,514] WAYSIDE-MODULE (DEBUG): Plc has been loaded for controller 4
-[2022-12-08 13:35:31,967] WAYSIDE-MODULE (DEBUG): track failure on block 1 in line green
-[2022-12-08 13:35:31,980] WAYSIDE-MODULE (DEBUG): track failure on block 1 in line green
-[2022-12-08 13:35:32,112] WAYSIDE-MODULE (DEBUG): track failure on block 99 in line green
-[2022-12-08 13:35:32,112] WAYSIDE-MODULE (DEBUG): circuit failure on block 99 in line green
-[2022-12-08 13:35:32,122] WAYSIDE-MODULE (DEBUG): circuit failure on block 150 in line green
-[2022-12-08 13:35:32,129] WAYSIDE-MODULE (DEBUG): circuit failure on block 150 in line green
-[2022-12-08 13:35:32,135] WAYSIDE-MODULE (DEBUG): track failure on block 1 in line green
-[2022-12-08 13:35:32,142] WAYSIDE-MODULE (DEBUG): track failure on block 1 in line green
-[2022-12-08 13:35:32,423] WAYSIDE-MODULE (DEBUG): track failure on block 99 in line green
-[2022-12-08 13:35:32,423] WAYSIDE-MODULE (DEBUG): circuit failure on block 99 in line green
-[2022-12-08 13:35:32,539] WAYSIDE-MODULE (DEBUG): circuit failure on block 150 in line green
-[2022-12-08 13:35:32,546] WAYSIDE-MODULE (DEBUG): circuit failure on block 150 in line green
-[2022-12-08 13:36:08,036] WAYSIDE-MODULE (DEBUG): track failure on block 1 in line green
-[2022-12-08 13:36:08,044] WAYSIDE-MODULE (DEBUG): track failure on block 1 in line green
-[2022-12-08 13:36:08,324] WAYSIDE-MODULE (DEBUG): track failure on block 99 in line green
-[2022-12-08 13:36:08,324] WAYSIDE-MODULE (DEBUG): circuit failure on block 99 in line green
-[2022-12-08 13:36:08,440] WAYSIDE-MODULE (DEBUG): circuit failure on block 150 in line green
-[2022-12-08 13:36:08,446] WAYSIDE-MODULE (DEBUG): circuit failure on block 150 in line green
-[2022-12-08 13:36:08,453] WAYSIDE-MODULE (DEBUG): track failure on block 1 in line green
-[2022-12-08 13:36:08,459] WAYSIDE-MODULE (DEBUG): track failure on block 1 in line green
-[2022-12-08 13:36:08,735] WAYSIDE-MODULE (DEBUG): track failure on block 99 in line green
-[2022-12-08 13:36:08,735] WAYSIDE-MODULE (DEBUG): circuit failure on block 99 in line green
-[2022-12-08 13:36:08,851] WAYSIDE-MODULE (DEBUG): circuit failure on block 150 in line green
-[2022-12-08 13:36:08,858] WAYSIDE-MODULE (DEBUG): circuit failure on block 150 in line green
+[2022-12-08 20:27:00,212] WAYSIDE-MODULE (DEBUG): Creating Wayside Controller
+[2022-12-08 20:27:00,316] WAYSIDE-MODULE (DEBUG): setting up red controllers
+[2022-12-08 20:27:00,317] WAYSIDE-MODULE (DEBUG): setting up greenline controllers
+[2022-12-08 20:27:00,319] WAYSIDE-MODULE (DEBUG): Plc has been loaded for controller 0
+[2022-12-08 20:27:00,322] WAYSIDE-MODULE (DEBUG): Plc has been loaded for controller 1
+[2022-12-08 20:27:00,323] WAYSIDE-MODULE (DEBUG): Plc has been loaded for controller 2
+[2022-12-08 20:27:00,324] WAYSIDE-MODULE (DEBUG): Plc has been loaded for controller 3
+[2022-12-08 20:27:00,326] WAYSIDE-MODULE (DEBUG): Plc has been loaded for controller 4

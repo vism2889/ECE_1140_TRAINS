@@ -1,9 +1,11 @@
 import os
+import sys
 import importlib
+sys.path.append('./extract_layout')
+
 # import threading
 from PLCParser import PLCParser
 from PyQt5.QtWidgets import QWidget
-
 
 ## testing
 from track_layout import extract_layout
@@ -58,7 +60,7 @@ class Controller():
             file = open(f"plc/controller{self.id}.plc")
             self.uploadPLC(file)
             self.maintenance = False
-    
+
     ###############
     ## BLOCK OPS ##
     ###############
@@ -111,10 +113,6 @@ class Controller():
     def updateMaintenance(self, blockNum, state):
         self.track['block-maintenance'][blockNum] = state
         self.parent.ui.setMaintenance(self.line, blockNum, state)
-
-        ## Run PLC program
-        # self.run()
-
         return self.track['block-maintenance']
 
     ## Switches and crossing only get update with the PLC program
@@ -159,15 +157,21 @@ class Controller():
                 self.plcGood = False
             else:
                 self.parent.logger.debug(f'Plc has been loaded for controller {self.id}')
-                # print(f'Plc has been loaded for controller {self.id}')
                 self.plc = mod.run
                 self.plcGood = True
         else:
             print(f"Error: Controller {self.id} not in maintenance mode for PLC upload")
 
-    ## (TODO) Return if a block, in maintenance or has  fault 
+    ## Return if a block, in maintenance or has  fault
     def blockState(self, blockNum):
-        return
+        flag = 0
+
+        if self.track['block'][str(blockNum)]:
+            flag +=1
+        if self.track['block-states'][str(blockNum)]:
+            flag +=1
+
+        return flag
 
 class WaysideIO(QWidget):
     def __init__(self, signals, logger):
@@ -202,8 +206,8 @@ class WaysideIO(QWidget):
     ###############
     ## CALLBACKS ##
     ###############
+    ## Train Location callback that determines authority
     def trainLocationCallback(self, loc):
-
         if len(loc) != 4:
             self.logger.warn(f'invalid signal size (trainLocationCallback)')
             return
@@ -211,26 +215,20 @@ class WaysideIO(QWidget):
         ## Figure out what line its
         line = loc[0]
         id = loc[1] ## train id
-
         prev = loc[2]
         curr = loc[3]
 
-        authority = []
-
         if line.lower() == 'red':
-            ## look at the next 5 blocks in the redline
-            ## append it to auth
-            pass
-        
+            controllers = self.lookupTable[line.lower()][str(curr)]['controller']
+            authority = self.planAuthority(self.redlineControllers[controllers[0][0]], self.redlineTrack, curr, prev)
+            self.signals.waysideAuthority.emit(authority)
+
         if line.lower() == 'green':
-            ##  Look at the next 5 blocks in the greenline
-            ## append it to auth
-            pass
+            controllers = self.lookupTable[line.lower()][str(curr)]['controller']
+            authority = self.planAuthority(self.greenlineControllers[controllers[0][0]], self.greenlineTrack, curr, prev)
+            self.signals.waysideAuthority.emit(authority)
 
-        ## pub to train controller
-        self.signals.waysideAuthority.emit(id, authority)
-        pass
-
+    ## (TODO) Need to add redline (talk to Morgan)
     def blockOccupancyCallback(self, occupancy):
         for i, block in enumerate(occupancy):
             self.setBlockOccupancy('green', i+1, block)
@@ -244,7 +242,7 @@ class WaysideIO(QWidget):
             else:
                 for i, failure in enumerate(failures):
                     self.setFaults('red', i+1, failure)
-    
+
     def maintenanceCallback(self, msg):
         self.setBlockMaintenance(msg[0], msg[1], [msg[2]])
 
@@ -291,17 +289,23 @@ class WaysideIO(QWidget):
                 self.greenlineControllers[c[0]].updateMaintenance(blockNum, state)
 
     def setSwitch(self, line, blockNum, state):
+        ## redline
         if self.lines[0] == line.lower():
             self.signals.switchState.emit([int(blockNum), state])
-            controllers = self.lookupBlock(self.lines[0], blockNum)['controller']
-            # for c in controllers:
-                # self.redline_controllers[c[0]].updateSwitch(blockNum, state)
+            res = self.redlineTrack.setSwitch(int(blockNum), state)
+            if res:
+                self.logger.error(f'could not set switch {blockNum}({res})')
+            else:
+                self.logger.debug(f'({line}line) switch {blockNum} set to {state}')
 
+        ## greenline
         if self.lines[1] == line.lower():
             self.signals.switchState.emit([int(blockNum), state])
-            controllers = self.lookupBlock(self.lines[1], blockNum)['controller']
-            # for c in controllers:
-                # self.greenline_controllers[c[0]].updateSwitch(blockNum, state)
+            res = self.greenlineTrack.setSwitch(int(blockNum), state)
+            if res:
+                self.logger.error(f'could not set switch {blockNum}({res})')
+            else:
+                self.logger.debug(f'({line}line) switch {blockNum} set to {state}')
 
     def setCrossing(self, line, blockNum, state):
         if self.lines[0] == line.lower():
@@ -317,10 +321,51 @@ class WaysideIO(QWidget):
     #############
     ## HELPERS ##
     #############
-    # Check the block occupancy
-    def checkOccupancy(self, line, blockNum):
-    
-        return 
+
+    ## Figure out the next 1-5 blocks that are traversable
+    def planAuthority(self, controller, track, curr, prev):
+        previousBlock = prev
+        currentBlock = curr
+        authority = [curr]
+
+        ## Look at the next five blocks
+        i = 0
+        while i < 5:
+            ## Get the next block
+            nextBlock = track.getNextBlock(currentBlock, previousBlock)
+            if nextBlock == -1:
+                ## Set a 2 block buffer for the authority
+                authority.pop(-1)
+                authority.pop(-1)
+                return authority
+
+            ## Check the state of the block
+            blockOccupied = controller.blockState(nextBlock.id)
+            if not blockOccupied:
+                authority.append(nextBlock.id)
+            else:
+                if len(authority) <= 2:
+                    return [curr]
+
+                ## Set a 2 block buffer for the authority
+                authority.pop(-1)
+                authority.pop(-1)
+                return authority
+
+            previousBlock = currentBlock
+            currentBlock = nextBlock.id
+            i+=1
+
+        return authority
+
+    def checkBlockState(self, line, blockNum):
+        if line.lower() == 'red':
+            controllerNum = self.lookupTable[line.lower()][str(blockNum)]
+            # self.redlineControllers[controllerNum].
+            pass
+
+        if line.lower() == 'green':
+            pass
 
     ## Get the number of blocks in a controller
     def getNumBlocks(self, line, controller):
@@ -328,7 +373,6 @@ class WaysideIO(QWidget):
             return self.redlineControllers[controller].numBlocks
         if line.lower() == 'green':
             return self.greenlineControllers[controller].numBlocks
-        
         return -1
 
     ## Lookup table
@@ -365,7 +409,7 @@ class WaysideIO(QWidget):
     ## Setting a UI reference
     def setUI(self, ui):
         self.ui = ui
-        
+
     ## Setting up the configuration for the redline
     def setupLine(self, line, layout, track):
         ## Redline
@@ -384,8 +428,8 @@ class WaysideIO(QWidget):
                 self.greenlineControllers.append(Controller(line.lower(), i, c, self.ui, self))
                 self.populateTable(i,c, 1)
 
-        
-        # self.ui.setFaultState('red', 1, [1,2,3])
+        # print(self.lookupTable['red'][str(24)])
+
         ## Registering signal callbacks
         self.signals.blockFailures.connect(self.blockFailureCallback)
         self.signals.globalOccupancyFromTrackModelSignal.connect(self.blockOccupancyCallback)
@@ -393,6 +437,7 @@ class WaysideIO(QWidget):
         self.signals.trainLocation.connect(self.trainLocationCallback)
 
 if __name__ == '__main__':
+
     w = WaysideIO(1)
 
     csvPath = os.path.abspath(__file__)
