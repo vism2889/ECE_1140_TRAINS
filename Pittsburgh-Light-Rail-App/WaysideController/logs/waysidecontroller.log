@@ -1,8 +1,0 @@
-[2022-12-09 12:16:13,749] WAYSIDE-MODULE (DEBUG): Creating Wayside Controller
-[2022-12-09 12:16:14,176] WAYSIDE-MODULE (DEBUG): setting up red controllers
-[2022-12-09 12:16:14,177] WAYSIDE-MODULE (DEBUG): setting up greenline controllers
-[2022-12-09 12:16:14,184] WAYSIDE-MODULE (DEBUG): Plc has been loaded for controller 0
-[2022-12-09 12:16:14,193] WAYSIDE-MODULE (DEBUG): Plc has been loaded for controller 1
-[2022-12-09 12:16:14,195] WAYSIDE-MODULE (DEBUG): Plc has been loaded for controller 2
-[2022-12-09 12:16:14,198] WAYSIDE-MODULE (DEBUG): Plc has been loaded for controller 3
-[2022-12-09 12:16:14,207] WAYSIDE-MODULE (DEBUG): Plc has been loaded for controller 4
