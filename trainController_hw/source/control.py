@@ -8,9 +8,7 @@
 
 # TODO:
 # - Generate new message files to take authority as a distance
-# - implement failure states
-#   + failure indicators
-#   + stop train 
+# - implement failure indicators
 # - Implement speed limit 
 #   + train cannot exceed speed limit
 # - Implement next station
@@ -19,6 +17,15 @@
 # - Implement authority
 #   + stop train when authority is reached
 # - Implement station announcement audio for green line
+# - Manual mode cannot override under unsafe conditions
+# - Train does not rapidly accelerate after ebrake is turned off
+# - Redundancy measures
+#   + two different methods of calculating power
+#   + stop train if disparity
+# - Handle safe braking distance for stoping at authority
+# - External lights are turned on and off for underground stations
+# - Switch between automatic and manual mode
+# - Open doors at arrival of station, close upon departure 
 ##############################################################################
 
 import RPi.GPIO as GPIO
