@@ -70,9 +70,6 @@ class Control():
                               "swissvale_penn.mp3", "penn_steelplaza.mp3", 
                               "steelplaza_first.mp3","first_stationSquare.mp3", 
                               "stationSquare_southHills.mp3"]
-        self.station_names = ["Shadyside", "Herron Ave.", "Swissvale", 
-                              "Penn Station", "Steel Plaza", "First Ave",
-                              "Station Square", "South Hills Junction"]
         
     def initializePID(self, kp_val, ki_val):
         self.k_p = kp_val

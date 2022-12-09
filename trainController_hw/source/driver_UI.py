@@ -176,6 +176,7 @@ class Ui_MainWindow():
         palette.setBrush(QtGui.QPalette.Disabled, QtGui.QPalette.PlaceholderText, brush)
         MainWindow.setPalette(palette)
         MainWindow.setStyleSheet("")
+
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.gridLayout_5 = QtWidgets.QGridLayout(self.centralwidget)
@@ -191,20 +192,25 @@ class Ui_MainWindow():
         sizePolicy.setHeightForWidth(self.speedometer.sizePolicy().hasHeightForWidth())
         self.speedometer.setSizePolicy(sizePolicy)
         self.speedometer.setMinimumSize(QtCore.QSize(100, 100))
-        self.speedometer.setMaximumSize(QtCore.QSize(600, 600))
-        self.speedometer.setBaseSize(QtCore.QSize(300, 300))
+        self.speedometer.setMaximumSize(QtCore.QSize(400, 400))
+        self.speedometer.setBaseSize(QtCore.QSize(200, 200))
         self.speedometer.setStyleSheet("")
         self.speedometer.setObjectName("speedometer")
+
         self.powerGauge = AnalogGaugeWidget(self.speedometer)
         self.powerGauge.setGeometry(QtCore.QRect(150, 170, 301, 261))
+        self.powerGauge.setSizePolicy(sizePolicy)
+        self.powerGauge.setMinimumSize(QtCore.QSize(100, 100))
+        self.powerGauge.setMaximumSize(QtCore.QSize(300, 300))
+        self.powerGauge.setBaseSize(QtCore.QSize(200, 200))
+        self.powerGauge.setStyleSheet("")
         self.powerGauge.setObjectName("powerGauge")
         self.verticalLayout.addWidget(self.speedometer)
         self.gridLayout_4.addLayout(self.verticalLayout, 0, 0, 1, 1)
         self.gridLayout_5.addLayout(self.gridLayout_4, 0, 0, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
-        self.statusbar = QtWidgets.QStatusBar(MainWindow)
-        self.statusbar.setObjectName("statusbar")
-        MainWindow.setStatusBar(self.statusbar)
+
+        self.powerGauge.move(50, 70)
 
         
         self.speedometer.value_max = 50
