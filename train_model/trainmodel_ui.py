@@ -85,7 +85,9 @@ class TrainModel(QtWidgets.QMainWindow):
         self.t.pm.ctc_authority = msg
 
         pass
-        
+    
+    def speedup(self, msg):
+        self.t.pm.speed_up = int(msg)
     def UI(self):
         
         self.signals.dispatchTrainSignal.connect(self.dispatch)
@@ -94,6 +96,7 @@ class TrainModel(QtWidgets.QMainWindow):
         self.signals.emergencyBrakeSignal.connect(self.tc_ebrake)
         self.signals.nonVitalDictSignal.connect(self.non_vitals)
         self.signals.ctcAuthoritySignal.connect(self.ctc_authority)
+        self.signals.clockSpeedSignal.connect(self.speedup)
         # if sys.argv[1] == 'user':
         #     self.test_win.setVisible(False)
         # else:

@@ -41,8 +41,10 @@ class TrainData():
 
 class PointMassModel():
     def __init__(self):
+        self.grade = 0.03
+        self.count = 0
         self.ctc_authority = []
-        self.speed_up = 10
+        self.speed_up = 1
         self.train_authority = [True]
         
         self.suggested_speed = 0
@@ -105,6 +107,7 @@ class PointMassModel():
 
         self.power = power
         
+       
         self.calcForce()
         self.calcAccel()
         self.calcVel()
@@ -145,6 +148,7 @@ class PointMassModel():
     def brake(self, val):
 
         self.power = 0
+        
 
         #setting time values
         self.prev_time = self.curr_time
@@ -152,35 +156,43 @@ class PointMassModel():
         self.elapsed_time = (self.curr_time-self.prev_time) * self.speed_up
 
         temp_start_t = 0
-        print(f'Serv Brake velocity before decleration:{self.curr_speed}')
-        print(f'Serv Brake force before deceleration: {self.force}')
-        print(f'Deceleration force is: {self._td.mass_empty * self._td.serv_brake}')
-        print(f'Train acceleration before stop seqeuence: {self.curr_accel}')
-        print(f'Friction Force: {self._td.mass_empty*self._td.kinetic_fric_constant}\n')
+        # print(f'Serv Brake velocity before decleration:{self.curr_speed}')
+        # print(f'Serv Brake force before deceleration: {self.force}')
+        # print(f'Deceleration force is: {self._td.mass_empty * self._td.serv_brake}')
+        # print(f'Train acceleration before stop seqeuence: {self.curr_accel}')
+        # print(f'Friction Force: {self._td.mass_empty*self._td.kinetic_fric_constant}\n')
+        
         if self.curr_vel > 0:
             self.prev_accel = self.curr_accel
             if self.elapsed_time > 0.5:
                 self.curr_accel = self.dec_force(val)
                 self.calcVel()
                 self.calcPos()
-                
+
                 self.prev_time = self.curr_time
             
             self.curr_time = time.time()
             self.elapsed_time = self.curr_time- self.prev_time
 
-            if self.curr_vel < 0:
+            if self.curr_vel <= 0:
                 self.curr_vel = 0
                 
             self.prev_accel = self.curr_accel
 
             
-            if time.time() - temp_start_t > 2:
-                print(f'Current Force is: {self.force}')
-                print(f'Current Acceleration is: {self.curr_accel}')
-                print(f'Current Velocity is: {self.curr_vel}')
-                print(f'Serv Brake decreasing velocity:{self.curr_speed} in {self.elapsed_time}\n')
+            if time.time() - temp_start_t > 5:
+                # print(f'Current Force is: {self.force}')
+                # print(f'Current Acceleration is: {self.curr_accel}')
+                # print(f'Current Velocity is: {self.curr_vel}')
+                # print(f'Serv Brake decreasing velocity:{self.curr_speed} in {self.elapsed_time}\n')
                 temp_start_t = time.time()
+        # elif self.curr_speed <= 0:
+        #     if self.count == 1:
+        #         total_time = time.time()-self.brake_time
+        #         print(f'Braking from {self.brake_start_vel}mph took {total_time} seconds')
+        #         print(f'Train Travelled {self.brake_distance}meters')
+
+        #         self.count += 1
 
         self.power = 0  
         self.force = 0
@@ -197,7 +209,7 @@ class PointMassModel():
         kinetic_friction_force = self._td.mass_empty*9.8*self._td.kinetic_fric_constant
 
         # if self.force > 0: 
-        self.force = self.force-dec_force
+        self.force = self.force-dec_force-kinetic_friction_force
         # else:
         #     self.force -= kinetic_friction_force
             
@@ -207,12 +219,16 @@ class PointMassModel():
     def calcForce(self, brake = False):
         static_friction_force = self._td.mass_empty*9.8*self._td.static_fric_constant
         kinetic_friction_force = self._td.mass_empty*9.8*self._td.kinetic_fric_constant*0.1
+        gradeForce = self._td.mass_empty*9.8*(self.grade)/(1+self.grade**2)**0.5
 
         if self.curr_vel > 0:
             self.force = float(self.power)/float(self.curr_vel)
+            self.force -= kinetic_friction_force
+            self.force -= gradeForce
         else:
             self.force = 120000 * 2
             self.force -= static_friction_force
+            self.force -= gradeForce
             # print(f'force - static force = {self.force}')
 
                 
@@ -243,6 +259,7 @@ class PointMassModel():
         #position calculation
         self.prev_pos = self.curr_pos
         self.curr_pos = self.prev_pos + (self.elapsed_time/2)*(self.prev_vel +self.curr_vel)
+        # self.brake_pos = (self.elapsed_time/2)*(self.prev_vel + self.curr_vel)
 
         #block object length calculation
         curr_block_object = self.glBlockModels[self.occ_index]
@@ -261,7 +278,7 @@ class PointMassModel():
         if self.curr_pos >= self.curr_block_len:
             self.occ_list[self.occ_index] = 0
             
-            #resetting position
+             #resetting position
             self.curr_pos = self.curr_pos-self.curr_block_len
             self.prev_pos = 0
 
@@ -271,12 +288,15 @@ class PointMassModel():
         self.occ_index = self.blocks[self.curr_block]
         self.occ_list[self.occ_index] = 1
 
-        for authority in self.ctc_authority:
-            if authority == self.blocks[self.curr_block]:
-                self.train_authority = [False]
-                self.ctc_authority.remove(authority)
-            else:
-                self.train_authority = [True]
+        # for authority in self.ctc_authority:
+        #     if authority == self.blocks[self.curr_block]:
+        #         if self.train_authority:
+        #             self.train_authority = [False]
+        #         else:
+        #             self.train_authority = [True]
+        #         self.ctc_authority.remove(authority)
+        #     else:
+        #         self.train_authority = [True]
 
             
         # self.calc_authority()
