@@ -55,7 +55,7 @@ class PointMassModel():
 
         self._td = TrainData()
 
-        self.glBlockModels = None
+        self.BlockModels = None
         # fname = open(f'{os.getcwd()}/trackblocks', 'rb')
         # self.glBlockMOdels = pickle.load(fname)
         # fname.close()
@@ -262,7 +262,7 @@ class PointMassModel():
         # self.brake_pos = (self.elapsed_time/2)*(self.prev_vel + self.curr_vel)
 
         #block object length calculation
-        curr_block_object = self.glBlockModels[self.occ_index]
+        curr_block_object = self.BlockModels[self.occ_index]
         self.curr_block_len = curr_block_object.blockLength
         self.curr_block_len = float(self.curr_block_len)
 
@@ -277,8 +277,7 @@ class PointMassModel():
         # print(f'-------------------Position: {self.curr_pos}-----------------------------')
         if self.curr_pos >= self.curr_block_len:
             self.occ_list[self.occ_index] = 0
-            
-             #resetting position
+            #resetting position
             self.curr_pos = self.curr_pos-self.curr_block_len
             self.prev_pos = 0
 

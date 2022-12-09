@@ -46,6 +46,7 @@ class TrainModel(QtWidgets.QMainWindow):
         self.brake_update = time.time()
 
     def set_blocks(self,msg):
+        #red is msg[0] and green is msg[1]
         self.t.pm.glBlockModels = msg[1]
         # file = open('trackblocks', 'wb')
         # pickle.dump(self.t.pm.glBlockMOdels, file)
