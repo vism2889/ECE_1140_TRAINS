@@ -72,7 +72,7 @@ class DispatchPopUp(object):
         self.lineSelection.setItemText(1, _translate("MainWindow", "Green Line"))
         self.dispatch.setText(_translate("MainWindow", "Dispatch"))
 
-        # set red line destination list 
+        # set red line destination list
         self.index = 0
         self.destinationList = self.redLineStations
         self.trainList = self.redLineTrains
@@ -114,7 +114,7 @@ class DispatchPopUp(object):
         elif (self.currentLine == "Green Line"):
             self.destinationList = self.greenLineStations
             self.stationTable.setRowCount(len(self.greenLineStations))
-            
+
             self.index = 0
             for key in self.greenLineStations.keys():
                 TTS = self.stationTable.cellWidget(self.index, 1).value()
@@ -160,7 +160,7 @@ class DispatchPopUp(object):
             self.trainList = self.greenLineTrains
             self.destinationList = self.greenLineStations
             self.stationTable.setRowCount(len(self.greenLineStations))
-            
+
             self.index = 0
             for key in self.greenLineStations.keys():
                 item = QtWidgets.QTableWidgetItem()
@@ -170,7 +170,7 @@ class DispatchPopUp(object):
                 spinBox.setRange(2,5)
                 self.stationTable.setCellWidget(self.index, 1, spinBox)
                 self.index += 1
-        
+
 
     def dispatchTrain(self):
         self.currentLine = self.lineSelection.currentText()
@@ -193,5 +193,5 @@ class DispatchPopUp(object):
 
         self.trainList.sendAuthority(self.trainName, self.signals)
         self.signals.dispatchTrainSignal.emit([self.trainName, self.currentLine, self.suggestedSpeed])
-        
+
 
