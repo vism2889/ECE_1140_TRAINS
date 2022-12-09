@@ -1,7 +1,17 @@
-from PyQt5.QtWidgets import QFileDialog, QMainWindow, QApplication, QWidget, QAction, QTableWidget,QTableWidgetItem,QVBoxLayout, QAbstractItemView
+#!/usr/bin/env python3
+
+##############################################################################
+# AUTHOR(S):   GARRETT MARCINAK
+# DATE:     11/13/2022
+# FILENAME: CTCOffice.py
+# DESCRIPTION:
+#   Launches the CTC Office interface
+##############################################################################
+
 from PyQt5 import QtCore, QtGui, QtWidgets, QtWidgets
-from PyQt5.QtGui import QIcon, QPixmap
-from PyQt5.QtCore import pyqtSlot, QTime, pyqtSignal
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import *
+from PyQt5.QtCore import *
 import sys, os
 
 sys.path.append('../train-functionality/')
@@ -12,7 +22,7 @@ from TrainDictionary import TrainDictionary
 from LayoutParser import LayoutParser
 from DispatchPopUp import DispatchPopUp
 from ScheduleParser import ScheduleParser
-from Signals import Signals
+#from Signals import Signals
 
 class CTCOffice(QWidget):
     dispatchSignal = QtCore.pyqtSignal(bool)
@@ -46,7 +56,7 @@ class CTCOffice(QWidget):
         self.redLineStations    = dict()
         self.greenLineStations  = dict()
 
-        # define station lists in order    
+        # define station lists in order
         for key, value in self.redLineBlocks.stations().items():
             self.redLineStations[value]     = [key, False]
 
@@ -80,6 +90,7 @@ class CTCOffice(QWidget):
         self.setObjectName("self")
         self.setGeometry(10, 10, 600, 580)
         self.setMouseTracking(True)
+        self.setStyleSheet("background-color: #747c8a;")
         self.redLineMaintenance   = False
         self.greenLineMaintenance = False
         self.manualMode           = True
@@ -91,7 +102,7 @@ class CTCOffice(QWidget):
         self.clockLabel = QtWidgets.QLabel(self)
         self.clockLabel.setGeometry(QtCore.QRect(450, 35, 140, 25))
         self.clockLabel.setObjectName("clockLabel")
-        self.clockLabel.setStyleSheet("background-color: gray; border: 1px solid black")
+        self.clockLabel.setStyleSheet("background-color: #7b8fb0; border: 1px solid black")
         self.clockLabel.setAlignment(QtCore.Qt.AlignCenter)
         self.clockLabel.setFont(font)
 
@@ -269,7 +280,7 @@ class CTCOffice(QWidget):
         self.clock = QtCore.QTimer()
         self.clock.timeout.connect(self.tickClock)
         self.startClock()
-        self.show()
+        #self.show()
 
     def tickClock(self):
         self.seconds = int(self.seconds)

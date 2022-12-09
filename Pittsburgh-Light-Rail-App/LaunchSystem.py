@@ -49,14 +49,15 @@ sys.path.append("../SystemSignals")
 from Signals import Signals
 import sys
 
-class PittsburghLightRail():
+class PittsburghLightRail(QWidget):
     def __init__(self, hw):
+        super().__init__()
         self.signals    = Signals()
         self.trackModel = TrackModel(self.signals)
-        self.CTCOffice = CTCOffice(self.signals)
+        self.CTCOffice  = CTCOffice(self.signals)
 
         ## Launch Wayside Controller
-        self.WaysideController = WaysideController(self.signals)
+        self.waysideController = WaysideController(self.signals)
 
         if not hw:
             self.trainController = Ui_TrainControllerSW_MainWindow(self.signals)
@@ -65,6 +66,65 @@ class PittsburghLightRail():
         file = f'{os.getcwd()}/train.ui'
         self.trainModel = TrainModel(file, hw, self.signals)
         self.globalOcc = []
+        self.signals.timeSignal.connect(self.showTime)
+        self.setupUi()
+
+    def setupUi(self):
+        self.setGeometry(1630,50,220,300)
+        self.setStyleSheet("background-color: #747c8a;")
+
+        font = QFont()
+        font.setPointSize(16)
+        self.clockLabel = QLabel(self)
+        self.clockLabel.setGeometry(QRect(60, 10, 100, 25))
+        self.clockLabel.setObjectName("clockLabel")
+        self.clockLabel.setStyleSheet("background-color: #7b8fb0; border: 1px solid black")
+        self.clockLabel.setAlignment(Qt.AlignCenter)
+        self.clockLabel.setFont(font)
+
+        font.setPointSize(14)
+        self.showCTCButton = QPushButton(self)
+        self.showCTCButton.setGeometry(35,40,150,25)
+        self.showCTCButton.clicked.connect(self.CTCOffice.show)
+        self.showCTCButton.setText("CTC Office")
+        self.showCTCButton.setFont(font)
+
+        self.showWaysideControllerButton = QPushButton(self)
+        self.showWaysideControllerButton.setGeometry(35,70,150,25)
+       #self.showWaysideControllerButton.clicked.connect(self.waysideController.show())
+        self.showWaysideControllerButton.setText("Track Controller")
+        self.showWaysideControllerButton.setFont(font)
+
+        self.showTrackModelButton = QPushButton(self)
+        self.showTrackModelButton.setGeometry(35,100,150,25)
+        self.showTrackModelButton.clicked.connect(self.trackModel.show)
+        self.showTrackModelButton.setText("Track Model")
+        self.showTrackModelButton.setFont(font)
+
+        self.showTrainModelButton = QPushButton(self)
+        self.showTrainModelButton.setGeometry(35,130,150,25)
+        self.showTrainModelButton.clicked.connect(self.trainModel.show)
+        self.showTrainModelButton.setText("Train Model")
+        self.showTrainModelButton.setFont(font)
+
+        self.showTrainControllerButton = QPushButton(self)
+        self.showTrainControllerButton.setGeometry(35,160,150,25)
+        self.showTrainControllerButton.clicked.connect(self.trainController.show)
+        self.showTrainControllerButton.setText("Train Controller")
+        self.showTrainControllerButton.setFont(font)
+
+        self.trainImage          = QLabel(self)
+        self.pixmap              = QPixmap('TeamRollingStock1.png')
+        self.trainImage.setPixmap(self.pixmap)
+        self.trainImage.setGeometry(0,190,250,110)
+
+        self.show()
+
+    def showTime(self, msg):
+        hours = ('%02d' % int(msg[0]))
+        mins = ('%02d' % int(msg[1]))
+        self.clockLabel.setText(hours + ":" + mins)
+
 
 ## Commandline CTRL-C ##
 def handler(signum, frame):
