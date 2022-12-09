@@ -52,7 +52,7 @@ class LayoutParser:
         Description Here
         '''
         with open(self.filename, 'r') as csvfile:
-            print("\tParsing Track Layout File: ", self.filename)
+            # print("\tParsing Track Layout File: ", self.filename)
             csvreader   = csv.reader(csvfile)
             self.fields = next(csvreader)
             for row in csvreader:
