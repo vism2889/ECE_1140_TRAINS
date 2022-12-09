@@ -50,24 +50,24 @@ class CTCOffice(QWidget):
         for key, value in self.redLineBlocks.stations().items():
             self.redLineStations[value]     = [key, False]
 
-        self.greenLineStations["GLENBURY"]      = ["65", False]
-        self.greenLineStations["DORMONT"]       = ["76", False]
-        self.greenLineStations["MT-LEBANON"]    = ["77", False]
-        self.greenLineStations["POPLAR"]        = ["88", False]
-        self.greenLineStations["CASTE SHANNON"] = ["77", False]
-        self.greenLineStations["MT-LEBANON"]    = ["77", False]
-        self.greenLineStations["GLENBURY"]      = ["114", False]
-        self.greenLineStations["OVERBROOK"]     = ["122", False]
-        self.greenLineStations["INGLEWOOD"]     = ["131", False]
-        self.greenLineStations["CENTRAL"]       = ["140", False]
-        self.greenLineStations["WHITED"]        = ["22", False]
-        self.greenLineStations["SUSHVILLE"]     = ["16", False]
-        self.greenLineStations["EDGEBROOK"]     = ["9", False]
-        self.greenLineStations["PIONEER"]       = ["2", False]
-        self.greenLineStations["SOUTH BANK"]    = ["31", False]
-        self.greenLineStations["CENTRAL"]       = ["38", False]
-        self.greenLineStations["INGLEWOOD"]     = ["47", False]
-        self.greenLineStations["OVERBROOK"]     = ["56", False]
+        self.greenLineStations["GLENBURY"]       = ["65", False]
+        self.greenLineStations["DORMONT"]        = ["76", False]
+        self.greenLineStations["MT-LEBANON"]     = ["77", False]
+        self.greenLineStations["POPLAR"]         = ["88", False]
+        self.greenLineStations["CASTE SHANNON"]  = ["77", False]
+        self.greenLineStations["MT-LEBANON"]     = ["77", False]
+        self.greenLineStations["GLENBURY"]       = ["114", False]
+        self.greenLineStations["OVERBROOK (OUT)"]= ["122", False]
+        self.greenLineStations["INGLEWOOD (OUT)"]= ["131", False]
+        self.greenLineStations["CENTRAL (OUT)"]  = ["140", False]
+        self.greenLineStations["WHITED"]         = ["22", False]
+        self.greenLineStations["SUSHVILLE"]      = ["16", False]
+        self.greenLineStations["EDGEBROOK"]      = ["9", False]
+        self.greenLineStations["PIONEER"]        = ["2", False]
+        self.greenLineStations["SOUTH BANK"]     = ["31", False]
+        self.greenLineStations["CENTRAL (IN)"]   = ["38", False]
+        self.greenLineStations["INGLEWOOD (IN)"] = ["47", False]
+        self.greenLineStations["OVERBROOK (IN)"] = ["56", False]
 
         # select default block
         self.selectedBlock      = 1
@@ -507,6 +507,11 @@ class CTCOffice(QWidget):
 
     def toggleMaintenance(self):
         self.selectedBlockLine.toggleMaintenanceState(str(self.selectedBlock))
+        maintenanceState = self.selectedBlockLine.getMaintenanceState(str(self.selectedBlock))
+        if self.selectedBlockLine == self.greenLineBlocks:
+            self.signals.signalMaintenance.emit(["Green", self.selectedBlock, maintenanceState])
+        else:
+            self.signals.signalMaintenance.emit(["Red", self.selectedBlock, maintenanceState])
         self.updateMaintenanceState()
 
     def launchDispatchPopUp(self):
