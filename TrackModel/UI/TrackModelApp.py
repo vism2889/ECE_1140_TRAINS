@@ -103,7 +103,8 @@ class TrackModel(QWidget):
     
     def initUI(self):
         '''
-        Initializes all of the objects in the base UI before a given track layout has been loaded or a track line has been selected
+        Initializes all of the objects in the base UI before a given track layout 
+        has been loaded or a track line has been selected
         '''
         # Pyqt Window Properties
         self.title               = 'Track Model - Pittsburgh Light Rail'
@@ -176,7 +177,8 @@ class TrackModel(QWidget):
 
     def displaySwitchList(self):
         '''
-        Creates the table that shows all of the switches and their information respective to the currently loaded line
+        Creates the table that shows all of the switches and their information 
+        respective to the currently loaded line
         '''
         # Switch Information / State Label
         self.switchInfoLabel = QLabel("Switch Information", self)
@@ -205,7 +207,8 @@ class TrackModel(QWidget):
 
     def displayStationList(self):
         '''
-        Creates the table that shows all of the stations and their information respective to the currently loaded line
+        Creates the table that shows all of the stations and their information 
+        respective to the currently loaded line
         '''
         self.stationInfoLabel = QLabel("Station Information", self)
         self.stationInfoLabel.setAlignment(QtCore.Qt.AlignCenter)
@@ -252,7 +255,8 @@ class TrackModel(QWidget):
 
     def updateBlockOccupancyCallback(self):
         '''
-        Checks to see if a line has been loaded, if so then the occupancy is displayed over the list of blocks for that line
+        Checks to see if a line has been loaded, if so then the occupancy is 
+        displayed over the list of blocks for that line
         '''
         if self.currLineIndex != None and self.blocksLoaded == True:
             self.updateBlocksOccupancy()
@@ -362,7 +366,8 @@ class TrackModel(QWidget):
 
     def center(self):
         '''
-        Aligns the main window to the center of the screen upon launching TrackModel application.
+        Aligns the main window to the center of the screen upon launching 
+        TrackModel application.
         '''
         frameGm     = self.frameGeometry()
         screen      = QApplication.desktop().screenNumber(QApplication.desktop().cursor().pos())
@@ -495,11 +500,11 @@ class TrackModel(QWidget):
         self.blockInfolistwidget.insertItem(20, "Switch:               ")
         self.blockInfolistwidget.insertItem(21, "Underground:          ")
         self.blockInfolistwidget.insertItem(22, "Track Heater:         ")
-        self.blockInfolistwidget.insertItem(23, "Switch STATE:         ")
 
     def loadAllLinesBlocks(self):
         '''
-        Loads all the blocks for all the lines in the layout specified with the user provided csv file
+        Loads all the blocks for all the lines in the layout specified 
+        with the user provided csv file
         '''
         i = 0
         for k in range(len(self.lineNames)):
@@ -567,7 +572,8 @@ class TrackModel(QWidget):
 
     def displayLineStations(self):
         ''' 
-        used to display all the stations for a given line, the boarding and exiting passengers, and the block at which the station exists
+        used to display all the stations for a given line, the boarding and 
+        exiting passengers, and the block at which the station exists
         '''
         for i in range(len(self.stations[self.currLineIndex])):
             self.stationInfoTable.setItem(i, 0, QTableWidgetItem(self.stations[self.currLineIndex][i][0]))
@@ -577,7 +583,8 @@ class TrackModel(QWidget):
 
     def displayLineSwitches(self):
         '''
-        Used to display all the switches for a given line, the switch state, and the block at which the switch exists
+        Used to display all the switches for a given line, the switch state, 
+        and the block at which the switch exists
         '''
         
         for i in range(len(self.switchText[self.currLineIndex])):
@@ -680,7 +687,7 @@ class TrackModel(QWidget):
             else:
                 self.blockVallistwidget.insertItem(13,str(False))
                 self.blockVallistwidget.item(13).setForeground(QtCore.Qt.red) 
-            self.blockVallistwidget.insertItem(14,"NA")
+            self.blockVallistwidget.insertItem(14, str(self.lineBlocks[1][self.currBlockIndex].switchState))
             self.blockVallistwidget.item(14).setForeground(QtCore.Qt.gray) 
 
             if ("CROSSING" in currBlock.infrastructure):
@@ -720,7 +727,6 @@ class TrackModel(QWidget):
             self.blockVallistwidget.item(21).setForeground(QtCore.Qt.red)
             
             self.blockVallistwidget.insertItem(22,str(self.heaterOn))
-            self.blockVallistwidget.insertItem(23, str(self.lineBlocks[1][self.currBlockIndex].switchState))
         
     def displayBeaconInformationLabels(self):
         '''
@@ -749,19 +755,19 @@ class TrackModel(QWidget):
     
     def getOccupancy(self, occupancy):
         '''
-        Description here
+        Updates all occupancy related displays and emits a new global occupancy
         '''
         self.occupancy = occupancy
         # print("GUI OCCUPANCY", self.occupancy)
         self.signals.globalOccupancyFromTrackModelSignal.emit(self.occupancy) # should emit a new global occupancy
         self.updateBlockOccupancyCallback()
 
-    def updateBlockList(self, line):
-        '''
-        Description here
-        '''
-        for block in self.lineBlocks[line]:
-            block.occupancy = 5
+    # def updateBlockList(self, line):
+    #     '''
+    #     Description here
+    #     '''
+    #     for block in self.lineBlocks[line]:
+    #         block.occupancy = 5
 
 
     def addPassngersToStations(self):
@@ -772,14 +778,16 @@ class TrackModel(QWidget):
 
     def generateBoardingPassengers(self):
         '''
-        Generates a random number of passengers between 1-99 to board the next arriving train
+        Generates a random number of passengers between 1-99 to board the next 
+        arriving train
         '''
         boardingPassengers = random.randint(0,50)
         return boardingPassengers
 
     def generateLeavingPassengers(self):
         '''
-        Generates a random number of passengers between 1-99 to exit the next arriving train
+        Generates a random number of passengers between 1-99 to exit the next 
+        arriving train
         '''
         leavingPassengers = random.randint(0, 50)
         return leavingPassengers
