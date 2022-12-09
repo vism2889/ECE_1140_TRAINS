@@ -15,6 +15,7 @@ class Controller():
         self.layout = layout
         self.ui = ui
         self.parent = parent
+        self.logger = parent.logger
 
         ## Function to run PLC program
         self.plc = None
@@ -56,7 +57,7 @@ class Controller():
             self.uploadPLC(file)
             self.maintenance = False
 
-    ## Get Current Track State ##
+    ## Get Current Track State
     def getTrack(self):
         return self.track
 
@@ -68,26 +69,49 @@ class Controller():
 
         ## Run PLC program
         self.run()
+
+        ## update outputs
         self.updateSwitch()
+        self.updateCrossing()
+
         return self.track['block']
 
     ## Update block failures
     def updateFailures(self, blockNum, failures):
         self.track['block-states'][blockNum] = failures
-        self.ui.setFaultState(self.line, blockNum, failures)
+
+        ## Extract the individual faults
+        faults = []
+
+        ## Track Failure (0x01)
+        if 0x01 & failures:
+            self.logger.debug(f'track failure on block {blockNum}')
+            faults.append(0x01)
+        ## Circuit Failure
+        if 0x02 & failures:
+            self.logger.debug(f'circuit failure on block {blockNum}')
+            faults.append(0x02)
+        ## Power Failure
+        if 0x04 & failures:
+            self.logger.debug(f'power failure on block {blockNum}')
+            faults.append(0x03)
+
+        self.ui.setFaultState(self.line, blockNum, faults)
         ## Run PLC program
-        self.run()
+        # self.run()
         return self.track['block-states']
 
     def updateMaintenance(self, blockNum, state):
         self.track['block-maintenance'][blockNum] = state
         self.ui.setMaintenance(self.line, blockNum, state)
+
         ## Run PLC program
         self.run()
+
         return self.track['block-maintenance']
 
+    ## Switches and crossing only get update with the PLC program
     def updateSwitch(self):
-        ## Run PLC program ##
         for switch in self.track['switch']:
             self.parent.setSwitch(self.line, switch, self.track['switch'][switch])
             self.ui.setSwitchState(self.line, int(switch), self.track['switch'][switch])
@@ -96,21 +120,18 @@ class Controller():
 
     def updateCrossing(self):
         for crossing in self.track['crossing']:
-            print(crossing)
-            if int(crossing) == 19:
-                print(self.track['crossing'][crossing])
-                exit()
             self.parent.setCrossing(self.line, crossing, self.track['crossing'][crossing])
             self.ui.setCrossingState(self.line, int(crossing), self.track['crossing'][crossing])
 
+        ## Run PLC program
         return self.track['crossing']
 
-    ## Toggle maintenance mode FOR THE CONTROLLER ##
+    ## Toggle maintenance mode (FOR THE CONTROLLER)
     def toggleMaintence(self):
         self.maintenance != self.maintenance
         return self.maintenance
 
-    ## Run the PLCs ##
+    ## Run the PLCs
     def run(self):
         if self.plcGood:
             try:
@@ -130,28 +151,34 @@ class Controller():
                 print(f"Errror: Could not import plc script for controller {self.id}")
                 self.plcGood = False
             else:
-                print(f'Plc has been loaded for controller {self.id}')
+                self.parent.logger.debug(f'Plc has been loaded for controller {self.id}')
+                # print(f'Plc has been loaded for controller {self.id}')
                 self.plc = mod.run
                 self.plcGood = True
         else:
             print(f"Error: Controller {self.id} not in maintenance mode for PLC upload")
 
 class WaysideIO(QWidget):
-    def __init__(self, signals):
+    def __init__(self, signals, logger):
+        self.logger = logger
+        self.logger.debug("Creating Wayside Controller")
+
         super().__init__()
 
-        ## Signals ##
+        ## Signals
         self.signals = signals
-        #############
 
+        ## UI reference
         self.ui = None
 
-        self.track = {}
+        self.redlineTrack = None
+        self.greenlineTrack = None
+
         self.lines = ['red', 'green']
 
-        ## Hold each controller
-        self.redline_controllers = []
-        self.greenline_controllers = []
+        ## List for each controller
+        self.redlineControllers = []
+        self.greenlineControllers = []
 
         ## Block, Switch, Crossing lookup tables
         self.lookupTable = {
@@ -159,14 +186,20 @@ class WaysideIO(QWidget):
             'green' : {}
         }
 
-    ## Callback for block occupancies from track ##
+    ###############
+    ## CALLBACKS ##
+    ###############
     def blockOccupancyCallback(self, occupancy):
         for i, block in enumerate(occupancy):
             self.setBlockOccupancy('green', i+1, block)
 
-    ## Setup and reference to UI ##
-    def setUI(self, ui):
-        self.ui = ui
+    def blockFailureCallback(self, blockFailures):
+        if len(blockFailures) == 150:
+            for i, failure in enumerate(blockFailures):
+                self.setFaults('green', i+1, failure)
+        else:
+            for i, failure in enumerate(blockFailures):
+                self.setFaults('red', i+1, failure)
 
     def filterSpeed(self, line, blockNum, speed):
         if int(self.lookupTable[line.lower()][str(blockNum)]['speed-limit']) < speed:
@@ -174,39 +207,41 @@ class WaysideIO(QWidget):
         else:
             return speed
 
-    #############   ## SETTERS ##   #############   #############
+    #############
+    ## SETTERS ##
+    #############
     def setFaults(self, line, blockNum, failures):
         if self.lines[0] == line.lower():
             controllers = self.lookupBlock(self.lines[0], blockNum)['controller']
             for c in controllers:
-                self.redline_controllers[c[0]].updateFailures(blockNum, failures)
+                self.redlineControllers[c[0]].updateFailures(blockNum, failures)
 
         if self.lines[1] == line.lower():
             controllers = self.lookupBlock(self.lines[1], blockNum)['controller']
             for c in controllers:
-                self.greenline_controllers[c[0]].updateFailures(blockNum, failures)
+                self.greenlineControllers[c[0]].updateFailures(blockNum, failures)
 
     def setBlockOccupancy(self, line, blockNum, state):
         if self.lines[0] == line.lower():
             controllers = self.lookupBlock(self.lines[0], blockNum)['controller']
             for c in controllers:
-                self.redline_controllers[c[0]].updateOccupancy(blockNum, state)
+                self.redlineControllers[c[0]].updateOccupancy(blockNum, state)
 
         if self.lines[1] == line.lower():
             controllers = self.lookupBlock(self.lines[1], blockNum)['controller']
             for c in controllers:
-                self.greenline_controllers[c[0]].updateOccupancy(blockNum, state)
+                self.greenlineControllers[c[0]].updateOccupancy(blockNum, state)
 
     def setBlockMaintenance(self, line, blockNum, state):
         if self.lines[0] == line.lower():
             controllers = self.lookupBlock(self.lines[0], blockNum)['controller']
             for c in controllers:
-                self.redline_controllers[c[0]].updateMaintenance(blockNum, state)
+                self.redlineControllers[c[0]].updateMaintenance(blockNum, state)
 
         if self.lines[1] == line.lower():
             controllers = self.lookupBlock(self.lines[1], blockNum)['controller']
             for c in controllers:
-                self.greenline_controllers[c[0]].updateMaintenance(blockNum, state)
+                self.greenlineControllers[c[0]].updateMaintenance(blockNum, state)
 
     def setSwitch(self, line, blockNum, state):
         if self.lines[0] == line.lower():
@@ -224,83 +259,77 @@ class WaysideIO(QWidget):
     def setCrossing(self, line, blockNum, state):
         if self.lines[0] == line.lower():
             controllers = self.lookupBlock(self.lines[0], blockNum)['controller']
-            for c in controllers:
-                self.redline_controllers[c[0]].updateCrossing(blockNum, state)
+            # for c in controllers:
+            #     self.redline_controllers[c[0]].updateCrossing(blockNum, state)
 
         if self.lines[1] == line.lower():
             controllers = self.lookupBlock(self.lines[1], blockNum)['controller']
-            for c in controllers:
-                self.greenline_controllers[c[0]].updateCrossing(blockNum, state)
-    #############   #############   #############   #############   #############
+            # for c in controllers:
+            #     self.greenline_controllers[c[0]].updateCrossing(blockNum, state)
 
+    #############
+    ## HELPERS ##
+    #############
+    ## Lookup table
     def lookupBlock(self, line, blockNum):
         return self.lookupTable[line.lower()][str(blockNum)]
 
     def uploadPLC(self, line, controllerNum, file):
         ## Redline
         if line.lower() == self.lines[0]:
-            self.redline_controllers[controllerNum].uploadPLC(file)
+            self.redlineControllers[controllerNum].uploadPLC(file)
 
         ## Greenline
         if line.lower() == self.lines[1]:
-            self.greenline_controllers[controllerNum].uploadPLC(file)
+            self.greenlineControllers[controllerNum].uploadPLC(file)
 
-    def setupLine(self, line, layout):
+    def populateTable(self, i, c, line):
+        idx = 0
+        for sec in c['sections']:
+            for block in c['sections'][sec]['blocks']:
+                entry = self.lookupTable[self.lines[line]]
+                if block[0] not in entry:
+                    entry[block[0]] = {
+                        'controller' : [],
+                    }
+                ## Mapped data for a block
+                entry[block[0]]['controller'].append((i,idx))
+                entry[block[0]]['section'] = sec
+                entry[block[0]]['speed-limit'] = block[1]
+                idx+=1
+
+    ###########
+    ## SETUP ##
+    ###########
+    ## Setting a UI reference
+    def setUI(self, ui):
+        self.ui = ui
+
+    ## Setting up the configuration for the redline
+    def setupLine(self, line, layout, track):
         ## Redline
         if line.lower() == self.lines[0]:
+            self.redlineTrack = track
             for i, c in enumerate(layout):
-                self.redline_controllers.append(Controller(line.lower(), i, c, self.ui, self))
-
-                ## Populate lookup table
-                idx = 0
-                for sec in c['sections']:
-                    for block in c['sections'][sec]['blocks']:
-                        entry = self.lookupTable[self.lines[0]]
-                        if block[0] not in entry:
-                            entry[block[0]] = {
-                                'controller' : [],
-                            }
-                        ## Mapped data for a block
-                        entry[block[0]]['controller'].append((i,idx))
-                        entry[block[0]]['section'] = sec
-                        entry[block[0]]['speed-limit'] = block[1]
-                        idx+=1
+                self.redlineControllers.append(Controller(line.lower(), i, c, self.ui, self))
+                self.populateTable(i, c, 0)
 
         ## Greenline
         if line.lower() == self.lines[1]:
+            self.greenlineTrack = track
             for i, c in enumerate(layout):
-                self.greenline_controllers.append(Controller(line.lower(), i, c, self.ui, self))
-                # if i ==
-                ## Populate lookup table
-                idx = 0
-                for sec in c['sections']:
-                    for block in c['sections'][sec]['blocks']:
-                        entry = self.lookupTable[self.lines[1]]
-                        if block[0] not in entry:
-                            entry[block[0]] = {
-                                'controller' : [],
-                            }
+                self.greenlineControllers.append(Controller(line.lower(), i, c, self.ui, self))
+                self.populateTable(i,c, 1)
 
-                        ## Mapped data for a block
-                        entry[block[0]]['controller'].append((i,idx))
-                        entry[block[0]]['section'] = sec
-                        entry[block[0]]['speed-limit'] = block[1]
-                        idx+=1
-
+        ## Registering signal callbacks
+        self.signals.blockFailures.connect(self.blockFailureCallback)
         self.signals.globalOccupancyFromTrackModelSignal.connect(self.blockOccupancyCallback)
-        # print(self.lookupTable['green'])
 
 if __name__ == '__main__':
     w = WaysideIO(1)
 
-    ## Testing configuration
-    # csvPath = os.getcwd()
-    # jsonPath = os.getcwd()
-
     csvPath = os.path.abspath(__file__)
     jsonPath = os.path.abspath(__file__)
-
-    # print(csvPath)
 
     if os.name == 'nt':
         csvPath += "\\track_layout\\Track Layout & Vehicle Data vF.xlsx - Green Line.csv"

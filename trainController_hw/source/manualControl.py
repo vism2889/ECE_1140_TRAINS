@@ -1,3 +1,12 @@
+##############################################################################
+# AUTHOR:   Juin Sommer
+# DATE:     11/17/2022
+# FILENAME: manualControl.pu
+# DESCRIPTION:
+# Class to define manual control functionality for the Train Driver UI
+# interfacing with hardware (RPi GPIO). Defines inputs to RPi.
+##############################################################################
+
 import RPi.GPIO as GPIO
 from time import sleep
 from pygame import mixer
@@ -43,9 +52,9 @@ class ManualControl():
 
     def setCommandedSpeed(self):
         if self.ebrake_state == False:
-            self.commandedSpeed = self.anal_in.getSpeedValue()
-            self.c.setSpeed(self.commandedSpeed)
-            return self.commandedSpeed
+            speed = self.anal_in.getSpeedValue()
+            self.commandedSpeed = speed / 2.3694
+            #print("\nManual Commanded Speed: %2d" % speed, end="", flush=True)
 
         else: self.commandedSpeed = 0
 
@@ -94,4 +103,5 @@ class ManualControl():
         self.c.setTemperature(temp)
 
     def calculatePower(self):
-        self.c.getPowerOutput(self.commandedSpeed)
+        power = self.c.getPowerOutput(self.commandedSpeed)
+        return power

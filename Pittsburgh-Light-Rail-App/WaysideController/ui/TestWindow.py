@@ -2,6 +2,8 @@
 import sys
 from  PyQt5 import QtWidgets
 
+sys.path.append('track_layout')
+
 # Important:
 # You need to run the following command to generate the ui_form.py file
 #     pyside6-uic form.ui -o ui_form.py, or

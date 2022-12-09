@@ -12,46 +12,65 @@ class DispatchPopUp(object):
     def __init__(self, signals):
         super().__init__()
         self.signals = signals
+        self.currentLine = "Red Line"
 
-    def setupUi(self, dispatchPopUp, redLineStations, greenLineStations, redLineTrains, greenLineTrains):
-        dispatchPopUp.setGeometry(400, 50, 200, 250)
-        self.trainNameEntry = QtWidgets.QLineEdit(dispatchPopUp)
-        self.trainNameEntry.setGeometry(QtCore.QRect(20, 10, 100, 21))
+    def setupUi(self, dispatchPopUp, redLineStations, greenLineStations, redLineTrains, greenLineTrains, trainCount):
+        dispatchPopUp.setGeometry(400, 50, 220, 250)
 
         self.redLineStations = redLineStations
         self.greenLineStations = greenLineStations
         self.redLineTrains = redLineTrains
         self.greenLineTrains = greenLineTrains
+        self.trainCount = trainCount
+
+        font = QtGui.QFont()
+        font.setPointSize(14)
+        self.clockLabel = QtWidgets.QLabel(dispatchPopUp)
+        self.clockLabel.setGeometry(QtCore.QRect(110,31,110,23))
+        self.clockLabel.setStyleSheet("background-color: gray; border: 1px solid black")
+        self.clockLabel.setAlignment(QtCore.Qt.AlignCenter)
+        self.clockLabel.setFont(font)
+
+        self.clockSpinBox = QtWidgets.QSpinBox(dispatchPopUp)
+        self.clockSpinBox.setGeometry(QtCore.QRect(110,31,110,23))
+        self.clockSpinBox.setRange(0,23)
+        self.clockSpinBox.hide()
 
         self.lineSelection = QtWidgets.QComboBox(dispatchPopUp)
-        self.lineSelection.setGeometry(QtCore.QRect(20, 40, 100, 23))
+        self.lineSelection.setGeometry(QtCore.QRect(0,30,110,25))
         self.lineSelection.addItem("")
         self.lineSelection.addItem("")
 
+        self.timeSelection = QtWidgets.QRadioButton(dispatchPopUp)
+        self.timeSelection.setGeometry(5,2,125,25)
+        self.timeSelection.setText("Set Dispatch Time")
+        self.timeSelection.clicked.connect(self.setTimeSelection)
+
         self.stationTable = QtWidgets.QTableWidget(dispatchPopUp)
-        self.stationTable.setGeometry(20,70,150,130)
+        self.stationTable.setGeometry(0,55,220,170)
         self.stationTable.setMouseTracking(True)
         self.stationTable.setSelectionMode(QAbstractItemView.MultiSelection)
         self.stationTable.setRowCount(len(self.redLineStations))
-        self.stationTable.setColumnCount(2)
-        self.stationTable.setColumnWidth(1, 12)
-        self.stationTable.horizontalHeader().hide()
+        self.stationTable.setColumnCount(3)
+        self.stationTable.setColumnWidth(1, 58)
+        self.stationTable.setColumnWidth(2, 45)
+        self.stationTable.setHorizontalHeaderLabels(['Station', 'TTS(min)', 'Arrival'])
         self.stationTable.verticalHeader().hide()
 
         self.dispatch = QtWidgets.QPushButton(dispatchPopUp)
-        self.dispatch.setGeometry(QtCore.QRect(20, 210, 100, 25))
+        self.dispatch.setGeometry(QtCore.QRect(0, 225, 220, 25))
 
         self.retranslateUi()
         QtCore.QMetaObject.connectSlotsByName(dispatchPopUp)
         self.lineSelection.activated.connect(self.updateDestinationList)
         self.dispatch.clicked.connect(self.dispatchTrain)
+        self.signals.timeSignal.connect(self.showTime)
 
     def retranslateUi(self):
         _translate = QtCore.QCoreApplication.translate
         self.lineSelection.setItemText(0, _translate("MainWindow", "Red Line"))
         self.lineSelection.setItemText(1, _translate("MainWindow", "Green Line"))
         self.dispatch.setText(_translate("MainWindow", "Dispatch"))
-        self.trainNameEntry.clear()
 
         # set red line destination list 
         self.index = 0
@@ -66,9 +85,61 @@ class DispatchPopUp(object):
             self.stationTable.setCellWidget(self.index, 1, spinBox)
             self.index += 1
 
+    def setTimeSelection(self):
+        if self.timeSelection.isChecked():
+            self.clockSpinBox.show()
+            self.clockLabel.hide()
+        else:
+            self.clockSpinBox.hide()
+            self.clockLabel.show()
+
+    def showTime(self, msg):
+        mins = ('%02d' % msg[1])
+        hours = ('%02d' % msg[0])
+        time = hours + ":" + mins
+        self.clockLabel.setText(time)
+        if (self.currentLine == "Red Line"):
+            self.destinationList = self.redLineStations
+            self.stationTable.setRowCount(len(self.redLineStations))
+
+            self.index = 0
+            for key in self.redLineStations.keys():
+                TTS = self.stationTable.cellWidget(self.index, 1).value()
+                hours, mins = self.getArrivalTime(int(hours), int(mins), TTS)
+                item = QtWidgets.QTableWidgetItem()
+                item.setText(hours + ":" + mins)
+                self.stationTable.setItem(self.index, 2, item)
+                self.index += 1
+
+        elif (self.currentLine == "Green Line"):
+            self.destinationList = self.greenLineStations
+            self.stationTable.setRowCount(len(self.greenLineStations))
+            
+            self.index = 0
+            for key in self.greenLineStations.keys():
+                TTS = self.stationTable.cellWidget(self.index, 1).value()
+                hours, mins = self.getArrivalTime(int(hours), int(mins), TTS)
+                item = QtWidgets.QTableWidgetItem()
+                item.setText(hours + ":" + mins)
+                self.stationTable.setItem(self.index, 2, item)
+                self.index += 1
+
+    def getArrivalTime(self, hours, mins, TTS):
+        mins = mins + TTS
+        if mins > 59:
+            mins = mins % 60
+            hours += 1
+        if hours > 23:
+            hours = 0
+
+        mins = ('%02d' % mins)
+        hours = ('%02d' % hours)
+        return hours, mins
+
     def updateDestinationList(self):
         self.currentLine = self.lineSelection.currentText()
         self.stationTable.clear()
+        self.stationTable.setHorizontalHeaderLabels(['Station', 'TTS', 'Arrival'])
 
         if (self.currentLine == "Red Line"):
             self.trainList = self.redLineTrains
@@ -99,11 +170,12 @@ class DispatchPopUp(object):
                 spinBox.setRange(2,5)
                 self.stationTable.setCellWidget(self.index, 1, spinBox)
                 self.index += 1
+        
 
     def dispatchTrain(self):
         self.currentLine = self.lineSelection.currentText()
         self.selectedDestinations = self.stationTable.selectedItems()
-        self.trainName = self.trainNameEntry.text()
+        self.trainName = "Train " + str(self.trainCount)
         self.totalTTS = 0
 
         for row in range(0,self.stationTable.rowCount()):
@@ -121,6 +193,5 @@ class DispatchPopUp(object):
 
         self.trainList.sendAuthority(self.trainName, self.signals)
         self.signals.dispatchTrainSignal.emit([self.trainName, self.currentLine, self.suggestedSpeed])
-
         
 

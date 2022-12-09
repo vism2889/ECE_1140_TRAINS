@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 
 ##############################################################################
-# AUTHOR(S):    Morgan Visnesky, Garrett Marcinak
+# AUTHOR(S):    Morgan Visnesky, Garrett Marcinak, Nathaniel Mallick
 # DATE:         11/13/2022
 # FILENAME:     occupancySignalSender.py
 # DESCRIPTION:
 #   Used to hold all signals used for inter-module communications in the
 #   Pittsburgh Light Rail Track System
+# Last Updated: 12/7/2022 - Nathaniel Mallick 
 ##############################################################################
 
 from PyQt5 import QtCore
@@ -34,24 +35,24 @@ class Signals(QWidget):
     # Above could be a single list signal formatted as below:
     # ["TrackLineName", [lineOccupancy], [lineSwitchStates], [lineMaintenance], [lineFailures]]
 
-
     # CTC Office Signals
     dispatchTrainSignal      = QtCore.pyqtSignal(list)
-    suggestedSpeedSignal     = QtCore.pyqtSignal(list)
+    suggestedSpeedSignal     = QtCore.pyqtSignal(list) # List of length 2 [(int) train id, (int) suggested speed]
+    ctcAuthoritySignal       = QtCore.pyqtSignal(list)
+    clockSpeedSignal         = QtCore.pyqtSignal(int)
+    signalMaintenance        = QtCore.pyqtSignal(list) # List of length 3 [(str) line, (int) block #, (bool) maintenance state]
+    timeSignal               = QtCore.pyqtSignal(list)
 
     # Wayside Controller Signals
-    switchState              = QtCore.pyqtSignal(list) # List of length two indicating a block and it's switch state [block #, boolean state]
-    crossingState            = QtCore.pyqtSignal(list) # List of length two indicating a block and it's crossing state [block #, boolean state]
-    blockFailures            = QtCore.pyqtSignal(list) # List of length N where N is the number of blocks in the track
-                                            ## Track Failure = 0x01, Circuit Failure = 0x02, Power Failure = 0x04
-                                            #   - any combination of the three should be logically OR'd together (i.e. TF + CF = 0x03)
-    waysideAuthority         = QtCore.pyqtSignal(list) # List of variable length N. Each index holds a block number identifying that block as a "do not pass" mark
+    switchState              = QtCore.pyqtSignal(list) # List of length two indicating a block and it's switch state [(int) block #, (bool) state]
+    crossingState            = QtCore.pyqtSignal(list) # List of length two indicating a block and it's crossing state [(int) block #, (bool) state]
+    waysideAuthority         = QtCore.pyqtSignal(list) # List of length 2 that specifices the authority for an individual train [(int) train id, (int) block #]
 
     # Train Model Signals
     blockListSignal          = QtCore.pyqtSignal(list)
     blockLengthSignal        = QtCore.pyqtSignal(list)
     gradeSignal              = QtCore.pyqtSignal(list)
-
+    trainLocation            = QtCore.pyqtSignal(list) # List of length 4 that identifies a unique trains location in the track [(str) line, (int) train id, (int) previos block, (int) current block]
 
     # Train Controller (SW) Inputs Signals
     authoritySignal          = QtCore.pyqtSignal(list)
