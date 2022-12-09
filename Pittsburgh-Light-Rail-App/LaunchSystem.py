@@ -70,13 +70,13 @@ class PittsburghLightRail(QWidget):
         self.setupUi()
 
     def setupUi(self):
-        self.setGeometry(1700,50,170,300)
+        self.setGeometry(1630,50,220,300)
         self.setStyleSheet("background-color: #747c8a;")
 
         font = QFont()
         font.setPointSize(16)
         self.clockLabel = QLabel(self)
-        self.clockLabel.setGeometry(QRect(35, 10, 100, 25))
+        self.clockLabel.setGeometry(QRect(60, 10, 100, 25))
         self.clockLabel.setObjectName("clockLabel")
         self.clockLabel.setStyleSheet("background-color: #7b8fb0; border: 1px solid black")
         self.clockLabel.setAlignment(Qt.AlignCenter)
@@ -84,34 +84,39 @@ class PittsburghLightRail(QWidget):
 
         font.setPointSize(14)
         self.showCTCButton = QPushButton(self)
-        self.showCTCButton.setGeometry(10,40,150,25)
+        self.showCTCButton.setGeometry(35,40,150,25)
         self.showCTCButton.clicked.connect(self.CTCOffice.show)
         self.showCTCButton.setText("CTC Office")
         self.showCTCButton.setFont(font)
 
         self.showWaysideControllerButton = QPushButton(self)
-        self.showWaysideControllerButton.setGeometry(10,70,150,25)
+        self.showWaysideControllerButton.setGeometry(35,70,150,25)
        #self.showWaysideControllerButton.clicked.connect(self.waysideController.show())
         self.showWaysideControllerButton.setText("Track Controller")
         self.showWaysideControllerButton.setFont(font)
 
         self.showTrackModelButton = QPushButton(self)
-        self.showTrackModelButton.setGeometry(10,100,150,25)
+        self.showTrackModelButton.setGeometry(35,100,150,25)
         self.showTrackModelButton.clicked.connect(self.trackModel.show)
         self.showTrackModelButton.setText("Track Model")
         self.showTrackModelButton.setFont(font)
 
         self.showTrainModelButton = QPushButton(self)
-        self.showTrainModelButton.setGeometry(10,130,150,25)
+        self.showTrainModelButton.setGeometry(35,130,150,25)
         self.showTrainModelButton.clicked.connect(self.trainModel.show)
         self.showTrainModelButton.setText("Train Model")
         self.showTrainModelButton.setFont(font)
 
         self.showTrainControllerButton = QPushButton(self)
-        self.showTrainControllerButton.setGeometry(10,160,150,25)
+        self.showTrainControllerButton.setGeometry(35,160,150,25)
         self.showTrainControllerButton.clicked.connect(self.trainController.show)
         self.showTrainControllerButton.setText("Train Controller")
         self.showTrainControllerButton.setFont(font)
+
+        self.trainImage          = QLabel(self)
+        self.pixmap              = QPixmap('TeamRollingStock1.png')
+        self.trainImage.setPixmap(self.pixmap)
+        self.trainImage.setGeometry(0,190,250,110)
 
         self.show()
 
