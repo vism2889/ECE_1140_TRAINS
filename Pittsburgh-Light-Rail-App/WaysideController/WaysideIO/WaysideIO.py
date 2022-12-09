@@ -209,15 +209,15 @@ class WaysideIO(QWidget):
         prev = loc[2]
         curr = loc[3]
 
-        if line.lower() == 'red':
-            controllers = self.lookupTable[line.lower()][str(curr)]['controller']
+        if line.lower() == 0:
+            controllers = self.lookupTable['red'][str(curr)]['controller']
             authority = self.planAuthority(self.redlineControllers[controllers[0][0]], self.redlineTrack, curr, prev)
-            self.signals.waysideAuthority.emit([line.lower(), id, authority])
+            self.signals.waysideAuthority.emit([line, id, authority])
 
-        if line.lower() == 'green':
-            controllers = self.lookupTable[line.lower()][str(curr)]['controller']
+        if line.lower() == 1:
+            controllers = self.lookupTable['green'][str(curr)]['controller']
             authority = self.planAuthority(self.greenlineControllers[controllers[0][0]], self.greenlineTrack, curr, prev)
-            self.signals.waysideAuthority.emit([line.lower(), id, authority])
+            self.signals.waysideAuthority.emit([line, id, authority])
 
     ##  Driver for most of the logic
     #       Sets block occupancy and eventually runs
@@ -245,7 +245,10 @@ class WaysideIO(QWidget):
                     self.setFaults('red', i+1, failure)
 
     def maintenanceCallback(self, msg):
-        self.setBlockMaintenance(msg[0], msg[1], [msg[2]])
+        if msg[0] == 0:
+            self.setBlockMaintenance('red', msg[1], [msg[2]])
+        if msg[1] == 1:
+            self.setBlockMaintenance('green', msg[1], [msg[2]])
 
     def filterSpeed(self, line, blockNum, speed):
         if int(self.lookupTable[line.lower()][str(blockNum)]['speed-limit']) < speed:
@@ -314,7 +317,6 @@ class WaysideIO(QWidget):
     #############
     ## HELPERS ##
     #############
-
     ## Figure out the next 1-5 blocks that are traversable
     def planAuthority(self, controller, track, curr, prev):
         previousBlock = prev
