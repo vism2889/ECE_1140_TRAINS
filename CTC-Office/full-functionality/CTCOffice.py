@@ -246,9 +246,9 @@ class CTCOffice(QWidget):
         self.selectedTrainLabel.show()
 
         self.trainImage          = QtWidgets.QLabel(self)
-        self.pixmap              = QPixmap('Train.png')
+        self.pixmap              = QPixmap('LogoCTCOffice1.png')
         self.trainImage.setPixmap(self.pixmap)
-        self.trainImage.setGeometry(420,430,200,200)
+        self.trainImage.setGeometry(400,440,200,120)
 
         self.populateRedLineTable()
         self.populateGreenLineTable()
@@ -470,7 +470,11 @@ class CTCOffice(QWidget):
             elif self.greenLineBlocks.getOccupancy(key):
                 self.greenLineBlockTable.item(int(key)-1,0).setBackground(QtGui.QColor(0,255,0))
             else:
+<<<<<<< Updated upstream
                 self.greenLineBlockTable.item(int(key)-1,0).setBackground(QtGui.QColor(255,255,255))       
+=======
+                self.greenLineBlockTable.item(int(key)-1,0).setBackground(QtGui.QColor(116,124,138))
+>>>>>>> Stashed changes
 
         for key in self.redLineBlocks.keys():
             if self.redLineBlocks.getMaintenanceState(key):
@@ -480,7 +484,11 @@ class CTCOffice(QWidget):
             elif self.redLineBlocks.getOccupancy(key):
                 self.redLineBlockTable.item(int(key)-1,0).setBackground(QtGui.QColor(0,255,0))
             else:
+<<<<<<< Updated upstream
                 self.redLineBlockTable.item(int(key)-1,0).setBackground(QtGui.QColor(255,255,255))      
+=======
+                self.redLineBlockTable.item(int(key)-1,0).setBackground(QtGui.QColor(116,124,138))
+>>>>>>> Stashed changes
 
     def updateOccupancy(self):
         item = QtWidgets.QTableWidgetItem()
