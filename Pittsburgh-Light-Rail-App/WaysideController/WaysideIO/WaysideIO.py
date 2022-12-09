@@ -221,16 +221,24 @@ class WaysideIO(QWidget):
         if line.lower() == 'red':
             controllers = self.lookupTable[line.lower()][str(curr)]['controller']
             authority = self.planAuthority(self.redlineControllers[controllers[0][0]], self.redlineTrack, curr, prev)
-            self.signals.waysideAuthority.emit(authority)
+            self.signals.waysideAuthority.emit(line.lower(), id, authority)
 
         if line.lower() == 'green':
             controllers = self.lookupTable[line.lower()][str(curr)]['controller']
             authority = self.planAuthority(self.greenlineControllers[controllers[0][0]], self.greenlineTrack, curr, prev)
-            self.signals.waysideAuthority.emit(authority)
+            self.signals.waysideAuthority.emit(line.lower(), id, authority)
 
-    ## (TODO) Need to add redline (talk to Morgan)
+    ##  Driver for most of the logic
+    #       Sets block occupancy and eventually runs
+    #       the PLC program loaded into the controller
     def blockOccupancyCallback(self, occupancy):
-        for i, block in enumerate(occupancy):
+        redLine = occupancy[0]
+        greenLine = occupancy[1]
+
+        for i, block in enumerate(redLine):
+            self.setBlockOccupancy('red', i+1, block)
+
+        for i, block in enumerate(greenLine):
             self.setBlockOccupancy('green', i+1, block)
 
     def blockFailureCallback(self, failures):
@@ -379,7 +387,7 @@ class WaysideIO(QWidget):
     def lookupBlock(self, line, blockNum):
         return self.lookupTable[line.lower()][str(blockNum)]
 
-    ## Set a controllers PLC program 
+    ## Set a controllers PLC program
     def uploadPLC(self, line, controllerNum, file):
         ## Redline
         if line.lower() == self.lines[0]:
