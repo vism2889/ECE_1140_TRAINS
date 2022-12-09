@@ -5,7 +5,7 @@ sys.path.append('track_layout')
 sys.path.append("../../SystemSignals")
 
 ## PyQt comms and widgets
-from  PyQt5 import QtWidgets
+from PyQt5 import QtCore, QtGui, QtWidgets, Qt
 if __name__ == '__main__': from Signals import Signals
 ## Wayside controller library
 from ui.WaysideUI import TrackControllerWindow
@@ -63,15 +63,22 @@ if __name__ == '__main__':
     signals = Signals() ## COMMENT OUT FOR FINAL PRODUCT
     wayside = WaysideController(signals)
 
+    signals.trainLocation.emit(['green', 0, 84, 85])
     ## Testing
-    blockFailures = []
-    for i in range(150):
-        blockFailures.append(0)
+    # blockFailures = []
+    # for i in range(76):
+    #     blockFailures.append(0)
 
-    blockFailures[0] = 0x01
-    blockFailures[5] = 0x03
-    blockFailures[149] = 0x02
-    signals.blockFailures.emit(blockFailures)
+    # while True:
+    #     key = input("Hit Enter: ")
+    #     if key == 'q':
+    #         exit(0)
+    #         sys.exit(app.exec_()) ## COMMENT OUT FOR FINAL PRODUCT
+
+    #     blockFailures[0] = 0x01
+        # blockFailures[98] = 0x03
+        # blockFailures[149] = 0x02
+        # signals.blockFailures.emit(blockFailures)
 
     ## Exit
     sys.exit(app.exec_()) ## COMMENT OUT FOR FINAL PRODUCT

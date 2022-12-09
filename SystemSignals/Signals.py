@@ -38,7 +38,7 @@ class Signals(QWidget):
     # CTC Office Signals
     dispatchTrainSignal      = QtCore.pyqtSignal(list)
     suggestedSpeedSignal     = QtCore.pyqtSignal(list) # List of length 2 [(int) train id, (int) suggested speed]
-    ctcAuthoritySignal       = QtCore.pyqtSignal(list)
+    ctcAuthoritySignal       = QtCore.pyqtSignal(list) # List of length 2 [(int) train id, [(int) stops 1, (int), stop 2, ..., (int) stop n]] 
     clockSpeedSignal         = QtCore.pyqtSignal(int)
     signalMaintenance        = QtCore.pyqtSignal(list) # List of length 3 [(str) line, (int) block #, (bool) maintenance state]
     timeSignal               = QtCore.pyqtSignal(list)
@@ -46,7 +46,7 @@ class Signals(QWidget):
     # Wayside Controller Signals
     switchState              = QtCore.pyqtSignal(list) # List of length two indicating a block and it's switch state [(int) block #, (bool) state]
     crossingState            = QtCore.pyqtSignal(list) # List of length two indicating a block and it's crossing state [(int) block #, (bool) state]
-    waysideAuthority         = QtCore.pyqtSignal(list) # List of length 2 that specifices the authority for an individual train [(int) train id, (int) block #]
+    waysideAuthority         = QtCore.pyqtSignal(list) # List of length 2 that specifices the authority for an individual train [(int) train id, (list) blocks[]]
 
     # Train Model Signals
     blockListSignal          = QtCore.pyqtSignal(list)
@@ -54,7 +54,7 @@ class Signals(QWidget):
     gradeSignal              = QtCore.pyqtSignal(list)
     trainLocation            = QtCore.pyqtSignal(list) # List of length 4 that identifies a unique trains location in the track [(str) line, (int) train id, (int) previos block, (int) current block]
 
-    # Train Controller (SW) Inputs Signals
+    # Train Controller (SW) Input Signals
     authoritySignal          = QtCore.pyqtSignal(list)
     commandedSpeedSignal     = QtCore.pyqtSignal(float)
     speedLimitSignal         = QtCore.pyqtSignal(list)
@@ -77,6 +77,7 @@ class Signals(QWidget):
     nonVitalDictSignal       = QtCore.pyqtSignal(dict)
 
     # Train Controller (HW) Signals
+
 
 
 

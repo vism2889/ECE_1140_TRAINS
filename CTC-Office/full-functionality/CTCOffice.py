@@ -1,7 +1,17 @@
-from PyQt5.QtWidgets import QFileDialog, QMainWindow, QApplication, QWidget, QAction, QTableWidget,QTableWidgetItem,QVBoxLayout, QAbstractItemView
+#!/usr/bin/env python3
+
+##############################################################################
+# AUTHOR(S):   GARRETT MARCINAK
+# DATE:     11/13/2022
+# FILENAME: CTCOffice.py
+# DESCRIPTION:
+#   Launches the CTC Office interface
+##############################################################################
+
 from PyQt5 import QtCore, QtGui, QtWidgets, QtWidgets
-from PyQt5.QtGui import QIcon, QPixmap
-from PyQt5.QtCore import pyqtSlot, QTime, pyqtSignal
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import *
+from PyQt5.QtCore import *
 import sys, os
 
 sys.path.append('../train-functionality/')
@@ -12,7 +22,7 @@ from TrainDictionary import TrainDictionary
 from LayoutParser import LayoutParser
 from DispatchPopUp import DispatchPopUp
 from ScheduleParser import ScheduleParser
-from Signals import Signals
+#from Signals import Signals
 
 class CTCOffice(QWidget):
     dispatchSignal = QtCore.pyqtSignal(bool)
@@ -46,7 +56,7 @@ class CTCOffice(QWidget):
         self.redLineStations    = dict()
         self.greenLineStations  = dict()
 
-        # define station lists in order    
+        # define station lists in order
         for key, value in self.redLineBlocks.stations().items():
             self.redLineStations[value]     = [key, False]
 
@@ -80,6 +90,7 @@ class CTCOffice(QWidget):
         self.setObjectName("self")
         self.setGeometry(10, 10, 600, 580)
         self.setMouseTracking(True)
+        self.setStyleSheet("background-color: #747c8a;")
         self.redLineMaintenance   = False
         self.greenLineMaintenance = False
         self.manualMode           = True
@@ -91,7 +102,7 @@ class CTCOffice(QWidget):
         self.clockLabel = QtWidgets.QLabel(self)
         self.clockLabel.setGeometry(QtCore.QRect(450, 35, 140, 25))
         self.clockLabel.setObjectName("clockLabel")
-        self.clockLabel.setStyleSheet("background-color: gray; border: 1px solid black")
+        self.clockLabel.setStyleSheet("background-color: #7b8fb0; border: 1px solid black")
         self.clockLabel.setAlignment(QtCore.Qt.AlignCenter)
         self.clockLabel.setFont(font)
 
@@ -163,7 +174,7 @@ class CTCOffice(QWidget):
 
         for row in range(0,self.greenLineBlockTable.rowCount()):
             self.greenLineBlockTable.setRowHeight(row, 10)
-            
+
         self.greenLineBlockTable.show()
 
         self.greenLineTrainTable = QTableWidget(self)
@@ -221,7 +232,7 @@ class CTCOffice(QWidget):
         self.uploadScheduleButton.setGeometry(450,70,140,25)
         self.uploadScheduleButton.setText("Upload Schedule")
         self.uploadScheduleButton.clicked.connect(self.uploadSchedule)
-        self.uploadScheduleButton.hide()  
+        self.uploadScheduleButton.hide()
 
         self.toggleDispatchModeButton = QtWidgets.QPushButton(self)
         self.toggleDispatchModeButton.setGeometry(450,105,140,25)
@@ -269,7 +280,7 @@ class CTCOffice(QWidget):
         self.clock = QtCore.QTimer()
         self.clock.timeout.connect(self.tickClock)
         self.startClock()
-        self.show()
+        #self.show()
 
     def tickClock(self):
         self.seconds = int(self.seconds)
@@ -314,16 +325,16 @@ class CTCOffice(QWidget):
             self.redLineBlockTable.setItem(int(key)-1, 0, item)
 
         for key in self.redLineBlocks.keys():
-           if (self.redLineBlocks.switch(key) != 0):      
+           if (self.redLineBlocks.switch(key) != 0):
                 item = QtWidgets.QTableWidgetItem()
                 item.setText(self.redLineBlocks.switch(key)[0] + " " + str(self.redLineBlocks.switch(key)[1]))
                 self.redLineBlockTable.setItem(int(key)-1, 1, item)
-                
+
         for key in self.redLineBlocks.keys():
-           if (self.redLineBlocks.crossing(key) != 0):      
+           if (self.redLineBlocks.crossing(key) != 0):
                 item = QtWidgets.QTableWidgetItem()
                 item.setText(self.redLineBlocks.crossing(key))
-                self.redLineBlockTable.setItem(int(key)-1, 2, item)        
+                self.redLineBlockTable.setItem(int(key)-1, 2, item)
 
         self.redLineBlockTable.resizeColumnToContents(1)
 
@@ -334,17 +345,17 @@ class CTCOffice(QWidget):
             self.greenLineBlockTable.setItem(int(key)-1, 0, item)
 
         for key in self.greenLineBlocks.keys():
-           if (self.greenLineBlocks.switch(key) != 0):      
+           if (self.greenLineBlocks.switch(key) != 0):
                 item = QtWidgets.QTableWidgetItem()
                 item.setText(self.greenLineBlocks.switch(key)[0] + " " + str(self.greenLineBlocks.switch(key)[1]))
                 self.greenLineBlockTable.setItem(int(key)-1, 1, item)
-                
+
         for key in self.greenLineBlocks.keys():
-           if (self.greenLineBlocks.crossing(key) != 0):      
+           if (self.greenLineBlocks.crossing(key) != 0):
                 item = QtWidgets.QTableWidgetItem()
                 item.setText(self.greenLineBlocks.crossing(key))
-                self.greenLineBlockTable.setItem(int(key)-1, 2, item)  
-        
+                self.greenLineBlockTable.setItem(int(key)-1, 2, item)
+
         self.greenLineBlockTable.resizeColumnToContents(1)
 
     def updateRedLineTrainTable(self):
@@ -375,7 +386,7 @@ class CTCOffice(QWidget):
                 self.redLineBacklogTable.insertRow(rowPosition)
                 self.redLineBacklogTable.setItem(rowPosition, 0, item)
                 self.currentRedLineBacklog = self.redLineTrains.backlogs()
-    
+
     def updateGreenLineTrainTable(self):
         # TODO checking for removed trains
         self.currentGreenLineTrains = []
@@ -404,7 +415,7 @@ class CTCOffice(QWidget):
                 self.greenLineBacklogTable.insertRow(rowPosition)
                 self.greenLineBacklogTable.setItem(rowPosition, 0, item)
                 self.currentGreenLineBacklog = self.greenLineTrains.backlogs()
-    
+
     def updateDestinationTable(self):
         index = 0
         self.destinationTable.clear()
@@ -471,10 +482,7 @@ class CTCOffice(QWidget):
                 self.greenLineBlockTable.item(int(key)-1,0).setBackground(QtGui.QColor(0,255,0))
             else:
 <<<<<<< Updated upstream
-                self.greenLineBlockTable.item(int(key)-1,0).setBackground(QtGui.QColor(255,255,255))       
-=======
                 self.greenLineBlockTable.item(int(key)-1,0).setBackground(QtGui.QColor(116,124,138))
->>>>>>> Stashed changes
 
         for key in self.redLineBlocks.keys():
             if self.redLineBlocks.getMaintenanceState(key):
@@ -484,11 +492,8 @@ class CTCOffice(QWidget):
             elif self.redLineBlocks.getOccupancy(key):
                 self.redLineBlockTable.item(int(key)-1,0).setBackground(QtGui.QColor(0,255,0))
             else:
-<<<<<<< Updated upstream
-                self.redLineBlockTable.item(int(key)-1,0).setBackground(QtGui.QColor(255,255,255))      
-=======
                 self.redLineBlockTable.item(int(key)-1,0).setBackground(QtGui.QColor(116,124,138))
->>>>>>> Stashed changes
+
 
     def updateOccupancy(self):
         item = QtWidgets.QTableWidgetItem()
@@ -528,7 +533,7 @@ class CTCOffice(QWidget):
         self.dispatchPopUp.setupUi(self.dispatchWidget, self.redLineStations, self.greenLineStations, self.redLineTrains, self.greenLineTrains, self.trainCount)
         self.dispatchPopUp.dispatch.clicked.connect(self.closeDispatchPopUp)
         self.dispatchWidget.show()
-    
+
     def closeDispatchPopUp(self):
         self.dispatchWidget.close()
         self.trainCount += 1
@@ -570,7 +575,7 @@ class CTCOffice(QWidget):
             self.toggleMaintenanceButton.show()
             self.uploadScheduleButton.hide()
             self.manualMode = True
-            
+
 
 if __name__ == "__main__":
     import sys
@@ -578,5 +583,5 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     signals = Signals()
     mainUi = CTCOffice(signals)
-    
+
     sys.exit(app.exec_())
