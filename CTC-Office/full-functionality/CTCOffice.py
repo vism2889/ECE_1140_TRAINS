@@ -481,7 +481,6 @@ class CTCOffice(QWidget):
             elif self.greenLineBlocks.getOccupancy(key):
                 self.greenLineBlockTable.item(int(key)-1,0).setBackground(QtGui.QColor(0,255,0))
             else:
-<<<<<<< Updated upstream
                 self.greenLineBlockTable.item(int(key)-1,0).setBackground(QtGui.QColor(116,124,138))
 
         for key in self.redLineBlocks.keys():
