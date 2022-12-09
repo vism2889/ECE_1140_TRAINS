@@ -32,7 +32,6 @@ class ManualControl():
         self.c = obj
         self.anal_in = AnalogIn()
         self.commandedSpeed = 0
-        self.ebrake_state = False
         self.service_brake_state = False
         self.light_state_internal = False
         self.light_state_external = False
@@ -51,10 +50,11 @@ class ManualControl():
                               "stationSquare_southHills.mp3"]
 
     def setCommandedSpeed(self):
-        if self.ebrake_state == False:
+        #print("MC: ebrake state = ", self.c.ebrakeCommand)
+        if self.c.ebrakeCommand == False:
             speed = self.anal_in.getSpeedValue()
             self.commandedSpeed = speed / 2.3694
-            #print("\nManual Commanded Speed: %2d" % speed, end="", flush=True)
+            # print("\nManual Commanded Speed: %2d" % speed, end="", flush=True)
 
         else: self.commandedSpeed = 0
 
@@ -90,17 +90,22 @@ class ManualControl():
             sleep(.5)
 
     def ebrake_button(self):
-        if GPIO.input(5) == GPIO.LOW:
-            self.ebrake_state = True
-            self.c.deployEbrake(True)
+        if self.c.vital_override == False:
+            if GPIO.input(5) == GPIO.LOW:
+                self.c.ebrakeCommand = True
+                self.c.deployEbrake(True)
 
-        if GPIO.input(5) == GPIO.HIGH:
-            self.ebrake_state = False
-            self.c.deployEbrake(False)
+            if GPIO.input(5) == GPIO.HIGH:
+                self.c.ebrakeCommand = False
+                self.c.deployEbrake(False)
                  
     def setTemperature_manual(self):
         temp = self.anal_in.getTemperatureValue()
         self.c.setTemperature(temp)
+
+    def checkFailures_manual(self):
+        brake = self.c.checkFailures()
+        self.c.deployEbrake(brake)
 
     def calculatePower(self):
         power = self.c.getPowerOutput(self.commandedSpeed)

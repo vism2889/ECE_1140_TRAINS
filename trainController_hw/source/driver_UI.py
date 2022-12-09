@@ -193,17 +193,26 @@ class Ui_MainWindow():
         self.speedometer.setSizePolicy(sizePolicy)
         self.speedometer.setMinimumSize(QtCore.QSize(100, 100))
         self.speedometer.setMaximumSize(QtCore.QSize(400, 400))
+<<<<<<< HEAD
         self.speedometer.setBaseSize(QtCore.QSize(200, 200))
+=======
+        self.speedometer.setBaseSize(QtCore.QSize(300, 300))
+>>>>>>> 9f24db2ef58d6c57ea9b76afed26b40e6bbed15e
         self.speedometer.setStyleSheet("")
         self.speedometer.setObjectName("speedometer")
 
         self.powerGauge = AnalogGaugeWidget(self.speedometer)
         self.powerGauge.setGeometry(QtCore.QRect(150, 170, 301, 261))
+<<<<<<< HEAD
         self.powerGauge.setSizePolicy(sizePolicy)
         self.powerGauge.setMinimumSize(QtCore.QSize(100, 100))
         self.powerGauge.setMaximumSize(QtCore.QSize(300, 300))
         self.powerGauge.setBaseSize(QtCore.QSize(200, 200))
         self.powerGauge.setStyleSheet("")
+=======
+        self.powerGauge.setMinimumSize(QtCore.QSize(50,50))
+        self.powerGauge.setMaximumSize(QtCore.QSize(100,100))
+>>>>>>> 9f24db2ef58d6c57ea9b76afed26b40e6bbed15e
         self.powerGauge.setObjectName("powerGauge")
         self.verticalLayout.addWidget(self.speedometer)
         self.gridLayout_4.addLayout(self.verticalLayout, 0, 0, 1, 1)
@@ -256,6 +265,9 @@ class Ui_MainWindow():
 
     def setTemperature_manual(self):
         self.mc.setTemperature_manual()
+    
+    def checkFailures_manual(self):
+        self.mc.checkFailures_manual()
 
     def setCurrentSpeed(self):
         self.current_speed = self.c.setCurrentSpeed()
@@ -305,9 +317,10 @@ class Ui_MainWindow():
     
     def manual_connect(self, MainWindow):
         self.timer.timeout.connect(self.subscribe)
+        self.timer.timeout.connect(self.checkFailures_manual)
         self.timer.timeout.connect(self.setSpeed_manual)
         self.timer.timeout.connect(self.setCurrentSpeed)
-        self.timer.timeout.connect(self.checkAuthority)
+        #self.timer.timeout.connect(self.checkAuthority)
         self.timer.timeout.connect(self.calculatePower_manual)
         self.timer.timeout.connect(self.setTemperature_manual)
         self.timer.timeout.connect(self.toggle_lights_manual)
