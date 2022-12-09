@@ -193,26 +193,20 @@ class Ui_MainWindow():
         self.speedometer.setSizePolicy(sizePolicy)
         self.speedometer.setMinimumSize(QtCore.QSize(100, 100))
         self.speedometer.setMaximumSize(QtCore.QSize(400, 400))
-<<<<<<< HEAD
         self.speedometer.setBaseSize(QtCore.QSize(200, 200))
-=======
         self.speedometer.setBaseSize(QtCore.QSize(300, 300))
->>>>>>> 9f24db2ef58d6c57ea9b76afed26b40e6bbed15e
         self.speedometer.setStyleSheet("")
         self.speedometer.setObjectName("speedometer")
 
         self.powerGauge = AnalogGaugeWidget(self.speedometer)
         self.powerGauge.setGeometry(QtCore.QRect(150, 170, 301, 261))
-<<<<<<< HEAD
         self.powerGauge.setSizePolicy(sizePolicy)
         self.powerGauge.setMinimumSize(QtCore.QSize(100, 100))
         self.powerGauge.setMaximumSize(QtCore.QSize(300, 300))
         self.powerGauge.setBaseSize(QtCore.QSize(200, 200))
         self.powerGauge.setStyleSheet("")
-=======
         self.powerGauge.setMinimumSize(QtCore.QSize(50,50))
         self.powerGauge.setMaximumSize(QtCore.QSize(100,100))
->>>>>>> 9f24db2ef58d6c57ea9b76afed26b40e6bbed15e
         self.powerGauge.setObjectName("powerGauge")
         self.verticalLayout.addWidget(self.speedometer)
         self.gridLayout_4.addLayout(self.verticalLayout, 0, 0, 1, 1)
@@ -221,7 +215,6 @@ class Ui_MainWindow():
 
         self.powerGauge.move(50, 70)
 
-        
         self.speedometer.value_max = 50
         self.speedometer.value_min = 0
         self.speedometer.gauge_color_inner_radius_factor = .9
@@ -256,7 +249,7 @@ class Ui_MainWindow():
         self.mc.setCommandedSpeed()
     
     def calculatePower_manual(self):
-        power = self.mc.calculatePower()
+        power = self.mc.calculatePower() / 745.7
         if power != None:
             self.powerGauge.update_value(power)
 
