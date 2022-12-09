@@ -757,7 +757,7 @@ class TrackModel(QWidget):
         '''
         Updates all occupancy related displays and emits a new global occupancy
         '''
-
+        print(occupancy)
         line      = occupancy[0]
         lastBlock = occupancy[2]
         currBlock = occupancy[3]
