@@ -69,8 +69,8 @@ class TrackModel(QWidget):
         self.currTemp            = 0
 
         # Variables to hold values for System Communication Signals For final presentation
-        self.occupancy           = [[False for i in range(76)],[False for i in range(150)]] # only Green line for right now
-        self.faults              = [[0 for i in range(76)],[0 for i in range(150)]]     # only Green line for right now
+        self.occupancy           = [[False for i in range(76)],[False for i in range(150)]]
+        self.faults              = [[0 for i in range(76)],[0 for i in range(150)]]
         self.switches            = [[0 for i in range(76)],[0 for i in range(150)]]
 
         # Variables to hold values for displaying stations and switches on a selected line
@@ -91,7 +91,7 @@ class TrackModel(QWidget):
         # System Communication Signals
         if signals:
             self.signals = signals
-            self.signals.occupancyFromTrainSignal.connect(self.getOccupancy)
+            self.signals.trainLocation.connect(self.getOccupancy)
             self.signals.switchState.connect(self.updateSwitchState)
 
             # self.signals.stoppedBlocks.connect(self.updateStoppedBlocks) # sets a list = [list of blocks that trains are stopped at]
@@ -757,8 +757,14 @@ class TrackModel(QWidget):
         '''
         Updates all occupancy related displays and emits a new global occupancy
         '''
-        self.occupancy = occupancy
+
+        line      = occupancy[0]
+        lastBlock = occupancy[2]
+        currBlock = occupancy[3]
+
         # print("GUI OCCUPANCY", self.occupancy)
+        self.occupancy[line][lastBlock] = 0
+        self.occupancy[line][currBlock] = 1
         self.signals.globalOccupancyFromTrackModelSignal.emit(self.occupancy) # should emit a new global occupancy
         self.updateBlockOccupancyCallback()
 
