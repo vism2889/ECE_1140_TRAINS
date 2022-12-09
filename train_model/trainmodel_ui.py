@@ -41,7 +41,7 @@ class TrainModel(QtWidgets.QMainWindow):
         self.signals = signals
         self.last_update = 0
         self.UI()
-        self.show()
+        #self.show()
         self.signals.trackBlocksToTrainModelSignal.connect(self.set_blocks)
         self.brake_update = time.time()
 

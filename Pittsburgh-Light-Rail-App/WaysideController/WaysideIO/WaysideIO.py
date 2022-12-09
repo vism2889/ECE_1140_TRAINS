@@ -106,10 +106,9 @@ class Controller():
             faults.append(3)
 
         self.parent.ui.setFaultState(self.line, blockNum, faults)
-        ## Run PLC program
-        # self.run()
         return self.track['block-states']
 
+    ## Updates the controller maintenance state
     def updateMaintenance(self, blockNum, state):
         self.track['block-maintenance'][blockNum] = state
         self.parent.ui.setMaintenance(self.line, blockNum, state)
@@ -123,6 +122,7 @@ class Controller():
 
         return self.track['switch']
 
+    ## Updates the crossing state of the controller
     def updateCrossing(self):
         for crossing in self.track['crossing']:
             self.parent.setCrossing(self.line, crossing, self.track['crossing'][crossing])
@@ -221,16 +221,24 @@ class WaysideIO(QWidget):
         if line.lower() == 'red':
             controllers = self.lookupTable[line.lower()][str(curr)]['controller']
             authority = self.planAuthority(self.redlineControllers[controllers[0][0]], self.redlineTrack, curr, prev)
-            self.signals.waysideAuthority.emit(authority)
+            self.signals.waysideAuthority.emit([line.lower(), id, authority])
 
         if line.lower() == 'green':
             controllers = self.lookupTable[line.lower()][str(curr)]['controller']
             authority = self.planAuthority(self.greenlineControllers[controllers[0][0]], self.greenlineTrack, curr, prev)
-            self.signals.waysideAuthority.emit(authority)
+            self.signals.waysideAuthority.emit([line.lower(), id, authority])
 
-    ## (TODO) Need to add redline (talk to Morgan)
+    ##  Driver for most of the logic
+    #       Sets block occupancy and eventually runs
+    #       the PLC program loaded into the controller
     def blockOccupancyCallback(self, occupancy):
-        for i, block in enumerate(occupancy):
+        redLine = occupancy[0]
+        greenLine = occupancy[1]
+
+        for i, block in enumerate(redLine):
+            self.setBlockOccupancy('red', i+1, block)
+
+        for i, block in enumerate(greenLine):
             self.setBlockOccupancy('green', i+1, block)
 
     def blockFailureCallback(self, failures):
@@ -375,10 +383,11 @@ class WaysideIO(QWidget):
             return self.greenlineControllers[controller].numBlocks
         return -1
 
-    ## Lookup table
+    ## Lookup table (TODO) either keep this or remove it
     def lookupBlock(self, line, blockNum):
         return self.lookupTable[line.lower()][str(blockNum)]
 
+    ## Set a controllers PLC program
     def uploadPLC(self, line, controllerNum, file):
         ## Redline
         if line.lower() == self.lines[0]:
