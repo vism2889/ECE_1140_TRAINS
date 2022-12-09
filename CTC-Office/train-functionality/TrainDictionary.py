@@ -18,7 +18,7 @@ class TrainDictionary:
 
     def setSuggestedSpeed(self, name, TTS):
         distance = 14552.6
-        velocity = 14552.6/(TTS*60)*2.23694
+        velocity = 14552.6/(TTS*60)
         self.trainList[name].suggestedSpeed = velocity
 
     def keys(self):

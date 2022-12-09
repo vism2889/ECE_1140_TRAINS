@@ -142,8 +142,6 @@ class TrackControllerWindow(QtWidgets.QWidget):
     def dialog(self):
         loc = self.main_window_reference.sender()
         idx = int(''.join(filter(str.isdigit, loc.objectName())))
-        print("location ", loc)
-        print("idx ", idx)
         if "redline" in loc.objectName():
             if self.redline_reference['maintenance'][idx]:
                 print(f"PLC upload request to redline controller {idx}")
@@ -151,8 +149,9 @@ class TrackControllerWindow(QtWidgets.QWidget):
                                                     "", "PLC Files (*.plc)")
                 if os.path.exists(file):
                     with open(file) as f:
-                        print(f.readline())
-                        f.close()
+                        self.waysideio_ref.uploadPLC('red', idx, file)
+                        # print(f.readline())
+                        f.close()         
 
         if "greenline" in loc.objectName():
             if self.greenline_reference['maintenance'][int(idx)]:
@@ -161,7 +160,8 @@ class TrackControllerWindow(QtWidgets.QWidget):
                                                     "", "PLC Files (*.plc)")
                 if os.path.exists(file):
                     with open(file) as f:
-                        print(f.readline())
+                        self.waysideio_ref.uploadPLC('red', idx, file)
+                        # print(f.readline())
                         f.close()
 
     def addTab(self, prefix, controllers, controller, layout, reference, isView=False):
