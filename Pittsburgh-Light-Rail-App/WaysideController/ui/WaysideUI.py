@@ -1,6 +1,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets, Qt
 import os
 from track_layout import extract_layout
+import time
 
 class TrackControllerWindow(QtWidgets.QWidget):
     def __init__(self, waysideio):
@@ -200,10 +201,10 @@ class TrackControllerWindow(QtWidgets.QWidget):
         item.setText("Block State")
         block_table.setHorizontalHeaderItem(2, item)
 
-        if isView:
-            item = QtWidgets.QTableWidgetItem()
-            item.setText("Controller")
-            block_table.setHorizontalHeaderItem(3, item)
+        # if isView:
+        #     item = QtWidgets.QTableWidgetItem()
+        #     item.setText("Controller")
+        #     block_table.setHorizontalHeaderItem(3, item)
 
         block_table.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
         block_table.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
@@ -268,6 +269,7 @@ class TrackControllerWindow(QtWidgets.QWidget):
         fault_table.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
         fault_table.setSelectionMode(QtWidgets.QTableWidget.NoSelection)
 
+        fault_table.size()
         if isView:
             fault_table.setColumnCount(4)
         else:
@@ -287,10 +289,10 @@ class TrackControllerWindow(QtWidgets.QWidget):
         item.setText("Fault Message")
         fault_table.setHorizontalHeaderItem(2, item)
 
-        if isView:
-            item = QtWidgets.QTableWidgetItem()
-            item.setText("Controller")
-            fault_table.setHorizontalHeaderItem(3, item)
+        # if isView:
+        #     item = QtWidgets.QTableWidgetItem()
+        #     item.setText("Controller")
+        #     fault_table.setHorizontalHeaderItem(3, item)
 
         for i in controller['block-occupancy']:
             row_idx = controller['block-occupancy'].index(i)
@@ -299,17 +301,17 @@ class TrackControllerWindow(QtWidgets.QWidget):
                 item.setTextAlignment(4)
 
                 if i.index(j) == 2:
-                    item.setText(self.FAULTS[-1])
+                    item.setText(self.FAULTS[0])
                     item.setBackground(QtGui.QColor(0xbf, 0xe3, 0xb4))
                 else:
                     item.setText(j)
 
                 fault_table.setItem(row_idx, i.index(j), item)
 
-                if isView:
-                    item = QtWidgets.QTableWidgetItem(str(int(int(block_table.item(row_idx, 0).text())/self.numBlocksPerController)))
-                    item.setTextAlignment(4)
-                    fault_table.setItem(row_idx, 3, item)
+                # if isView:
+                #     item = QtWidgets.QTableWidgetItem(str(int(int(block_table.item(row_idx, 0).text())/self.numBlocksPerController)))
+                #     item.setTextAlignment(4)
+                #     fault_table.setItem(row_idx, 3, item)
 
         fault_table.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
         fault_table.verticalHeader().hide()
@@ -358,10 +360,10 @@ class TrackControllerWindow(QtWidgets.QWidget):
             item.setText("Switch State")
             switch_table.setHorizontalHeaderItem(2, item)
 
-            if isView:
-                item = QtWidgets.QTableWidgetItem()
-                item.setText("Controller")
-                switch_table.setHorizontalHeaderItem(3, item)
+            # if isView:
+            #     item = QtWidgets.QTableWidgetItem()
+            #     item.setText("Controller")
+            #     switch_table.setHorizontalHeaderItem(3, item)
 
             switch_table.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
             switch_table.verticalHeader().hide()
@@ -386,10 +388,10 @@ class TrackControllerWindow(QtWidgets.QWidget):
 
                     switch_table.setItem(row_idx, i.index(j), item)
 
-                if isView:
-                    item = QtWidgets.QTableWidgetItem(str(int(int(switch_table.item(row_idx, 0).text())/self.numBlocksPerController)))
-                    item.setTextAlignment(4)
-                    switch_table.setItem(row_idx, 3, item)
+                # if isView:
+                #     item = QtWidgets.QTableWidgetItem(str(int(int(switch_table.item(row_idx, 0).text())/self.numBlocksPerController)))
+                #     item.setTextAlignment(4)
+                #     switch_table.setItem(row_idx, 3, item)
 
             info['switch-table'] = switch_table
 
@@ -439,10 +441,10 @@ class TrackControllerWindow(QtWidgets.QWidget):
             crossing_table.setHorizontalHeaderItem(2, item)
             item.setText("Crossing State")
 
-            if isView:
-                item = QtWidgets.QTableWidgetItem()
-                crossing_table.setHorizontalHeaderItem(3, item)
-                item.setText("Controller")
+            # if isView:
+            #     item = QtWidgets.QTableWidgetItem()
+            #     crossing_table.setHorizontalHeaderItem(3, item)
+            #     item.setText("Controller")
 
             crossing_table.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
             crossing_table.verticalHeader().hide()
@@ -468,10 +470,10 @@ class TrackControllerWindow(QtWidgets.QWidget):
 
                     crossing_table.setItem(row_idx, i.index(j), item)
 
-                    if isView:
-                        item = QtWidgets.QTableWidgetItem(str(int(int(crossing_table.item(row_idx, 0).text())/self.numBlocksPerController)))
-                        item.setTextAlignment(4)
-                        crossing_table.setItem(row_idx, 3, item)
+                    # if isView:
+                    #     item = QtWidgets.QTableWidgetItem(str(int(int(crossing_table.item(row_idx, 0).text())/self.numBlocksPerController)))
+                    #     item.setTextAlignment(4)
+                    #     crossing_table.setItem(row_idx, 3, item)
 
             info['crossing-table'] = crossing_table
 
@@ -590,24 +592,29 @@ class TrackControllerWindow(QtWidgets.QWidget):
         if line == 'red':
             for i in controller_indices:
                 fault_table = self.redline_reference['controllers'][i[0]]['fault-table']
-                if fault_table.item(i[1],2).text() != 'OK':
-                    self.redline_controllers.setTabIcon(i[0], QtGui.QIcon("warning.png"))
-                    good = False
-            if good: self.redline_controllers.setTabIcon(i[0], QtGui.QIcon())
+                size = self.waysideio_ref.getNumBlocks(line, i[0])
+                for j in range(size):
+                    # if fault_table.item(j[1],2).text() != 'OK':
+                    if fault_table.item(j,2).text() != 'OK':
+                        self.redline_controllers.setTabIcon(i[0], QtGui.QIcon("warning.png"))
+                        good = False
+            if good:
+                self.redline_controllers.setTabIcon(i[0], QtGui.QIcon())
 
         if line == 'green':
-            # for row_idx in range(self.greenline_reference['view'][0]['fault-table'].rowCount()):
             for i in controller_indices:
                 fault_table = self.greenline_reference['controllers'][i[0]]['fault-table']
-                if fault_table.item(i[1],2).text() != 'OK':
-                    self.greenline_controllers.setTabIcon(i[0], QtGui.QIcon("warning.png"))
-                    good = False
-            if good: self.greenline_controllers.setTabIcon(i[0], QtGui.QIcon())
+                size = self.waysideio_ref.getNumBlocks(line, i[0])
+                for j in range(size):
+                    if fault_table.item(j,2).text() != 'OK':
+                        self.greenline_controllers.setTabIcon(i[0], QtGui.QIcon("warning.png"))
+                        good = False
+            if good:
+                self.greenline_controllers.setTabIcon(i[0], QtGui.QIcon())
         if good:
             self.checkMaintenance(line, block_num)
 
         return good
-
 
     def setSwitchState(self, line, block_num, state):
         controller_indices = self.waysideio_ref.lookupBlock(line, block_num)['controller']
@@ -656,6 +663,10 @@ class TrackControllerWindow(QtWidgets.QWidget):
         controller_indices = self.waysideio_ref.lookupBlock(line, block_num)['controller']
 
         value = ""
+
+        if state == True:
+            exit(1)
+
         if state:
             value = "ON"
         else:
@@ -669,9 +680,7 @@ class TrackControllerWindow(QtWidgets.QWidget):
                 item = QtWidgets.QTableWidgetItem(str(value))
                 item.setTextAlignment(4)
 
-                if state:
-                    item.setBackground(QtGui.QColor(0xbf, 0xe3, 0xb4))
-                else:
+                if value:
                     item.setBackground(QtGui.QColor(0xf4, 0x71, 0x74))
 
                 controller_table = self.redline_reference['controllers'][i[0]]
@@ -689,9 +698,7 @@ class TrackControllerWindow(QtWidgets.QWidget):
                 item = QtWidgets.QTableWidgetItem(str(value))
                 item.setTextAlignment(4)
 
-                if state:
-                    item.setBackground(QtGui.QColor(0xbf, 0xe3, 0xb4))
-                else:
+                if value:
                     item.setBackground(QtGui.QColor(0xf4, 0x71, 0x74))
 
                 controller_table = self.greenline_reference['controllers'][i[0]]
@@ -728,15 +735,12 @@ class TrackControllerWindow(QtWidgets.QWidget):
 
     def checkMaintenance(self, line, block_num):
         controller_indices = self.waysideio_ref.lookupBlock(line, block_num)['controller']
-
         if line == 'red':
             for i in controller_indices:
                 value = self.redline_reference['maintenance'][i[0]]
                 if value:
-                    self.redline_reference['view'][0]['block-table'].item(block_num-1, 0).setIcon(QtGui.QIcon("alert.png"))
                     self.redline_controllers.setTabIcon(i[0], QtGui.QIcon("alert.png"))
                 else:
-                    self.redline_reference['view'][0]['block-table'].item(block_num-1, 0).setIcon(QtGui.QIcon())
                     self.redline_controllers.setTabIcon(i[0], QtGui.QIcon())
 
         if line == 'green':

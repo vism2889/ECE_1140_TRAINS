@@ -4,8 +4,6 @@
 ## Pycache
 *.pyc
 **__pycache__/ 
-# CTC-Office/__pycache__
-# CTC-Office/block-functionality/__pycache__/*
 
 ## Logs
 *.log
