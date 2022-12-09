@@ -24,13 +24,13 @@ class WaysideController():
 
         ## Logger
         format = '[%(asctime)s] %(name)s (%(levelname)s): %(message)s'
-        logging.basicConfig(format=format, level=logging.DEBUG,
-                            filename='logs/waysidecontroller.log', filemode='w')
-        logger = logging.getLogger('WAYSIDE-MODULE')
-        logger.setLevel(logging.DEBUG)
+        # logging.basicConfig(format=format, level=logging.DEBUG,
+        #                     filename='logs/waysidecontroller.log', filemode='w')
+        # logger = logging.getLogger('WAYSIDE-MODULE')
+        # logger.setLevel(logging.DEBUG)
 
         ## Main Wayside Controller class
-        wayside = WaysideIO(signals, logger)
+        wayside = WaysideIO(signals)
 
         ## UI
         w = QtWidgets.QWidget()
