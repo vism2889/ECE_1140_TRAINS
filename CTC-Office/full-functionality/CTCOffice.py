@@ -61,10 +61,10 @@ class CTCOffice(QWidget):
             self.redLineStations[value]     = [key, False]
 
         self.greenLineStations["GLENBURY"]       = ["65", False]
-        self.greenLineStations["DORMONT"]        = ["76", False]
+        self.greenLineStations["DORMONT"]        = ["73", False]
         self.greenLineStations["MT-LEBANON"]     = ["77", False]
         self.greenLineStations["POPLAR"]         = ["88", False]
-        self.greenLineStations["CASTE SHANNON"]  = ["77", False]
+        self.greenLineStations["CASTE SHANNON"]  = ["96", False]
         self.greenLineStations["MT-LEBANON"]     = ["77", False]
         self.greenLineStations["GLENBURY"]       = ["114", False]
         self.greenLineStations["OVERBROOK (OUT)"]= ["122", False]
