@@ -46,7 +46,7 @@ class PointMassModel():
         self.ctc_authority = []
         self.speed_up = 1
         self.waysideAuthority = []
-        self.train_authority = 0
+        self.train_authority = [False]
         
         self.suggested_speed = 0
         #track model to train comms
