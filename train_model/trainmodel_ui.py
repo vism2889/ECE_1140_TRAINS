@@ -59,10 +59,13 @@ class TrainModel(QtWidgets.QMainWindow):
             self.t.pm.prev_block = 0
             self.t.pm.curr_block = 9
             self.t.line = 0
+        
+        self.train_dict.update({msg[0]: self.t})
+        
 
         # print(f'------------DISPATCHED!!!!!!!!!!!------------------')
-        self.t.dispatch()
-        self.last_update = time.time()
+        self.t.dispatched = True
+        self.update_display()
 
     def curr_t_power(self, msg):
         # print(f'Message is:{msg}')
@@ -92,7 +95,9 @@ class TrainModel(QtWidgets.QMainWindow):
     
     def wayside_authority(self,msg):
         self.t.pm.waysideAuthority = msg[1]
-        print(msg)
+        if msg[1][0] == 'T':
+            print("OOP")
+        # print(msg)
     
     def speedup(self, msg):
         self.t.pm.speed_up = int(msg)
@@ -235,8 +240,16 @@ class TrainModel(QtWidgets.QMainWindow):
                 if self.hw:
                     self.mp.publish()
             
-            if self.t.line != None and self.t.pm.prev_block != None and self.t.pm.curr_block !=0:
-                self.signals.trainLocation.emit([self.t.line, self.t.id, self.t.pm.prev_block, self.t.pm.curr_block])
+            if self.t.line != None and self.t.pm.prev_block != None and self.t.pm.curr_block != 0:
+                print(f'values are, line: {self.t.line}, previous block: {self.t.pm.prev_block}, curr block: {self.t.pm.curr_block}')
+                self.signals.trainLocation.emit([int(self.t.line), self.t.id, int(self.t.pm.prev_block), int(self.t.pm.curr_block)])
+            # elif type(self.t.line) != int:
+            #     print("LINE not int")
+            # elif type(self.t.pm.prev_block ) != int:
+            #     print("LINE not int")
+            # elif type(self.t.pm.curr_block ) != int:
+            #     print("LINE not int")
+
 
         if time.time()-self.brake_update > 0.5:
             if self.t.service_brake == True:

@@ -282,9 +282,14 @@ class PointMassModel():
             self.curr_pos = self.curr_pos-self.curr_block_len
             self.prev_pos = 0
             #incrementing curr_block
-            if len(self.waysideAuthority) > 0:
+
+            if len(self.waysideAuthority) > 1:
                 self.curr_block = self.waysideAuthority[1]
                 self.prev_block = self.waysideAuthority[0]
+            if len(self.waysideAuthority) == 1:
+                self.curr_block = self.waysideAuthority[0]
+                self.prev_block = self.prev_block
+                
 
         # self.occ_index = self.blocks[self.curr_block-1]
         # self.occ_list[self.occ_index] = 1
