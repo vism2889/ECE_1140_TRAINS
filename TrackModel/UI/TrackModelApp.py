@@ -91,9 +91,9 @@ class TrackModel(QWidget):
         if signals:
             self.signals = signals
             self.signals.trainLocation.connect(self.getOccupancy)
-            self.signals.switchState.connect()
-            self.signals.waysideAuthority.connect()
-            self.signals.crossingState.connect()
+            # self.signals.switchState.connect()
+            # self.signals.waysideAuthority.connect()
+            # self.signals.crossingState.connect()
             # self.signals.switchState.connect(self.updateSwitchState)
 
             # self.signals.stoppedBlocks.connect(self.updateStoppedBlocks) # sets a list = [list of blocks that trains are stopped at]
@@ -782,8 +782,8 @@ class TrackModel(QWidget):
         currBlock = occupancy[3]
 
         # print("GUI OCCUPANCY", self.occupancy)
-        self.occupancy[int(line)][lastBlock] = 0
-        self.occupancy[line][currBlock]      = 1
+        self.occupancy[int(line)][int(lastBlock)-1] = 0
+        self.occupancy[int(line)][int(currBlock)-1] = 1
         self.signals.globalOccupancyFromTrackModelSignal.emit(self.occupancy) # should emit a new global occupancy
         self.updateBlockOccupancyCallback()
 
