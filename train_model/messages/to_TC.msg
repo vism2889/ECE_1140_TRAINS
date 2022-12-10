@@ -1,7 +1,7 @@
 float current_speed
 int commanded_speed
 int speed_limit
-bool[] authority
+float authority
 string next_station
 bool brake_failure
 bool engine_failure
