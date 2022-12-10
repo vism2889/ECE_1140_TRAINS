@@ -46,7 +46,7 @@ class PointMassModel():
         self.ctc_authority = []
         self.speed_up = 1
         self.waysideAuthority = []
-        self.train_authority = [True]
+        self.train_authority = 0
         
         self.suggested_speed = 0
         #track model to train comms
@@ -256,6 +256,7 @@ class PointMassModel():
 
     
     def calcPos(self):
+        self.train_authority = 0
         
         #position calculation
         self.prev_pos = self.curr_pos
@@ -282,9 +283,24 @@ class PointMassModel():
             self.curr_pos = self.curr_pos-self.curr_block_len
             self.prev_pos = 0
             #incrementing curr_block
-            if len(self.waysideAuthority) > 0:
+
+            if len(self.waysideAuthority) > 1:
                 self.curr_block = self.waysideAuthority[1]
                 self.prev_block = self.waysideAuthority[0]
+            if len(self.waysideAuthority) == 1:
+                self.curr_block = self.waysideAuthority[0]
+                self.prev_block = self.prev_block
+        
+        
+        if self.curr_block == self.waysideAuthority[0]:
+            wayside = self.waysideAuthority[1:len(self.waysideAuthority)]
+            self.train_authority += float(self.BlockModels[self.curr_block-1].blockLength)-self.curr_pos
+            for b in wayside:
+                self.train_authority += float(self.BlockModels[b-1].blockLength)
+
+
+
+                
 
         # self.occ_index = self.blocks[self.curr_block-1]
         # self.occ_list[self.occ_index] = 1
