@@ -5,6 +5,8 @@ import time
 
 class TrackControllerWindow(QtWidgets.QWidget):
     def __init__(self, waysideio):
+        super().__init__()
+
         self.redline_maintenance_mode = []
         self.greenline_maintenance_mode = []
         self.numBlocksPerController = 12
@@ -28,17 +30,17 @@ class TrackControllerWindow(QtWidgets.QWidget):
             'maintenance' : []
         }
 
-
         self.waysideio_ref = waysideio
         self.FAULTS = ["OK", "BROKEN RAIL", "CIRCUIT FAILURE", "POWER FAILURE","UNDEFINED"]
 
     ## Main window generation
     def setupUi(self, main_window):
-        # self.setStyleSheet("background-color: #747c8a;")
         self.main_window_reference = main_window
 
         main_window.setObjectName("main_window")
         main_window.resize(800, 600)
+        main_window.setStyleSheet("background-color: #747c8a;")
+        self.setStyleSheet("background-color: #747c8a;")
 
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Ignored)
         sizePolicy.setHorizontalStretch(0)
@@ -52,6 +54,7 @@ class TrackControllerWindow(QtWidgets.QWidget):
         self.toolBox = QtWidgets.QToolBox(main_window)
         self.toolBox.setObjectName("toolBox")
         self.toolBox.setFont(QtGui.QFont())
+        self.toolBox.setStyleSheet("background-color: #747c8a;")
 
         if os.name == 'nt':
             path = os.path.abspath(__file__.replace(__name__.replace('.', '\\')+'.py', ''))
@@ -82,6 +85,8 @@ class TrackControllerWindow(QtWidgets.QWidget):
         self.verticalLayout_2.setObjectName("verticalLayout_2")
         self.redline_controllers = QtWidgets.QTabWidget(self.redline_tab)
         self.redline_controllers.setObjectName("redline_controllers")
+
+        self.redline_tab.setStyleSheet("background-color: #747c8a;")
 
         for controller in redline_layout:
             ## Creating a controller tab
@@ -119,6 +124,7 @@ class TrackControllerWindow(QtWidgets.QWidget):
         self.verticalLayout_7.setObjectName("verticalLayout_7")
         self.greenline_controllers = QtWidgets.QTabWidget(self.greenline_tab)
         self.greenline_controllers.setObjectName("greenline_controllers")
+        self.greenline_tab.setStyleSheet("background-color: #747c8a;")
 
         for controller in greenline_layout:
             ## Creating a controller tab
@@ -152,7 +158,7 @@ class TrackControllerWindow(QtWidgets.QWidget):
                     with open(file) as f:
                         self.waysideio_ref.uploadPLC('red', idx, file)
                         # print(f.readline())
-                        f.close()         
+                        f.close()
 
         if "greenline" in loc.objectName():
             if self.greenline_reference['maintenance'][int(idx)]:
