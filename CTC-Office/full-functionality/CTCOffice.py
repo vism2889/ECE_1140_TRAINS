@@ -588,10 +588,10 @@ class CTCOffice(QWidget):
 
     def readOccupancySignal(self, occupancySignal):
         print(occupancySignal)
-        # for block in range(0, len(occupancySignal[0])):
-        #     self.greenLineBlocks.setOccupancy(str(block+1), occupancySignal[block])
-        # for block in range(0, len(occupancySignal[1])):
-        #     self.greenLineBlocks.setOccupancy(str(block+1), occupancySignal[block])
+        for block in range(0, len(occupancySignal[1])):
+            self.greenLineBlocks.setOccupancy(str(block+1), occupancySignal[1][block])
+        for block in range(0, len(occupancySignal[0])):
+            self.redLineBlocks.setOccupancy(str(block+1), occupancySignal[0][block])
 
     def toggleDispatchMode(self):
         if self.manualMode:
