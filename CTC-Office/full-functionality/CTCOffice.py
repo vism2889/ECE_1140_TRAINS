@@ -210,6 +210,13 @@ class CTCOffice(QWidget):
         self.toggleMaintenanceButton.clicked.connect(self.toggleMaintenance)
         self.toggleMaintenanceButton.show()
 
+        self.toggleSwitchButton = QtWidgets.QPushButton(self)
+        self.toggleSwitchButton.setGeometry(450,330,140,20)
+        self.toggleSwitchButton.setStyleSheet("background-color: #e8c33c;")
+        self.toggleSwitchButton.setText("Toggle Switch")
+        self.toggleSwitchButton.clicked.connect(self.toggleSwitch)
+        self.toggleSwitchButton.show()
+
     ##################### TRAIN INFO ########################
         self.destinationTable = QtWidgets.QTableWidget(self)
         self.destinationTable.setGeometry(10,450,250,120)
@@ -522,9 +529,23 @@ class CTCOffice(QWidget):
         maintenanceState = self.selectedBlockLine.getMaintenanceState(str(self.selectedBlock))
         if self.selectedBlockLine == self.greenLineBlocks:
             self.signals.signalMaintenance.emit(["Green", self.selectedBlock, maintenanceState])
+            self.greenLineMaintenance = maintenanceState
         else:
             self.signals.signalMaintenance.emit(["Red", self.selectedBlock, maintenanceState])
+            self.redLineMaintenance = maintenanceState
         self.updateMaintenanceState()
+
+    def toggleSwitch(self):
+        item = QtWidgets.QTableWidgetItem()
+        currentSwitchState = self.selectedBlockLine.getSwitchState(str(self.selectedBlock))
+        if self.selectedBlockLine == self.greenLineBlocks and self.greenLineMaintenance:
+            maintenanceState = self.selectedBlockLine.setSwitchState(str(self.selectedBlock), not currentSwitchState)
+            currentSwitch = self.selectedBlockLine.switch(str(self.selectedBlock))
+            item.setText(str(currentSwitch[0]) + " " + str(currentSwitch[1]))
+        elif self.selectedBlockLine == self.redLineBlocks and self.redLineMaintenance:
+            maintenanceState = self.selectedBlockLine.setSwitchState(str(self.selectedBlock), not currentSwitchState)
+            currentSwitch = self.selectedBlockLine.switch(str(self.selectedBlock))
+            item.setText(str(currentSwitch[0]) + " " + str(currentSwitch[1]))
 
     def launchDispatchPopUp(self):
         self.dispatchWidget = QtWidgets.QWidget()
@@ -560,8 +581,17 @@ class CTCOffice(QWidget):
         self.selectedTrainLine.sendAuthority(self.selectedTrain, self.signals)
 
     def readOccupancySignal(self, occupancySignal):
+<<<<<<< Updated upstream
         for block in range(0, len(occupancySignal)):
             self.greenLineBlocks.setOccupancy(str(block+1), occupancySignal[block])
+=======
+        pass
+        #print(occupancySignal)
+        # for block in range(0, len(occupancySignal[0])):
+        #     self.greenLineBlocks.setOccupancy(str(block+1), occupancySignal[block])
+        # for block in range(0, len(occupancySignal[1])):
+        #     self.greenLineBlocks.setOccupancy(str(block+1), occupancySignal[block])
+>>>>>>> Stashed changes
 
     def toggleDispatchMode(self):
         if self.manualMode:
