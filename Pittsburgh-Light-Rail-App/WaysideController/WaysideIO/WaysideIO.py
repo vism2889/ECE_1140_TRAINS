@@ -160,7 +160,6 @@ class Controller():
     ## Return if a block, in maintenance or has  fault
     def blockState(self, blockNum):
         flag = 0
-
         if self.track['block'][str(blockNum)]:
             flag +=1
         if self.track['block-states'][str(blockNum)]:
@@ -208,13 +207,11 @@ class WaysideIO(QWidget):
         curr = loc[3]
 
         if line == 0:
-            controllers = self.lookupTable['red'][str(curr)]['controller']
-            authority = self.planAuthority(self.redlineControllers[controllers[0][0]], self.redlineTrack, curr, prev)
+            authority = self.planAuthority('red', self.redlineControllers, self.redlineTrack, curr, prev)
             self.signals.waysideAuthority.emit([line, id, authority])
 
         if line == 1:
-            controllers = self.lookupTable['green'][str(curr)]['controller']
-            authority = self.planAuthority(self.greenlineControllers[controllers[0][0]], self.greenlineTrack, curr, prev)
+            authority = self.planAuthority('green', self.greenlineControllers, self.greenlineTrack, curr, prev)
             self.signals.waysideAuthority.emit([line, id, authority])
 
     ##  Driver for most of the logic
@@ -314,7 +311,7 @@ class WaysideIO(QWidget):
     ## HELPERS ##
     #############
     ## Figure out the next 1-5 blocks that are traversable
-    def planAuthority(self, controller, track, curr, prev):
+    def planAuthority(self, line, controllers, track, curr, prev):
         previousBlock = prev
         currentBlock = curr
         authority = [curr]
@@ -331,7 +328,11 @@ class WaysideIO(QWidget):
                 return authority
 
             ## Check the state of the block
-            blockOccupied = controller.blockState(nextBlock.id)
+
+            # blockOccupied = controller.blockState(nextBlock.id)
+            controller = self.lookupBlock(line, nextBlock.id)['controller']
+            blockOccupied = controllers[controller[0][0]].blockState(nextBlock.id)
+
             if not blockOccupied:
                 authority.append(nextBlock.id)
             else:
