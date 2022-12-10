@@ -29,10 +29,16 @@ Instructions for contributing to this repository:
 Instructions for running the Pittsburgh Light Rail North Shore Extension application:
 
 Sytem Requirement Dependencies:
+    - PC w/ intel i7 or equivalent
+    - OS should be windows 10 or higher
 
 Software Dependencies:
+    - Python 3
+    - Python Pip
+    - PyQt5 or newer
 
-External Package Dependencies
+External Package Dependencies:
+    - LINK TO WINSERVER HERE
 
 ## Resources
 Put any important development resrouces here.
