@@ -214,7 +214,7 @@ class TrainModel(QtWidgets.QMainWindow):
         #critical info
         self.serv_brake_disp.setText(f'{self.t.service_brake}')
         self.ebrake_disp.setText(f'{self.t.e_brake}')
-        self.auth_disp.setText(f'{self.t.pm.train_authority[0]}')
+        self.auth_disp.setText(f'{self.t.pm.train_authority}')
         self.grade_disp.setText(f'{self.t.grade} %')
         self.switch_disp.setText(f'{self.t.switch} miles')
 
@@ -223,6 +223,9 @@ class TrainModel(QtWidgets.QMainWindow):
         self.next_st_disp.setText(f'{self.t.next_station}')
         
         if time.time()-self.last_update > 0.1:
+            if self.t.line != None and self.t.pm.prev_block != None and self.t.pm.curr_block != 0:
+                print(f'values are, line: {self.t.line}, previous block: {self.t.pm.prev_block}, curr block: {self.t.pm.curr_block}')
+                self.signals.trainLocation.emit([int(self.t.line), self.t.id, int(self.t.pm.prev_block), int(self.t.pm.curr_block)])
             # print("inside if statement")
             if self.t.e_brake == False and self.t.service_brake == False and self.t.dispatched:
                 self.t.set_power(self.t.pm.power)
@@ -231,15 +234,14 @@ class TrainModel(QtWidgets.QMainWindow):
                 # print(f'Curr Pos in block {self.qt.t.pm.curr_block} is: {self.qt.t.pm.curr_pos}')
                 self.signals.occupancyFromTrainSignal.emit(self.t.pm.occ_list)
                 self.signals.commandedSpeedSignal.emit(self.t.pm.speed_limit)
+                print(f"Authority is {self.t.pm.train_authority}")
                 self.signals.authoritySignal.emit(self.t.pm.train_authority)
                 self.last_update = time.time()
                 # print('PUBLISHING!!!')
                 if self.hw:
                     self.mp.publish()
             
-            if self.t.line != None and self.t.pm.prev_block != None and self.t.pm.curr_block != 0:
-                print(f'values are, line: {self.t.line}, previous block: {self.t.pm.prev_block}, curr block: {self.t.pm.curr_block}')
-                self.signals.trainLocation.emit([int(self.t.line), self.t.id, int(self.t.pm.prev_block), int(self.t.pm.curr_block)])
+            
             # elif type(self.t.line) != int:
             #     print("LINE not int")
             # elif type(self.t.pm.prev_block ) != int:
