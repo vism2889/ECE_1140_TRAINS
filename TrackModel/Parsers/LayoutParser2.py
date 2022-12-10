@@ -151,12 +151,44 @@ class LayoutParser:
                     self.currBlock.station = station
             if 'SWITCH' in infra:
                 switch = infra.split()
+                
+                newSwitch = []
                 if len(switch) > 1:
                     switch = switch[1:]
-                    self.currBlock.switch = switch
+                    if len(switch) > 2:
+                        switch = switch[:2]
+                    for item in switch:
+                        x = item.strip("(")
+                        x = x.replace(';', ' ')
+                        
+                        x = x.replace(")", '')
+                        x = x.lstrip()
+                        x = x.rstrip()
+                        if ' ' in x:
+                            x = x.split(' ')
+                            for val in x:
+                                newSwitch.append(val)
+                        else:
+                            newSwitch.append(x)
+                        #print('item', x)
+                print('SWITCH', newSwitch)
+                switch = newSwitch
+                if len(switch) > 1 and type(switch)==list:
+                    self.currBlock.switchForward = switch[0]
+                    self.currBlock.switchReverse = switch[1]
                 else:
-                    switch = switch[0]
-                    self.currBlock.switch = switch
+                    self.currBlock.switchForward = switch
+                self.currBlock.switch = switch
+                print("switch:      ", switch)
+                if type(self.currBlock.switchForward) ==list:
+                    self.currBlock.switchForward = self.currBlock.switchForward[0]
+                print('forward', self.currBlock.switchForward)
+                
+                print('reverse', self.currBlock.switchReverse)
+
+            # else:
+            #     switch = switch[0]
+            #     self.currBlock.switch = switch
             if 'CROSSING' in infra:
                 self.currBlock.crossingPresence = True
             if 'UNDERGROUND' in infra:
