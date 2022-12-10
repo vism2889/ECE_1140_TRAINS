@@ -19,7 +19,6 @@ import sys
 import os
 import time
 from train import Train
-from Server_Comm import MyPub, MySub
 
 
 
@@ -35,6 +34,7 @@ class TrainModel(QtWidgets.QMainWindow):
         self.hw = hw
 
         if self.hw:
+            from Server_Comm import MyPub, MySub
             self.mp = MyPub(self.t)
             self.ms = MySub(self.t)
 
@@ -89,7 +89,6 @@ class TrainModel(QtWidgets.QMainWindow):
 
         self.t.pm.ctc_authority = msg
 
-        pass
     
     def wayside_authority(self,msg):
         self.t.pm.waysideAuthority = msg[1]
@@ -236,7 +235,8 @@ class TrainModel(QtWidgets.QMainWindow):
                 if self.hw:
                     self.mp.publish()
             
-            self.signals.trainLocation.emit([self.t.line, self.t.id, self.t.pm.prev_block, self.t.pm.curr_block])
+            if self.t.line != None and self.t.pm.prev_block != None and self.t.pm.curr_block !=0:
+                self.signals.trainLocation.emit([self.t.line, self.t.id, self.t.pm.prev_block, self.t.pm.curr_block])
 
         if time.time()-self.brake_update > 0.5:
             if self.t.service_brake == True:
