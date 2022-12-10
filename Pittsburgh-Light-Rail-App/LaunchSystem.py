@@ -33,6 +33,7 @@ from CTCOffice import CTCOffice
 sys.path.append("../TrackModel/UI")
 sys.path.append("../TrackModel/Parsers")
 sys.path.append("../TrackModel/Track-System-Models")
+sys.path.append("../TrackModel/images")
 from TrackModelApp import TrackModel
 
 # Wayside IMPORTS
