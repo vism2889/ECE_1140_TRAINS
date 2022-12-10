@@ -575,6 +575,8 @@ class TrackModel(QWidget):
         used to display all the stations for a given line, the boarding and 
         exiting passengers, and the block at which the station exists
         '''
+        self.stationInfoTable.setRowCount(0)
+        self.stationInfoTable.setRowCount(10) 
         for i in range(len(self.stations[self.currLineIndex])):
             self.stationInfoTable.setItem(i, 0, QTableWidgetItem(self.stations[self.currLineIndex][i][0]))
             self.stationInfoTable.setItem(i, 1, QTableWidgetItem(self.stations[self.currLineIndex][i][1]))
@@ -586,10 +588,13 @@ class TrackModel(QWidget):
         Used to display all the switches for a given line, the switch state, 
         and the block at which the switch exists
         '''
-        
+        self.switchInfoTable.setRowCount(0)
+        self.switchInfoTable.setRowCount(10) 
         for i in range(len(self.switchText[self.currLineIndex])):
             self.switchInfoTable.setItem(i, 0, QTableWidgetItem(str(self.switchText[self.currLineIndex][i][0])))
-            self.switchInfoTable.setItem(i, 1, QTableWidgetItem(str(self.switchText[self.currLineIndex][i][1])))
+            self.switchInfoTable.setItem(i, 1, QTableWidgetItem(str(self.switchText[self.currLineIndex][i][1][0])))
+            # if len(self.switchText[self.currLineIndex][i][1]) >=2:
+            #     self.switchInfoTable.setItem(i, 2, QTableWidgetItem(str(self.switchText[self.currLineIndex][i][2][1])))
 
     def onClickedLine(self, item):
         '''
