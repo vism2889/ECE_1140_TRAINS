@@ -816,7 +816,7 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
     
     # Signals Functions
     def setAuthority(self, msg):
-        self.authority = msg[0]
+        self.authority = msg
         self.Authority_lcdDisplay.display(self.authority)
         # Safe Braking Distance 
         # authority (m)
