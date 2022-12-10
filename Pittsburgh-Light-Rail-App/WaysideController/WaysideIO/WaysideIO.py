@@ -45,7 +45,7 @@ class Controller():
 
             ## Switches
             for switch in self.layout['sections'][section]['switches']:
-                self.track['switch'][switch] = False
+                self.track['switch'][switch] = True
 
             ## Crossings
             for crossing in self.layout['sections'][section]['crossing']:
@@ -193,8 +193,6 @@ class WaysideIO(QWidget):
             'green' : {}
         }
 
-        self.test = False
-
     ###############
     ## CALLBACKS ##
     ###############
@@ -209,12 +207,12 @@ class WaysideIO(QWidget):
         prev = loc[2]
         curr = loc[3]
 
-        if line.lower() == 0:
+        if line == 0:
             controllers = self.lookupTable['red'][str(curr)]['controller']
             authority = self.planAuthority(self.redlineControllers[controllers[0][0]], self.redlineTrack, curr, prev)
             self.signals.waysideAuthority.emit([line, id, authority])
 
-        if line.lower() == 1:
+        if line == 1:
             controllers = self.lookupTable['green'][str(curr)]['controller']
             authority = self.planAuthority(self.greenlineControllers[controllers[0][0]], self.greenlineTrack, curr, prev)
             self.signals.waysideAuthority.emit([line, id, authority])
@@ -223,8 +221,6 @@ class WaysideIO(QWidget):
     #       Sets block occupancy and eventually runs
     #       the PLC program loaded into the controller
     def blockOccupancyCallback(self, occupancy):
-        print("Occupancy:")
-        print(occupancy)
         redLine = occupancy[0]
         greenLine = occupancy[1]
 
@@ -421,8 +417,6 @@ class WaysideIO(QWidget):
             for i, c in enumerate(layout):
                 self.greenlineControllers.append(Controller(line.lower(), i, c, self.ui, self))
                 self.populateTable(i,c, 1)
-
-        # print(self.lookupTable['red'][str(24)])
 
         ## Registering signal callbacks
         self.signals.blockFailures.connect(self.blockFailureCallback)

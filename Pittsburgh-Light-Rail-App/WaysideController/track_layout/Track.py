@@ -56,6 +56,8 @@ class Track():
         return self.blocks[blockNum-1]
 
     def getInfo(self, blockNum):
+        if self.blocks[blockNum-1].hasSwitch:
+            print(self.blocks[blockNum-1].switch)
         self.blocks[blockNum-1].printBlock()
 
     def confSwitch(self, id, blockNum):
@@ -63,8 +65,7 @@ class Track():
 
     def setSwitch(self, id, val=None):
         if id not in self.switches:
-            print("Error in switch lookup")
-            return
+            return -1
 
         blockNum = self.switches[id]
         block = self.getBlock(blockNum)
@@ -75,8 +76,11 @@ class Track():
             else:
                 block.switch = not block.switch
 
+        return 0
+
     def getNextBlock(self, curr, prev):
         neighbors = self.blocks[curr-1].getNeighbors()
+
         if neighbors[0].id == prev:
             return neighbors[1]
 
