@@ -282,8 +282,9 @@ class PointMassModel():
             self.curr_pos = self.curr_pos-self.curr_block_len
             self.prev_pos = 0
             #incrementing curr_block
-            self.curr_block = self.waysideAuthority[1]
-            self.prev_block = self.waysideAuthority[0]
+            if len(self.waysideAuthority) > 0:
+                self.curr_block = self.waysideAuthority[1]
+                self.prev_block = self.waysideAuthority[0]
 
         # self.occ_index = self.blocks[self.curr_block-1]
         # self.occ_list[self.occ_index] = 1
@@ -367,7 +368,7 @@ class Train():
         self.Failures = {'Brake':self.brake_failure, 'Signal':self.signal_pickup_failure, 'Train_Engine': self.train_engine_failure}
         
         #Current Line
-        self.line = 'blue'
+        self.line = None
         
         #Brake Values
         self.e_brake = False

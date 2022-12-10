@@ -109,6 +109,7 @@ class CTCOffice(QWidget):
         self.changeClockSpeedButton = QtWidgets.QPushButton(self)
         self.changeClockSpeedButton.setGeometry(450,15,140,20)
         self.changeClockSpeedButton.setText("Change clock speed")
+        self.changeClockSpeedButton.setStyleSheet("background-color: #e8c33c;")
         self.changeClockSpeedButton.clicked.connect(self.toggleTenTimeSpeed)
 
     ##################### RED LINE ##########################
@@ -206,6 +207,7 @@ class CTCOffice(QWidget):
 
         self.toggleMaintenanceButton = QtWidgets.QPushButton(self)
         self.toggleMaintenanceButton.setGeometry(450,310,140,20)
+        self.toggleMaintenanceButton.setStyleSheet("background-color: #e8c33c;")
         self.toggleMaintenanceButton.setText("Toggle Maintenance")
         self.toggleMaintenanceButton.clicked.connect(self.toggleMaintenance)
         self.toggleMaintenanceButton.show()
@@ -224,24 +226,28 @@ class CTCOffice(QWidget):
 
         self.dispatchTrainButton = QtWidgets.QPushButton(self)
         self.dispatchTrainButton.setGeometry(450,70,140,25)
+        self.dispatchTrainButton.setStyleSheet("background-color: #e8c33c;")
         self.dispatchTrainButton.setText("Dispatch")
         self.dispatchTrainButton.show()
         self.dispatchTrainButton.clicked.connect(self.launchDispatchPopUp)
 
         self.uploadScheduleButton = QtWidgets.QPushButton(self)
         self.uploadScheduleButton.setGeometry(450,70,140,25)
+        self.uploadScheduleButton.setStyleSheet("background-color: #e8c33c;")
         self.uploadScheduleButton.setText("Upload Schedule")
         self.uploadScheduleButton.clicked.connect(self.uploadSchedule)
         self.uploadScheduleButton.hide()
 
         self.toggleDispatchModeButton = QtWidgets.QPushButton(self)
         self.toggleDispatchModeButton.setGeometry(450,105,140,25)
+        self.toggleDispatchModeButton.setStyleSheet("background-color: #e8c33c;")
         self.toggleDispatchModeButton.setText("Toggle Dispatch Mode")
         self.toggleDispatchModeButton.show()
         self.toggleDispatchModeButton.clicked.connect(self.toggleDispatchMode)
 
         self.toggleDestinationsButton = QtWidgets.QPushButton(self)
         self.toggleDestinationsButton.setGeometry(265,545,140,20)
+        self.toggleDestinationsButton.setStyleSheet("background-color: #e8c33c;")
         self.toggleDestinationsButton.setText("Toggle Destinations")
         self.toggleDestinationsButton.clicked.connect(self.toggleDestinations)
         self.toggleDestinationsButton.show()
@@ -560,8 +566,11 @@ class CTCOffice(QWidget):
         self.selectedTrainLine.sendAuthority(self.selectedTrain, self.signals)
 
     def readOccupancySignal(self, occupancySignal):
-        for block in range(0, len(occupancySignal)):
-            self.greenLineBlocks.setOccupancy(str(block+1), occupancySignal[block])
+        print(occupancySignal)
+        # for block in range(0, len(occupancySignal[0])):
+        #     self.greenLineBlocks.setOccupancy(str(block+1), occupancySignal[block])
+        # for block in range(0, len(occupancySignal[1])):
+        #     self.greenLineBlocks.setOccupancy(str(block+1), occupancySignal[block])
 
     def toggleDispatchMode(self):
         if self.manualMode:
