@@ -617,8 +617,8 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
         self.Manual_lights_ComboBox.setCurrentIndex(3)
         self.Manual_doors_ComboBox.setCurrentIndex(0)
         self.Manual_temperature_box.setValue(self.temperature)
-        self.speed_Slider.setValue(self.commandedSpeed * 2.23694)
-        self.Manual_CommandedSpeed_lcdDisplay.display(self.commandedSpeed * 2.23694)
+        self.speed_Slider.setValue(int(self.commandedSpeed * 2.23694))
+        self.Manual_CommandedSpeed_lcdDisplay.display(int(self.commandedSpeed * 2.23694))
         
         ## Initialize PID
         self.pid = PID(self.kp, self.ki, 0, setpoint=(self.commandedSpeed))
@@ -674,7 +674,7 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
 
 ###### Automatic Control Functions
     def setAutoCommandedSpeed(self):
-        self.Auto_CommandedSpeedDisplay.display(self.commandedSpeed * 2.23694)
+        self.Auto_CommandedSpeedDisplay.display(int(self.commandedSpeed * 2.23694))
         
     def setAutoSpeedLimit(self):
         self.Auto_SpeedDisplay.display(self.speedLimit * 2.23694)
@@ -711,16 +711,16 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
         if((self.speed_Slider.value() / 2.23694) > self.speedLimit):
             self.commandedSpeed = self.speedLimit
             
-            self.speed_Slider.setValue(self.commandedSpeed * 2.23694)   # display in mph
-            self.Manual_CommandedSpeed_lcdDisplay.display(self.commandedSpeed * 2.23694)    # display in mph
+            self.speed_Slider.setValue(int(self.commandedSpeed * 2.23694))   # display in mph
+            self.Manual_CommandedSpeed_lcdDisplay.display(int(self.commandedSpeed * 2.23694))    # display in mph
             
             self.serviceBrakeState = True
             self.braking_Slider.setValue(True)
             self.signals.serviceBrakeSignal.emit(self.serviceBrakeState)
         else:
             self.commandedSpeed = self.speed_Slider.value() / 2.23694  # variable in m/s
-            self.speed_Slider.setValue(self.commandedSpeed * 2.23694)
-            self.Manual_CommandedSpeed_lcdDisplay.display(self.commandedSpeed * 2.23694)    # display in mph
+            self.speed_Slider.setValue(int(self.commandedSpeed * 2.23694))
+            self.Manual_CommandedSpeed_lcdDisplay.display(int(self.commandedSpeed * 2.23694))    # display in mph
         
     def setManualControl_ServiceBrake(self):
         self.serviceBrakeState = self.braking_Slider.value()
