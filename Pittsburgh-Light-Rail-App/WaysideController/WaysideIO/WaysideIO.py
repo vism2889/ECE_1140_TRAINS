@@ -160,8 +160,11 @@ class Controller():
     ## Return if a block, in maintenance or has  fault
     def blockState(self, blockNum):
         flag = 0
+        print(f'Checking block occupancy for block {blockNum}')
+        print(self.track)
 
         if self.track['block'][str(blockNum)]:
+            print(f'block {blockNum} is occupied')
             flag +=1
         if self.track['block-states'][str(blockNum)]:
             flag +=1
@@ -215,6 +218,7 @@ class WaysideIO(QWidget):
         if line == 1:
             controllers = self.lookupTable['green'][str(curr)]['controller']
             authority = self.planAuthority(self.greenlineControllers[controllers[0][0]], self.greenlineTrack, curr, prev)
+            print(f'Authority: {authority}')
             self.signals.waysideAuthority.emit([line, id, authority])
 
     ##  Driver for most of the logic
@@ -332,10 +336,12 @@ class WaysideIO(QWidget):
 
             ## Check the state of the block
             blockOccupied = controller.blockState(nextBlock.id)
+            print(f'block {nextBlock.id} is {blockOccupied}')
             if not blockOccupied:
                 authority.append(nextBlock.id)
             else:
                 if len(authority) <= 2:
+                    print('yo bitch')
                     return [curr]
 
                 ## Set a 2 block buffer for the authority
@@ -423,6 +429,11 @@ class WaysideIO(QWidget):
         self.signals.globalOccupancyFromTrackModelSignal.connect(self.blockOccupancyCallback)
         self.signals.signalMaintenance.connect(self.maintenanceCallback)
         self.signals.trainLocation.connect(self.trainLocationCallback)
+
+        if line == 'green':
+            controllers = self.lookupBlock('green', 63)['controller']
+            print(f'auth: {self.planAuthority(self.redlineControllers[controllers[0][0]], self.greenlineTrack, 63, 0)}')
+            exit(0)
 
 if __name__ == '__main__':
 

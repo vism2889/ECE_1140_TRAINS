@@ -367,7 +367,7 @@ class Train():
         self.Failures = {'Brake':self.brake_failure, 'Signal':self.signal_pickup_failure, 'Train_Engine': self.train_engine_failure}
         
         #Current Line
-        self.line = 'blue'
+        self.line =  None
         
         #Brake Values
         self.e_brake = False

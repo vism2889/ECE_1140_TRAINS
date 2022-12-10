@@ -236,7 +236,8 @@ class TrainModel(QtWidgets.QMainWindow):
                 if self.hw:
                     self.mp.publish()
             
-            self.signals.trainLocation.emit([self.t.line, self.t.id, self.t.pm.prev_block, self.t.pm.curr_block])
+            if self.t.line != None and self.t.pm.prev_block != None and self.t.pm.curr_block != None:
+                self.signals.trainLocation.emit([self.t.line, self.t.id, self.t.pm.prev_block, self.t.pm.curr_block])
 
         if time.time()-self.brake_update > 0.5:
             if self.t.service_brake == True:
