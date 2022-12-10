@@ -84,13 +84,16 @@ class TrackModel(QWidget):
         
         self.heaterOn                = False 
         
-        self.orderedGreenLineList = []
+        self.orderedGreenLineList    = []
         self.orderedGreenLine()
         
         # System Communication Signals
         if signals:
             self.signals = signals
             self.signals.trainLocation.connect(self.getOccupancy)
+            self.signals.switchState.connect()
+            self.signals.waysideAuthority.connect()
+            self.signals.crossingState.connect()
             # self.signals.switchState.connect(self.updateSwitchState)
 
             # self.signals.stoppedBlocks.connect(self.updateStoppedBlocks) # sets a list = [list of blocks that trains are stopped at]
@@ -779,8 +782,8 @@ class TrackModel(QWidget):
         currBlock = occupancy[3]
 
         # print("GUI OCCUPANCY", self.occupancy)
-        self.occupancy[line][lastBlock] = 0
-        self.occupancy[line][currBlock] = 1
+        self.occupancy[int(line)][lastBlock] = 0
+        self.occupancy[line][currBlock]      = 1
         self.signals.globalOccupancyFromTrackModelSignal.emit(self.occupancy) # should emit a new global occupancy
         self.updateBlockOccupancyCallback()
 
