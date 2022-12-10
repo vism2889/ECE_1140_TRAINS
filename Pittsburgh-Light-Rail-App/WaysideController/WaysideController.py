@@ -20,7 +20,6 @@ import signal
 
 class WaysideController():
     def __init__(self, signals, launchTestWindow=False):
-        self.active = False
 
         ## Logger
         format = '[%(asctime)s] %(name)s (%(levelname)s): %(message)s'
@@ -33,22 +32,16 @@ class WaysideController():
         wayside = WaysideIO(signals)
 
         ## UI
-        w = QtWidgets.QWidget()
+        self.w = QtWidgets.QWidget()
         wTest = QtWidgets.QWidget()
-        main = TrackControllerWindow(wayside)
-        main.setupUi(w)
-
-        if launchTestWindow:
-            test = Ui_test_window(main)
-            test.setupUi(wTest)
-            w.show()
-            wTest.show()
-        else:
-            w.show()
+        self.main = TrackControllerWindow(wayside)
+        self.main.setupUi(self.w)
 
         ## Set UI reference
-        wayside.setUI(main)
-        self.active = True
+        wayside.setUI(self.main)
+
+    def show(self):
+        self.w.show()
 
 ## Commandline CTRL-C ##
 def handler(signum, frame):
