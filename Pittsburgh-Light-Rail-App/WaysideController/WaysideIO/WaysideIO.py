@@ -208,10 +208,12 @@ class WaysideIO(QWidget):
 
         if line == 0:
             authority= self.planAuthority('red', self.redlineControllers, self.redlineTrack, curr, prev)
+            print(f'{id}: {authority}')
             self.signals.waysideAuthority.emit([line, id, authority])
 
         if line == 1:
             authority = self.planAuthority('green', self.greenlineControllers, self.greenlineTrack, curr, prev)
+            print(f'{id}: {authority}')
             self.signals.waysideAuthority.emit([id, authority])
 
     ##  Driver for most of the logic

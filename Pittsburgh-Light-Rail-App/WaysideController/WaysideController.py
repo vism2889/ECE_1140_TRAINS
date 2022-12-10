@@ -57,6 +57,7 @@ if __name__ == '__main__':
     wayside.show()
 
     signals.trainLocation.emit(['green', 0, 84, 85])
+
     ## Testing
     # blockFailures = []
     # for i in range(76):
