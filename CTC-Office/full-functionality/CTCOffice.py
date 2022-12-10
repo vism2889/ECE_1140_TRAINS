@@ -566,11 +566,12 @@ class CTCOffice(QWidget):
         self.selectedTrainLine.sendAuthority(self.selectedTrain, self.signals)
 
     def readOccupancySignal(self, occupancySignal):
-        print(occupancySignal)
+        # print(occupancySignal)
         # for block in range(0, len(occupancySignal[0])):
         #     self.greenLineBlocks.setOccupancy(str(block+1), occupancySignal[block])
         # for block in range(0, len(occupancySignal[1])):
         #     self.greenLineBlocks.setOccupancy(str(block+1), occupancySignal[block])
+        pass
 
     def toggleDispatchMode(self):
         if self.manualMode:
