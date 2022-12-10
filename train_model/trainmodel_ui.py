@@ -95,9 +95,6 @@ class TrainModel(QtWidgets.QMainWindow):
     
     def wayside_authority(self,msg):
         self.t.pm.waysideAuthority = msg[1]
-        if msg[1][0] == 'T':
-            print("OOP")
-        # print(msg)
     
     def speedup(self, msg):
         self.t.pm.speed_up = int(msg)
