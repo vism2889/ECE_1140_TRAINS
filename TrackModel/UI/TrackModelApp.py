@@ -49,7 +49,7 @@ class TrackModel(QWidget):
         
         today                        = date.today()
         self.currDate                = today.strftime("%d/%m/%Y")
-        print("d1 =", self.currDate)
+        #print("d1 =", self.currDate)
 
         # Current Selections
         self.currBlock               = None
@@ -174,7 +174,7 @@ class TrackModel(QWidget):
         updates the temperature to be what the user inputs into the temperature prompt
         '''
         self.temp, done = QInputDialog.getInt(self, 'Temperature Edit', 'Enter Track Line Temperature:')
-        print(self.temp)
+        #print(self.temp)
         self.temperatureVal.setText("Temp: " + str(self.temp) + ' F')
         if self.temp <= 32:
             self.heaterSignal.emit(True)
@@ -427,7 +427,7 @@ class TrackModel(QWidget):
             self.blockslistwidget.item(int(self.currBlock.blockNumber)-1).setIcon(QIcon(""))
         
         x = [x for x in self.faults[self.currLineIndex] if x != 0]
-        print(x)
+        #print(x)
         if len(x)==0:
             self.linelistwidget.item(int(self.currLineIndex)).setIcon(QIcon(""))
 
@@ -444,7 +444,7 @@ class TrackModel(QWidget):
         options |= QFileDialog.DontUseNativeDialog
         fileName, _ = QFileDialog.getOpenFileName(self,"Track Layout Selection", "../Layout-Files","All Files (*);;Python Files (*.py)", options=options)
         if fileName:
-            print(fileName)
+            #print(fileName)
             self.layoutFile = fileName
             self.initLayout()
 
@@ -562,7 +562,7 @@ class TrackModel(QWidget):
         Updates the background color of all the blocks in the current lines
         block selection list with colors reflecting thier fault and occupancy states.
         '''
-        print("Block Update Called")
+        #print("Block Update Called")
         for i in range(len(self.occupancy[self.currLineIndex])):
             if self.faults[self.currLineIndex][i] == True:
                 self.blockslistwidget.item(i).setBackground(QColor(255,0,0))
@@ -620,8 +620,8 @@ class TrackModel(QWidget):
         self.displayLineStations()
         self.displayLineSwitches()
         self.loadBlocks()
-        print(self.boardingPassengers)
-        print(self.stations)
+        #print(self.boardingPassengers)
+        #print(self.stations)
 
     def onClickedBlock(self, item):
         '''
@@ -772,7 +772,7 @@ class TrackModel(QWidget):
         '''
         Updates all occupancy related displays and emits a new global occupancy
         '''
-        print(occupancy)
+        #print(occupancy)
         line      = occupancy[0]
         lastBlock = occupancy[2]
         currBlock = occupancy[3]
@@ -810,10 +810,10 @@ class TrackModel(QWidget):
         should update the track heater to be True for all blocks on both lines
         '''
         if state:
-            print("heater on")
+            #print("heater on")
             self.heaterOn = True
         else:
-            print("heater off")
+           # print("heater off")
             self.heaterOn = False
         
         if self.currBlockIndex != None:
