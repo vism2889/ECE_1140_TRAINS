@@ -290,8 +290,8 @@ class PointMassModel():
                 self.curr_block = self.waysideAuthority[0]
                 self.prev_block = self.prev_block
         
-        for b in self.waysideAuthority:
-            if self.curr_block == self.waysideAuthority[0]:
+        # for b in self.waysideAuthority:
+        #     if self.curr_block == self.waysideAuthority[0]:
 
                 
 
