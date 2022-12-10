@@ -7,7 +7,7 @@
 # DESCRIPTION:
 #   Used to hold all signals used for inter-module communications in the
 #   Pittsburgh Light Rail Track System
-# Last Updated: 12/7/2022 - Nathaniel Mallick 
+# Last Updated: 12/7/2022 - Nathaniel Mallick
 ##############################################################################
 
 from PyQt5 import QtCore
@@ -38,9 +38,9 @@ class Signals(QWidget):
     # CTC Office Signals
     dispatchTrainSignal      = QtCore.pyqtSignal(list)
     suggestedSpeedSignal     = QtCore.pyqtSignal(list) # List of length 2 [(int) train id, (int) suggested speed]
-    ctcAuthoritySignal       = QtCore.pyqtSignal(list) # List of length 2 [(int) train id, [(int) stops 1, (int), stop 2, ..., (int) stop n]] 
+    ctcAuthoritySignal       = QtCore.pyqtSignal(list) # List of length 2 [(int) train id, [(int) stops 1, (int), stop 2, ..., (int) stop n]]
     clockSpeedSignal         = QtCore.pyqtSignal(int)
-    signalMaintenance        = QtCore.pyqtSignal(list) # List of length 3 [(str) line, (int) block #, (bool) maintenance state]
+    signalMaintenance        = QtCore.pyqtSignal(list) # List of length 3 [(int) line, (int) block #, (bool) maintenance state]
     timeSignal               = QtCore.pyqtSignal(list)
 
     # Wayside Controller Signals
@@ -52,7 +52,7 @@ class Signals(QWidget):
     blockListSignal          = QtCore.pyqtSignal(list)
     blockLengthSignal        = QtCore.pyqtSignal(list)
     gradeSignal              = QtCore.pyqtSignal(list)
-    trainLocation            = QtCore.pyqtSignal(list) # List of length 4 that identifies a unique trains location in the track [(str) line, (int) train id, (int) previos block, (int) current block]
+    trainLocation            = QtCore.pyqtSignal(list) # List of length 4 that identifies a unique trains location in the track [(int) line, (int) train id, (int) previos block, (int) current block]
 
     # Train Controller (SW) Input Signals
     authoritySignal          = QtCore.pyqtSignal(list)

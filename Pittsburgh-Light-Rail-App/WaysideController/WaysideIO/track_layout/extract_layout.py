@@ -191,7 +191,7 @@ def generateTrackPath(path, name):
             if i['Switch'] != '':
                 block.hasSwitch = True
                 track.confSwitch(int(i['Switch']), block.id)
-                track.setSwitch(int(i['Switch']), False)
+                track.setSwitch(int(i['Switch']), True)
 
     file.close()
     return track
