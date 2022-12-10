@@ -91,7 +91,7 @@ class TrackModel(QWidget):
         if signals:
             self.signals = signals
             self.signals.trainLocation.connect(self.getOccupancy)
-            self.signals.switchState.connect(self.updateSwitchState)
+            # self.signals.switchState.connect(self.updateSwitchState)
 
             # self.signals.stoppedBlocks.connect(self.updateStoppedBlocks) # sets a list = [list of blocks that trains are stopped at]
 
@@ -597,6 +597,7 @@ class TrackModel(QWidget):
         Used to display all the switches for a given line, the switch state, 
         and the block at which the switch exists
         '''
+        
         self.switchInfoTable.setRowCount(0)
         self.switchInfoTable.setRowCount(10) 
         for i in range(len(self.switchText[self.currLineIndex])):
