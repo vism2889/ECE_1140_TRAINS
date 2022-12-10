@@ -141,7 +141,7 @@ def parseTrackLayout(path, jsonPath):
 def generateTrackPath(path, name):
     # with open(path, mode='r', encoding='utf-8-sig') as file:
     with open(path, mode='r') as file:
-        
+
         ## Return the top of the file
         trackLayout = csv.DictReader(file)
         ## Get the number of lines in the file
@@ -152,7 +152,7 @@ def generateTrackPath(path, name):
         ## Create track instance
         track = Track(name, size)
 
-        ## Go back to the top of the file 
+        ## Go back to the top of the file
         file.seek(0)
         trackLayout = csv.DictReader(file)
         yard = Block(0)
@@ -162,25 +162,25 @@ def generateTrackPath(path, name):
             ## Previous = Left, Next = Right
             prev = i['Previous']
             next = i['Next']
-            
+
             ## previous
-            if ';' in prev: 
+            if ';' in prev:
                 prev = prev.split(';')
                 for j in prev:
-                    ## Set previous 
+                    ## Set previous
                     if int(j) == 0:
                         block.setLeftNode(yard)
                     else:
                         block.setLeftNode(track.getBlock(int(j)))
             else:
                 block.setLeftNode(track.getBlock(int(prev)))
-                
+
             ## next
-            if ';' in next: 
+            if ';' in next:
                 next = next.split(';')
                 for j in next:
-                    ## Set previous 
-                    if int(j) == 0: 
+                    ## Set previous
+                    if int(j) == 0:
                         block.setRightNode(yard)
                     else:
                         block.setRightNode(track.getBlock(int(j)))
@@ -191,7 +191,7 @@ def generateTrackPath(path, name):
             if i['Switch'] != '':
                 block.hasSwitch = True
                 track.confSwitch(int(i['Switch']), block.id)
-                track.setSwitch(int(i['Switch']), False)
+                track.setSwitch(int(i['Switch']), True)
 
     file.close()
     return track
@@ -207,10 +207,10 @@ if __name__ == '__main__':
     filename = "Trains Layout - Red Line.csv"
     redTrack = generateTrackPath(filename, 'red')
 
-    ## Track simulation for the green line 
+    ## Track simulation for the green line
     # print("Testing track for the greenline(hit enter to continue and 'q' to quit)")
     # prev = 0
-    # curr = 63 
+    # curr = 63
     # greenTrack.setSwitch(62)
     # key = None
 
@@ -224,7 +224,7 @@ if __name__ == '__main__':
     #         # print(f'Getting info for block {curr}')
     #         # greenTrack.getInfo(curr)
     #         nb = greenTrack.getNextBlock(curr, prev)
-    #         if nb == -1: 
+    #         if nb == -1:
     #             print("Error and/or crash!")
     #             exit(0)
     #         print(f'Next block is {nb.id}')
@@ -237,10 +237,10 @@ if __name__ == '__main__':
     #         if int(key) > 0:
     #             greenTrack.setSwitch(int(key))
     #             continue
-    
+
     ## Track simulation for the red line
     print("Testing track for the greenline(hit enter to continue and 'q' to quit)")
-    prev = 0 
+    prev = 0
     curr = 9
     while True:
         key = input("")
@@ -250,7 +250,7 @@ if __name__ == '__main__':
         ## Continue
         if key == "":
             nb = redTrack.getNextBlock(curr, prev)
-            if nb == -1: 
+            if nb == -1:
                 print("Error and/or crash!")
                 exit(0)
             print(f'Next block is {nb.id}')
@@ -264,4 +264,3 @@ if __name__ == '__main__':
                 redTrack.setSwitch(int(key))
                 continue
 
-    

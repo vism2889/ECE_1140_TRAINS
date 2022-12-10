@@ -34,6 +34,7 @@ class TrackControllerWindow(QtWidgets.QWidget):
 
     ## Main window generation
     def setupUi(self, main_window):
+        # self.setStyleSheet("background-color: #747c8a;")
         self.main_window_reference = main_window
 
         main_window.setObjectName("main_window")

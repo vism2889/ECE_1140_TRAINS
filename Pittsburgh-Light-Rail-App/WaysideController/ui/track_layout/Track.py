@@ -11,12 +11,12 @@ class Block():
         for i in self.right:
             if i.id == block.id:
                 return
-        self.right.append(block) 
+        self.right.append(block)
 
     def setLeftNode(self, block):
         ## Check for duplicate blocks
         for i  in self.left:
-            if i.id == block.id: 
+            if i.id == block.id:
                 return
         self.left.append(block)
 
@@ -28,13 +28,13 @@ class Block():
         print("Right")
         for i in self.right:
             print(f'\t{i.id}')
-    
-    def getNeighbors(self): 
+
+    def getNeighbors(self):
         if self.hasSwitch:
-            
+
             if len(self.left) == 2:
                 return (self.left[int(self.switch)], self.right[0])
-            if len(self.right) == 2: 
+            if len(self.right) == 2:
                 return (self.left[0], self.right[int(self.switch)])
         else:
             return (self.left[0], self.right[0])
@@ -51,39 +51,40 @@ class Track():
 
     def getNumBlocks(self):
         return len(self.blocks)
-    
+
     def getBlock(self, blockNum):
         return self.blocks[blockNum-1]
-    
+
     def getInfo(self, blockNum):
         self.blocks[blockNum-1].printBlock()
-    
+
     def confSwitch(self, id, blockNum):
         self.switches[id] = blockNum
-    
+
     def setSwitch(self, id, val=None):
         if id not in self.switches:
-            print("Error in switch lookup")
-            return
+            return -1
 
         blockNum = self.switches[id]
         block = self.getBlock(blockNum)
-    
+
         if block.hasSwitch:
             if val != None:
-                block.switch = val 
-            else: 
+                block.switch = val
+            else:
                 block.switch = not block.switch
+
+        return 0
 
     def getNextBlock(self, curr, prev):
         neighbors = self.blocks[curr-1].getNeighbors()
-        if neighbors[0].id == prev: 
+        if neighbors[0].id == prev:
             return neighbors[1]
-        
-        if neighbors[1].id == prev: 
-            return neighbors[0]
-        
-        return -1 
 
-            
+        if neighbors[1].id == prev:
+            return neighbors[0]
+
+        return -1
+
+
 
