@@ -13,6 +13,7 @@ import time
 import sys
 sys.path.append("../server_interfaces")
 from in_msg import in_msg
+import numpy as np
 
 class TrainData:
     def __init__(self):
@@ -49,7 +50,11 @@ class TrainData:
         return self.authority
 
     def getFailures(self):
-        failure_states = [self.brake_failure, self.engine_failure, self.signalPickup_failure]
+        failure_states = []
+        failure_states.append((self.brake_failure, 13)) 
+        failure_states.append((self.engine_failure, 12))
+        failure_states.append((self.signalPickup_failure, 6))
+
         return failure_states
 
     def spin(self):

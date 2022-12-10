@@ -8,7 +8,6 @@
 
 # TODO:
 # - Generate new message files to take authority as a distance
-# - implement failure indicators
 # - Implement speed limit 
 #   + train cannot exceed speed limit
 # - Implement next station
@@ -33,6 +32,7 @@ from simple_pid import PID
 from pygame import mixer
 from outputData import OutputData
 from trainData import TrainData
+import time
 
 GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BCM)
@@ -42,6 +42,9 @@ GPIO.setup(14, GPIO.OUT, initial=GPIO.LOW) # internal lights
 GPIO.setup(15, GPIO.OUT, initial=GPIO.LOW) # external lights
 GPIO.setup(23, GPIO.OUT, initial=GPIO.LOW) # left door
 GPIO.setup(24, GPIO.OUT, initial=GPIO.LOW) # right door
+GPIO.setup(6, GPIO.OUT, initial=GPIO.LOW) # brake failure
+GPIO.setup(12, GPIO.OUT, initial=GPIO.LOW) # engine failure 
+GPIO.setup(13, GPIO.OUT, initial=GPIO.LOW) # pickup failure 
 
 mixer.init()
 
@@ -60,7 +63,7 @@ class Control():
         self.ebrakeCommand = False
         self.brakeCommand = False
         self.current_speed = 0
-        self.speed_limit = 100
+        self.speed_limit = 5 
         self.temperature = 0
         self.k_p = 24e3
         self.k_i = 100
@@ -121,11 +124,11 @@ class Control():
     def setSpeed(self, commanded_speed=None):
         if(commanded_speed==None):
             speed = self.input.getCommandedSpeed()
-            if(speed != None):
-                self.commanded_speed = speed
+            if(speed != None and self.limitSpeed(speed) == False):
+                self.commanded_speed = speed 
 
-        else:
-            self.commanded_speed = commanded_speed
+        elif(self.limitSpeed(commanded_speed) == False):
+            self.commanded_speed = commanded_speed 
             
     # can remove after testing
     def setCurrentSpeed(self, current_speed=None):
@@ -162,7 +165,9 @@ class Control():
     # TODO: implement speed limit
     def limitSpeed(self, speed):
         speed_limit = self.input.getSpeedLimit()
-        if(speed > speed_limit):
+        #print("\nspeed limit = ", speed_limit)
+        if(speed_limit != None and speed > self.speed_limit):  
+            self.deployServiceBrake(True)
             return False
         
         else: return True
@@ -174,7 +179,9 @@ class Control():
 
     # TODO: implement authority
     def checkAuthority(self):
-        if self.authority == 0:
+        if self.input.getAuthority() != None:
+            self.authority = self.input.getAuthority() 
+        if authority == 0:
             self.deployEbrake(True)
     
     def set_kp_ki(kp_val, ki_val, self):
@@ -205,18 +212,24 @@ class Control():
 
     def checkFailures(self):
         failures = self.input.getFailures()
-        brakeFailure = failures[0]
-        engineFailure = failures[1]
-        pickupFailure = failures[2]
-
-        if brakeFailure == True or engineFailure == True or pickupFailure == True:
-            self.vital_override = True
-            return True
-        
-        else:
+        fail = False
+        for failure, p in failures:
+            if failure:
+                self.vital_override = True
+                fail = True
+            self.failure_lights(failure, p)
+ 
+        if(fail == False):
             self.vital_override = False
             return False
-                  
+
+        elif(fail == True):
+            return True
+
+    def failure_lights(self,failure, pin):
+        if failure: GPIO.output(pin, GPIO.HIGH)
+        if not failure: GPIO.output(pin, GPIO.LOW)
+
     # used for server interface testing to send dummy data to a client acting as train model
     def sendRandom(self):
         self.output.randomize()

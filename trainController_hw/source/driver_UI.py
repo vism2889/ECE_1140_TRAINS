@@ -12,6 +12,7 @@ from analoggaugewidget import AnalogGaugeWidget
 from PyQt5.QtCore import pyqtSlot, QTimer, pyqtSignal
 from control import Control
 from manualControl import ManualControl
+import threading
 
 class Ui_MainWindow():
     def __init__(self):
@@ -131,7 +132,7 @@ class Ui_MainWindow():
     
     def checkFailures_manual(self):
         self.mc.checkFailures_manual()
-
+         
     def setCurrentSpeed(self):
         self.current_speed = self.c.setCurrentSpeed()
         #self.c.getSpeedLimit()

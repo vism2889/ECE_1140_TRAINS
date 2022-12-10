@@ -1,7 +1,7 @@
 ##############################################################################
 # AUTHOR:   Juin Sommer
 # DATE:     11/17/2022
-# FILENAME: manualControl.pu
+# FILENAME: manualControl.py
 # DESCRIPTION:
 # Class to define manual control functionality for the Train Driver UI
 # interfacing with hardware (RPi GPIO). Defines inputs to RPi.
@@ -51,9 +51,10 @@ class ManualControl():
 
     def setCommandedSpeed(self):
         #print("MC: ebrake state = ", self.c.ebrakeCommand)
-        if self.c.ebrakeCommand == False:
-            speed = self.anal_in.getSpeedValue()
-            self.commandedSpeed = speed / 2.3694
+        if self.c.ebrakeCommand == False and self.c.vital_override == False:
+            speed = self.anal_in.getSpeedValue() / 2.3694
+            if self.c.limitSpeed(self.c.current_speed): 
+                self.commandedSpeed = speed 
             # print("\nManual Commanded Speed: %2d" % speed, end="", flush=True)
 
         else: self.commandedSpeed = 0
