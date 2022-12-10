@@ -290,9 +290,10 @@ class PointMassModel():
             if len(self.waysideAuthority) == 1:
                 self.curr_block = self.waysideAuthority[0]
                 self.prev_block = self.prev_block
+                self.train_authority = 0
         
         
-        if self.curr_block == self.waysideAuthority[0]:
+        if self.curr_block == self.waysideAuthority[0] and len(self.waysideAuthority) > 1:
             wayside = self.waysideAuthority[1:len(self.waysideAuthority)]
             self.train_authority += float(self.BlockModels[self.curr_block-1].blockLength)-self.curr_pos
             for b in wayside:
