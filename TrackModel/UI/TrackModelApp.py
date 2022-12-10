@@ -782,7 +782,7 @@ class TrackModel(QWidget):
         currBlock = occupancy[3]
 
         # print("GUI OCCUPANCY", self.occupancy)
-        self.occupancy[int(line)][int(lastBlock)] = 0
+        self.occupancy[int(line)][lastBlock] = 0
         self.occupancy[line][currBlock]      = 1
         self.signals.globalOccupancyFromTrackModelSignal.emit(self.occupancy) # should emit a new global occupancy
         self.updateBlockOccupancyCallback()
