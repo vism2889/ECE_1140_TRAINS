@@ -62,7 +62,8 @@ class TrainModel(QtWidgets.QMainWindow):
             self.t.pm.prev_block = 0
             self.t.pm.curr_block = 9
             self.t.line = 0
-            
+        
+        self.t.pm.suggSpeed = float(msg[2])
         self.trainDict.update({msg[0]: self.t})
         
 
@@ -189,7 +190,7 @@ class TrainModel(QtWidgets.QMainWindow):
         #power
         self.cmd_pwr_disp.setText(f'{round(float(self.t.pm.power)/1000)} kW')
         # self.qt.t.set_power(round(float(self.qt.t.curr_power)/1000))
-        self.cmd_speed_disp.setText(f'{self.t.cmd_speed} mph')
+        self.cmd_speed_disp.setText(f'{self.t.pm.cmdSpeed} mph')
         
         self.curr_speed_disp.setText(f'{self.t.pm.curr_speed} mph')
 
