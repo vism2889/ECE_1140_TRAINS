@@ -130,7 +130,7 @@ class LayoutParser:
         self.currSection.blockNames.append(currBlockName)
         self.currBlock = BlockModel(row[0], row[1], row[2], row[3], 
                                           row[4], row[5], row[6], row[7], 
-                                          row[8], row[9], row[10]
+                                          row[8], row[9], row[10], row[11]
                                           )
         self.parseInfrastructure()
         self.currSection.blocks.append(self.currBlock)
@@ -171,7 +171,7 @@ class LayoutParser:
                         else:
                             newSwitch.append(x)
                         #print('item', x)
-                print('SWITCH', newSwitch)
+                # print('SWITCH', newSwitch)
                 switch = newSwitch
                 if len(switch) > 1 and type(switch)==list:
                     self.currBlock.switchForward = switch[0]
@@ -179,12 +179,12 @@ class LayoutParser:
                 else:
                     self.currBlock.switchForward = switch
                 self.currBlock.switch = switch
-                print("switch:      ", switch)
+                # print("switch:      ", switch)
                 if type(self.currBlock.switchForward) ==list:
                     self.currBlock.switchForward = self.currBlock.switchForward[0]
-                print('forward', self.currBlock.switchForward)
+                # print('forward', self.currBlock.switchForward)
                 
-                print('reverse', self.currBlock.switchReverse)
+                # print('reverse', self.currBlock.switchReverse)
 
             # else:
             #     switch = switch[0]
