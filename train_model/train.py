@@ -41,7 +41,9 @@ class TrainData():
 
 class PointMassModel():
     def __init__(self):
-        self.grade = 0.03
+        self.suggSpeed = None
+        self.cmdSpeed = None
+        self.grade = 0
         self.count = 0
         self.ctc_authority = []
         self.speed_up = 1
@@ -290,7 +292,7 @@ class PointMassModel():
             if len(self.waysideAuthority) == 1:
                 self.curr_block = self.waysideAuthority[0]
                 self.prev_block = self.prev_block
-                self.train_authority = 0
+                
         
         
         for c_bl in self.ctc_authority:
@@ -303,15 +305,23 @@ class PointMassModel():
                 
         if len(self.waysideAuthority) > 1:
             if self.curr_block == self.waysideAuthority[0]:
-                wayside = self.waysideAuthority[1:len(self.waysideAuthority)]
+                wayside = self.waysideAuthority[1:len(self.waysideAuthority)-1]
                 self.train_authority += float(self.BlockModels[self.curr_block-1].blockLength)-self.curr_pos
                 for b in wayside:
                     self.train_authority += float(self.BlockModels[b-1].blockLength)
             elif self.curr_block == self.waysideAuthority[1]:
-                wayside = self.waysideAuthority[2:len(self.waysideAuthority)]
+                wayside = self.waysideAuthority[2:len(self.waysideAuthority)-1]
                 self.train_authority += float(self.BlockModels[self.curr_block-1].blockLength)-self.curr_pos
                 for b in wayside:
                     self.train_authority += float(self.BlockModels[b-1].blockLength)
+        
+
+        self.grade = float(self.BlockModels[self.curr_block].grade)
+        self.cmdSpeed = float(self.BlockModels[self.curr_block].speedLimit)
+        if self.cmdSpeed > self.suggSpeed:
+            self.cmdSpeed = self.suggSpeed
+        else:
+            pass
 
 
 
@@ -407,7 +417,7 @@ class Train():
 
         self.curr_power = 0
         self.curr_speed = 0
-        self.cmd_speed = 30.22
+        
 
 
         self.int_lights = False
