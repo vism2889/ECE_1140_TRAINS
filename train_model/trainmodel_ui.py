@@ -115,7 +115,6 @@ class TrainModel(QtWidgets.QMainWindow):
         # else:
         #     self.test_win.setVisible(True)
 
-        self.test_win.setVisible(False)
        
         self.test_win.clicked.connect(self.test_window)
         #connecting failure buttons to respective slots
@@ -227,7 +226,7 @@ class TrainModel(QtWidgets.QMainWindow):
         
         if time.time()-self.last_update > 0.1:
             if self.t.line != None and self.t.pm.prev_block != None and self.t.pm.curr_block != 0:
-                print(f'values are, line: {self.t.line}, previous block: {self.t.pm.prev_block}, curr block: {self.t.pm.curr_block}')
+                # print(f'values are, line: {self.t.line}, previous block: {self.t.pm.prev_block}, curr block: {self.t.pm.curr_block}')
                 self.signals.trainLocation.emit([int(self.t.line), self.t.id, int(self.t.pm.prev_block), int(self.t.pm.curr_block)])
             # print("inside if statement")
             if self.t.e_brake == False and self.t.service_brake == False and self.t.dispatched:
