@@ -94,8 +94,10 @@ class TrackModel(QWidget):
             self.signals.trainLocation.connect(self.getOccupancy)
             # self.signals.switchState.connect()
             self.signals.waysideAuthority.connect(self.getAuthority)
-            # self.signals.crossingState.connect()
-            # self.signals.switchState.connect(self.updateSwitchState)
+
+            # self.signals.crossingState.connect() # List of length two indicating a block and it's crossing state [(int) block #, (bool) state]
+            #self.signals.switchState.connect(self.updateSwitchState)    # List of length 2 [(int) block #, (bool) state]
+            #self.signals.ctcSwitchState.connect(self.updateSwitchState) # List of length 3 [(int) line, (int) block #, (bool) switch state]
 
             # self.signals.stoppedBlocks.connect(self.updateStoppedBlocks) # sets a list = [list of blocks that trains are stopped at]
 
@@ -251,8 +253,18 @@ class TrackModel(QWidget):
         '''
         updates the swicthes for a given line
         '''
-        self.lineswitches[switch[0]] = switch[1]
-        self.lineBlocks[1][switch[0]-1].switchState = switch[1]
+        for i in range(len(self.switchText)):
+            # print('TEXT', self.switchText[self.currLineIndex][i][0])
+            blockNum = int(self.switchText[self.currLineIndex][i][0])
+            if switch[0] == blockNum:
+                # print('switch signal 2:', switch, ', current line switch', )
+                self.lineBlocks[self.currLineIndex][switch[0]-1].switchState = switch[1]
+                if switch[1] == True:
+                    self.switchInfoTable.item(i,1).setBackground(QtCore.Qt.green)
+                    self.switchInfoTable.item(i,2).setBackground(QtCore.Qt.red)
+                else:
+                    self.switchInfoTable.item(i,1).setBackground(QtCore.Qt.red)
+                    self.switchInfoTable.item(i,2).setBackground(QtCore.Qt.green)
 
     def orderedGreenLine(self):
         '''
