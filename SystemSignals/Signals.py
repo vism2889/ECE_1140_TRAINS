@@ -32,6 +32,9 @@ class Signals(QWidget):
     trackBlocksToTrainModelSignal       = QtCore.pyqtSignal(list) # List of block objects, sent to train
     greenLineTrackBlockSignal           = QtCore.pyqtSignal(list) # List of integer block numbers in the correct order for the green line.
 
+
+    beaconFromTrackModelSignal          = QtCore.pyqtSignal(list) # List containing information from beacon
+
     # Above could be a single list signal formatted as below:
     # ["TrackLineName", [lineOccupancy], [lineSwitchStates], [lineMaintenance], [lineFailures]]
 
