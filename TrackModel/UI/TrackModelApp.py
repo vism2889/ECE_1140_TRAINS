@@ -86,13 +86,14 @@ class TrackModel(QWidget):
         
         self.orderedGreenLineList    = []
         self.orderedGreenLine()
+        self.authorityFromWayside    = []
         
         # System Communication Signals
         if signals:
             self.signals = signals
             self.signals.trainLocation.connect(self.getOccupancy)
             # self.signals.switchState.connect()
-            # self.signals.waysideAuthority.connect()
+            self.signals.waysideAuthority.connect(self.getAuthority)
             # self.signals.crossingState.connect()
             # self.signals.switchState.connect(self.updateSwitchState)
 
@@ -575,6 +576,9 @@ class TrackModel(QWidget):
                 self.blockslistwidget.item(i).setBackground(QColor(200,200,50))
                 if self.currBlockIndex == i: 
                     self.currBlockDisplay.setStyleSheet("background-color: rgb(200,200,50); color: black;")
+            elif self.authorityFromWayside != None and (i+1) in self.authorityFromWayside:
+
+                self.blockslistwidget.item(i).setBackground(QtCore.Qt.green)
             else:
                 self.blockslistwidget.item(i).setBackground(QColor(134, 132, 130))
                 
@@ -786,6 +790,12 @@ class TrackModel(QWidget):
         self.occupancy[int(line)][int(currBlock)-1] = 1
         self.signals.globalOccupancyFromTrackModelSignal.emit(self.occupancy) # should emit a new global occupancy
         self.updateBlockOccupancyCallback()
+
+    def getAuthority(self, authority):
+        self.authorityFromWayside = authority[1]
+        print('authority from track model:', self.authorityFromWayside)
+        self.updateBlocksOccupancy()
+
 
     def addPassngersToStations(self):
         '''
