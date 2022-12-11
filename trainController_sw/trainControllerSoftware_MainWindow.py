@@ -858,7 +858,7 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
         elif((self.authority <= 610) & (self.currentSpeed >= 19)):  
             print("2")
             self.serviceBrakeState = True
-            self.braking_Slider.serviceBrakeSignal(1)
+            self.braking_Slider.setValue(1)
             self.signals.serviceBrakeSignal.emit(True)
         elif((self.authority <= 610) & (self.authority >= 444) & (self.currentSpeed >= 15) & (self.currentSpeed < 19)):
             print("3")
