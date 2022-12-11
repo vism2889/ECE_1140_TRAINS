@@ -713,7 +713,6 @@ class TrackControllerWindow(QtWidgets.QWidget):
                             break
 
     def setMaintenance(self, line, block_num, value):
-
         controller_indices = self.waysideio_ref.lookupBlock(line, block_num)['controller']
         good = self.checkFaults(line, block_num)
 

@@ -60,6 +60,7 @@ class Controller():
         self.parser = PLCParser(controllerNum)
         if self.line == 'green':
             file = open(f"plc/controller{self.id}.plc")
+            # print(f'Loaded plc/controller{file}.plc')
             self.uploadPLC(file)
             self.maintenance = False
 
@@ -109,6 +110,7 @@ class Controller():
 
     ## Updates the controller maintenance state
     def updateMaintenance(self, blockNum, state):
+        print(f'{blockNum}\t{state}')
         self.track['block-maintenance'][blockNum] = state
         self.parent.ui.setMaintenance(self.line, blockNum, state)
         return self.track['block-maintenance']
@@ -244,10 +246,11 @@ class WaysideIO(QWidget):
                     self.setFaults('red', i+1, failure)
 
     def maintenanceCallback(self, msg):
+        # print(msg)
         if msg[0] == 0:
-            self.setBlockMaintenance('red', msg[1], [msg[2]])
-        if msg[1] == 1:
-            self.setBlockMaintenance('green', msg[1], [msg[2]])
+            self.setBlockMaintenance('red', msg[1], msg[2])
+        if msg[0] == 1:
+            self.setBlockMaintenance('green', msg[1], msg[2])
 
     def filterSpeed(self, line, blockNum, speed):
         if int(self.lookupTable[line.lower()][str(blockNum)]['speed-limit']) < speed:
@@ -333,9 +336,12 @@ class WaysideIO(QWidget):
                 authority.pop(-1)
                 return authority
 
-            ## Check the state of the block
+            ## Check if it's the yard
+            if nextBlock.id == 0:
+                authority.append(nextBlock.id)
+                return authority
 
-            # blockOccupied = controller.blockState(nextBlock.id)
+            ## Check the state of the block
             controller = self.lookupBlock(line, nextBlock.id)['controller']
             blockOccupied = controllers[controller[0][0]].blockState(nextBlock.id)
 
