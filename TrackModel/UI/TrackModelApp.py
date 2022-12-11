@@ -809,8 +809,8 @@ class TrackModel(QWidget):
         self.updateBlockOccupancyCallback()
 
     def getAuthority(self, authority):
-        self.authorityFromWayside = authority[1]
-        print('authority from track model:', self.authorityFromWayside)
+        self.authorityFromWayside = authority[2]
+        #print('authority from track model:', self.authorityFromWayside)
         self.updateBlocksOccupancy()
 
 
