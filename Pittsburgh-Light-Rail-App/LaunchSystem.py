@@ -70,22 +70,29 @@ class PittsburghLightRail(QWidget):
         self.setupUi()
 
     def setupUi(self):
-        self.setGeometry(1630,50,220,300)
+        self.setGeometry(1630,50,220,330)
         self.setStyleSheet("background-color: #747c8a;")
 
         font = QFont()
         font.setPointSize(16)
         self.clockLabel = QLabel(self)
-        self.clockLabel.setGeometry(QRect(60, 10, 100, 25))
+        self.clockLabel.setGeometry(QRect(60, 40, 100, 25))
         self.clockLabel.setObjectName("clockLabel")
         self.clockLabel.setStyleSheet("background-color: #7b8fb0; border: 1px solid black")
         self.clockLabel.setAlignment(Qt.AlignCenter)
         self.clockLabel.setFont(font)
 
+        ## Speed Control
+        self.speedController = QSlider(Qt.Horizontal,self)
+        self.speedController.setGeometry(50,10,120,20)
+        self.speedController.setMinimum(1)
+        self.speedController.setMaximum(100)
+        self.speedController.valueChanged.connect(self.sendClockSpeed)
+
         ## CTC Offic3
         font.setPointSize(14)
         self.showCTCButton = QPushButton(self)
-        self.showCTCButton.setGeometry(35,40,150,25)
+        self.showCTCButton.setGeometry(35,70,150,25)
         self.showCTCButton.setStyleSheet("background-color: #e8c33c; ")
         self.showCTCButton.clicked.connect(self.CTCOffice.show)
         self.showCTCButton.setText("CTC Office")
@@ -93,7 +100,7 @@ class PittsburghLightRail(QWidget):
 
         ## Wayside Controller
         self.showWaysideControllerButton = QPushButton(self)
-        self.showWaysideControllerButton.setGeometry(35,70,150,25)
+        self.showWaysideControllerButton.setGeometry(35,100,150,25)
         self.showWaysideControllerButton.setStyleSheet("background-color: #e8c33c; ")
         self.showWaysideControllerButton.clicked.connect(self.waysideController.show)
         self.showWaysideControllerButton.setText("Track Controller")
@@ -101,7 +108,7 @@ class PittsburghLightRail(QWidget):
 
         ## Track Model
         self.showTrackModelButton = QPushButton(self)
-        self.showTrackModelButton.setGeometry(35,100,150,25)
+        self.showTrackModelButton.setGeometry(35,130,150,25)
         self.showTrackModelButton.setStyleSheet("background-color: #e8c33c; ")
         self.showTrackModelButton.clicked.connect(self.trackModel.show)
         self.showTrackModelButton.setText("Track Model")
@@ -109,7 +116,7 @@ class PittsburghLightRail(QWidget):
 
         ## Train Model
         self.showTrainModelButton = QPushButton(self)
-        self.showTrainModelButton.setGeometry(35,130,150,25)
+        self.showTrainModelButton.setGeometry(35,160,150,25)
         self.showTrainModelButton.setStyleSheet("background-color: #e8c33c; ")
         self.showTrainModelButton.clicked.connect(self.trainModel.show)
         self.showTrainModelButton.setText("Train Model")
@@ -117,23 +124,39 @@ class PittsburghLightRail(QWidget):
 
         ## Train Controller
         self.showTrainControllerButton = QPushButton(self)
-        self.showTrainControllerButton.setGeometry(35,160,150,25)
+        self.showTrainControllerButton.setGeometry(35,190,150,25)
         self.showTrainControllerButton.setStyleSheet("background-color: #e8c33c; ")
         self.showTrainControllerButton.clicked.connect(self.trainController.show)
         self.showTrainControllerButton.setText("Train Controller")
         self.showTrainControllerButton.setFont(font)
 
+        ## Icons
         self.trainImage          = QLabel(self)
-        self.pixmap              = QPixmap('TeamRollingStock1.png')
+        self.pixmap              = QPixmap('TeamRollingStock.png')
         self.trainImage.setPixmap(self.pixmap)
-        self.trainImage.setGeometry(0,190,250,110)
+        self.trainImage.setGeometry(0,220,250,110)
+
+        self.rabbitImage         = QLabel(self)
+        self.pixmap              = QPixmap('Rabbit.png')
+        self.rabbitImage.setPixmap(self.pixmap)
+        self.rabbitImage.setGeometry(175,5,30,30)
+
+        self.turtleImage         = QLabel(self)
+        self.pixmap              = QPixmap('Turtle.png')
+        self.turtleImage.setPixmap(self.pixmap)
+        self.turtleImage.setGeometry(10,5,35,35)
 
         self.show()
 
     def showTime(self, msg):
         hours = ('%02d' % int(msg[0]))
         mins = ('%02d' % int(msg[1]))
-        self.clockLabel.setText(hours + ":" + mins)
+        secs = ('%02d' % int(msg[2]))
+        self.clockLabel.setText(hours + ":" + mins + ":" + secs)
+
+    def sendClockSpeed(self, msg):
+        value = int(self.speedController.value())
+        self.signals.clockSpeedSignal.emit(value)
 
 
 ## Commandline CTRL-C ##

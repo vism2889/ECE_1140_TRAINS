@@ -45,6 +45,7 @@ class CTCOffice(QWidget):
         # connect to necessary signals
         self.signals.globalOccupancyFromTrackModelSignal.connect(self.readOccupancySignal)
         self.signals.switchState.connect(self.updateSwitchState)
+        self.signals.clockSpeedSignal.connect(self.changeClockSpeed)
 
     def setupLayout(self):
         # getting lists of blocks
@@ -63,9 +64,9 @@ class CTCOffice(QWidget):
         self.redLineStations["PENN STATION (OUT)"]  = ["25", False]
         self.redLineStations["STEEL PLAZA (OUT)"]   = ["35", False]
         self.redLineStations["FIRST AVE (OUT)"]     = ["45", False]
-        self.redLineStations["STATION SQUARE (OUT)"]= ["48", False]
-        self.redLineStations["SOUTH HILLS JUNCTION"]= ["60", False]
-        self.redLineStations["STATION SQUARE (IN)"] = ["48", False]
+        self.redLineStations["STATION SQ. (OUT)"]   = ["48", False]
+        self.redLineStations["SOUTH HILLS JUNC."]   = ["60", False]
+        self.redLineStations["STATION SQ. (IN)"]    = ["48", False]
         self.redLineStations["FIRST AVE (IN)"]      = ["45", False]
         self.redLineStations["STEEL PLAZA (IN)"]    = ["35", False]
         self.redLineStations["PENN STATION (IN)"]   = ["25", False]
@@ -118,13 +119,14 @@ class CTCOffice(QWidget):
         self.clockLabel.setAlignment(QtCore.Qt.AlignCenter)
         self.clockLabel.setFont(font)
 
-        self.changeClockSpeedButton = QtWidgets.QPushButton(self)
-        self.changeClockSpeedButton.setGeometry(550,15,140,20)
-        self.changeClockSpeedButton.setText("Change clock speed")
-        self.changeClockSpeedButton.setStyleSheet("background-color: #e8c33c;")
-        self.changeClockSpeedButton.clicked.connect(self.toggleTenTimeSpeed)
+        # self.changeClockSpeedButton = QtWidgets.QPushButton(self)
+        # self.changeClockSpeedButton.setGeometry(550,15,140,20)
+        # self.changeClockSpeedButton.setText("Change clock speed")
+        # self.changeClockSpeedButton.setStyleSheet("background-color: #e8c33c;")
+        # self.changeClockSpeedButton.clicked.connect(self.toggleTenTimeSpeed)
 
     ##################### RED LINE ##########################
+        font.setPointSize(10)
         self.redLineLabelTable = QTableWidget(self)
         self.redLineLabelTable.setRowCount(0)
         self.redLineLabelTable.setColumnCount(1)
@@ -133,11 +135,12 @@ class CTCOffice(QWidget):
         self.redLineLabelTable.setHorizontalHeaderLabels(['Red Line'])
         self.redLineBlockTable = QTableWidget(self)
         self.redLineBlockTable.setRowCount(self.redLineBlocks.len())
-        self.redLineBlockTable.setColumnCount(3)
+        self.redLineBlockTable.setColumnCount(4)
         self.redLineBlockTable.setColumnWidth(0, 40)
-        self.redLineBlockTable.setColumnWidth(2, 40)
+        self.redLineBlockTable.setColumnWidth(3, 40)
         self.redLineBlockTable.setGeometry(10,30,260,289)
-        self.redLineBlockTable.setHorizontalHeaderLabels(['Block','Switch','Xing'])
+        self.redLineBlockTable.setHorizontalHeaderLabels(['Block','Switch','Station','Xing'])
+        self.redLineBlockTable.horizontalHeader().setFont(font)
         self.redLineBlockTable.verticalHeader().hide()
         self.redLineBlockTable.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.redLineBlockTable.setEditTriggers(QAbstractItemView.NoEditTriggers)
@@ -168,6 +171,7 @@ class CTCOffice(QWidget):
         self.redLineBacklogTable.show()
 
     ##################### GREEN LINE ########################
+        font.setPointSize(10)
         self.greenLineLabelTable = QTableWidget(self)
         self.greenLineLabelTable.setRowCount(0)
         self.greenLineLabelTable.setColumnCount(1)
@@ -181,6 +185,7 @@ class CTCOffice(QWidget):
         self.greenLineBlockTable.setColumnWidth(3, 41)
         self.greenLineBlockTable.setGeometry(280,30,260,289)
         self.greenLineBlockTable.setHorizontalHeaderLabels(['Block','Switch','Station','Xing'])
+        self.greenLineBlockTable.horizontalHeader().setFont(font)
         self.greenLineBlockTable.verticalHeader().hide()
         self.greenLineBlockTable.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.greenLineBlockTable.setEditTriggers(QAbstractItemView.NoEditTriggers)
@@ -330,24 +335,19 @@ class CTCOffice(QWidget):
         secs = ('%02d' % int(self.seconds))
         mins = ('%02d' % int(self.minutes))
         hours = ('%02d' % int(self.hours))
-        self.clockLabel.setText(str(hours) + ":" + str(mins))
-        self.signals.timeSignal.emit([self.hours, self.minutes])
+        self.clockLabel.setText(str(hours) + ":" + str(mins) + ":" + str(secs))
+        self.signals.timeSignal.emit([self.hours, self.minutes, self.seconds])
 
-    def toggleTenTimeSpeed(self):
-        self.tenTimeSpeed = not self.tenTimeSpeed
-        if self.tenTimeSpeed:
-            self.clockSpeed = 10
-            self.signals.clockSpeedSignal.emit(10)
-        else:
-            self.clockSpeed = 1000
-            self.signals.clockSpeedSignal.emit(1)
-
+    def changeClockSpeed(self, msg):
+        self.clockSpeed = int(1000 / msg)
         self.startClock()
 
     def startClock(self):
         self.clock.start(self.clockSpeed)
 
     def populateRedLineTable(self):
+        font = QtGui.QFont()
+        font.setPointSize(7)
         for key in self.redLineBlocks.keys():
             item = QtWidgets.QTableWidgetItem()
             item.setText(key)
@@ -357,6 +357,7 @@ class CTCOffice(QWidget):
            if (self.redLineBlocks.switch(key) != 0):
                 item = QtWidgets.QTableWidgetItem()
                 item.setText(self.redLineBlocks.switch(key)[0] + " " + str(self.redLineBlocks.switch(key)[1]))
+                item.setFont(font)
                 self.redLineBlockTable.setItem(int(key)-1, 1, item)
 
         for key in self.redLineBlocks.keys():
@@ -364,6 +365,12 @@ class CTCOffice(QWidget):
                 item = QtWidgets.QTableWidgetItem()
                 item.setText(self.redLineBlocks.crossing(key))
                 self.redLineBlockTable.setItem(int(key)-1, 3, item)
+
+        for key in self.redLineStations.keys():
+            item = QtWidgets.QTableWidgetItem()
+            item.setText(key)
+            item.setFont(font)
+            self.redLineBlockTable.setItem(int(self.redLineStations[key][0])-1, 2, item)
 
         self.redLineBlockTable.resizeColumnToContents(1)
 
@@ -379,6 +386,7 @@ class CTCOffice(QWidget):
             if (self.greenLineBlocks.switch(key) != 0):
                 item = QtWidgets.QTableWidgetItem()
                 item.setText(self.greenLineBlocks.switch(key)[0] + " " + str(self.greenLineBlocks.switch(key)[1]))
+                item.setFont(font)
                 self.greenLineBlockTable.setItem(int(key)-1, 1, item)
 
         for key in self.greenLineBlocks.keys():
