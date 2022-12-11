@@ -56,7 +56,7 @@ class Track():
 
     def getInfo(self, blockNum):
         if self.blocks[blockNum-1].hasSwitch:
-            print(self.blocks[blockNum-1].switch)
+            print(f'Switch state: {self.blocks[blockNum-1].switch}')
         self.blocks[blockNum-1].printBlock()
 
     def confSwitch(self, id, blockNum):
@@ -73,9 +73,11 @@ class Track():
 
         if block.hasSwitch:
             if val != None:
+                # print(f'{self.trackName}: Setting switch {id} to {val}')
                 block.switch = val
             else:
                 block.switch = not block.switch
+                # print(f'{self.trackName}: Setting switch {id} to {val}')
 
         return 0
 

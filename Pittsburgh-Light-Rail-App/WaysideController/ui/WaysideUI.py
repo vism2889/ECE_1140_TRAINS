@@ -60,14 +60,14 @@ class TrackControllerWindow(QtWidgets.QWidget):
             path = os.path.abspath(__file__.replace(__name__.replace('.', '\\')+'.py', ''))
             jsonPath = path
             trackLayoutPath = path
-            path += "\\track_layout\\Track Layout & Vehicle Data vF.xlsx - Red Line.csv"
+            path += "\\track_layout\\Track Layout & Vehicle Data vF2.xlsx - Red Line.csv"
             jsonPath += "\\track_layout\\redline-layout.json"
             trackLayoutPath += "\\track_layout\\Trains Layout - Red Line.csv"
         elif os.name == 'posix':
             path = os.path.abspath(__file__.replace(__name__.replace('.', '/')+'.py', ''))
             jsonPath = path
             trackLayoutPath = path
-            path += "/track_layout/Track Layout & Vehicle Data vF.xlsx - Red Line.csv"
+            path += "/track_layout/Track Layout & Vehicle Data vF2.xlsx - Red Line.csv"
             jsonPath += "/track_layout/redline-layout.json"
             trackLayoutPath += "/track_layout/Trains Layout - Red Line.csv"
 
@@ -100,14 +100,14 @@ class TrackControllerWindow(QtWidgets.QWidget):
             path = os.path.abspath(__file__.replace(__name__.replace('.', '\\')+'.py', ''))
             jsonPath = path
             trackLayoutPath = path
-            path += "\\track_layout\\Track Layout & Vehicle Data vF.xlsx - Green Line.csv"
+            path += "\\track_layout\\Track Layout & Vehicle Data vF2.xlsx - Green Line.csv"
             jsonPath += "\\track_layout\\greenline-layout.json"
             trackLayoutPath += "\\track_layout\\Trains Layout - Green Line.csv"
         elif os.name == 'posix':
             path = os.path.abspath(__file__.replace(__name__.replace('.', '/')+'.py', ''))
             jsonPath = path
             trackLayoutPath = path
-            path += "/track_layout/Track Layout & Vehicle Data vF.xlsx - Green Line.csv"
+            path += "/track_layout/Track Layout & Vehicle Data vF2.xlsx - Green Line.csv"
             jsonPath += "/track_layout/greenline-layout.json"
             trackLayoutPath += "/track_layout/Trains Layout - Green Line.csv"
 

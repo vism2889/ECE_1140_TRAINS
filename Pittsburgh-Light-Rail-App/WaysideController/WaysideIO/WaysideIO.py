@@ -208,13 +208,13 @@ class WaysideIO(QWidget):
 
         if line == 0:
             authority= self.planAuthority('red', self.redlineControllers, self.redlineTrack, curr, prev)
-            print(f'{id}: {authority}')
+            # print(f'{id}: {authority}')
             self.signals.waysideAuthority.emit([line, id, authority])
 
         if line == 1:
             # print(f'curr: {curr}\t{prev}')
             authority = self.planAuthority('green', self.greenlineControllers, self.greenlineTrack, curr, prev)
-            print(f'{id}: {authority}')
+            # print(f'{id}: {authority}')
             self.signals.waysideAuthority.emit([id, authority])
 
     ##  Driver for most of the logic
@@ -297,8 +297,6 @@ class WaysideIO(QWidget):
         ## greenline
         if self.lines[1] == line.lower():
             self.signals.switchState.emit([int(blockNum), state])
-            # if blockNum == 76:
-            #     print(f'Setting switch {blockNum} to {state}')
             res = self.greenlineTrack.setSwitch(int(blockNum), state)
 
     def setCrossing(self, line, blockNum, state):
@@ -423,10 +421,6 @@ class WaysideIO(QWidget):
             for i, c in enumerate(layout):
                 self.greenlineControllers.append(Controller(line.lower(), i, c, self.ui, self))
                 self.populateTable(i,c, 1)
-
-            # self.setSwitch('green', 76, False)
-            # print(f'{self.planAuthority(line, self.greenlineControllers, self.greenlineTrack, 76, 75)}')
-            # exit(0)
 
         ## Registering signal callbacks
         self.signals.blockFailures.connect(self.blockFailureCallback)

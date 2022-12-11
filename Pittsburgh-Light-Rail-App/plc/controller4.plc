@@ -1,7 +1,6 @@
 if #block_75 == True and #block_100 == False:
     #switch_76 = False
-    #swtich_85 = False
-
-if #block_100 == True and #block_76 == False:
+    #switch_85 = False
+elif #block_99 == True and #block_75 == False:
     #switch_76 = True
-    #swtich_85 = True
+    #switch_85 = True
