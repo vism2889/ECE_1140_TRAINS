@@ -184,7 +184,7 @@ class Ui_MainWindow():
         self.timer.timeout.connect(self.checkFailures_manual)
         self.timer.timeout.connect(self.setSpeed_manual)
         self.timer.timeout.connect(self.setCurrentSpeed)
-        #self.timer.timeout.connect(self.checkAuthority)
+        self.timer.timeout.connect(self.checkAuthority)
         self.timer.timeout.connect(self.calculatePower_manual)
         self.timer.timeout.connect(self.setTemperature_manual)
         self.timer.timeout.connect(self.toggle_lights_manual)

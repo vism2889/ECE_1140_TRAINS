@@ -22,7 +22,7 @@ class TrainData:
         self.current_speed = None
         self.commanded_speed = None
         self.speed_limit = None
-        self.authority = []
+        self.authority = None 
         self.brake_failure = None
         self.engine_failure = None
         self.signalPickup_failure = None
@@ -31,7 +31,7 @@ class TrainData:
         self.current_speed = msg.current_speed
         self.commanded_speed = msg.commanded_speed
         self.speed_limit = msg.speed_limit
-        self.authority.append(msg.authority)
+        self.authority = msg.authority
         self.brake_failure = msg.brake_failure
         self.engine_failure = msg.engine_failure
         self.signalPickup_failure = msg.signalPickup_failure

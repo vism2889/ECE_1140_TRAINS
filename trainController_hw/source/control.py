@@ -8,8 +8,6 @@
 
 # TODO:
 # - Generate new message files to take authority as a distance
-# - Implement speed limit 
-#   + train cannot exceed speed limit
 # - Implement next station
 #   + display next station
 #   + use next station for announcements 
@@ -63,7 +61,7 @@ class Control():
         self.ebrakeCommand = False
         self.brakeCommand = False
         self.current_speed = 0
-        self.speed_limit = 5 
+        self.speed_limit = 15 
         self.temperature = 0
         self.k_p = 24e3
         self.k_i = 100
@@ -181,7 +179,7 @@ class Control():
     def checkAuthority(self):
         if self.input.getAuthority() != None:
             self.authority = self.input.getAuthority() 
-        if authority == 0:
+        if self.authority == 0:
             self.deployEbrake(True)
     
     def set_kp_ki(kp_val, ki_val, self):
