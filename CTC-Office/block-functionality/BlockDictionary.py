@@ -47,11 +47,21 @@ class BlockDictionary:
 
     def setSwitchState(self, blockNum, state):
         if blockNum in self.switchList:
-            self.switchList[blockNum] = state
+            self.switchList[blockNum][1] = state
+
+    def getSwitchState(self, blockNum):
+        if blockNum in self.switchList:
+            return self.switchList[blockNum]
+
+    def getStation(self, blockNum):
+        if blockNum in self.stationList:
+            return self.stationList[blockNum]
+        else:
+            return 'None'
 
     def getLine(self, blockNum):
         return self.blockList[blockNum].line
-    
+
     def getOccupancy(self, blockNum):
         return self.blockList[blockNum].occupancy
 

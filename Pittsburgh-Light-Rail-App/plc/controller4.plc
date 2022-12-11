@@ -1,4 +1,6 @@
-if #block_76 == True or #block_77 == True:
-    #switch_76 = True
-else:
+if #block_74 == True and #block_100 == False:
     #switch_76 = False
+    #switch_85 = False
+elif #block_100 == True and #block_75 == False:
+    #switch_76 = True
+    #switch_85 = True

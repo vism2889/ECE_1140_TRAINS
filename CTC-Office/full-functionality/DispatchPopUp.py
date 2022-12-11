@@ -16,6 +16,7 @@ class DispatchPopUp(object):
 
     def setupUi(self, dispatchPopUp, redLineStations, greenLineStations, redLineTrains, greenLineTrains, trainCount):
         dispatchPopUp.setGeometry(400, 50, 220, 250)
+        dispatchPopUp.setStyleSheet("background-color: #747c8a;")
 
         self.redLineStations = redLineStations
         self.greenLineStations = greenLineStations
@@ -27,7 +28,7 @@ class DispatchPopUp(object):
         font.setPointSize(14)
         self.clockLabel = QtWidgets.QLabel(dispatchPopUp)
         self.clockLabel.setGeometry(QtCore.QRect(110,31,110,23))
-        self.clockLabel.setStyleSheet("background-color: gray; border: 1px solid black")
+        self.clockLabel.setStyleSheet("background-color: #7b8fb0; border: 1px solid black")
         self.clockLabel.setAlignment(QtCore.Qt.AlignCenter)
         self.clockLabel.setFont(font)
 
@@ -59,6 +60,7 @@ class DispatchPopUp(object):
 
         self.dispatch = QtWidgets.QPushButton(dispatchPopUp)
         self.dispatch.setGeometry(QtCore.QRect(0, 225, 220, 25))
+        self.dispatch.setStyleSheet("background-color: #e8c33c;")
 
         self.retranslateUi()
         QtCore.QMetaObject.connectSlotsByName(dispatchPopUp)

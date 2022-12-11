@@ -113,7 +113,7 @@ class Controller():
     ## Switches and crossing only get update with the PLC program
     def updateSwitch(self):
         for switch in self.track['switch']:
-            self.parent.setSwitch(self.line, switch, self.track['switch'][switch])
+            self.parent.setSwitch(self.line, int(switch), self.track['switch'][switch])
             self.ui.setSwitchState(self.line, int(switch), self.track['switch'][switch])
 
         return self.track['switch']
@@ -165,6 +165,10 @@ class Controller():
         if self.track['block-states'][str(blockNum)]:
             flag +=1
 
+        if blockNum in self.track['block-maintenance']:
+            if self.track['block-maintenance'][blockNum]:
+                flag += 1
+
         return flag
 
 class WaysideIO(QWidget):
@@ -208,11 +212,11 @@ class WaysideIO(QWidget):
 
         if line == 0:
             authority= self.planAuthority('red', self.redlineControllers, self.redlineTrack, curr, prev)
-            self.signals.waysideAuthority.emit([line, id, authority])
+            self.signals.waysideAuthority.emit([0, id, authority])
 
         if line == 1:
             authority = self.planAuthority('green', self.greenlineControllers, self.greenlineTrack, curr, prev)
-            self.signals.waysideAuthority.emit([id, authority])
+            self.signals.waysideAuthority.emit([1, id, authority])
 
     ##  Driver for most of the logic
     #       Sets block occupancy and eventually runs
@@ -238,10 +242,11 @@ class WaysideIO(QWidget):
                     self.setFaults('red', i+1, failure)
 
     def maintenanceCallback(self, msg):
+        # print(msg)
         if msg[0] == 0:
-            self.setBlockMaintenance('red', msg[1], [msg[2]])
-        if msg[1] == 1:
-            self.setBlockMaintenance('green', msg[1], [msg[2]])
+            self.setBlockMaintenance('red', msg[1], msg[2])
+        if msg[0] == 1:
+            self.setBlockMaintenance('green', msg[1], msg[2])
 
     def filterSpeed(self, line, blockNum, speed):
         if int(self.lookupTable[line.lower()][str(blockNum)]['speed-limit']) < speed:
@@ -325,6 +330,11 @@ class WaysideIO(QWidget):
                 ## Set a 2 block buffer for the authority
                 authority.pop(-1)
                 authority.pop(-1)
+                return authority
+
+            ## Check if it's the yard
+            if nextBlock.id == 0:
+                authority.append(nextBlock.id)
                 return authority
 
             ## Check the state of the block
