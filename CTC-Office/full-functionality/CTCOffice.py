@@ -106,12 +106,15 @@ class CTCOffice(QWidget):
         self.clockLabel.setAlignment(QtCore.Qt.AlignCenter)
         self.clockLabel.setFont(font)
 
+<<<<<<< Updated upstream
         self.changeClockSpeedButton = QtWidgets.QPushButton(self)
         self.changeClockSpeedButton.setGeometry(450,15,140,20)
         self.changeClockSpeedButton.setText("Change clock speed")
         self.changeClockSpeedButton.setStyleSheet("background-color: #e8c33c;")
         self.changeClockSpeedButton.clicked.connect(self.toggleTenTimeSpeed)
 
+=======
+>>>>>>> Stashed changes
     ##################### RED LINE ##########################
         self.redLineLabelTable = QTableWidget(self)
         self.redLineLabelTable.setRowCount(0)
@@ -526,9 +529,11 @@ class CTCOffice(QWidget):
         self.blockInfoTable.setItem(4,0,item)
 
     def updateSwitchState(self, switchSignal):
+        print(switchSignal)
         self.greenLineBlocks.setSwitchState(switchSignal[0], switchSignal[1])
         item = QtWidgets.QTableWidgetItem()
         #item.setText(self.greenLineBlocks.switch(switchSignal[0])[0] + " " + str(self.greenLineBlocks.switch(switchSignal[0])[1]))
+        #self.selectedBlockTable.setItem(int(self.selectedBlock)-1,1,item)
 
     def toggleMaintenance(self):
         self.selectedBlockLine.toggleMaintenanceState(str(self.selectedBlock))
@@ -542,16 +547,42 @@ class CTCOffice(QWidget):
         self.updateMaintenanceState()
 
     def toggleSwitch(self):
+<<<<<<< Updated upstream
         item = QtWidgets.QTableWidgetItem()
         currentSwitchState = self.selectedBlockLine.getSwitchState(str(self.selectedBlock))
         if self.selectedBlockLine == self.greenLineBlocks and self.greenLineMaintenance:
             maintenanceState = self.selectedBlockLine.setSwitchState(str(self.selectedBlock), not currentSwitchState)
+=======
+        # check if block has switch
+        font = QtGui.QFont()
+        font.setPointSize(7)
+        if self.selectedBlockLine.switch(str(self.selectedBlock)) == 0:
+            return
+        # if block has switch, toggle it
+        item = QtWidgets.QTableWidgetItem()
+        currentSwitchState = self.selectedBlockLine.getSwitchState(str(self.selectedBlock))
+        if self.selectedBlockLine == self.greenLineBlocks and self.greenLineMaintenance:
+            self.selectedBlockLine.setSwitchState(str(self.selectedBlock), not currentSwitchState[1])
+            print(currentSwitchState)
+>>>>>>> Stashed changes
             currentSwitch = self.selectedBlockLine.switch(str(self.selectedBlock))
             item.setText(str(currentSwitch[0]) + " " + str(currentSwitch[1]))
         elif self.selectedBlockLine == self.redLineBlocks and self.redLineMaintenance:
+<<<<<<< Updated upstream
             maintenanceState = self.selectedBlockLine.setSwitchState(str(self.selectedBlock), not currentSwitchState)
             currentSwitch = self.selectedBlockLine.switch(str(self.selectedBlock))
             item.setText(str(currentSwitch[0]) + " " + str(currentSwitch[1]))
+=======
+            self.selectedBlockLine.setSwitchState(str(self.selectedBlock), not currentSwitchState[1])
+            currentSwitch = self.selectedBlockLine.switch(str(self.selectedBlock))
+        else:
+            return
+        # change switch label and emit new state
+        item.setText(str(currentSwitch[0]) + " " + str(currentSwitch[1]))
+        item.setFont(font)
+        self.selectedBlockTable.setItem(int(self.selectedBlock)-1,1,item)
+        # TODO emit switch signal
+>>>>>>> Stashed changes
 
     def launchDispatchPopUp(self):
         self.dispatchWidget = QtWidgets.QWidget()
@@ -597,11 +628,13 @@ class CTCOffice(QWidget):
         if self.manualMode:
             self.dispatchTrainButton.hide()
             self.toggleMaintenanceButton.hide()
+            self.toggleSwitchButton.hide()
             self.uploadScheduleButton.show()
             self.manualMode = False
         else:
             self.dispatchTrainButton.show()
             self.toggleMaintenanceButton.show()
+            self.toggleSwitchButton.show()
             self.uploadScheduleButton.hide()
             self.manualMode = True
 

@@ -82,6 +82,16 @@ class PittsburghLightRail(QWidget):
         self.clockLabel.setAlignment(Qt.AlignCenter)
         self.clockLabel.setFont(font)
 
+<<<<<<< Updated upstream
+=======
+        ## Speed Control
+        self.speedController = QSlider(Qt.Horizontal,self)
+        self.speedController.setGeometry(50,10,120,20)
+        self.speedController.setMinimum(1)
+        self.speedController.setMaximum(100)
+        self.speedController.sliderMoved.connect(self.sendClockSpeed)
+
+>>>>>>> Stashed changes
         ## CTC Offic3
         font.setPointSize(14)
         self.showCTCButton = QPushButton(self)
