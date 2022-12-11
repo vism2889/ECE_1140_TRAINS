@@ -33,7 +33,8 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
         #self.show()
         
 
-    def setupUi(self):        
+    def setupUi(self):       
+        self.setStyleSheet("background-color: #747c8a;") 
         self.setObjectName("self")
         self.resize(835, 423)
         self.setAutoFillBackground(False)
@@ -563,7 +564,7 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
         self.signals.speedLimitSignal.connect(self.setSpeedLimitSignal)
         self.signals.commandedSpeedSignal.connect(self.setCommandedSpeedSignal)
         self.signals.trainFailuresSignal.connect(self.setTrainFailuresSignal)
-        #self.signals.beaconSignal(self.setBeaconSignal)
+        self.signals.beaconFromTrackModelSignal.connect(self.setBeaconSignal) # station side, nanme of station, underground
 
     def setOperationMode(self):
         if(self.TabWigets.currentIndex() == 0):     # Automatic Mode
@@ -613,7 +614,9 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
         self.nextStation = "Station"
         self.blockFailures = [0]
         self.speedLimit = 18
-        self.beacon = 0
+        self.stationSide = ""
+        self.stationName = ""
+        self.underground = False
         self.commandedSpeedSignal = 13.4112
         
         self.Manual_lights_ComboBox.setCurrentIndex(3)
@@ -656,10 +659,11 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
         self.setAutoTemperature()
         self.setAutoLights()
         self.setAutoDoors()
+        self.setAuthority()
     
     def setAuthoritySignal(self, msg):
         self.authority = msg
-        self.setAuthority()
+        #self.setAuthority()
           
     def setBlockFailuresSignal(self, msg):
         pass
@@ -677,8 +681,17 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
         pass
     
     def setBeaconSignal(self, msg):
-        pass            
-
+        self.stationSide = msg
+        #self.stationName = msg[1]
+        #self.underground = msg[2]
+        print("Station Side, Station Name, Underground: ", self.stationSide)
+        #print("Station Name: ", self.stationName)
+        #print("Underground: ", self.underground)
+        self.setAutoDoors()
+        self.setAutoLights()
+        self.setStationName()
+        pass
+        
 ###### Helper Functions                
     def checkCurrentSpeed(self, msg):
         if(self.commandedSpeed < (self.currentSpeed)):
@@ -690,7 +703,6 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
             self.braking_Slider.setValue(False)
             self.signals.serviceBrakeSignal.emit(self.serviceBrakeState)
             
-        
     def EmergencyBrakeDisplay(self):
         self.EmergencyBrakeDisplayBox.setCheckable(True)
 
@@ -714,13 +726,19 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
         #     self.temperature = 78
     
     def setAutoLights(self):
-        self.ExternalLights_DisplayBox.setChecked(True)
-        self.InternalLights_DisplayBox.setChecked(True)
+        if(self.underground == True):
+            self.ExternalLights_DisplayBox.setChecked(True)
+            self.InternalLights_DisplayBox.setChecked(True)
         
     def setAutoDoors(self):
-        self.LeftDoors_DisplayBox.setChecked(False)
-        self.RightDoors_DisplayBox.setChecked(False)
-     
+        if(self.currentSpeed == 0):
+            #self.LeftDoors_DisplayBox.setChecked(False)
+            #self.RightDoors_DisplayBox.setChecked(False)
+            pass
+
+    def setStationName(self):
+        #self.next_station_label.setText(self.stationName)
+        pass
  
 ###### Block Failures: Track, Circuit, Power 
     def setBlockFailures(self, msg):
@@ -786,19 +804,20 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
         self.emitNonVital()           
     
     def setManualControl_Doors(self):
-        if(self.Manual_doors_ComboBox.currentIndex() == 0):
-            self.leftDoorState = False
-            self.rightDoorState = False
-        elif(self.Manual_doors_ComboBox.currentIndex() == 1):
-            self.leftDoorState = True
-            self.rightDoorState = False
-        elif(self.Manual_doors_ComboBox.currentIndex() == 2):
-            self.leftDoorState = False
-            self.rightDoorState = True
-        elif(self.Manual_doors_ComboBox.currentIndex() == 3):
-            self.leftDoorState = True
-            self.righttDoorState = True
-        self.emitNonVital() 
+        if(self.currentSpeed == 0):
+            if(self.Manual_doors_ComboBox.currentIndex() == 0):
+                self.leftDoorState = False
+                self.rightDoorState = False
+            elif(self.Manual_doors_ComboBox.currentIndex() == 1):
+                self.leftDoorState = True
+                self.rightDoorState = False
+            elif(self.Manual_doors_ComboBox.currentIndex() == 2):
+                self.leftDoorState = False
+                self.rightDoorState = True
+            elif(self.Manual_doors_ComboBox.currentIndex() == 3):
+                self.leftDoorState = True
+                self.righttDoorState = True
+            self.emitNonVital() 
     
     def setManualControl_Advertisements(self):
         self.advertisementState = self.Manual_Advertisements_CheckBox.checkState()
@@ -849,57 +868,14 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
         # Safe Braking Distance 
         # authority (m)
         # velocity (m/s)
-        
-        if(self.authority > 610):
-            print("1")
+        if(((self.currentSpeed ** 2) * 1.2) >= (self.authority * 0.9)):
+            self.serviceBrakeState = True
+            self.braking_Slider.setValue(1)
+            self.signals.serviceBrakeSignal.emit(True)
+        else:
             self.serviceBrakeState = False
             self.braking_Slider.setValue(0)
-            self.signals.serviceBrakeSignal.emit(False)
-        elif((self.authority <= 610) & (self.currentSpeed >= 19)):  
-            print("2")
-            self.serviceBrakeState = True
-            self.braking_Slider.setValue(1)
-            self.signals.serviceBrakeSignal.emit(True)
-        elif((self.authority <= 610) & (self.authority >= 444) & (self.currentSpeed >= 15) & (self.currentSpeed < 19)):
-            print("3")
-            self.serviceBrakeState = True
-            self.braking_Slider.setValue(1)
-            self.signals.serviceBrakeSignal.emit(True)
-        elif((self.authority <= 444) & (self.authority >= 312) & (self.currentSpeed >= 13) & (self.currentSpeed < 19)):
-            print("4")
-            self.serviceBrakeState = True
-            self.braking_Slider.setValue(1)
-            self.signals.serviceBrakeSignal.emit(True)
-        elif((self.authority <= 312) & (self.authority >= 208) & (self.currentSpeed >= 12) & (self.currentSpeed < 19)):
-            print("5")
-            self.serviceBrakeState = True
-            self.braking_Slider.setValue(1)
-            self.signals.serviceBrakeSignal.emit(True)
-        elif((self.authority <= 208) & (self.authority >= 131) & (self.currentSpeed >= 11) & (self.currentSpeed < 19)):
-            print("6")
-            self.serviceBrakeState = True
-            self.braking_Slider.setValue(1)
-            self.signals.serviceBrakeSignal.emit(True)
-        elif((self.authority <= 131) & (self.authority >= 75) & (self.currentSpeed >= 10) & (self.currentSpeed < 19)):
-            print("7")
-            self.serviceBrakeState = True
-            self.braking_Slider.setValue(1)
-            self.signals.serviceBrakeSignal.emit(True)
-        elif((self.authority <= 75) & (self.authority >= 46) & (self.currentSpeed >= 8) & (self.currentSpeed < 19)):
-            print("8")
-            self.serviceBrakeState = True
-            self.braking_Slider.setValue(1)
-            self.signals.serviceBrakeSignal.emit(True)
-        elif((self.authority <= 46) & (self.authority >= 23) & (self.currentSpeed >= 6) & (self.currentSpeed < 19)):
-            print("9")
-            self.serviceBrakeState = True
-            self.braking_Slider.setValue(1)
-            self.signals.serviceBrakeSignal.emit(True)      
-        elif((self.authority <= 23)):
-            print("10")
-            self.serviceBrakeState = True
-            self.braking_Slider.setValue(1)
-            self.signals.serviceBrakeSignal.emit(True)         
+            self.signals.serviceBrakeSignal.emit(False)        
     
     def waitUntilStopped(self):
         while(self.currentSpeed != 0):
