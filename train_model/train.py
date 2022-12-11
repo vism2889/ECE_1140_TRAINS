@@ -41,8 +41,8 @@ class TrainData():
 
 class PointMassModel():
     def __init__(self):
-        self.suggSpeed = None
-        self.cmdSpeed = None
+        self.suggSpeed = 0
+        self.cmdSpeed = 0
         self.grade = 0
         self.count = 0
         self.ctc_authority = []
@@ -270,13 +270,6 @@ class PointMassModel():
         self.curr_block_len = curr_block_object.blockLength
         self.curr_block_len = float(self.curr_block_len)
 
-        #getting block values for speed
-        self.speed_limit = float(curr_block_object.speedLimit)
-        if self.suggested_speed > self.speed_limit:
-            self.speed_limit = self.speed_limit
-        else:
-            self.speed_limit = self.suggested_speed
-
         
         # print(f'-------------------Position: {self.curr_pos}-----------------------------')
         if self.curr_pos >= self.curr_block_len:
@@ -299,7 +292,7 @@ class PointMassModel():
             if c_bl in self.waysideAuthority:
                 ind = self.waysideAuthority.index(c_bl)
                 self.waysideAuthority = self.waysideAuthority[0:ind+1]
-                if len(self.waysideAuthority) == 1:
+                if c_bl == self.prev_block:
                     self.ctc_authority.remove(c_bl)
 
                 
@@ -314,14 +307,16 @@ class PointMassModel():
                 self.train_authority += float(self.BlockModels[self.curr_block-1].blockLength)-self.curr_pos
                 for b in wayside:
                     self.train_authority += float(self.BlockModels[b-1].blockLength)
+        elif len(self.waysideAuthority) == 1:
+            self.train_authority = 0
         
 
         self.grade = float(self.BlockModels[self.curr_block].grade)
-        self.cmdSpeed = float(self.BlockModels[self.curr_block].speedLimit)
-        if self.cmdSpeed > self.suggSpeed:
+        self.speedLimit = float(self.BlockModels[self.curr_block].speedLimit)*0.277778
+        if self.speedLimit >= self.suggSpeed:
             self.cmdSpeed = self.suggSpeed
         else:
-            pass
+            self.cmdSpeed = self.speed_limit
 
 
 

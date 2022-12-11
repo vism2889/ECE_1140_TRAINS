@@ -190,7 +190,8 @@ class TrainModel(QtWidgets.QMainWindow):
         #power
         self.cmd_pwr_disp.setText(f'{round(float(self.t.pm.power)/1000)} kW')
         # self.qt.t.set_power(round(float(self.qt.t.curr_power)/1000))
-        self.cmd_speed_disp.setText(f'{self.t.pm.cmdSpeed} mph')
+
+        self.cmd_speed_disp.setText('%.1f mph' %(float(self.t.pm.cmdSpeed)*2.23694))
         
         self.curr_speed_disp.setText(f'{self.t.pm.curr_speed} mph')
 
@@ -237,7 +238,8 @@ class TrainModel(QtWidgets.QMainWindow):
                 # print(f'Occ_list is: {self.t.pm.occ_list}')
                 # print(f'Curr Pos in block {self.qt.t.pm.curr_block} is: {self.qt.t.pm.curr_pos}')
                 self.signals.occupancyFromTrainSignal.emit(self.t.pm.occ_list)
-                self.signals.commandedSpeedSignal.emit(self.t.pm.speed_limit)
+                self.signals.commandedSpeedSignal.emit(self.t.pm.cmdSpeed)
+                self.signals.speedLimitSignal.emit(self.t.pm.speedLimit)
                 self.signals.authoritySignal.emit(self.t.pm.train_authority)
                 self.last_update = time.time()
                 # print('PUBLISHING!!!')
