@@ -90,14 +90,16 @@ class TrackModel(QWidget):
         
         # System Communication Signals
         if signals:
-            self.signals = signals
-            self.signals.trainLocation.connect(self.getOccupancy)
-            # self.signals.switchState.connect()
-            self.signals.waysideAuthority.connect(self.getAuthority)
+            self.signals = signals # system signals instance 
 
-            # self.signals.crossingState.connect() # List of length two indicating a block and it's crossing state [(int) block #, (bool) state]
-            #self.signals.switchState.connect(self.updateSwitchState)    # List of length 2 [(int) block #, (bool) state]
-            #self.signals.ctcSwitchState.connect(self.updateSwitchState) # List of length 3 [(int) line, (int) block #, (bool) switch state]
+            self.signals.trainLocation.connect(self.getOccupancy)          # from train model: (used for occupancy)
+
+            self.signals.waysideAuthority.connect(self.getAuthority)       # from wayside: (used for authority)
+            # self.signals.crossingState.connect()                         # from wayside: List of length two indicating a block and it's crossing state [(int) block #, (bool) state]
+            self.signals.switchState.connect(self.updateSwitchState)       # from wayside: List of length 2 [(int) block #, (bool) state]
+
+
+            self.signals.ctcSwitchState.connect(self.updateCtcSwitchState) # from ctc office: List of length 3 [(int) line, (int) block #, (bool) switch state]
 
             # self.signals.stoppedBlocks.connect(self.updateStoppedBlocks) # sets a list = [list of blocks that trains are stopped at]
 
@@ -265,6 +267,9 @@ class TrackModel(QWidget):
                 else:
                     self.switchInfoTable.item(i,1).setBackground(QtCore.Qt.red)
                     self.switchInfoTable.item(i,2).setBackground(QtCore.Qt.green)
+
+    def updateCtcSwitchState(self, switchState):
+        print("CTC Switch State Signal", switchState)
 
     def orderedGreenLine(self):
         '''
