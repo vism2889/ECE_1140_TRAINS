@@ -119,12 +119,6 @@ class CTCOffice(QWidget):
         self.clockLabel.setAlignment(QtCore.Qt.AlignCenter)
         self.clockLabel.setFont(font)
 
-        # self.changeClockSpeedButton = QtWidgets.QPushButton(self)
-        # self.changeClockSpeedButton.setGeometry(550,15,140,20)
-        # self.changeClockSpeedButton.setText("Change clock speed")
-        # self.changeClockSpeedButton.setStyleSheet("background-color: #e8c33c;")
-        # self.changeClockSpeedButton.clicked.connect(self.toggleTenTimeSpeed)
-
     ##################### RED LINE ##########################
         font.setPointSize(10)
         self.redLineLabelTable = QTableWidget(self)
@@ -558,9 +552,11 @@ class CTCOffice(QWidget):
         self.blockInfoTable.setItem(4,0,item)
 
     def updateSwitchState(self, switchSignal):
+        print(switchSignal)
         self.greenLineBlocks.setSwitchState(switchSignal[0], switchSignal[1])
         item = QtWidgets.QTableWidgetItem()
         #item.setText(self.greenLineBlocks.switch(switchSignal[0])[0] + " " + str(self.greenLineBlocks.switch(switchSignal[0])[1]))
+        #self.selectedBlockTable.setItem(int(self.selectedBlock)-1,1,item)
 
     def toggleMaintenance(self):
         self.selectedBlockLine.toggleMaintenanceState(str(self.selectedBlock))
@@ -586,8 +582,12 @@ class CTCOffice(QWidget):
         elif self.selectedBlockLine == self.redLineBlocks and self.redLineMaintenance:
             self.selectedBlockLine.setSwitchState(str(self.selectedBlock), not currentSwitchState)
             currentSwitch = self.selectedBlockLine.switch(str(self.selectedBlock))
+        else:
+            return
         # change switch label and emit new state
         item.setText(str(currentSwitch[0]) + " " + str(currentSwitch[1]))
+        item.setFont(font)
+        self.selectedBlockTable.setItem(int(self.selectedBlock)-1,1,item)
         # TODO emit switch signal
 
     def launchDispatchPopUp(self):
@@ -633,11 +633,13 @@ class CTCOffice(QWidget):
         if self.manualMode:
             self.dispatchTrainButton.hide()
             self.toggleMaintenanceButton.hide()
+            self.toggleSwitchButton.hide()
             self.uploadScheduleButton.show()
             self.manualMode = False
         else:
             self.dispatchTrainButton.show()
             self.toggleMaintenanceButton.show()
+            self.toggleSwitchButton.show()
             self.uploadScheduleButton.hide()
             self.manualMode = True
 

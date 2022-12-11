@@ -87,7 +87,7 @@ class PittsburghLightRail(QWidget):
         self.speedController.setGeometry(50,10,120,20)
         self.speedController.setMinimum(1)
         self.speedController.setMaximum(100)
-        self.speedController.valueChanged.connect(self.sendClockSpeed)
+        self.speedController.sliderMoved.connect(self.sendClockSpeed)
 
         ## CTC Offic3
         font.setPointSize(14)

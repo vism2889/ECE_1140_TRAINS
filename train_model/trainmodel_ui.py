@@ -131,7 +131,7 @@ class TrainModel(QtWidgets.QMainWindow):
 
         self.timer = QtCore.QTimer()
         self.timer.timeout.connect(self.update_display)
-        self.timer.start(100)
+        self.timer.start(1)
 
         #Setting up Thread and worker to continuously update labels
         # self.disp_thread = QThread()
