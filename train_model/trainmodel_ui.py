@@ -90,10 +90,8 @@ class TrainModel(QtWidgets.QMainWindow):
             setattr(self.t, key, msg[key])
     
     def ctc_authority(self, msg):
-        
         for i,m in enumerate(msg):
             msg[i] = int(m)
-
         self.t.pm.ctc_authority.extend(msg)
 
     

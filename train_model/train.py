@@ -386,7 +386,7 @@ class Train():
     def __init__ (self):
 
         self.id = None
-        self.speed_limit = 0
+        
         
         #block list
         # self.blocks          = [i for i in range(150)]
