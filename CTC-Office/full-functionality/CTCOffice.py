@@ -46,6 +46,7 @@ class CTCOffice(QWidget):
         self.signals.globalOccupancyFromTrackModelSignal.connect(self.readOccupancySignal)
         self.signals.switchState.connect(self.updateSwitchState)
         self.signals.clockSpeedSignal.connect(self.changeClockSpeed)
+        self.signals.waysideAuthority.connect(self.showAuthority)
 
     def setupLayout(self):
         # getting lists of blocks
@@ -525,6 +526,8 @@ class CTCOffice(QWidget):
                 self.greenLineBlockTable.item(int(key)-1,0).setBackground(QtGui.QColor(255,0,0))
             elif self.greenLineBlocks.getOccupancy(key):
                 self.greenLineBlockTable.item(int(key)-1,0).setBackground(QtGui.QColor(0,255,0))
+            elif self.greenLineBlocks.getAuthority(key):
+                self.greenLineBlockTable.item(int(key)-1,0).setBackground(QtGui.QColor(147,245,147))
             else:
                 self.greenLineBlockTable.item(int(key)-1,0).setBackground(QtGui.QColor(116,124,138))
 
@@ -535,6 +538,8 @@ class CTCOffice(QWidget):
                 self.redLineBlockTable.item(int(key)-1,0).setBackground(QtGui.QColor(255,0,0))
             elif self.redLineBlocks.getOccupancy(key):
                 self.redLineBlockTable.item(int(key)-1,0).setBackground(QtGui.QColor(0,255,0))
+            elif self.redLineBlocks.getAuthority(key):
+                self.redLineBlockTable.item(int(key)-1,0).setBackground(QtGui.QColor(147,245,147))
             else:
                 self.redLineBlockTable.item(int(key)-1,0).setBackground(QtGui.QColor(116,124,138))
 
@@ -647,6 +652,23 @@ class CTCOffice(QWidget):
             self.uploadScheduleButton.hide()
             self.manualMode = True
 
+    def showAuthority(self, msg):
+        pass
+        # red line
+        if msg[0] == 0:
+            for block in self.redLineBlocks:
+                if block in msg:
+                    self.redLineBlocks.setAuthority(block, True)
+                else:
+                    self.redLineBlocks.setAuthority(block, False)
+        elif msg[0] == 1:
+            for block in self.greenLineBlocks:
+                if block in msg:
+                    self.greenLineBlocks.setAuthority(block, True)
+                else:
+                    self.greenLineBlocks.setAuthority(block, False)
+        else:
+            return
 
 if __name__ == "__main__":
     import sys

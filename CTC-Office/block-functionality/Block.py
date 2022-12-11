@@ -12,6 +12,7 @@ class Block:
         self.occupancy = False
         self.faultState = False
         self.maintenanceState = False
+        self.authority = False
 
     # def getOccupancy(self):
     #     if self.occupancy:
