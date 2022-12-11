@@ -53,6 +53,9 @@ class Controller():
 
         self.id = controllerNum
 
+        # if self.id == 1 and self.line == 'green':
+        #     print(self.track)
+        #     exit(0)
         ## Setup PLC interface
         self.parser = PLCParser(controllerNum)
         if self.line == 'green':

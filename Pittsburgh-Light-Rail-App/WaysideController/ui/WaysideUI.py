@@ -671,9 +671,6 @@ class TrackControllerWindow(QtWidgets.QWidget):
 
         value = ""
 
-        if state == True:
-            exit(1)
-
         if state:
             value = "ON"
         else:
