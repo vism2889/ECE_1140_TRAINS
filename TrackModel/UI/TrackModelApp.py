@@ -86,15 +86,20 @@ class TrackModel(QWidget):
         
         self.orderedGreenLineList    = []
         self.orderedGreenLine()
+        self.authorityFromWayside    = []
         
         # System Communication Signals
         if signals:
-            self.signals = signals
-            self.signals.trainLocation.connect(self.getOccupancy)
-            # self.signals.switchState.connect()
-            # self.signals.waysideAuthority.connect()
-            # self.signals.crossingState.connect()
-            # self.signals.switchState.connect(self.updateSwitchState)
+            self.signals = signals # system signals instance 
+
+            self.signals.trainLocation.connect(self.getOccupancy)          # from train model: (used for occupancy)
+
+            self.signals.waysideAuthority.connect(self.getAuthority)       # from wayside: (used for authority)
+            # self.signals.crossingState.connect()                         # from wayside: List of length two indicating a block and it's crossing state [(int) block #, (bool) state]
+            self.signals.switchState.connect(self.updateSwitchState)       # from wayside: List of length 2 [(int) block #, (bool) state]
+
+
+            self.signals.ctcSwitchState.connect(self.updateCtcSwitchState) # from ctc office: List of length 3 [(int) line, (int) block #, (bool) switch state]
 
             # self.signals.stoppedBlocks.connect(self.updateStoppedBlocks) # sets a list = [list of blocks that trains are stopped at]
 
@@ -250,8 +255,21 @@ class TrackModel(QWidget):
         '''
         updates the swicthes for a given line
         '''
-        self.lineswitches[switch[0]] = switch[1]
-        self.lineBlocks[1][switch[0]-1].switchState = switch[1]
+        for i in range(len(self.switchText)):
+            # print('TEXT', self.switchText[self.currLineIndex][i][0])
+            blockNum = int(self.switchText[self.currLineIndex][i][0])
+            if switch[0] == blockNum:
+                # print('switch signal 2:', switch, ', current line switch', )
+                self.lineBlocks[self.currLineIndex][switch[0]-1].switchState = switch[1]
+                if switch[1] == True:
+                    self.switchInfoTable.item(i,1).setBackground(QtCore.Qt.green)
+                    self.switchInfoTable.item(i,2).setBackground(QtCore.Qt.red)
+                else:
+                    self.switchInfoTable.item(i,1).setBackground(QtCore.Qt.red)
+                    self.switchInfoTable.item(i,2).setBackground(QtCore.Qt.green)
+
+    def updateCtcSwitchState(self, switchState):
+        print("CTC Switch State Signal", switchState)
 
     def orderedGreenLine(self):
         '''
@@ -575,6 +593,9 @@ class TrackModel(QWidget):
                 self.blockslistwidget.item(i).setBackground(QColor(200,200,50))
                 if self.currBlockIndex == i: 
                     self.currBlockDisplay.setStyleSheet("background-color: rgb(200,200,50); color: black;")
+            elif self.authorityFromWayside != None and (i+1) in self.authorityFromWayside:
+
+                self.blockslistwidget.item(i).setBackground(QtCore.Qt.green)
             else:
                 self.blockslistwidget.item(i).setBackground(QColor(134, 132, 130))
                 
@@ -786,6 +807,12 @@ class TrackModel(QWidget):
         self.occupancy[int(line)][int(currBlock)-1] = 1
         self.signals.globalOccupancyFromTrackModelSignal.emit(self.occupancy) # should emit a new global occupancy
         self.updateBlockOccupancyCallback()
+
+    def getAuthority(self, authority):
+        self.authorityFromWayside = authority[1]
+        print('authority from track model:', self.authorityFromWayside)
+        self.updateBlocksOccupancy()
+
 
     def addPassngersToStations(self):
         '''

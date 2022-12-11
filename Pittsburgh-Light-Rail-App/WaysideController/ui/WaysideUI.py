@@ -60,14 +60,14 @@ class TrackControllerWindow(QtWidgets.QWidget):
             path = os.path.abspath(__file__.replace(__name__.replace('.', '\\')+'.py', ''))
             jsonPath = path
             trackLayoutPath = path
-            path += "\\track_layout\\Track Layout & Vehicle Data vF.xlsx - Red Line.csv"
+            path += "\\track_layout\\Track Layout & Vehicle Data vF2.xlsx - Red Line.csv"
             jsonPath += "\\track_layout\\redline-layout.json"
             trackLayoutPath += "\\track_layout\\Trains Layout - Red Line.csv"
         elif os.name == 'posix':
             path = os.path.abspath(__file__.replace(__name__.replace('.', '/')+'.py', ''))
             jsonPath = path
             trackLayoutPath = path
-            path += "/track_layout/Track Layout & Vehicle Data vF.xlsx - Red Line.csv"
+            path += "/track_layout/Track Layout & Vehicle Data vF2.xlsx - Red Line.csv"
             jsonPath += "/track_layout/redline-layout.json"
             trackLayoutPath += "/track_layout/Trains Layout - Red Line.csv"
 
@@ -100,14 +100,14 @@ class TrackControllerWindow(QtWidgets.QWidget):
             path = os.path.abspath(__file__.replace(__name__.replace('.', '\\')+'.py', ''))
             jsonPath = path
             trackLayoutPath = path
-            path += "\\track_layout\\Track Layout & Vehicle Data vF.xlsx - Green Line.csv"
+            path += "\\track_layout\\Track Layout & Vehicle Data vF2.xlsx - Green Line.csv"
             jsonPath += "\\track_layout\\greenline-layout.json"
             trackLayoutPath += "\\track_layout\\Trains Layout - Green Line.csv"
         elif os.name == 'posix':
             path = os.path.abspath(__file__.replace(__name__.replace('.', '/')+'.py', ''))
             jsonPath = path
             trackLayoutPath = path
-            path += "/track_layout/Track Layout & Vehicle Data vF.xlsx - Green Line.csv"
+            path += "/track_layout/Track Layout & Vehicle Data vF2.xlsx - Green Line.csv"
             jsonPath += "/track_layout/greenline-layout.json"
             trackLayoutPath += "/track_layout/Trains Layout - Green Line.csv"
 
@@ -671,9 +671,6 @@ class TrackControllerWindow(QtWidgets.QWidget):
 
         value = ""
 
-        if state == True:
-            exit(1)
-
         if state:
             value = "ON"
         else:
@@ -716,7 +713,6 @@ class TrackControllerWindow(QtWidgets.QWidget):
                             break
 
     def setMaintenance(self, line, block_num, value):
-
         controller_indices = self.waysideio_ref.lookupBlock(line, block_num)['controller']
         good = self.checkFaults(line, block_num)
 

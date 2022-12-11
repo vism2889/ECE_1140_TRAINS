@@ -10,7 +10,7 @@ class to_TC(msg):
 		self.__vars__.append(self.commanded_speed)
 		self.speed_limit = None
 		self.__vars__.append(self.speed_limit)
-		self.authority = []
+		self.authority = None
 		self.__vars__.append(self.authority)
 		self.next_station = None
 		self.__vars__.append(self.next_station)
@@ -21,9 +21,9 @@ class to_TC(msg):
 		self.signalPickup_failure = None
 		self.__vars__.append(self.signalPickup_failure)
 		self.__data_types__.append("float")
+		self.__data_types__.append("int")
+		self.__data_types__.append("int")
 		self.__data_types__.append("float")
-		self.__data_types__.append("float")
-		self.__data_types__.append("bool[]")
 		self.__data_types__.append("string")
 		self.__data_types__.append("bool")
 		self.__data_types__.append("bool")

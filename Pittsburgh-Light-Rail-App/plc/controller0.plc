@@ -1,1 +1,12 @@
-pass
+if #block_18 == True or #block_19 == True or #block_20 == True:
+    #crossing_19 = True
+else:
+    #crossing_19 = False
+
+if #block_149 == True and #block_2 == False:
+    #switch_29 = True
+    #switch_12 = True
+
+if #block_2 == True and #block_149 == False:
+    #switch_29 = False
+    #switch_12 = False

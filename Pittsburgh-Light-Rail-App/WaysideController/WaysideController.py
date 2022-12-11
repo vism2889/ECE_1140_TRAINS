@@ -50,13 +50,14 @@ def handler(signum, frame):
 
 signal.signal(signal.SIGINT, handler)
 
-
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv) ## COMMENT OUT FOR FINAL PRODUCT
     signals = Signals() ## COMMENT OUT FOR FINAL PRODUCT
     wayside = WaysideController(signals)
+    wayside.show()
 
     signals.trainLocation.emit(['green', 0, 84, 85])
+
     ## Testing
     # blockFailures = []
     # for i in range(76):

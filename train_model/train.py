@@ -41,7 +41,9 @@ class TrainData():
 
 class PointMassModel():
     def __init__(self):
-        self.grade = 0.03
+        self.suggSpeed = 0
+        self.cmdSpeed = 0
+        self.grade = 0
         self.count = 0
         self.ctc_authority = []
         self.speed_up = 1
@@ -268,13 +270,6 @@ class PointMassModel():
         self.curr_block_len = curr_block_object.blockLength
         self.curr_block_len = float(self.curr_block_len)
 
-        #getting block values for speed
-        self.speed_limit = float(curr_block_object.speedLimit)
-        if self.suggested_speed > self.speed_limit:
-            self.speed_limit = self.speed_limit
-        else:
-            self.speed_limit = self.suggested_speed
-
         
         # print(f'-------------------Position: {self.curr_pos}-----------------------------')
         if self.curr_pos >= self.curr_block_len:
@@ -290,13 +285,38 @@ class PointMassModel():
             if len(self.waysideAuthority) == 1:
                 self.curr_block = self.waysideAuthority[0]
                 self.prev_block = self.prev_block
+                
         
         
-        if self.curr_block == self.waysideAuthority[0]:
-            wayside = self.waysideAuthority[1:len(self.waysideAuthority)]
-            self.train_authority += float(self.BlockModels[self.curr_block-1].blockLength)-self.curr_pos
-            for b in wayside:
-                self.train_authority += float(self.BlockModels[b-1].blockLength)
+        for c_bl in self.ctc_authority:
+            if c_bl in self.waysideAuthority:
+                ind = self.waysideAuthority.index(c_bl)
+                self.waysideAuthority = self.waysideAuthority[0:ind+1]
+                if c_bl == self.prev_block:
+                    self.ctc_authority.remove(c_bl)
+
+                
+        if len(self.waysideAuthority) > 1:
+            if self.curr_block == self.waysideAuthority[0]:
+                wayside = self.waysideAuthority[1:len(self.waysideAuthority)-1]
+                self.train_authority += float(self.BlockModels[self.curr_block-1].blockLength)-self.curr_pos
+                for b in wayside:
+                    self.train_authority += float(self.BlockModels[b-1].blockLength)
+            elif self.curr_block == self.waysideAuthority[1]:
+                wayside = self.waysideAuthority[2:len(self.waysideAuthority)-1]
+                self.train_authority += float(self.BlockModels[self.curr_block-1].blockLength)-self.curr_pos
+                for b in wayside:
+                    self.train_authority += float(self.BlockModels[b-1].blockLength)
+        elif len(self.waysideAuthority) == 1:
+            self.train_authority = 0
+        
+
+        self.grade = float(self.BlockModels[self.curr_block].grade)
+        self.speedLimit = float(self.BlockModels[self.curr_block].speedLimit)*0.277778
+        if self.speedLimit >= self.suggSpeed:
+            self.cmdSpeed = self.suggSpeed
+        else:
+            self.cmdSpeed = self.speed_limit
 
 
 
@@ -392,7 +412,7 @@ class Train():
 
         self.curr_power = 0
         self.curr_speed = 0
-        self.cmd_speed = 30.22
+        
 
 
         self.int_lights = False

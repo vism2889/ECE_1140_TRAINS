@@ -31,7 +31,6 @@ class Block():
 
     def getNeighbors(self):
         if self.hasSwitch:
-
             if len(self.left) == 2:
                 return (self.left[int(self.switch)], self.right[0])
             if len(self.right) == 2:
@@ -57,13 +56,15 @@ class Track():
 
     def getInfo(self, blockNum):
         if self.blocks[blockNum-1].hasSwitch:
-            print(self.blocks[blockNum-1].switch)
+            print(f'Switch state: {self.blocks[blockNum-1].switch}')
         self.blocks[blockNum-1].printBlock()
 
     def confSwitch(self, id, blockNum):
         self.switches[id] = blockNum
 
     def setSwitch(self, id, val=None):
+        # if int(id) == 76:
+            # print(f'paoisdjfa  : {self.switches}')
         if id not in self.switches:
             return -1
 
@@ -72,9 +73,11 @@ class Track():
 
         if block.hasSwitch:
             if val != None:
+                # print(f'{self.trackName}: Setting switch {id} to {val}')
                 block.switch = val
             else:
                 block.switch = not block.switch
+                # print(f'{self.trackName}: Setting switch {id} to {val}')
 
         return 0
 
