@@ -24,7 +24,8 @@ from train import Train
 
 class TrainModel(QtWidgets.QMainWindow):
     '''Primary Train Model UI Window that contains all childs/widgets'''
-    train_dict = {}
+    trainDict = {}
+    blockList = None
 
     def __init__(self, ui, hw, signals):
         super().__init__()
@@ -50,6 +51,8 @@ class TrainModel(QtWidgets.QMainWindow):
         self.t.pm.BlockModels = msg[1]
 
     def dispatch(self, msg):
+
+        
         self.t.id = msg[0]
         if msg[1] == 'Green Line':
             self.t.line = 1
@@ -59,8 +62,8 @@ class TrainModel(QtWidgets.QMainWindow):
             self.t.pm.prev_block = 0
             self.t.pm.curr_block = 9
             self.t.line = 0
-        
-        self.train_dict.update({msg[0]: self.t})
+            
+        self.trainDict.update({msg[0]: self.t})
         
 
         # print(f'------------DISPATCHED!!!!!!!!!!!------------------')
@@ -90,10 +93,7 @@ class TrainModel(QtWidgets.QMainWindow):
         for i,m in enumerate(msg):
             msg[i] = int(m)
 
-        if len(msg) == 1:
-            self.t.pm.ctc_authority.append(msg)
-        if len(msg) > 1:
-            self.t.pm.ctc_authority.extend(msg)
+        self.t.pm.ctc_authority.extend(msg)
 
     
     def wayside_authority(self,msg):
