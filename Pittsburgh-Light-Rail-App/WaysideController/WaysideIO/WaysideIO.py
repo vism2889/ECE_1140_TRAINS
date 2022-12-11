@@ -53,14 +53,10 @@ class Controller():
 
         self.id = controllerNum
 
-        # if self.id == 1 and self.line == 'green':
-        #     print(self.track)
-        #     exit(0)
         ## Setup PLC interface
         self.parser = PLCParser(controllerNum)
         if self.line == 'green':
             file = open(f"plc/controller{self.id}.plc")
-            # print(f'Loaded plc/controller{file}.plc')
             self.uploadPLC(file)
             self.maintenance = False
 
@@ -110,7 +106,6 @@ class Controller():
 
     ## Updates the controller maintenance state
     def updateMaintenance(self, blockNum, state):
-        print(f'{blockNum}\t{state}')
         self.track['block-maintenance'][blockNum] = state
         self.parent.ui.setMaintenance(self.line, blockNum, state)
         return self.track['block-maintenance']
@@ -170,6 +165,10 @@ class Controller():
         if self.track['block-states'][str(blockNum)]:
             flag +=1
 
+        if blockNum in self.track['block-maintenance']:
+            if self.track['block-maintenance'][blockNum]:
+                flag += 1
+
         return flag
 
 class WaysideIO(QWidget):
@@ -213,13 +212,10 @@ class WaysideIO(QWidget):
 
         if line == 0:
             authority= self.planAuthority('red', self.redlineControllers, self.redlineTrack, curr, prev)
-            # print(f'{id}: {authority}')
             self.signals.waysideAuthority.emit([line, id, authority])
 
         if line == 1:
-            # print(f'curr: {curr}\t{prev}')
             authority = self.planAuthority('green', self.greenlineControllers, self.greenlineTrack, curr, prev)
-            # print(f'{id}: {authority}')
             self.signals.waysideAuthority.emit([id, authority])
 
     ##  Driver for most of the logic
