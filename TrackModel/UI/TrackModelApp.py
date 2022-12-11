@@ -592,8 +592,8 @@ class TrackModel(QWidget):
                 self.blockslistwidget.item(i).setIcon(QIcon("../images/alert.png"))
             elif self.occupancy[self.currLineIndex][i] == True:
                 self.blockslistwidget.item(i).setBackground(QColor(200,200,50))
-                self.signals.beaconFromTrackModelSignal.emit(self.lineBlocks[self.currLineIndex][i].forwardBeacon.split())
-                print(self.lineBlocks[self.currLineIndex][i].forwardBeacon)
+                self.signals.beaconFromTrackModelSignal.emit(self.lineBlocks[self.currLineIndex][i].forwardBeacon.split(','))
+                print(self.lineBlocks[self.currLineIndex][i].forwardBeacon.split(','))
                 if self.currBlockIndex == i: 
                     self.currBlockDisplay.setStyleSheet("background-color: rgb(200,200,50); color: black;")
             elif self.authorityFromWayside != None and (i+1) in self.authorityFromWayside:
