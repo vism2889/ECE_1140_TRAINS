@@ -36,12 +36,13 @@ class Signals(QWidget):
     # ["TrackLineName", [lineOccupancy], [lineSwitchStates], [lineMaintenance], [lineFailures]]
 
     # CTC Office Signals
-    dispatchTrainSignal      = QtCore.pyqtSignal(list)
-    suggestedSpeedSignal     = QtCore.pyqtSignal(list) # List of length 2 [(int) train id, (int) suggested speed]
-    ctcAuthoritySignal       = QtCore.pyqtSignal(list) # List of length 2 [(int) train id, [(int) stops 1, (int), stop 2, ..., (int) stop n]]
-    clockSpeedSignal         = QtCore.pyqtSignal(int)
+    dispatchTrainSignal      = QtCore.pyqtSignal(list) # List of lenfth 3 [(string) train id,  (string) line, (int) suggested speed]
+    suggestedSpeedSignal     = QtCore.pyqtSignal(list) # List of length 2 [(string) train id, (int) suggested speed]
+    ctcAuthoritySignal       = QtCore.pyqtSignal(list) # List of length 2 [(string) train id, [(int) stops 1, (int), stop 2, ..., (int) stop n]]
+    clockSpeedSignal         = QtCore.pyqtSignal(int)  # Integer value of clock speed
     signalMaintenance        = QtCore.pyqtSignal(list) # List of length 3 [(int) line, (int) block #, (bool) maintenance state]
-    timeSignal               = QtCore.pyqtSignal(list)
+    timeSignal               = QtCore.pyqtSignal(list) # List of length 3 [(int) hours, (int) mins, (int) secs]
+    ctcSwitchState           = QtCore.pyqtSignal(list) # List of length 3 [(int) line, (int) block #, (bool) switch state]
 
     # Wayside Controller Signals
     switchState              = QtCore.pyqtSignal(list) # List of length two indicating a block and it's switch state [(int) block #, (bool) state]

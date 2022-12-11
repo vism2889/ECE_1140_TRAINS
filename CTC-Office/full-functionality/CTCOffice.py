@@ -45,6 +45,7 @@ class CTCOffice(QWidget):
         # connect to necessary signals
         self.signals.globalOccupancyFromTrackModelSignal.connect(self.readOccupancySignal)
         self.signals.switchState.connect(self.updateSwitchState)
+        self.signals.clockSpeedSignal.connect(self.changeClockSpeed)
 
     def setupLayout(self):
         # getting lists of blocks
@@ -57,27 +58,39 @@ class CTCOffice(QWidget):
         self.greenLineStations  = dict()
 
         # define station lists in order
-        for key, value in self.redLineBlocks.stations().items():
-            self.redLineStations[value]     = [key, False]
+        self.redLineStations["SHADYSIDE"]           = ["7", False]
+        self.redLineStations["HERRON AVE (OUT)"]    = ["16", False]
+        self.redLineStations["SWISSVILLE (OUT)"]    = ["21", False]
+        self.redLineStations["PENN STATION (OUT)"]  = ["25", False]
+        self.redLineStations["STEEL PLAZA (OUT)"]   = ["35", False]
+        self.redLineStations["FIRST AVE (OUT)"]     = ["45", False]
+        self.redLineStations["STATION SQ. (OUT)"]   = ["48", False]
+        self.redLineStations["SOUTH HILLS JUNC."]   = ["60", False]
+        self.redLineStations["STATION SQ. (IN)"]    = ["48", False]
+        self.redLineStations["FIRST AVE (IN)"]      = ["45", False]
+        self.redLineStations["STEEL PLAZA (IN)"]    = ["35", False]
+        self.redLineStations["PENN STATION (IN)"]   = ["25", False]
+        self.redLineStations["SWISSVILLE (IN)"]     = ["21", False]
+        self.redLineStations["HERRON AVE (IN)"]     = ["16", False]
 
-        self.greenLineStations["GLENBURY"]       = ["65", False]
-        self.greenLineStations["DORMONT"]        = ["73", False]
-        self.greenLineStations["MT-LEBANON"]     = ["77", False]
-        self.greenLineStations["POPLAR"]         = ["88", False]
-        self.greenLineStations["CASTE SHANNON"]  = ["96", False]
-        self.greenLineStations["MT-LEBANON"]     = ["77", False]
-        self.greenLineStations["GLENBURY"]       = ["114", False]
-        self.greenLineStations["OVERBROOK (OUT)"]= ["122", False]
-        self.greenLineStations["INGLEWOOD (OUT)"]= ["131", False]
-        self.greenLineStations["CENTRAL (OUT)"]  = ["140", False]
-        self.greenLineStations["WHITED"]         = ["22", False]
-        self.greenLineStations["SUSHVILLE"]      = ["16", False]
-        self.greenLineStations["EDGEBROOK"]      = ["9", False]
-        self.greenLineStations["PIONEER"]        = ["2", False]
-        self.greenLineStations["SOUTH BANK"]     = ["31", False]
-        self.greenLineStations["CENTRAL (IN)"]   = ["38", False]
-        self.greenLineStations["INGLEWOOD (IN)"] = ["47", False]
-        self.greenLineStations["OVERBROOK (IN)"] = ["56", False]
+        self.greenLineStations["GLENBURY"]          = ["65", False]
+        self.greenLineStations["DORMONT"]           = ["73", False]
+        self.greenLineStations["MT-LEBANON"]        = ["77", False]
+        self.greenLineStations["POPLAR"]            = ["88", False]
+        self.greenLineStations["CASTE SHANNON"]     = ["96", False]
+        self.greenLineStations["MT-LEBANON"]        = ["77", False]
+        self.greenLineStations["GLENBURY"]          = ["114", False]
+        self.greenLineStations["OVERBROOK (OUT)"]   = ["122", False]
+        self.greenLineStations["INGLEWOOD (OUT)"]   = ["131", False]
+        self.greenLineStations["CENTRAL (OUT)"]     = ["140", False]
+        self.greenLineStations["WHITED"]            = ["22", False]
+        self.greenLineStations["SUSHVILLE"]         = ["16", False]
+        self.greenLineStations["EDGEBROOK"]         = ["9", False]
+        self.greenLineStations["PIONEER"]           = ["2", False]
+        self.greenLineStations["SOUTH BANK"]        = ["31", False]
+        self.greenLineStations["CENTRAL (IN)"]      = ["38", False]
+        self.greenLineStations["INGLEWOOD (IN)"]    = ["47", False]
+        self.greenLineStations["OVERBROOK (IN)"]    = ["56", False]
 
         # select default block
         self.selectedBlock      = 1
@@ -88,7 +101,7 @@ class CTCOffice(QWidget):
 
     def setupUi(self):
         self.setObjectName("self")
-        self.setGeometry(10, 10, 600, 580)
+        self.setGeometry(10, 10, 700, 580)
         self.setMouseTracking(True)
         self.setStyleSheet("background-color: #747c8a;")
         self.redLineMaintenance   = False
@@ -100,32 +113,34 @@ class CTCOffice(QWidget):
         font = QtGui.QFont()
         font.setPointSize(16)
         self.clockLabel = QtWidgets.QLabel(self)
-        self.clockLabel.setGeometry(QtCore.QRect(450, 35, 140, 25))
+        self.clockLabel.setGeometry(QtCore.QRect(550, 35, 140, 25))
         self.clockLabel.setObjectName("clockLabel")
         self.clockLabel.setStyleSheet("background-color: #7b8fb0; border: 1px solid black")
         self.clockLabel.setAlignment(QtCore.Qt.AlignCenter)
         self.clockLabel.setFont(font)
 
-        self.changeClockSpeedButton = QtWidgets.QPushButton(self)
-        self.changeClockSpeedButton.setGeometry(450,15,140,20)
-        self.changeClockSpeedButton.setText("Change clock speed")
-        self.changeClockSpeedButton.setStyleSheet("background-color: #e8c33c;")
-        self.changeClockSpeedButton.clicked.connect(self.toggleTenTimeSpeed)
+        # self.changeClockSpeedButton = QtWidgets.QPushButton(self)
+        # self.changeClockSpeedButton.setGeometry(550,15,140,20)
+        # self.changeClockSpeedButton.setText("Change clock speed")
+        # self.changeClockSpeedButton.setStyleSheet("background-color: #e8c33c;")
+        # self.changeClockSpeedButton.clicked.connect(self.toggleTenTimeSpeed)
 
     ##################### RED LINE ##########################
+        font.setPointSize(10)
         self.redLineLabelTable = QTableWidget(self)
         self.redLineLabelTable.setRowCount(0)
         self.redLineLabelTable.setColumnCount(1)
-        self.redLineLabelTable.setGeometry(10,15,210,20)
-        self.redLineLabelTable.setColumnWidth(0, 210)
+        self.redLineLabelTable.setGeometry(10,15,260,20)
+        self.redLineLabelTable.setColumnWidth(0, 260)
         self.redLineLabelTable.setHorizontalHeaderLabels(['Red Line'])
         self.redLineBlockTable = QTableWidget(self)
         self.redLineBlockTable.setRowCount(self.redLineBlocks.len())
-        self.redLineBlockTable.setColumnCount(3)
+        self.redLineBlockTable.setColumnCount(4)
         self.redLineBlockTable.setColumnWidth(0, 40)
-        self.redLineBlockTable.setColumnWidth(2, 40)
-        self.redLineBlockTable.setGeometry(10,30,210,289)
-        self.redLineBlockTable.setHorizontalHeaderLabels(['Block','Switch','Xing'])
+        self.redLineBlockTable.setColumnWidth(3, 40)
+        self.redLineBlockTable.setGeometry(10,30,260,289)
+        self.redLineBlockTable.setHorizontalHeaderLabels(['Block','Switch','Station','Xing'])
+        self.redLineBlockTable.horizontalHeader().setFont(font)
         self.redLineBlockTable.verticalHeader().hide()
         self.redLineBlockTable.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.redLineBlockTable.setEditTriggers(QAbstractItemView.NoEditTriggers)
@@ -140,7 +155,8 @@ class CTCOffice(QWidget):
 
         self.redLineTrainTable = QTableWidget(self)
         self.redLineTrainTable.setColumnCount(1)
-        self.redLineTrainTable.setGeometry(10,319,105,120)
+        self.redLineTrainTable.setColumnWidth(0,130)
+        self.redLineTrainTable.setGeometry(10,319,130,120)
         self.redLineTrainTable.setHorizontalHeaderLabels(['Active Trains'])
         self.redLineTrainTable.verticalHeader().hide()
         self.redLineTrainTable.itemClicked.connect(self.redTrainSelectionChanged)
@@ -148,25 +164,28 @@ class CTCOffice(QWidget):
 
         self.redLineBacklogTable = QTableWidget(self)
         self.redLineBacklogTable.setColumnCount(1)
-        self.redLineBacklogTable.setGeometry(115,319,105,120)
+        self.redLineBacklogTable.setColumnWidth(0,130)
+        self.redLineBacklogTable.setGeometry(140,319,130,120)
         self.redLineBacklogTable.setHorizontalHeaderLabels(['Scheduled'])
         self.redLineBacklogTable.verticalHeader().hide()
         self.redLineBacklogTable.show()
 
     ##################### GREEN LINE ########################
+        font.setPointSize(10)
         self.greenLineLabelTable = QTableWidget(self)
         self.greenLineLabelTable.setRowCount(0)
         self.greenLineLabelTable.setColumnCount(1)
-        self.greenLineLabelTable.setGeometry(230,15,210,20)
-        self.greenLineLabelTable.setColumnWidth(0, 210)
+        self.greenLineLabelTable.setGeometry(280,15,260,20)
+        self.greenLineLabelTable.setColumnWidth(0, 260)
         self.greenLineLabelTable.setHorizontalHeaderLabels(['Green Line'])
         self.greenLineBlockTable = QTableWidget(self)
         self.greenLineBlockTable.setRowCount(self.greenLineBlocks.len())
-        self.greenLineBlockTable.setColumnCount(3)
+        self.greenLineBlockTable.setColumnCount(4)
         self.greenLineBlockTable.setColumnWidth(0, 40)
-        self.greenLineBlockTable.setColumnWidth(2, 41)
-        self.greenLineBlockTable.setGeometry(230,30,210,289)
-        self.greenLineBlockTable.setHorizontalHeaderLabels(['Block','Switch','Xing'])
+        self.greenLineBlockTable.setColumnWidth(3, 41)
+        self.greenLineBlockTable.setGeometry(280,30,260,289)
+        self.greenLineBlockTable.setHorizontalHeaderLabels(['Block','Switch','Station','Xing'])
+        self.greenLineBlockTable.horizontalHeader().setFont(font)
         self.greenLineBlockTable.verticalHeader().hide()
         self.greenLineBlockTable.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.greenLineBlockTable.setEditTriggers(QAbstractItemView.NoEditTriggers)
@@ -180,7 +199,8 @@ class CTCOffice(QWidget):
 
         self.greenLineTrainTable = QTableWidget(self)
         self.greenLineTrainTable.setColumnCount(1)
-        self.greenLineTrainTable.setGeometry(230,319,105,120)
+        self.greenLineTrainTable.setColumnWidth(0,130)
+        self.greenLineTrainTable.setGeometry(280,319,130,120)
         self.greenLineTrainTable.setHorizontalHeaderLabels(['Active Trains'])
         self.greenLineTrainTable.verticalHeader().hide()
         self.greenLineTrainTable.itemClicked.connect(self.greenTrainSelectionChanged)
@@ -188,7 +208,8 @@ class CTCOffice(QWidget):
 
         self.greenLineBacklogTable = QTableWidget(self)
         self.greenLineBacklogTable.setColumnCount(1)
-        self.greenLineBacklogTable.setGeometry(335,319,105,120)
+        self.greenLineBacklogTable.setColumnWidth(0,130)
+        self.greenLineBacklogTable.setGeometry(410,319,130,120)
         self.greenLineBacklogTable.setHorizontalHeaderLabels(['Scheduled'])
         self.greenLineBacklogTable.verticalHeader().hide()
         self.greenLineBacklogTable.show()
@@ -200,20 +221,20 @@ class CTCOffice(QWidget):
         self.blockInfoTable.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.blockInfoTable.setSelectionMode(QAbstractItemView.NoSelection)
         self.blockInfoTable.setColumnCount(1)
-        self.blockInfoTable.setGeometry(450,210,140,102)
+        self.blockInfoTable.setGeometry(550,210,140,102)
         self.blockInfoTable.horizontalHeader().hide()
         self.blockInfoTable.setVerticalHeaderLabels(['Line','Number','Occupancy','Fault','Maintenance'])
         self.blockInfoTable.show()
 
         self.toggleMaintenanceButton = QtWidgets.QPushButton(self)
-        self.toggleMaintenanceButton.setGeometry(450,310,140,20)
+        self.toggleMaintenanceButton.setGeometry(550,310,140,20)
         self.toggleMaintenanceButton.setStyleSheet("background-color: #e8c33c;")
         self.toggleMaintenanceButton.setText("Toggle Maintenance")
         self.toggleMaintenanceButton.clicked.connect(self.toggleMaintenance)
         self.toggleMaintenanceButton.show()
 
         self.toggleSwitchButton = QtWidgets.QPushButton(self)
-        self.toggleSwitchButton.setGeometry(450,330,140,20)
+        self.toggleSwitchButton.setGeometry(550,330,140,20)
         self.toggleSwitchButton.setStyleSheet("background-color: #e8c33c;")
         self.toggleSwitchButton.setText("Toggle Switch")
         self.toggleSwitchButton.clicked.connect(self.toggleSwitch)
@@ -232,21 +253,21 @@ class CTCOffice(QWidget):
         self.destinationTable.show()
 
         self.dispatchTrainButton = QtWidgets.QPushButton(self)
-        self.dispatchTrainButton.setGeometry(450,70,140,25)
+        self.dispatchTrainButton.setGeometry(550,70,140,25)
         self.dispatchTrainButton.setStyleSheet("background-color: #e8c33c;")
         self.dispatchTrainButton.setText("Dispatch")
         self.dispatchTrainButton.show()
         self.dispatchTrainButton.clicked.connect(self.launchDispatchPopUp)
 
         self.uploadScheduleButton = QtWidgets.QPushButton(self)
-        self.uploadScheduleButton.setGeometry(450,70,140,25)
+        self.uploadScheduleButton.setGeometry(550,70,140,25)
         self.uploadScheduleButton.setStyleSheet("background-color: #e8c33c;")
         self.uploadScheduleButton.setText("Upload Schedule")
         self.uploadScheduleButton.clicked.connect(self.uploadSchedule)
         self.uploadScheduleButton.hide()
 
         self.toggleDispatchModeButton = QtWidgets.QPushButton(self)
-        self.toggleDispatchModeButton.setGeometry(450,105,140,25)
+        self.toggleDispatchModeButton.setGeometry(550,105,140,25)
         self.toggleDispatchModeButton.setStyleSheet("background-color: #e8c33c;")
         self.toggleDispatchModeButton.setText("Toggle Dispatch Mode")
         self.toggleDispatchModeButton.show()
@@ -272,7 +293,7 @@ class CTCOffice(QWidget):
         self.trainImage          = QtWidgets.QLabel(self)
         self.pixmap              = QPixmap('LogoCTCOffice1.png')
         self.trainImage.setPixmap(self.pixmap)
-        self.trainImage.setGeometry(400,440,200,120)
+        self.trainImage.setGeometry(450,440,200,120)
 
         self.populateRedLineTable()
         self.populateGreenLineTable()
@@ -314,24 +335,19 @@ class CTCOffice(QWidget):
         secs = ('%02d' % int(self.seconds))
         mins = ('%02d' % int(self.minutes))
         hours = ('%02d' % int(self.hours))
-        self.clockLabel.setText(str(hours) + ":" + str(mins))
-        self.signals.timeSignal.emit([self.hours, self.minutes])
+        self.clockLabel.setText(str(hours) + ":" + str(mins) + ":" + str(secs))
+        self.signals.timeSignal.emit([self.hours, self.minutes, self.seconds])
 
-    def toggleTenTimeSpeed(self):
-        self.tenTimeSpeed = not self.tenTimeSpeed
-        if self.tenTimeSpeed:
-            self.clockSpeed = 10
-            self.signals.clockSpeedSignal.emit(10)
-        else:
-            self.clockSpeed = 1000
-            self.signals.clockSpeedSignal.emit(1)
-
+    def changeClockSpeed(self, msg):
+        self.clockSpeed = int(1000 / msg)
         self.startClock()
 
     def startClock(self):
         self.clock.start(self.clockSpeed)
 
     def populateRedLineTable(self):
+        font = QtGui.QFont()
+        font.setPointSize(7)
         for key in self.redLineBlocks.keys():
             item = QtWidgets.QTableWidgetItem()
             item.setText(key)
@@ -341,33 +357,49 @@ class CTCOffice(QWidget):
            if (self.redLineBlocks.switch(key) != 0):
                 item = QtWidgets.QTableWidgetItem()
                 item.setText(self.redLineBlocks.switch(key)[0] + " " + str(self.redLineBlocks.switch(key)[1]))
+                item.setFont(font)
                 self.redLineBlockTable.setItem(int(key)-1, 1, item)
 
         for key in self.redLineBlocks.keys():
            if (self.redLineBlocks.crossing(key) != 0):
                 item = QtWidgets.QTableWidgetItem()
                 item.setText(self.redLineBlocks.crossing(key))
-                self.redLineBlockTable.setItem(int(key)-1, 2, item)
+                self.redLineBlockTable.setItem(int(key)-1, 3, item)
+
+        for key in self.redLineStations.keys():
+            item = QtWidgets.QTableWidgetItem()
+            item.setText(key)
+            item.setFont(font)
+            self.redLineBlockTable.setItem(int(self.redLineStations[key][0])-1, 2, item)
 
         self.redLineBlockTable.resizeColumnToContents(1)
 
     def populateGreenLineTable(self):
+        font = QtGui.QFont()
+        font.setPointSize(7)
         for key in self.greenLineBlocks.keys():
             item = QtWidgets.QTableWidgetItem()
             item.setText(key)
             self.greenLineBlockTable.setItem(int(key)-1, 0, item)
 
         for key in self.greenLineBlocks.keys():
-           if (self.greenLineBlocks.switch(key) != 0):
+            if (self.greenLineBlocks.switch(key) != 0):
                 item = QtWidgets.QTableWidgetItem()
                 item.setText(self.greenLineBlocks.switch(key)[0] + " " + str(self.greenLineBlocks.switch(key)[1]))
+                item.setFont(font)
                 self.greenLineBlockTable.setItem(int(key)-1, 1, item)
 
         for key in self.greenLineBlocks.keys():
-           if (self.greenLineBlocks.crossing(key) != 0):
+            if (self.greenLineBlocks.crossing(key) != 0):
                 item = QtWidgets.QTableWidgetItem()
                 item.setText(self.greenLineBlocks.crossing(key))
-                self.greenLineBlockTable.setItem(int(key)-1, 2, item)
+                self.greenLineBlockTable.setItem(int(key)-1, 3, item)
+
+        for key in self.greenLineStations.keys():
+            item = QtWidgets.QTableWidgetItem()
+            item.setText(key)
+            item.setFont(font)
+            self.greenLineBlockTable.setItem(int(self.greenLineStations[key][0])-1, 2, item)
 
         self.greenLineBlockTable.resizeColumnToContents(1)
 
@@ -534,24 +566,29 @@ class CTCOffice(QWidget):
         self.selectedBlockLine.toggleMaintenanceState(str(self.selectedBlock))
         maintenanceState = self.selectedBlockLine.getMaintenanceState(str(self.selectedBlock))
         if self.selectedBlockLine == self.greenLineBlocks:
-            self.signals.signalMaintenance.emit(["Green", self.selectedBlock, maintenanceState])
+            self.signals.signalMaintenance.emit([1, self.selectedBlock, maintenanceState])
             self.greenLineMaintenance = maintenanceState
         else:
-            self.signals.signalMaintenance.emit(["Red", self.selectedBlock, maintenanceState])
+            self.signals.signalMaintenance.emit([0, self.selectedBlock, maintenanceState])
             self.redLineMaintenance = maintenanceState
         self.updateMaintenanceState()
 
     def toggleSwitch(self):
+        # check if block has switch
+        if self.selectedBlockLine.switch(self.selectedBlock) == 0:
+            return
+        # if block has switch, toggle it
         item = QtWidgets.QTableWidgetItem()
         currentSwitchState = self.selectedBlockLine.getSwitchState(str(self.selectedBlock))
         if self.selectedBlockLine == self.greenLineBlocks and self.greenLineMaintenance:
-            maintenanceState = self.selectedBlockLine.setSwitchState(str(self.selectedBlock), not currentSwitchState)
+            self.selectedBlockLine.setSwitchState(str(self.selectedBlock), not currentSwitchState)
             currentSwitch = self.selectedBlockLine.switch(str(self.selectedBlock))
-            item.setText(str(currentSwitch[0]) + " " + str(currentSwitch[1]))
         elif self.selectedBlockLine == self.redLineBlocks and self.redLineMaintenance:
-            maintenanceState = self.selectedBlockLine.setSwitchState(str(self.selectedBlock), not currentSwitchState)
+            self.selectedBlockLine.setSwitchState(str(self.selectedBlock), not currentSwitchState)
             currentSwitch = self.selectedBlockLine.switch(str(self.selectedBlock))
-            item.setText(str(currentSwitch[0]) + " " + str(currentSwitch[1]))
+        # change switch label and emit new state
+        item.setText(str(currentSwitch[0]) + " " + str(currentSwitch[1]))
+        # TODO emit switch signal
 
     def launchDispatchPopUp(self):
         self.dispatchWidget = QtWidgets.QWidget()

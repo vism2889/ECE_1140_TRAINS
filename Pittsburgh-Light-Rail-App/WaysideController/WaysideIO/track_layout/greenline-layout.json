@@ -2,7 +2,7 @@
     "track" : "greenline",
     "controllers":[
         {"sections" : ["A", "B", "C"]},
-        {"sections" : ["A", "C", "D", "E", "F", "G", "Z"]},
+        {"sections" : ["A", "C", "D", "E", "F", "G", "Y","Z"]},
         {"sections" : ["R", "S", "T", "U", "V", "W", "X", "Y", "Z"]},
         {"sections" : ["G", "H", "I", "J", "K", "L", "M"]},
         {"sections" : ["M", "N", "O", "P","Q", "R"]}
