@@ -338,6 +338,8 @@ class WaysideIO(QWidget):
                 return authority
 
             ## Check the state of the block
+
+            # blockOccupied = controller.blockState(nextBlock.id)
             controller = self.lookupBlock(line, nextBlock.id)['controller']
             blockOccupied = controllers[controller[0][0]].blockState(nextBlock.id)
 
