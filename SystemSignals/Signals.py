@@ -58,8 +58,8 @@ class Signals(QWidget):
     # Train Controller (SW) Input Signals
     authoritySignal          = QtCore.pyqtSignal(float) #float in meters of the upcoming authority
     commandedSpeedSignal     = QtCore.pyqtSignal(float)
-    speedLimitSignal         = QtCore.pyqtSignal(list)
-    trainFailuresSignal      = QtCore.pyqtSignal(list)
+    speedLimitSignal         = QtCore.pyqtSignal(float)
+    trainFailuresSignal      = QtCore.pyqtSignal(list) #
     beaconSignal             = QtCore.pyqtSignal(list)        # Next Station and Station Side
     infrastructureSignal     = QtCore.pyqtSignal(list)        # Underground
     currentSpeedOfTrainModel = QtCore.pyqtSignal(float)
