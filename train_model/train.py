@@ -290,13 +290,28 @@ class PointMassModel():
             if len(self.waysideAuthority) == 1:
                 self.curr_block = self.waysideAuthority[0]
                 self.prev_block = self.prev_block
+                self.train_authority = 0
         
         
-        if self.curr_block == self.waysideAuthority[0]:
-            wayside = self.waysideAuthority[1:len(self.waysideAuthority)]
-            self.train_authority += float(self.BlockModels[self.curr_block-1].blockLength)-self.curr_pos
-            for b in wayside:
-                self.train_authority += float(self.BlockModels[b-1].blockLength)
+        for c_bl in self.ctc_authority:
+            if c_bl in self.waysideAuthority:
+                ind = self.waysideAuthority.index(c_bl)
+                self.waysideAuthority = self.waysideAuthority[0:ind+1]
+                if len(self.waysideAuthority) == 1:
+                    self.ctc_authority.remove(c_bl)
+
+                
+        if len(self.waysideAuthority) > 1:
+            if self.curr_block == self.waysideAuthority[0]:
+                wayside = self.waysideAuthority[1:len(self.waysideAuthority)]
+                self.train_authority += float(self.BlockModels[self.curr_block-1].blockLength)-self.curr_pos
+                for b in wayside:
+                    self.train_authority += float(self.BlockModels[b-1].blockLength)
+            elif self.curr_block == self.waysideAuthority[1]:
+                wayside = self.waysideAuthority[2:len(self.waysideAuthority)]
+                self.train_authority += float(self.BlockModels[self.curr_block-1].blockLength)-self.curr_pos
+                for b in wayside:
+                    self.train_authority += float(self.BlockModels[b-1].blockLength)
 
 
 
