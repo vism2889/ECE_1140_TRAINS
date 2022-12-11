@@ -50,7 +50,7 @@ class Signals(QWidget):
     # Wayside Controller Signals
     switchState              = QtCore.pyqtSignal(list) # List of length two indicating a block and it's switch state [(int) block #, (bool) state]
     crossingState            = QtCore.pyqtSignal(list) # List of length two indicating a block and it's crossing state [(int) block #, (bool) state]
-    waysideAuthority         = QtCore.pyqtSignal(list) # List of length 3 that specifices the authority for an individual train [(int) line, (int) train id, (list) blocks[]]
+    waysideAuthority         = QtCore.pyqtSignal(list) # List of length 2 that specifices the authority for an individual train [(int) train id, (list) blocks[]]
 
     # Train Model Signals
     blockListSignal          = QtCore.pyqtSignal(list)
@@ -61,8 +61,8 @@ class Signals(QWidget):
     # Train Controller (SW) Input Signals
     authoritySignal          = QtCore.pyqtSignal(float) #float in meters of the upcoming authority
     commandedSpeedSignal     = QtCore.pyqtSignal(float)
-    speedLimitSignal         = QtCore.pyqtSignal(float)
-    trainFailuresSignal      = QtCore.pyqtSignal(list) #
+    speedLimitSignal         = QtCore.pyqtSignal(list)
+    trainFailuresSignal      = QtCore.pyqtSignal(list)
     beaconSignal             = QtCore.pyqtSignal(list)        # Next Station and Station Side
     infrastructureSignal     = QtCore.pyqtSignal(list)        # Underground
     currentSpeedOfTrainModel = QtCore.pyqtSignal(float)
