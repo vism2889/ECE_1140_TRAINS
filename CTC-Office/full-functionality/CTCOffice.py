@@ -574,20 +574,26 @@ class CTCOffice(QWidget):
         self.updateMaintenanceState()
 
     def toggleSwitch(self):
+        font = QtGui.QFont()
+        font.setPointSize(7)
         # check if block has switch
-        if self.selectedBlockLine.switch(self.selectedBlock) == 0:
+        if self.selectedBlockLine.switch(str(self.selectedBlock)) == 0:
             return
         # if block has switch, toggle it
-        item = QtWidgets.QTableWidgetItem()
         currentSwitchState = self.selectedBlockLine.getSwitchState(str(self.selectedBlock))
         if self.selectedBlockLine == self.greenLineBlocks and self.greenLineMaintenance:
-            self.selectedBlockLine.setSwitchState(str(self.selectedBlock), not currentSwitchState)
+            self.selectedBlockLine.setSwitchState(str(self.selectedBlock), not currentSwitchState[1])
             currentSwitch = self.selectedBlockLine.switch(str(self.selectedBlock))
         elif self.selectedBlockLine == self.redLineBlocks and self.redLineMaintenance:
-            self.selectedBlockLine.setSwitchState(str(self.selectedBlock), not currentSwitchState)
+            self.selectedBlockLine.setSwitchState(str(self.selectedBlock), not currentSwitchState[1])
             currentSwitch = self.selectedBlockLine.switch(str(self.selectedBlock))
+        else:
+            return
         # change switch label and emit new state
+        item = QtWidgets.QTableWidgetItem()
         item.setText(str(currentSwitch[0]) + " " + str(currentSwitch[1]))
+        item.setFont(font)
+        self.selectedBlockTable.setItem(int(self.selectedBlock)-1,1,item)
         # TODO emit switch signal
 
     def launchDispatchPopUp(self):

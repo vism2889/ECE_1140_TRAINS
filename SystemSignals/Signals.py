@@ -50,7 +50,7 @@ class Signals(QWidget):
     # Wayside Controller Signals
     switchState              = QtCore.pyqtSignal(list) # List of length two indicating a block and it's switch state [(int) block #, (bool) state]
     crossingState            = QtCore.pyqtSignal(list) # List of length two indicating a block and it's crossing state [(int) block #, (bool) state]
-    waysideAuthority         = QtCore.pyqtSignal(list) # List of length 3 that specifices the authority for an individual train [(int) line, (int) train id, (list) blocks[]]
+    waysideAuthority         = QtCore.pyqtSignal(list) # List of length 3 that specifices the authority for an individual train [(int) line,(...) train id, (list) blocks[]]
 
     # Train Model Signals
     blockListSignal          = QtCore.pyqtSignal(list)
