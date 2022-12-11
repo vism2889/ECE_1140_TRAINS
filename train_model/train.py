@@ -291,23 +291,24 @@ class PointMassModel():
         for c_bl in self.ctc_authority:
             if c_bl in self.waysideAuthority:
                 ind = self.waysideAuthority.index(c_bl)
-                self.waysideAuthority = self.waysideAuthority[0:ind+1]
-                if c_bl == self.prev_block:
+                if self.curr_vel != 0:
+                    self.waysideAuthority = self.waysideAuthority[0:ind+1]
+                if c_bl == self.curr_block and self.curr_vel == 0:
                     self.ctc_authority.remove(c_bl)
 
                 
         if len(self.waysideAuthority) > 1:
             if self.curr_block == self.waysideAuthority[0]:
-                wayside = self.waysideAuthority[1:len(self.waysideAuthority)-1]
+                wayside = self.waysideAuthority[1:len(self.waysideAuthority)]
                 self.train_authority += float(self.BlockModels[self.curr_block-1].blockLength)-self.curr_pos
                 for b in wayside:
                     self.train_authority += float(self.BlockModels[b-1].blockLength)
             elif self.curr_block == self.waysideAuthority[1]:
-                wayside = self.waysideAuthority[2:len(self.waysideAuthority)-1]
+                wayside = self.waysideAuthority[2:len(self.waysideAuthority)]
                 self.train_authority += float(self.BlockModels[self.curr_block-1].blockLength)-self.curr_pos
                 for b in wayside:
                     self.train_authority += float(self.BlockModels[b-1].blockLength)
-        elif len(self.waysideAuthority) == 1:
+        elif len(self.waysideAuthority) == 1 and self.curr_vel != 0:
             self.train_authority = 0
         
 
@@ -386,7 +387,7 @@ class Train():
     def __init__ (self):
 
         self.id = None
-        self.speed_limit = 0
+        
         
         #block list
         # self.blocks          = [i for i in range(150)]
