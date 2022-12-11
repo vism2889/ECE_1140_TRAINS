@@ -570,8 +570,10 @@ class CTCOffice(QWidget):
         self.updateMaintenanceState()
 
     def toggleSwitch(self):
+        font = QtGui.QFont()
+        font.setPointSize(7)
         # check if block has switch
-        if self.selectedBlockLine.switch(self.selectedBlock) == 0:
+        if self.selectedBlockLine.switch(str(self.selectedBlock)) == 0:
             return
         # if block has switch, toggle it
         item = QtWidgets.QTableWidgetItem()
