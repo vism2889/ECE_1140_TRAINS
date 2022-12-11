@@ -53,6 +53,12 @@ class BlockDictionary:
         if blockNum in self.switchList:
             return self.switchList[blockNum]
 
+    def getStation(self, blockNum):
+        if blockNum in self.stationList:
+            return self.stationList[blockNum]
+        else:
+            return 'None'
+
     def getLine(self, blockNum):
         return self.blockList[blockNum].line
 
