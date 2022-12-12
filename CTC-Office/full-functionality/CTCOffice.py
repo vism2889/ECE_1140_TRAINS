@@ -525,9 +525,9 @@ class CTCOffice(QWidget):
             elif self.greenLineBlocks.getFaultState(key):
                 self.greenLineBlockTable.item(int(key)-1,0).setBackground(QtGui.QColor(255,0,0))
             elif self.greenLineBlocks.getOccupancy(key):
-                self.greenLineBlockTable.item(int(key)-1,0).setBackground(QtGui.QColor(0,255,0))
+                self.greenLineBlockTable.item(int(key)-1,0).setBackground(QtGui.QColor(20,107,43))
             elif self.greenLineBlocks.getAuthority(key):
-                self.greenLineBlockTable.item(int(key)-1,0).setBackground(QtGui.QColor(147,245,147))
+                self.greenLineBlockTable.item(int(key)-1,0).setBackground(QtGui.QColor(135,201,153))
             else:
                 self.greenLineBlockTable.item(int(key)-1,0).setBackground(QtGui.QColor(116,124,138))
 
@@ -537,9 +537,9 @@ class CTCOffice(QWidget):
             elif self.redLineBlocks.getFaultState(key):
                 self.redLineBlockTable.item(int(key)-1,0).setBackground(QtGui.QColor(255,0,0))
             elif self.redLineBlocks.getOccupancy(key):
-                self.redLineBlockTable.item(int(key)-1,0).setBackground(QtGui.QColor(0,255,0))
+                self.redLineBlockTable.item(int(key)-1,0).setBackground(QtGui.QColor(20,107,43))
             elif self.redLineBlocks.getAuthority(key):
-                self.redLineBlockTable.item(int(key)-1,0).setBackground(QtGui.QColor(147,245,147))
+                self.redLineBlockTable.item(int(key)-1,0).setBackground(QtGui.QColor(135,201,153))
             else:
                 self.redLineBlockTable.item(int(key)-1,0).setBackground(QtGui.QColor(116,124,138))
 
@@ -653,17 +653,18 @@ class CTCOffice(QWidget):
             self.manualMode = True
 
     def showAuthority(self, msg):
+        print(msg[2])
         pass
         # red line
         if msg[0] == 0:
-            for block in self.redLineBlocks:
-                if block in msg:
+            for block in self.redLineBlocks.keys():
+                if block in msg[2]:
                     self.redLineBlocks.setAuthority(block, True)
                 else:
                     self.redLineBlocks.setAuthority(block, False)
         elif msg[0] == 1:
-            for block in self.greenLineBlocks:
-                if block in msg:
+            for block in self.greenLineBlocks.keys():
+                if int(block) in msg[2]:
                     self.greenLineBlocks.setAuthority(block, True)
                 else:
                     self.greenLineBlocks.setAuthority(block, False)
