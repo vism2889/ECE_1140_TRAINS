@@ -217,7 +217,7 @@ class TrainModel(QtWidgets.QMainWindow):
         self.serv_brake_disp.setText(f'{self.t.service_brake}')
         self.ebrake_disp.setText(f'{self.t.e_brake}')
         self.auth_disp.setText(f'{self.t.pm.train_authority}')
-        self.grade_disp.setText(f'{self.t.grade} %')
+        self.grade_disp.setText(f'{self.t.pm.grade * 100} %')
         self.switch_disp.setText(f'{self.t.switch} miles')
 
         #stations
@@ -261,7 +261,7 @@ class TrainModel(QtWidgets.QMainWindow):
 
                 self.signals.currentSpeedOfTrainModel.emit(self.t.pm.curr_vel)
                 self.signals.occupancyFromTrainSignal.emit(self.t.pm.occ_list)
-                self.signals.commandedSpeedSignal.emit(self.t.pm.speed_limit)
+                self.signals.commandedSpeedSignal.emit(self.t.pm.speedLimit)
                 self.brake_update = time.time()
             elif self.t.e_brake == True:
                 self.t.pm.brake(1)
@@ -271,7 +271,7 @@ class TrainModel(QtWidgets.QMainWindow):
 
                 self.signals.currentSpeedOfTrainModel.emit(self.t.pm.curr_vel)
                 self.signals.occupancyFromTrainSignal.emit(self.t.pm.occ_list)
-                self.signals.commandedSpeedSignal.emit(self.t.pm.speed_limit)
+                self.signals.commandedSpeedSignal.emit(self.t.pm.speedLimit)
                 self.brake_update = time.time()
 
 
@@ -329,7 +329,7 @@ class TrainModel(QtWidgets.QMainWindow):
     def test_window(self):
         self.w = TestWindow()
         self.w.test_clicked.connect(self.update_model)
-        self.w.show()
+        # self.w.show()
 
 
 
