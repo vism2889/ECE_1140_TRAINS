@@ -7,19 +7,14 @@
 # for the RPi
 
 # TODO:
-# - Generate new message files to take authority as a distance
 # - Implement next station
 #   + display next station
 #   + use next station for announcements 
-# - Implement authority
-#   + stop train when authority is reached
 # - Implement station announcement audio for green line
 # - Manual mode cannot override under unsafe conditions
-# - Train does not rapidly accelerate after ebrake is turned off
 # - Redundancy measures
 #   + two different methods of calculating power
 #   + stop train if disparity
-# - Handle safe braking distance for stoping at authority
 # - External lights are turned on and off for underground stations
 # - Switch between automatic and manual mode
 # - Open doors at arrival of station, close upon departure 
@@ -79,14 +74,6 @@ class Control():
         self.pid = PID(self.k_p, self.k_i, 0, setpoint=self.commanded_speed)
         self.pid.output_limits = (0, 120000) # clamp at max power output specified in datasheet 120kW
 
-    # need to confirm what data type authority will be
-    def setAuthority(self, authority=None):
-        if(authority==None):
-            self.authority = self.input.getAuthority()
-            return
-        
-        self.authority = authority
-    
     def setInternalLights(self, light_state):
         self.light_state_internal = light_state
 
@@ -163,12 +150,14 @@ class Control():
     # TODO: implement speed limit
     def limitSpeed(self, speed):
         speed_limit = self.input.getSpeedLimit()
-        #print("\nspeed limit = ", speed_limit)
-        if(speed_limit != None and speed > self.speed_limit):  
+        if(speed_limit != None and speed > self.speed_limit):
+            self.vital_override = True  
             self.deployServiceBrake(True)
             return False
         
-        else: return True
+        else:
+            self.vital_override = False 
+            return True
 
     def getSpeedLimit(self):
         limit = self.input.getSpeedLimit()
@@ -179,9 +168,9 @@ class Control():
     def checkAuthority(self):
         if self.input.getAuthority() != None:
             self.authority = self.input.getAuthority() 
-        if self.authority == 0:
-            self.deployEbrake(True)
-    
+        
+        self.calculateBrakingDistance()
+ 
     def set_kp_ki(kp_val, ki_val, self):
         self.k_p = kp_val
         self.k_i = ki_val
@@ -191,13 +180,13 @@ class Control():
 
     def getPowerOutput(self, commanded_speed=None):
         #print("ebrake: ", self.ebrakeCommand)
-        if self.ebrakeCommand == True or self.brakeCommand == True:
+        if self.ebrakeCommand == True or self.brakeCommand == True or self.vital_override == True:
             self.output.setPower(0.0)
+            self.power = 0.0
             return self.power
         
         if commanded_speed == None and self.input.getCommandedSpeed() != None:
             self.pid.setpoint = self.input.getCommandedSpeed()
-            self.current_speed = self.input.getCurrentSpeed()
 
         elif commanded_speed != None:
             self.commanded_speed = commanded_speed
@@ -211,6 +200,8 @@ class Control():
     def checkFailures(self):
         failures = self.input.getFailures()
         fail = False
+
+        # check failures and corresponding pin for indicator
         for failure, p in failures:
             if failure:
                 self.vital_override = True
@@ -227,7 +218,19 @@ class Control():
     def failure_lights(self,failure, pin):
         if failure: GPIO.output(pin, GPIO.HIGH)
         if not failure: GPIO.output(pin, GPIO.LOW)
-
+    
+    def calculateBrakingDistance(self):
+        # d = v^2 * k (arbitrary proportional constant under system conditions
+        distance = (self.current_speed ** 2) * 1.2 
+        #print("\nDistance to brake: ", distance)
+    
+        # if minimum safe distance is < 90% of authority, override manual commands and deploy service brake
+        if distance >= self.authority *.9:
+            self.vital_override = True
+            self.deployServiceBrake(True)
+        else:
+            self.vital_override = False
+  
     # used for server interface testing to send dummy data to a client acting as train model
     def sendRandom(self):
         self.output.randomize()

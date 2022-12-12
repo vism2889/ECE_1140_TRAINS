@@ -196,9 +196,16 @@ class Ui_MainWindow():
         self.timer.start(10)
 
     def auto_connect(self, MainWindow):
+        self.timer.timeout.connect(self.subscribe)
         self.timer.timeout.connect(self.setCommandedSpeed)
         self.timer.timeout.connect(self.calculatePower)
+        self.timer.timeout.connect(self.checkAuthority) 
         self.timer.timeout.connect(self.sendData)
+        self.timer.start(10)
+    
+    def switch_operator(self, MainWindow):
+        self.auto_connect(MainWindow)
+        self.manual_connect(MainWindow)
 
 if __name__ == "__main__":
     import sys
@@ -206,6 +213,6 @@ if __name__ == "__main__":
     MainWindow = QtWidgets.QMainWindow()
     ui = Ui_MainWindow()
     ui.setupUi(MainWindow)
-    ui.manual_connect(MainWindow)
+    ui.auto_connect(MainWindow)
     MainWindow.show()
     sys.exit(app.exec_())

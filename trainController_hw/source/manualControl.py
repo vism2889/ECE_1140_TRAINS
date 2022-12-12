@@ -50,17 +50,16 @@ class ManualControl():
                               "stationSquare_southHills.mp3"]
 
     def setCommandedSpeed(self):
-        #print("MC: ebrake state = ", self.c.ebrakeCommand)
         if self.c.ebrakeCommand == False and self.c.vital_override == False:
             speed = self.anal_in.getSpeedValue() / 2.3694
             if self.c.limitSpeed(self.c.current_speed): 
                 self.commandedSpeed = speed 
-            # print("\nManual Commanded Speed: %2d" % speed, end="", flush=True)
 
         else: self.commandedSpeed = 0
 
     def setServiceBrake(self):
-        self.c.deployServiceBrake(self.anal_in.getBrakingValue())
+        if self.c.vital_override == False:
+            self.c.deployServiceBrake(self.anal_in.getBrakingValue())
 
     def lightsButton(self):
         if GPIO.input(25) == GPIO.HIGH:
