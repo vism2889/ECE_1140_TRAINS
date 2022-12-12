@@ -14,9 +14,6 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtCore import QTimer
 from functools import partial
-from trainControllerSoftware_TestSecondWindow import Ui_Test_SecondWindow
-from manualControl import ManualControl
-from Control import Control
 from simple_pid import PID
 from signalSender import signalSender
 
@@ -591,33 +588,33 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
         QtCore.QMetaObject.connectSlotsByName(self)
  
     def variableInit(self):
-        self.c = Control()
-        self.mc = ManualControl()
-        self.internalLightState = True        
-        self.externalLightState = True
-        self.leftDoorState = False
-        self.leftDoorState = False
-        self.announceState = False
-        self.advertisementState = False
-        self.serviceBrakeState = False
-        self.emergencyBrakeState = False
-        self.temperature = 72
         self.speed_display_value = 0
         self.power_failure_value = 0
         self.commandedSpeed = 13.4112 # commanded speed input as m/s
         self.kp = 24000
         self.ki = 100
         
-        ## Variables for incoming data
+        # Variables for incoming data
         self.authority = 0
         self.currentSpeed = 0
         self.nextStation = "Station"
         self.blockFailures = [0]
         self.speedLimit = 18
-        self.stationSide = ""
-        self.stationName = ""
-        self.underground = False
+        self.stationSide = ''
+        self.stationName = ''
+        self.underground = ''
         self.commandedSpeedSignal = 13.4112
+        
+        # Variables for outgoing data
+        self.internalLightState = True        
+        self.externalLightState = True
+        self.leftDoorState = False
+        self.rightDoorState = False
+        self.announceState = False
+        self.advertisementState = False
+        self.serviceBrakeState = False
+        self.emergencyBrakeState = False
+        self.temperature = 72
         
         self.Manual_lights_ComboBox.setCurrentIndex(3)
         self.Manual_doors_ComboBox.setCurrentIndex(0)
@@ -652,18 +649,15 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
 ##### Set Signal Inputs      
     def setCurrentSpeedSignal(self, msg):
         self.currentSpeed = msg
-        print("Speed Limit:", (self.speedLimit*2.23694))
         self.setPID()
-        #self.setAutoCommandedSpeed()
-        self.setAutoServiceBrake()
-        self.setAutoTemperature()
-        self.setAutoLights()
-        self.setAutoDoors()
         self.setAuthority()
+        if(self.TabWigets.currentIndex() != 1 & self.TabWigets.currentIndex() != 2):     
+            #self.setAutoCommandedSpeed()
+            self.setAutoServiceBrake()
     
     def setAuthoritySignal(self, msg):
         self.authority = msg
-        #self.setAuthority()
+        self.setAuthority()
           
     def setBlockFailuresSignal(self, msg):
         pass
@@ -681,16 +675,14 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
         pass
     
     def setBeaconSignal(self, msg):
-        self.stationSide = msg
-        #self.stationName = msg[1]
-        #self.underground = msg[2]
-        print("Station Side, Station Name, Underground: ", self.stationSide)
-        #print("Station Name: ", self.stationName)
-        #print("Underground: ", self.underground)
+        if(len(msg) > 1):
+            self.stationSide = msg[0]
+            self.stationName = msg[1]
+            self.underground = msg[2]
         self.setAutoDoors()
         self.setAutoLights()
         self.setStationName()
-        pass
+        
         
 ###### Helper Functions                
     def checkCurrentSpeed(self, msg):
@@ -708,16 +700,20 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
 
 ###### Automatic Control Functions
     def setAutoCommandedSpeed(self):
+        self.commandedSpeed = self.commandedSpeedSignal
         self.Auto_CommandedSpeedDisplay.display(int(self.commandedSpeedSignal * 2.23694))
+        self.setPID()
         
     def setAutoSpeedLimit(self):
         self.Auto_SpeedDisplay.display(self.speedLimit * 2.23694)
     
     def setAutoServiceBrake(self):
         self.Auto_BrakingDisplay.display(self.serviceBrakeState)
-    
+        self.signals.emergencyBrakeSignal.emit(self.serviceBrakeState)            
+
     def setAutoTemperature(self):
         self.Temperature_DisplayBox.display(self.temperature)
+        self.emitNonVital()
         # if(self.outdoorTemperature >= 80):
         #     self.temperature = 70
         # elif(self.outdoorTemperature > 60 & self.outdoorTemperature < 80):
@@ -726,19 +722,41 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
         #     self.temperature = 78
     
     def setAutoLights(self):
-        if(self.underground == True):
+        if(self.underground == 'True'):
             self.ExternalLights_DisplayBox.setChecked(True)
             self.InternalLights_DisplayBox.setChecked(True)
-        
+        else:
+            self.ExternalLights_DisplayBox.setChecked(False)
+            self.InternalLights_DisplayBox.setChecked(True)
+        self.emitNonVital() 
+   
     def setAutoDoors(self):
-        if(self.currentSpeed == 0):
-            #self.LeftDoors_DisplayBox.setChecked(False)
-            #self.RightDoors_DisplayBox.setChecked(False)
-            pass
+        if(self.currentSpeed == 0): # and we are at a station
+            if(self.stationSide == 'Left'):
+                self.leftDoorState = True
+                self.rightDoorState = False
+                self.LeftDoors_DisplayBox.setChecked(True)
+                self.RightDoors_DisplayBox.setChecked(False)
+            elif(self.stationSide == 'Right'):
+                self.leftDoorState = False
+                self.rightDoorState = True
+                self.LeftDoors_DisplayBox.setChecked(False)
+                self.RightDoors_DisplayBox.setChecked(True)
+            elif(self.stationSide == 'Left/Right'):
+                self.leftDoorState = True
+                self.rightDoorState = True
+                self.LeftDoors_DisplayBox.setChecked(True)
+                self.RightDoors_DisplayBox.setChecked(True)
+        else:
+            self.leftDoorState = False
+            self.rightDoorState = False
+            self.LeftDoors_DisplayBox.setChecked(False)
+            self.RightDoors_DisplayBox.setChecked(False)
+        
+        self.emitNonVital() 
 
     def setStationName(self):
-        #self.next_station_label.setText(self.stationName)
-        pass
+        self.next_station_label.setText(self.stationName)
  
 ###### Block Failures: Track, Circuit, Power 
     def setBlockFailures(self, msg):
@@ -757,13 +775,8 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
             self.speed_Slider.setMaximum(self.commandedSpeed * 2.23694);
             self.speed_Slider.setValue(int(self.commandedSpeed * 2.23694))   # display in mph
             self.Manual_CommandedSpeed_lcdDisplay.display(int(self.commandedSpeed * 2.23694))    # display in mph
-            
-            #self.serviceBrakeState = True
-            #self.braking_Slider.setValue(True)
-            #self.signals.serviceBrakeSignal.emit(self.serviceBrakeState)
         else:
             self.commandedSpeed = self.speed_Slider.value() / 2.23694  # variable in m/s
-            #self.speed_Slider.setValue(int(self.commandedSpeed * 2.23694))
             self.Manual_CommandedSpeed_lcdDisplay.display(int(self.commandedSpeed * 2.23694))    # display in mph
         
     def setManualControl_ServiceBrake(self):
