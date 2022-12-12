@@ -598,7 +598,7 @@ class CTCOffice(QWidget):
             return
         # change switch label
         item = QtWidgets.QTableWidgetItem()
-        item.setText(str(currentSwitch[0]) + " " + str(currentSwitch[1]))
+        item.setText(str(currentSwitch[0]) + " " + str(not currentSwitchState[1]))
         item.setFont(font)
         self.selectedBlockTable.setItem(int(self.selectedBlock)-1,1,item)
 
