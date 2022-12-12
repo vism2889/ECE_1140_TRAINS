@@ -46,6 +46,7 @@ class CTCOffice(QWidget):
         self.signals.globalOccupancyFromTrackModelSignal.connect(self.readOccupancySignal)
         self.signals.switchState.connect(self.updateSwitchState)
         self.signals.clockSpeedSignal.connect(self.changeClockSpeed)
+        self.signals.waysideAuthority.connect(self.showAuthority)
 
     def setupLayout(self):
         # getting lists of blocks
@@ -524,7 +525,9 @@ class CTCOffice(QWidget):
             elif self.greenLineBlocks.getFaultState(key):
                 self.greenLineBlockTable.item(int(key)-1,0).setBackground(QtGui.QColor(255,0,0))
             elif self.greenLineBlocks.getOccupancy(key):
-                self.greenLineBlockTable.item(int(key)-1,0).setBackground(QtGui.QColor(0,255,0))
+                self.greenLineBlockTable.item(int(key)-1,0).setBackground(QtGui.QColor(20,107,43))
+            elif self.greenLineBlocks.getAuthority(key):
+                self.greenLineBlockTable.item(int(key)-1,0).setBackground(QtGui.QColor(135,201,153))
             else:
                 self.greenLineBlockTable.item(int(key)-1,0).setBackground(QtGui.QColor(116,124,138))
 
@@ -534,7 +537,9 @@ class CTCOffice(QWidget):
             elif self.redLineBlocks.getFaultState(key):
                 self.redLineBlockTable.item(int(key)-1,0).setBackground(QtGui.QColor(255,0,0))
             elif self.redLineBlocks.getOccupancy(key):
-                self.redLineBlockTable.item(int(key)-1,0).setBackground(QtGui.QColor(0,255,0))
+                self.redLineBlockTable.item(int(key)-1,0).setBackground(QtGui.QColor(20,107,43))
+            elif self.redLineBlocks.getAuthority(key):
+                self.redLineBlockTable.item(int(key)-1,0).setBackground(QtGui.QColor(135,201,153))
             else:
                 self.redLineBlockTable.item(int(key)-1,0).setBackground(QtGui.QColor(116,124,138))
 
@@ -584,17 +589,18 @@ class CTCOffice(QWidget):
         if self.selectedBlockLine == self.greenLineBlocks and self.greenLineMaintenance:
             self.selectedBlockLine.setSwitchState(str(self.selectedBlock), not currentSwitchState[1])
             currentSwitch = self.selectedBlockLine.switch(str(self.selectedBlock))
+            self.signals.ctcSwitchState.emit([1,int(self.selectedBlock),not currentSwitchState[1]])
         elif self.selectedBlockLine == self.redLineBlocks and self.redLineMaintenance:
             self.selectedBlockLine.setSwitchState(str(self.selectedBlock), not currentSwitchState[1])
             currentSwitch = self.selectedBlockLine.switch(str(self.selectedBlock))
+            self.signals.ctcSwitchState.emit([0,int(self.selectedBlock),not currentSwitchState[1]])
         else:
             return
-        # change switch label and emit new state
+        # change switch label
         item = QtWidgets.QTableWidgetItem()
         item.setText(str(currentSwitch[0]) + " " + str(currentSwitch[1]))
         item.setFont(font)
         self.selectedBlockTable.setItem(int(self.selectedBlock)-1,1,item)
-        # TODO emit switch signal
 
     def launchDispatchPopUp(self):
         self.dispatchWidget = QtWidgets.QWidget()
@@ -647,6 +653,24 @@ class CTCOffice(QWidget):
             self.uploadScheduleButton.hide()
             self.manualMode = True
 
+    def showAuthority(self, msg):
+        print(msg[2])
+        pass
+        # red line
+        if msg[0] == 0:
+            for block in self.redLineBlocks.keys():
+                if block in msg[2]:
+                    self.redLineBlocks.setAuthority(block, True)
+                else:
+                    self.redLineBlocks.setAuthority(block, False)
+        elif msg[0] == 1:
+            for block in self.greenLineBlocks.keys():
+                if int(block) in msg[2]:
+                    self.greenLineBlocks.setAuthority(block, True)
+                else:
+                    self.greenLineBlocks.setAuthority(block, False)
+        else:
+            return
 
 if __name__ == "__main__":
     import sys
