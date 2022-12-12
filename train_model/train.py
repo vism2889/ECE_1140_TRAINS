@@ -52,7 +52,7 @@ class PointMassModel():
         
         self.suggested_speed = 0
         #track model to train comms
-        self.speed_limit = 0
+        self.speedLimit = 0
 
         self._td = TrainData()
 
@@ -312,12 +312,12 @@ class PointMassModel():
             self.train_authority = 0
         
 
-        self.grade = float(self.BlockModels[self.curr_block].grade)
+        self.grade = float(self.BlockModels[self.curr_block].grade)/100
         self.speedLimit = float(self.BlockModels[self.curr_block].speedLimit)*0.277778
         if self.speedLimit >= self.suggSpeed:
             self.cmdSpeed = self.suggSpeed
         else:
-            self.cmdSpeed = self.speed_limit
+            self.cmdSpeed = self.speedLimit
 
 
 

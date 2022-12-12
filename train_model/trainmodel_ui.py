@@ -217,7 +217,7 @@ class TrainModel(QtWidgets.QMainWindow):
         self.serv_brake_disp.setText(f'{self.t.service_brake}')
         self.ebrake_disp.setText(f'{self.t.e_brake}')
         self.auth_disp.setText(f'{self.t.pm.train_authority}')
-        self.grade_disp.setText(f'{self.t.grade} %')
+        self.grade_disp.setText(f'{self.t.pm.grade * 100} %')
         self.switch_disp.setText(f'{self.t.switch} miles')
 
         #stations
@@ -329,7 +329,7 @@ class TrainModel(QtWidgets.QMainWindow):
     def test_window(self):
         self.w = TestWindow()
         self.w.test_clicked.connect(self.update_model)
-        self.w.show()
+        # self.w.show()
 
 
 
