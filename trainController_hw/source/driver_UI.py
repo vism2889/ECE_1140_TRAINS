@@ -12,7 +12,6 @@ from analoggaugewidget import AnalogGaugeWidget
 from PyQt5.QtCore import pyqtSlot, QTimer, pyqtSignal
 from control import Control
 from manualControl import ManualControl
-import threading
 
 class Ui_MainWindow():
     def __init__(self):
@@ -119,8 +118,8 @@ class Ui_MainWindow():
     def setSpeed_manual(self):
         self.mc.setCommandedSpeed()
     
-    def calculatePower_manual(self):
-        power = self.mc.calculatePower() / 745.7
+    def calculatePower(self):
+        power = self.c.getPowerOutput()/ 745.7
         if power != None:
             self.powerGauge.update_value(power)
 
@@ -130,33 +129,16 @@ class Ui_MainWindow():
     def setTemperature_manual(self):
         self.mc.setTemperature_manual()
     
-    def checkFailures_manual(self):
-        self.mc.checkFailures_manual()
+    def checkFailures(self):
+        self.c.checkFailures()
          
     def setCurrentSpeed(self):
         self.current_speed = self.c.setCurrentSpeed()
-        #self.c.getSpeedLimit()
         converted_speed = 2.3694 * self.current_speed
         self.speedometer.update_value(converted_speed)
 
     def setCommandedSpeed(self):
         self.c.setSpeed()
-
-    def toggle_internal_lights(self):
-        self.internal_light_state = not self.internal_light_state
-        self.c.setInternalLights(self.internal_light_state)
-
-    def toggle_external_lights(self):
-        self.external_light_state = not self.external_light_state
-        self.c.setExternalLights(self.external_light_state)
-
-    def toggle_left_door(self):
-        self.left_door_state = not self.left_door_state
-        self.c.setLeftDoor(self.left_door_state)
-
-    def toggle_right_door(self):
-        self.right_door_state = not self.right_door_state
-        self.c.setRightDoor(self.right_door_state)
 
     def deployEbrake(self):
         self.c.deployEbrake()
@@ -165,10 +147,10 @@ class Ui_MainWindow():
         self.c.checkAuthority()
 
     def setServiceBrake(self):
-        self.c.deployServiceBrake(False)
+        self.c.deployServiceBrake()
 
-    def calculatePower(self):
-        self.c.getPowerOutput()
+    def auto_manual_switch(self):
+        self.c.auto_manual_switch()
 
     def sendData(self):
         self.c.publish()
@@ -179,13 +161,15 @@ class Ui_MainWindow():
     def sendRandom(self):
         self.c.sendRandom()
     
-    def manual_connect(self, MainWindow):
+    def connect(self):
+        self.timer.timeout.connect(self.auto_manual_switch)
         self.timer.timeout.connect(self.subscribe)
-        self.timer.timeout.connect(self.checkFailures_manual)
+        self.timer.timeout.connect(self.checkFailures)
         self.timer.timeout.connect(self.setSpeed_manual)
+        self.timer.timeout.connect(self.setCommandedSpeed)
         self.timer.timeout.connect(self.setCurrentSpeed)
         self.timer.timeout.connect(self.checkAuthority)
-        self.timer.timeout.connect(self.calculatePower_manual)
+        self.timer.timeout.connect(self.calculatePower)
         self.timer.timeout.connect(self.setTemperature_manual)
         self.timer.timeout.connect(self.toggle_lights_manual)
         self.timer.timeout.connect(self.toggle_doors_manual)
@@ -193,19 +177,7 @@ class Ui_MainWindow():
         self.timer.timeout.connect(self.announce_manual)
         self.timer.timeout.connect(self.deploy_serviceBrake_manual)
         self.timer.timeout.connect(self.sendData)
-        self.timer.start(10)
-
-    def auto_connect(self, MainWindow):
-        self.timer.timeout.connect(self.subscribe)
-        self.timer.timeout.connect(self.setCommandedSpeed)
-        self.timer.timeout.connect(self.calculatePower)
-        self.timer.timeout.connect(self.checkAuthority) 
-        self.timer.timeout.connect(self.sendData)
-        self.timer.start(10)
-    
-    def switch_operator(self, MainWindow):
-        self.auto_connect(MainWindow)
-        self.manual_connect(MainWindow)
+        self.timer.start(1)
 
 if __name__ == "__main__":
     import sys
@@ -213,6 +185,6 @@ if __name__ == "__main__":
     MainWindow = QtWidgets.QMainWindow()
     ui = Ui_MainWindow()
     ui.setupUi(MainWindow)
-    ui.auto_connect(MainWindow)
+    ui.connect()
     MainWindow.show()
     sys.exit(app.exec_())

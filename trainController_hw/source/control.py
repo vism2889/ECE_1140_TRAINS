@@ -16,7 +16,6 @@
 #   + two different methods of calculating power
 #   + stop train if disparity
 # - External lights are turned on and off for underground stations
-# - Switch between automatic and manual mode
 # - Open doors at arrival of station, close upon departure 
 ##############################################################################
 
@@ -39,6 +38,8 @@ GPIO.setup(6, GPIO.OUT, initial=GPIO.LOW) # brake failure
 GPIO.setup(12, GPIO.OUT, initial=GPIO.LOW) # engine failure 
 GPIO.setup(13, GPIO.OUT, initial=GPIO.LOW) # pickup failure 
 
+GPIO.setup(27, GPIO.IN, pull_up_down=GPIO.PUD_DOWN) # auto manual switch
+
 mixer.init()
 
 class Control():
@@ -46,6 +47,7 @@ class Control():
         self.output = OutputData()
         self.input = TrainData()
         self.vital_override = False
+        self.operating_mode = False
         self.authority = 0
         self.light_state_internal = False
         self.light_state_external = False
@@ -107,12 +109,12 @@ class Control():
         self.output.setRightDoorState(self.door_state_right)
 
     def setSpeed(self, commanded_speed=None):
-        if(commanded_speed==None):
+        if(commanded_speed==None and self.operating_mode == True):
             speed = self.input.getCommandedSpeed()
             if(speed != None and self.limitSpeed(speed) == False):
                 self.commanded_speed = speed 
 
-        elif(self.limitSpeed(commanded_speed) == False):
+        elif(commanded_speed != None and self.limitSpeed(commanded_speed) == False):
             self.commanded_speed = commanded_speed 
             
     # can remove after testing
@@ -179,14 +181,14 @@ class Control():
         return self.k_p, self.k_i
 
     def getPowerOutput(self, commanded_speed=None):
-        #print("ebrake: ", self.ebrakeCommand)
         if self.ebrakeCommand == True or self.brakeCommand == True or self.vital_override == True:
             self.output.setPower(0.0)
             self.power = 0.0
             return self.power
         
-        if commanded_speed == None and self.input.getCommandedSpeed() != None:
+        if self.operating_mode == True and self.input.getCommandedSpeed() != None:
             self.pid.setpoint = self.input.getCommandedSpeed()
+            print("\nCommanded speed: ", self.input.getCommandedSpeed())
 
         elif commanded_speed != None:
             self.commanded_speed = commanded_speed
@@ -210,10 +212,11 @@ class Control():
  
         if(fail == False):
             self.vital_override = False
-            return False
 
         elif(fail == True):
-            return True
+            self.vital_override = True
+
+        self.deployEbrake(fail)
 
     def failure_lights(self,failure, pin):
         if failure: GPIO.output(pin, GPIO.HIGH)
@@ -222,7 +225,6 @@ class Control():
     def calculateBrakingDistance(self):
         # d = v^2 * k (arbitrary proportional constant under system conditions
         distance = (self.current_speed ** 2) * 1.2 
-        #print("\nDistance to brake: ", distance)
     
         # if minimum safe distance is < 90% of authority, override manual commands and deploy service brake
         if distance >= self.authority *.9:
@@ -230,7 +232,21 @@ class Control():
             self.deployServiceBrake(True)
         else:
             self.vital_override = False
-  
+
+    def auto_manual_switch(self):
+        if GPIO.input(27) == GPIO.HIGH:
+            self.operating_mode = True 
+
+        if GPIO.input(27) == GPIO.LOW:
+            self.operating_mode = False
+    
+    def station_procedure(self):
+        # open doors 
+        # dwell for 30 seconds
+        # close doors
+        # depart
+        return
+
     # used for server interface testing to send dummy data to a client acting as train model
     def sendRandom(self):
         self.output.randomize()

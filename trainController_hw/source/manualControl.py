@@ -54,34 +54,39 @@ class ManualControl():
             speed = self.anal_in.getSpeedValue() / 2.3694
             if self.c.limitSpeed(self.c.current_speed): 
                 self.commandedSpeed = speed 
-
+        
+            if self.c.operating_mode == False:
+                self.c.getPowerOutput(self.commandedSpeed)
+ 
         else: self.commandedSpeed = 0
 
     def setServiceBrake(self):
-        if self.c.vital_override == False:
+        if self.c.vital_override == False and self.c.operating_mode == False:
             self.c.deployServiceBrake(self.anal_in.getBrakingValue())
 
     def lightsButton(self):
-        if GPIO.input(25) == GPIO.HIGH:
-            self.light_state_internal = not self.light_state_internal
-            self.c.setInternalLights(self.light_state_internal)
-            sleep(.5)
+        if not self.c.operating_mode:
+            if GPIO.input(25) == GPIO.HIGH:
+                self.light_state_internal = not self.light_state_internal
+                self.c.setInternalLights(self.light_state_internal)
+                sleep(.5)
 
-        if GPIO.input(8) == GPIO.HIGH:
-            self.light_state_external = not self.light_state_external
-            self.c.setExternalLights(self.light_state_external)
-            sleep(.5)
+            if GPIO.input(8) == GPIO.HIGH:
+                self.light_state_external = not self.light_state_external
+                self.c.setExternalLights(self.light_state_external)
+                sleep(.5)
 
     def doorsButton(self):
-        if GPIO.input(7) == GPIO.HIGH:
-            self.door_state_left = not self.door_state_left
-            self.c.setLeftDoor(self.door_state_left)
-            sleep(.5)
+        if not self.c.operating_mode:
+            if GPIO.input(7) == GPIO.HIGH:
+                self.door_state_left = not self.door_state_left
+                self.c.setLeftDoor(self.door_state_left)
+                sleep(.5)
 
-        if GPIO.input(16) == GPIO.HIGH:
-            self.door_state_right = not self.door_state_right
-            self.c.setRightDoor(self.door_state_right)
-            sleep(.5)
+            if GPIO.input(16) == GPIO.HIGH:
+                self.door_state_right = not self.door_state_right
+                self.c.setRightDoor(self.door_state_right)
+                sleep(.5)
 
     def announceButton(self, station_idx):
         if GPIO.input(26) == GPIO.HIGH:
@@ -90,7 +95,7 @@ class ManualControl():
             sleep(.5)
 
     def ebrake_button(self):
-        if self.c.vital_override == True:
+        if self.c.vital_override == True and self.c.operating_mode == False:
             if GPIO.input(5) == GPIO.LOW:
                 self.c.ebrakeCommand = True
                 self.c.deployEbrake(True)
@@ -106,7 +111,3 @@ class ManualControl():
     def checkFailures_manual(self):
         brake = self.c.checkFailures()
         self.c.deployEbrake(brake)
-
-    def calculatePower(self):
-        power = self.c.getPowerOutput(self.commandedSpeed)
-        return power

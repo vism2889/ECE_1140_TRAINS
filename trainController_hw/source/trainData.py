@@ -41,6 +41,7 @@ class TrainData:
         return self.current_speed
 
     def getCommandedSpeed(self):
+        print("\nCommanded Speed: ", self.commanded_speed)
         return self.commanded_speed
     
     def getSpeedLimit(self):
