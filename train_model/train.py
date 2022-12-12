@@ -52,7 +52,7 @@ class PointMassModel():
         
         self.suggested_speed = 0
         #track model to train comms
-        self.speed_limit = 0
+        self.speedLimit = 0
 
         self._td = TrainData()
 
@@ -220,6 +220,8 @@ class PointMassModel():
         return self.curr_accel
 
     def calcForce(self, brake = False):
+        if self.curr_block:
+            self.grade = float(self.BlockModels[self.curr_block-1].grade)/100
         static_friction_force = self._td.mass_empty*9.8*self._td.static_fric_constant
         kinetic_friction_force = self._td.mass_empty*9.8*self._td.kinetic_fric_constant*0.1
         gradeForce = self._td.mass_empty*9.8*(self.grade)/(1+self.grade**2)**0.5
@@ -312,12 +314,12 @@ class PointMassModel():
             self.train_authority = 0
         
 
-        self.grade = float(self.BlockModels[self.curr_block].grade)
-        self.speedLimit = float(self.BlockModels[self.curr_block].speedLimit)*0.277778
+        
+        self.speedLimit = float(self.BlockModels[self.curr_block-1].speedLimit)*0.277778
         if self.speedLimit >= self.suggSpeed:
             self.cmdSpeed = self.suggSpeed
         else:
-            self.cmdSpeed = self.speed_limit
+            self.cmdSpeed = self.speedLimit
 
 
 
