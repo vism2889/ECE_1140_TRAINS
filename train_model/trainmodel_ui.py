@@ -261,7 +261,7 @@ class TrainModel(QtWidgets.QMainWindow):
 
                 self.signals.currentSpeedOfTrainModel.emit(self.t.pm.curr_vel)
                 self.signals.occupancyFromTrainSignal.emit(self.t.pm.occ_list)
-                self.signals.commandedSpeedSignal.emit(self.t.pm.speed_limit)
+                self.signals.commandedSpeedSignal.emit(self.t.pm.speedLimit)
                 self.brake_update = time.time()
             elif self.t.e_brake == True:
                 self.t.pm.brake(1)
@@ -271,7 +271,7 @@ class TrainModel(QtWidgets.QMainWindow):
 
                 self.signals.currentSpeedOfTrainModel.emit(self.t.pm.curr_vel)
                 self.signals.occupancyFromTrainSignal.emit(self.t.pm.occ_list)
-                self.signals.commandedSpeedSignal.emit(self.t.pm.speed_limit)
+                self.signals.commandedSpeedSignal.emit(self.t.pm.speedLimit)
                 self.brake_update = time.time()
 
 
