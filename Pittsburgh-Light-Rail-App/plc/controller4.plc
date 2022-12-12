@@ -1,3 +1,7 @@
+for blk in range(77, 86)
+    print( #block_blk )
+    print('yo')
+
 if #block_74 == True and #block_100 == False:
     #switch_76 = False
     #switch_85 = False
