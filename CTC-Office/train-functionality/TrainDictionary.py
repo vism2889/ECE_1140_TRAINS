@@ -16,9 +16,12 @@ class TrainDictionary:
         self.trainList[name] = self.backLog[name]
         self.backLog.pop(name)
 
-    def setSuggestedSpeed(self, name, TTS):
-        distance = 14552.6
-        velocity = 14552.6/(TTS*60)
+    def setSuggestedSpeed(self, name, TTS, line):
+        if line == "Green Line":
+            distance = 14552.6
+        else:
+            distance = 5548.2
+        velocity = distance/(TTS*60)
         self.trainList[name].suggestedSpeed = velocity
 
     def keys(self):

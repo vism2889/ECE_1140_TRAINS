@@ -615,7 +615,10 @@ class CTCOffice(QWidget):
 
     def uploadSchedule(self):
         fileName = QFileDialog.getOpenFileName(QtWidgets.QStackedWidget(), 'open file', '/home/garrett/git/ECE_1140_TRAINS/CTC-Office', 'csv files (*.csv)')
-        self.scheduleParser.loadSchedule(fileName[0], self.redLineStations, self.greenLineStations, self.redLineTrains, self.greenLineTrains)
+        if self.scheduleParser.loadSchedule(fileName[0], self.redLineStations, self.greenLineStations, self.redLineTrains, self.greenLineTrains, self.trainCount):
+            self.trainCount += 1
+        else:
+            print("ERROR: invalid schedule uploaded")
 
     def checkForScheduledTrains(self):
         for train in list(self.redLineTrains.backlogs()):
