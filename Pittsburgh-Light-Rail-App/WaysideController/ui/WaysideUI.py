@@ -54,7 +54,7 @@ class TrackControllerWindow(QtWidgets.QWidget):
         self.toolBox = QtWidgets.QToolBox(main_window)
         self.toolBox.setObjectName("toolBox")
         self.toolBox.setFont(QtGui.QFont())
-        self.toolBox.setStyleSheet("background-color: #747c8a;")
+        self.toolBox.setStyleSheet("background-color: #e8c33c; ")
 
         if os.name == 'nt':
             path = os.path.abspath(__file__.replace(__name__.replace('.', '\\')+'.py', ''))
@@ -85,15 +85,15 @@ class TrackControllerWindow(QtWidgets.QWidget):
         self.verticalLayout_2.setObjectName("verticalLayout_2")
         self.redline_controllers = QtWidgets.QTabWidget(self.redline_tab)
         self.redline_controllers.setObjectName("redline_controllers")
-
         self.redline_tab.setStyleSheet("background-color: #747c8a;")
-
+        
         for controller in redline_layout:
             ## Creating a controller tab
             self.addTab("redline", self.redline_controllers, controller, redline_layout, self.redline_reference)
 
         self.verticalLayout_2.addWidget(self.redline_controllers)
         self.toolBox.addItem(self.redline_tab, "")
+        self.toolBox.setStyleSheet("background-color: #747c8a;")
 
         ######## Green Line ########
         if os.name == 'nt':
@@ -176,6 +176,7 @@ class TrackControllerWindow(QtWidgets.QWidget):
         info = {}
 
         tab = QtWidgets.QWidget()
+        # tab.setStyleSheet("background-color: #F0EAD6; ")
         tab.setObjectName(f"{prefix}_controller_tab_{layout.index(controller)}")
 
         gridLayout = QtWidgets.QGridLayout(tab)
@@ -207,11 +208,6 @@ class TrackControllerWindow(QtWidgets.QWidget):
         item = QtWidgets.QTableWidgetItem()
         item.setText("Block State")
         block_table.setHorizontalHeaderItem(2, item)
-
-        # if isView:
-        #     item = QtWidgets.QTableWidgetItem()
-        #     item.setText("Controller")
-        #     block_table.setHorizontalHeaderItem(3, item)
 
         block_table.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
         block_table.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
@@ -296,11 +292,6 @@ class TrackControllerWindow(QtWidgets.QWidget):
         item.setText("Fault Message")
         fault_table.setHorizontalHeaderItem(2, item)
 
-        # if isView:
-        #     item = QtWidgets.QTableWidgetItem()
-        #     item.setText("Controller")
-        #     fault_table.setHorizontalHeaderItem(3, item)
-
         for i in controller['block-occupancy']:
             row_idx = controller['block-occupancy'].index(i)
             for j in i:
@@ -314,11 +305,6 @@ class TrackControllerWindow(QtWidgets.QWidget):
                     item.setText(j)
 
                 fault_table.setItem(row_idx, i.index(j), item)
-
-                # if isView:
-                #     item = QtWidgets.QTableWidgetItem(str(int(int(block_table.item(row_idx, 0).text())/self.numBlocksPerController)))
-                #     item.setTextAlignment(4)
-                #     fault_table.setItem(row_idx, 3, item)
 
         fault_table.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
         fault_table.verticalHeader().hide()
@@ -338,7 +324,7 @@ class TrackControllerWindow(QtWidgets.QWidget):
             verticalLayout_5 = QtWidgets.QVBoxLayout(switch_block)
             verticalLayout_5.setObjectName("verticalLayout_8")
             switch_table = QtWidgets.QTableWidget(switch_block)
-            sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+            sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
             sizePolicy.setHorizontalStretch(0)
             sizePolicy.setVerticalStretch(0)
 
@@ -355,8 +341,9 @@ class TrackControllerWindow(QtWidgets.QWidget):
 
             switch_table.setRowCount(len(controller['switch-state']))
 
-            item = QtWidgets.QTableWidgetItem()
-            item.setText("Block Number")
+            item = QtWidgets.QTableWidgetItem('Block Number')
+            item.background().setColor(QtGui.QColor(0, 0, 255))
+            # item.setBackground()
             switch_table.setHorizontalHeaderItem(0, item)
 
             item = QtWidgets.QTableWidgetItem()
@@ -366,11 +353,6 @@ class TrackControllerWindow(QtWidgets.QWidget):
             item = QtWidgets.QTableWidgetItem()
             item.setText("Switch State")
             switch_table.setHorizontalHeaderItem(2, item)
-
-            # if isView:
-            #     item = QtWidgets.QTableWidgetItem()
-            #     item.setText("Controller")
-            #     switch_table.setHorizontalHeaderItem(3, item)
 
             switch_table.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
             switch_table.verticalHeader().hide()
@@ -395,11 +377,6 @@ class TrackControllerWindow(QtWidgets.QWidget):
 
                     switch_table.setItem(row_idx, i.index(j), item)
 
-                # if isView:
-                #     item = QtWidgets.QTableWidgetItem(str(int(int(switch_table.item(row_idx, 0).text())/self.numBlocksPerController)))
-                #     item.setTextAlignment(4)
-                #     switch_table.setItem(row_idx, 3, item)
-
             info['switch-table'] = switch_table
 
             verticalLayout_5.addWidget(switch_table)
@@ -409,11 +386,10 @@ class TrackControllerWindow(QtWidgets.QWidget):
         if len(controller['crossing-state']):
             crossing_box = QtWidgets.QGroupBox(bottom_half)
             sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Fixed)
-            sizePolicy.setHorizontalStretch(0)
-            sizePolicy.setVerticalStretch(0)
+        
             sizePolicy.setHeightForWidth(crossing_box.sizePolicy().hasHeightForWidth())
             crossing_box.setSizePolicy(sizePolicy)
-            crossing_box.setMinimumSize(QtCore.QSize(0, 20))
+
             crossing_box.setObjectName("crossing_box")
             crossing_box.setTitle("Crossing State")
             verticalLayout_6 = QtWidgets.QVBoxLayout(crossing_box)
@@ -448,11 +424,6 @@ class TrackControllerWindow(QtWidgets.QWidget):
             crossing_table.setHorizontalHeaderItem(2, item)
             item.setText("Crossing State")
 
-            # if isView:
-            #     item = QtWidgets.QTableWidgetItem()
-            #     crossing_table.setHorizontalHeaderItem(3, item)
-            #     item.setText("Controller")
-
             crossing_table.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
             crossing_table.verticalHeader().hide()
 
@@ -477,11 +448,6 @@ class TrackControllerWindow(QtWidgets.QWidget):
 
                     crossing_table.setItem(row_idx, i.index(j), item)
 
-                    # if isView:
-                    #     item = QtWidgets.QTableWidgetItem(str(int(int(crossing_table.item(row_idx, 0).text())/self.numBlocksPerController)))
-                    #     item.setTextAlignment(4)
-                    #     crossing_table.setItem(row_idx, 3, item)
-
             info['crossing-table'] = crossing_table
 
             verticalLayout_6.addWidget(crossing_table)
@@ -497,6 +463,7 @@ class TrackControllerWindow(QtWidgets.QWidget):
             configure_button.setObjectName(f"{prefix}_configure_button_{layout.index(controller)}")
             configure_button.setText("Configure Controller")
             configure_button.clicked.connect(lambda: self.dialog()) ## Set Button Click Signal
+            configure_button.setStyleSheet("background-color: #e8c33c; ")
             gridLayout.addWidget(configure_button, 2, 0, 1, 1)
 
         if isView:
