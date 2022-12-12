@@ -49,6 +49,12 @@ class BlockDictionary:
         if blockNum in self.switchList:
             self.switchList[blockNum][1] = state
 
+    def setAuthority(self, blockNum, state):
+        self.blockList[blockNum].authority = state
+
+    def getAuthority(self, blockNum):
+        return self.blockList[blockNum].authority
+
     def getSwitchState(self, blockNum):
         if blockNum in self.switchList:
             return self.switchList[blockNum]
