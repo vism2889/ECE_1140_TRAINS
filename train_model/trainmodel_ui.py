@@ -62,7 +62,8 @@ class TrainModel(QtWidgets.QMainWindow):
             self.t.pm.prev_block = 0
             self.t.pm.curr_block = 9
             self.t.line = 0
-            
+        
+        self.t.pm.suggSpeed = float(msg[2])
         self.trainDict.update({msg[0]: self.t})
         
 
@@ -89,15 +90,13 @@ class TrainModel(QtWidgets.QMainWindow):
             setattr(self.t, key, msg[key])
     
     def ctc_authority(self, msg):
-        
         for i,m in enumerate(msg):
             msg[i] = int(m)
-
         self.t.pm.ctc_authority.extend(msg)
 
     
     def wayside_authority(self,msg):
-        self.t.pm.waysideAuthority = msg[1]
+        self.t.pm.waysideAuthority = msg[2]
     
     def speedup(self, msg):
         self.t.pm.speed_up = int(msg)
@@ -116,7 +115,6 @@ class TrainModel(QtWidgets.QMainWindow):
         # else:
         #     self.test_win.setVisible(True)
 
-        self.test_win.setVisible(False)
        
         self.test_win.clicked.connect(self.test_window)
         #connecting failure buttons to respective slots
@@ -189,7 +187,8 @@ class TrainModel(QtWidgets.QMainWindow):
         #power
         self.cmd_pwr_disp.setText(f'{round(float(self.t.pm.power)/1000)} kW')
         # self.qt.t.set_power(round(float(self.qt.t.curr_power)/1000))
-        self.cmd_speed_disp.setText(f'{self.t.cmd_speed} mph')
+
+        self.cmd_speed_disp.setText('%.1f mph' %(float(self.t.pm.cmdSpeed)*2.23694))
         
         self.curr_speed_disp.setText(f'{self.t.pm.curr_speed} mph')
 
@@ -227,7 +226,7 @@ class TrainModel(QtWidgets.QMainWindow):
         
         if time.time()-self.last_update > 0.1:
             if self.t.line != None and self.t.pm.prev_block != None and self.t.pm.curr_block != 0:
-                print(f'values are, line: {self.t.line}, previous block: {self.t.pm.prev_block}, curr block: {self.t.pm.curr_block}')
+                # print(f'values are, line: {self.t.line}, previous block: {self.t.pm.prev_block}, curr block: {self.t.pm.curr_block}')
                 self.signals.trainLocation.emit([int(self.t.line), self.t.id, int(self.t.pm.prev_block), int(self.t.pm.curr_block)])
             # print("inside if statement")
             if self.t.e_brake == False and self.t.service_brake == False and self.t.dispatched:
@@ -236,7 +235,8 @@ class TrainModel(QtWidgets.QMainWindow):
                 # print(f'Occ_list is: {self.t.pm.occ_list}')
                 # print(f'Curr Pos in block {self.qt.t.pm.curr_block} is: {self.qt.t.pm.curr_pos}')
                 self.signals.occupancyFromTrainSignal.emit(self.t.pm.occ_list)
-                self.signals.commandedSpeedSignal.emit(self.t.pm.speed_limit)
+                self.signals.commandedSpeedSignal.emit(self.t.pm.cmdSpeed)
+                self.signals.speedLimitSignal.emit(self.t.pm.speedLimit)
                 self.signals.authoritySignal.emit(self.t.pm.train_authority)
                 self.last_update = time.time()
                 # print('PUBLISHING!!!')
