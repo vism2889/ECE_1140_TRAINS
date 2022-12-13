@@ -38,6 +38,7 @@ class DispatchPopUp(object):
         self.scheduledTimeLabel.setStyleSheet("background-color: #7b8fb0; border: 1px solid black")
         self.scheduledTimeLabel.setAlignment(QtCore.Qt.AlignCenter)
         self.scheduledTimeLabel.setFont(font)
+        self.scheduledTimeLabel.hide()
 
         self.hourSpinBox = QtWidgets.QSpinBox(dispatchPopUp)
         self.hourSpinBox.setGeometry(QtCore.QRect(190,31,15,23))
@@ -102,16 +103,19 @@ class DispatchPopUp(object):
     def setTimeSelection(self):
         if self.timeSelection.isChecked():
             self.scheduledTime = True
+            self.scheduledTimeLabel.show()
             self.hourSpinBox.show()
             self.minuteSpinBox.show()
             self.clockLabel.hide()
         else:
             self.scheduledTime = False
+            self.scheduledTimeLabel.hide()
             self.hourSpinBox.hide()
             self.minuteSpinBox.hide()
             self.clockLabel.show()
 
     def showTime(self, msg):
+        # set time values
         self.scheduledMins = self.minuteSpinBox.value()
         self.scheduledHours = self.hourSpinBox.value()
         if not self.scheduledTime:
@@ -123,6 +127,8 @@ class DispatchPopUp(object):
             self.showScheduledTime()
         time = hours + ":" + mins
         self.clockLabel.setText(time)
+
+        # update dispatch/arrival times
         if (self.currentLine == "Red Line"):
             self.destinationList = self.redLineStations
             self.stationTable.setRowCount(len(self.redLineStations))
@@ -153,6 +159,7 @@ class DispatchPopUp(object):
         mins = ('%02d' % self.scheduledMins)
         hours = ('%02d' % self.scheduledHours)
         time = hours + ":" + mins
+        self.scheduledTime = time
         self.scheduledTimeLabel.setText(time)
 
 
@@ -215,15 +222,19 @@ class DispatchPopUp(object):
             TTS = spinBox.value()
             self.totalTTS += int(TTS)
 
-        self.trainList.addTrain(self.trainName, self.destinationList, 0, 0)
-        self.trainList.setSuggestedSpeed(self.trainName, self.totalTTS, self.currentLine)
-        self.suggestedSpeed = self.trainList.getSuggestedSpeed(self.trainName)
+        if self.scheduledTime:
+            self.trainList.addScheduledTrain(self.scheduledTime, self.destinationList, 0, 0)
+            self.trainList.setSuggestedSpeed(self.scheduledTime, self.totalTTS, self.currentLine, True)
+        else:
+            self.trainList.addTrain(self.trainName, self.destinationList, 0, 0)
+            self.trainList.setSuggestedSpeed(self.trainName, self.totalTTS, self.currentLine, False)
+            self.suggestedSpeed = self.trainList.getSuggestedSpeed(self.trainName)
 
-        # add dispatch destinations to list
-        for destination in self.selectedDestinations:
-            self.trainList.toggleDestination(self.trainName, destination.text(), False)
+            # add dispatch destinations to list
+            for destination in self.selectedDestinations:
+                self.trainList.toggleDestination(self.trainName, destination.text(), False)
 
-        self.trainList.sendAuthority(self.trainName, self.signals)
-        self.signals.dispatchTrainSignal.emit([self.trainName, self.currentLine, self.suggestedSpeed])
+            self.trainList.sendAuthority(self.trainName, self.signals)
+            self.signals.dispatchTrainSignal.emit([self.trainName, self.currentLine, self.suggestedSpeed])
 
 
