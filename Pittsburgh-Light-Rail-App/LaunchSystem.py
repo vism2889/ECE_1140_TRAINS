@@ -49,7 +49,6 @@ from trainmodel_ui import TrainModel
 sys.path.append("../trainController_sw/")
 from trainControllerSoftware_MainWindow import Ui_TrainControllerSW_MainWindow
 
-
 # Style sheet
 styleSheet = """
 QWidget {
