@@ -63,6 +63,10 @@ QPushButton {
 QTableWidget {
     background-color: #747c8a;
 }
+
+QListWidget {
+    background-color: #747c8a;
+}
 """
 
 class PittsburghLightRail(QWidget):
@@ -71,6 +75,7 @@ class PittsburghLightRail(QWidget):
         self.signals    = Signals()
         self.trackModel = TrackModel(self.signals)
         self.CTCOffice  = CTCOffice(self.signals)
+        self.CTCOffice.setStyle(QStyleFactory.create('Fusion'))
         self.CTCOffice.setStyleSheet(styleSheet)
 
         ## Launch Wayside Controller
@@ -186,6 +191,7 @@ if __name__ == '__main__':
         hardWare = False
 
     app = QApplication(sys.argv)
+    app.setStyle(QStyleFactory.create('Fusion'))
     app.setStyleSheet(styleSheet)
     ex = PittsburghLightRail(hardWare)
     sys.exit(app.exec_())
