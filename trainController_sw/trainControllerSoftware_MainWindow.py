@@ -10,6 +10,9 @@
 
 import sys
 import time
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import *
+from PyQt5.QtCore import *
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtCore import QTimer
@@ -30,8 +33,13 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
         #self.show()
         
 
-    def setupUi(self):       
-        self.setStyleSheet("background-color: #747c8a;") 
+    def setupUi(self):      
+        self.trainImage          = QLabel(self)
+        self.pixmap              = QPixmap('TrainController.png')
+        self.trainImage.setPixmap(self.pixmap)
+        self.trainImage.setGeometry(0,220,250,110)
+        self.setStyleSheet("background-color: #747c8a;")
+         
         self.setObjectName("self")
         self.resize(835, 423)
         self.setAutoFillBackground(False)
@@ -648,6 +656,7 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
              
 ##### Set Signal Inputs      
     def setCurrentSpeedSignal(self, msg):
+        msg[0]
         self.currentSpeed = msg
         self.setPID()
         self.setAuthority()
