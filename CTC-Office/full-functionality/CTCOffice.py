@@ -648,11 +648,13 @@ class CTCOffice(QWidget):
         if self.manualMode:
             self.dispatchTrainButton.hide()
             self.toggleMaintenanceButton.hide()
+            self.toggleSwitchButton.hide()
             self.uploadScheduleButton.show()
             self.manualMode = False
         else:
             self.dispatchTrainButton.show()
             self.toggleMaintenanceButton.show()
+            self.toggleSwitchButton.show()
             self.uploadScheduleButton.hide()
             self.manualMode = True
 
