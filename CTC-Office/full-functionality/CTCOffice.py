@@ -119,12 +119,6 @@ class CTCOffice(QWidget):
         self.clockLabel.setAlignment(QtCore.Qt.AlignCenter)
         self.clockLabel.setFont(font)
 
-        # self.changeClockSpeedButton = QtWidgets.QPushButton(self)
-        # self.changeClockSpeedButton.setGeometry(550,15,140,20)
-        # self.changeClockSpeedButton.setText("Change clock speed")
-        # self.changeClockSpeedButton.setStyleSheet("background-color: #e8c33c;")
-        # self.changeClockSpeedButton.clicked.connect(self.toggleTenTimeSpeed)
-
     ##################### RED LINE ##########################
         font.setPointSize(10)
         self.redLineLabelTable = QTableWidget(self)
