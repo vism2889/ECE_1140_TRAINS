@@ -23,6 +23,7 @@ class DispatchPopUp(object):
         self.redLineTrains = redLineTrains
         self.greenLineTrains = greenLineTrains
         self.trainCount = trainCount
+        self.scheduledTime = False
 
         font = QtGui.QFont()
         font.setPointSize(14)
@@ -32,13 +33,19 @@ class DispatchPopUp(object):
         self.clockLabel.setAlignment(QtCore.Qt.AlignCenter)
         self.clockLabel.setFont(font)
 
+        self.scheduledTimeLabel = QtWidgets.QLabel(dispatchPopUp)
+        self.scheduledTimeLabel.setGeometry(QtCore.QRect(110,31,80,23))
+        self.scheduledTimeLabel.setStyleSheet("background-color: #7b8fb0; border: 1px solid black")
+        self.scheduledTimeLabel.setAlignment(QtCore.Qt.AlignCenter)
+        self.scheduledTimeLabel.setFont(font)
+
         self.hourSpinBox = QtWidgets.QSpinBox(dispatchPopUp)
-        self.hourSpinBox.setGeometry(QtCore.QRect(110,31,55,23))
+        self.hourSpinBox.setGeometry(QtCore.QRect(190,31,15,23))
         self.hourSpinBox.setRange(0,23)
         self.hourSpinBox.hide()
 
         self.minuteSpinBox = QtWidgets.QSpinBox(dispatchPopUp)
-        self.minuteSpinBox.setGeometry(QtCore.QRect(165,31,55,23))
+        self.minuteSpinBox.setGeometry(QtCore.QRect(205,31,15,23))
         self.minuteSpinBox.setRange(0,60)
         self.minuteSpinBox.hide()
 
@@ -94,17 +101,26 @@ class DispatchPopUp(object):
 
     def setTimeSelection(self):
         if self.timeSelection.isChecked():
+            self.scheduledTime = True
             self.hourSpinBox.show()
             self.minuteSpinBox.show()
             self.clockLabel.hide()
         else:
+            self.scheduledTime = False
             self.hourSpinBox.hide()
             self.minuteSpinBox.hide()
             self.clockLabel.show()
 
     def showTime(self, msg):
-        mins = ('%02d' % msg[1])
-        hours = ('%02d' % msg[0])
+        self.scheduledMins = self.minuteSpinBox.value()
+        self.scheduledHours = self.hourSpinBox.value()
+        if not self.scheduledTime:
+            mins = ('%02d' % msg[1])
+            hours = ('%02d' % msg[0])
+        else:
+            mins = ('%02d' % self.scheduledMins)
+            hours = ('%02d' % self.scheduledHours)
+            self.showScheduledTime()
         time = hours + ":" + mins
         self.clockLabel.setText(time)
         if (self.currentLine == "Red Line"):
@@ -132,6 +148,13 @@ class DispatchPopUp(object):
                 item.setText(hours + ":" + mins)
                 self.stationTable.setItem(self.index, 2, item)
                 self.index += 1
+
+    def showScheduledTime(self):
+        mins = ('%02d' % self.scheduledMins)
+        hours = ('%02d' % self.scheduledHours)
+        time = hours + ":" + mins
+        self.scheduledTimeLabel.setText(time)
+
 
     def getArrivalTime(self, hours, mins, TTS):
         mins = mins + TTS
@@ -176,7 +199,7 @@ class DispatchPopUp(object):
                 item.setText(key)
                 self.stationTable.setItem(self.index, 0, item)
                 spinBox = QtWidgets.QSpinBox()
-                spinBox.setRange(2,5)
+                spinBox.setRange(1,5)
                 self.stationTable.setCellWidget(self.index, 1, spinBox)
                 self.index += 1
 
