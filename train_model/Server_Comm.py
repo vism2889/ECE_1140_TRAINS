@@ -16,8 +16,8 @@ class MyPub:
     def publish(self):
         self.tc_message.current_speed = self.train.pm.curr_vel
         self.tc_message.authority = self.train.pm.train_authority
-        self.tc_message.commanded_speed = self.train.pm.speed_limit
-        self.tc_message.speed_limit = self.train.pm.speed_limit
+        self.tc_message.commanded_speed = self.train.pm.cmdSpeed
+        self.tc_message.speed_limit = self.train.pm.speedLimit
         self.tc_message.next_station = self.train.next_station
         self.tc_message.brake_failure = self.train.brake_failure
         self.tc_message.signalPickup_failure = self.train.signal_pickup_failure

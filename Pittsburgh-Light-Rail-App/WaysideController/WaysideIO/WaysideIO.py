@@ -39,8 +39,8 @@ class Controller():
         for section in self.layout['sections']:
             ## Blocks
             for block in self.layout['sections'][section]['blocks']:
-                self.track['block'][block[0]] = block[2]
-                self.track['block-states'][block[0]] = 0x00
+                self.track['block'][int(block[0])] = block[2]
+                self.track['block-states'][int(block[0])] = 0x00
                 self.numBlocks+=1
 
             ## Switches
@@ -52,6 +52,10 @@ class Controller():
                 self.track['crossing'][crossing] = False
 
         self.id = controllerNum
+        
+        ## Initalizing track component values
+        self.updateCrossing()
+        self.updateSwitch()
 
         ## Setup PLC interface
         self.parser = PLCParser(controllerNum)
@@ -70,7 +74,7 @@ class Controller():
     ## Update block occupancies
     def updateOccupancy(self, blockNum, state):
         ## Update block
-        self.track['block'][str(blockNum)] = state
+        self.track['block'][blockNum] = state
         self.ui.setBlockState(self.line, blockNum, state)
 
         ## Run PLC program
@@ -108,6 +112,13 @@ class Controller():
     def updateMaintenance(self, blockNum, state):
         self.track['block-maintenance'][blockNum] = state
         self.parent.ui.setMaintenance(self.line, blockNum, state)
+        
+        ## Plubish maintenance state
+        if self.line == 'red': 
+            self.parent.publishMaintenance(0, blockNum, state)
+        if self.line == 'green':
+            self.parent.publishMaintenance(1, blockNum, state)
+
         return self.track['block-maintenance']
 
     ## Switches and crossing only get update with the PLC program
@@ -131,6 +142,15 @@ class Controller():
     def toggleMaintence(self):
         self.maintenance != self.maintenance
         return self.maintenance
+
+    def setSwitch(self, blockNum, state):
+        if blockNum not in self.track['block-maintenance']:
+            print("err in setting switch")
+            return -1 
+
+        if self.track['block-maintenance'][blockNum]:
+            self.track['switch'][blockNum] = state
+            self.updateSwitch()
 
     ## Run the PLCs
     def run(self):
@@ -160,9 +180,9 @@ class Controller():
     ## Return if a block, in maintenance or has  fault
     def blockState(self, blockNum):
         flag = 0
-        if self.track['block'][str(blockNum)]:
+        if self.track['block'][blockNum]:
             flag +=1
-        if self.track['block-states'][str(blockNum)]:
+        if self.track['block-states'][blockNum]:
             flag +=1
 
         if blockNum in self.track['block-maintenance']:
@@ -231,15 +251,14 @@ class WaysideIO(QWidget):
         for i, block in enumerate(greenLine):
             self.setBlockOccupancy('green', i+1, block)
 
-    def blockFailureCallback(self, failures):
-        if not self.test:
-            ## Extract the individual faults
-            if len(failures) == 150:
-                for i, failure in enumerate(failures):
-                    self.setFaults('green', i+1, failure)
-            else:
-                for i, failure in enumerate(failures):
-                    self.setFaults('red', i+1, failure)
+    def blockFailureCallback(self, msg):
+        ## Extract the individual faults
+        if len(msg) == 150:
+            for i, failure in enumerate(msg):
+                self.setFaults('green', i+1, failure)
+        else:
+            for i, failure in enumerate(msg):
+                self.setFaults('red', i+1, failure)
 
     def maintenanceCallback(self, msg):
         # print(msg)
@@ -247,6 +266,25 @@ class WaysideIO(QWidget):
             self.setBlockMaintenance('red', msg[1], msg[2])
         if msg[0] == 1:
             self.setBlockMaintenance('green', msg[1], msg[2])
+    
+    def publishMaintenance(self, line, block, state):
+        self.signals.blockMaintenance.emit([line, block, state])
+
+    def ctcSetSwitch(self, msg):
+        blockNum = msg[1]
+        state = msg[2] 
+        
+        ## Redline
+        if msg[0] == 0:
+            controllers = self.lookupBlock('red', blockNum)['controller']
+            for c in controllers:
+                self.redlineControllers[c[0]].setSwitch(blockNum, state)
+        
+        ## Greenline
+        if msg[0] == 1: 
+            controllers = self.lookupBlock('green', blockNum)['controller']
+            for c in controllers:
+                self.greenlineControllers[c[0]].setSwitch(blockNum, state)
 
     def filterSpeed(self, line, blockNum, speed):
         if int(self.lookupTable[line.lower()][str(blockNum)]['speed-limit']) < speed:
@@ -419,21 +457,22 @@ class WaysideIO(QWidget):
         if line.lower() == self.lines[0]:
             self.redlineTrack = track
             for i, c in enumerate(layout):
-                self.redlineControllers.append(Controller(line.lower(), i, c, self.ui, self))
                 self.populateTable(i, c, 0)
+                self.redlineControllers.append(Controller(line.lower(), i, c, self.ui, self))
 
         ## Greenline
         if line.lower() == self.lines[1]:
             self.greenlineTrack = track
             for i, c in enumerate(layout):
-                self.greenlineControllers.append(Controller(line.lower(), i, c, self.ui, self))
                 self.populateTable(i,c, 1)
+                self.greenlineControllers.append(Controller(line.lower(), i, c, self.ui, self))
 
         ## Registering signal callbacks
         self.signals.blockFailures.connect(self.blockFailureCallback)
         self.signals.globalOccupancyFromTrackModelSignal.connect(self.blockOccupancyCallback)
         self.signals.signalMaintenance.connect(self.maintenanceCallback)
         self.signals.trainLocation.connect(self.trainLocationCallback)
+        self.signals.ctcSwitchState.connect(self.ctcSetSwitch)
 
 if __name__ == '__main__':
 
