@@ -323,6 +323,7 @@ class CTCOffice(QWidget):
         secs = ('%02d' % int(self.seconds))
         mins = ('%02d' % int(self.minutes))
         hours = ('%02d' % int(self.hours))
+        self.clockWithoutSeconds = (str(hours) + ":" + str(mins))
         self.clockLabel.setText(str(hours) + ":" + str(mins) + ":" + str(secs))
         self.signals.timeSignal.emit([self.hours, self.minutes, self.seconds])
 
@@ -409,7 +410,10 @@ class CTCOffice(QWidget):
     def updateRedLineBacklog(self):
         self.currentRedLineBacklog = []
         for i in range(self.redLineBacklogTable.rowCount()):
-            self.currentRedLineBacklog.append(self.redLineBacklogTable.item(i,0).text())
+            time = self.redLineBacklogTable.item(i,0).text()
+            if time not in self.redLineTrains.backlogs():
+                self.redLineBacklogTable.removeRow(i)
+            self.currentRedLineBacklog.append(time)
 
         for train in self.redLineTrains.backlogs():
             if ((train in self.currentRedLineBacklog) == False):
@@ -438,7 +442,10 @@ class CTCOffice(QWidget):
     def updateGreenLineBacklog(self):
         self.currentGreenLineBacklog = []
         for i in range(self.greenLineBacklogTable.rowCount()):
-            self.currentGreenLineBacklog.append(self.greenLineBacklogTable.item(i,0).text())
+            time = self.greenLineBacklogTable.item(i,0).text()
+            if time not in self.greenLineTrains.backlogs():
+                self.redLineBacklogTable.removeRow(i)
+            self.currentGreenLineBacklog.append(time)
 
         for train in self.greenLineTrains.backlogs():
             if ((train in self.currentGreenLineBacklog) == False):
@@ -597,8 +604,9 @@ class CTCOffice(QWidget):
         self.dispatchWidget.show()
 
     def closeDispatchPopUp(self):
+        if self.dispatchPopUp.dispatch.text() == "Dispatch":
+            self.trainCount += 1
         self.dispatchWidget.close()
-        self.trainCount += 1
 
     def uploadSchedule(self):
         fileName = QFileDialog.getOpenFileName(QtWidgets.QStackedWidget(), 'open file', '/home/garrett/git/ECE_1140_TRAINS/CTC-Office', 'csv files (*.csv)')
@@ -608,13 +616,16 @@ class CTCOffice(QWidget):
             print("ERROR: invalid schedule uploaded")
 
     def checkForScheduledTrains(self):
+        trainName = "Train " + str(self.trainCount)
         for train in list(self.redLineTrains.backlogs()):
-            if str(train) == self.clockLabel.text():
-                self.redLineTrains.dispatchScheduledTrain(str(train))
+            if str(train) == self.clockWithoutSeconds:
+                self.redLineTrains.dispatchScheduledTrain(self.clockWithoutSeconds, trainName)
+                self.trainCount += 1
 
         for train in list(self.greenLineTrains.backlogs()):
-            if str(train) == self.clockLabel.text():
-                self.greenLineTrains.dispatchScheduledTrain(str(train))
+            if str(train) == self.clockWithoutSeconds:
+                self.greenLineTrains.dispatchScheduledTrain(self.clockWithoutSeconds, trainName)
+                self.trainCount += 1
 
     def toggleDestinations(self):
         self.selectedDestinations = self.destinationTable.selectedIndexes()

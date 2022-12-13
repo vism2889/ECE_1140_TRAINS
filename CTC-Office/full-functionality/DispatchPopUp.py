@@ -107,12 +107,14 @@ class DispatchPopUp(object):
             self.hourSpinBox.show()
             self.minuteSpinBox.show()
             self.clockLabel.hide()
+            self.dispatch.setText("Schedule")
         else:
             self.scheduledTime = False
             self.scheduledTimeLabel.hide()
             self.hourSpinBox.hide()
             self.minuteSpinBox.hide()
             self.clockLabel.show()
+            self.dispatch.setText("Dispatch")
 
     def showTime(self, msg):
         # set time values
