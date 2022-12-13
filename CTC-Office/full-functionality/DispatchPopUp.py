@@ -32,10 +32,15 @@ class DispatchPopUp(object):
         self.clockLabel.setAlignment(QtCore.Qt.AlignCenter)
         self.clockLabel.setFont(font)
 
-        self.clockSpinBox = QtWidgets.QSpinBox(dispatchPopUp)
-        self.clockSpinBox.setGeometry(QtCore.QRect(110,31,110,23))
-        self.clockSpinBox.setRange(0,23)
-        self.clockSpinBox.hide()
+        self.hourSpinBox = QtWidgets.QSpinBox(dispatchPopUp)
+        self.hourSpinBox.setGeometry(QtCore.QRect(110,31,55,23))
+        self.hourSpinBox.setRange(0,23)
+        self.hourSpinBox.hide()
+
+        self.minuteSpinBox = QtWidgets.QSpinBox(dispatchPopUp)
+        self.minuteSpinBox.setGeometry(QtCore.QRect(165,31,55,23))
+        self.minuteSpinBox.setRange(0,60)
+        self.minuteSpinBox.hide()
 
         self.lineSelection = QtWidgets.QComboBox(dispatchPopUp)
         self.lineSelection.setGeometry(QtCore.QRect(0,30,110,25))
@@ -89,10 +94,12 @@ class DispatchPopUp(object):
 
     def setTimeSelection(self):
         if self.timeSelection.isChecked():
-            self.clockSpinBox.show()
+            self.hourSpinBox.show()
+            self.minuteSpinBox.show()
             self.clockLabel.hide()
         else:
-            self.clockSpinBox.hide()
+            self.hourSpinBox.hide()
+            self.minuteSpinBox.hide()
             self.clockLabel.show()
 
     def showTime(self, msg):
@@ -186,7 +193,7 @@ class DispatchPopUp(object):
             self.totalTTS += int(TTS)
 
         self.trainList.addTrain(self.trainName, self.destinationList, 0, 0)
-        self.trainList.setSuggestedSpeed(self.trainName, self.totalTTS)
+        self.trainList.setSuggestedSpeed(self.trainName, self.totalTTS, self.currentLine)
         self.suggestedSpeed = self.trainList.getSuggestedSpeed(self.trainName)
 
         # add dispatch destinations to list
