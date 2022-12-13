@@ -104,7 +104,6 @@ class CTCOffice(QWidget):
         self.setObjectName("self")
         self.setGeometry(10, 10, 700, 580)
         self.setMouseTracking(True)
-        self.setStyleSheet("background-color: #747c8a;")
         self.redLineMaintenance   = False
         self.greenLineMaintenance = False
         self.manualMode           = True
