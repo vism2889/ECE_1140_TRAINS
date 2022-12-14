@@ -34,7 +34,7 @@ class TrainData():
     serv_brake = float = 1.2  #m/s^2
     emergency_brake = 2.73    #m/s^2
 
-    kinetic_fric_constant = float = 0.1 #Newtons
+    kinetic_fric_constant = float = 0.2 #Newtons
     static_fric_constant = float = 0.6
     
 
@@ -46,7 +46,7 @@ class PointMassModel():
         self.grade = 0
         self.count = 0
         self.ctc_authority = []
-        self.speed_up = 1
+        self.speedUp = 1
         self.waysideAuthority = []
         self.train_authority = 0
         self.stationStop = False
@@ -107,7 +107,7 @@ class PointMassModel():
             self.prev_time = self.curr_time
             self.curr_time = t
 
-        self.elapsed_time = (self.curr_time-self.prev_time) * self.speed_up
+        self.elapsed_time = (self.curr_time-self.prev_time) * self.speedUp
 
         self.power = power
         
@@ -157,7 +157,7 @@ class PointMassModel():
         #setting time values
         self.prev_time = self.curr_time
         self.curr_time = time.time()
-        self.elapsed_time = (self.curr_time-self.prev_time) * self.speed_up
+        self.elapsed_time = (self.curr_time-self.prev_time) * self.speedUp
 
         # print(f'Serv Brake velocity before decleration:{self.curr_speed}')
         # print(f'Serv Brake force before deceleration: {self.force}')
@@ -167,19 +167,16 @@ class PointMassModel():
         
         if self.curr_vel > 0:
             self.prev_accel = self.curr_accel
-            
             self.curr_accel = self.dec_force(val)
             self.calcVel()
             self.calcPos()
-
-
             if self.curr_vel <= 0:
                 self.curr_vel = 0
-
-        self.power = 0  
-        self.force = 0
-        self.prev_accel = 0
-        self.curr_accel = 0
+        else:
+            self.power = 0  
+            self.force = 0
+            self.prev_accel = 0
+            self.curr_accel = 0
 
     def dec_force(self, val):
         # print(f"Current force is: {self.force}")
@@ -222,9 +219,8 @@ class PointMassModel():
         self.curr_accel = float(self.force)/float(self._td.mass_empty)
     
     def calcVel(self):
-
         self.prev_vel = self.curr_vel
-        self.curr_vel = self.prev_vel + (self.elapsed_time/2)*(self.prev_accel+self.curr_accel)*(1/self.speed_up)
+        self.curr_vel = self.prev_vel + ((self.elapsed_time)/2)*(self.prev_accel+self.curr_accel)
         if self.curr_vel < 0:
             self.curr_vel = 0
         if self.curr_vel > 19.444444:
@@ -298,7 +294,9 @@ class PointMassModel():
                 lastBlock = wayside[-1]
                 self.train_authority += float(self.BlockModels[lastBlock-1].blockLength)/4
         elif len(self.waysideAuthority) == 1 and self.curr_vel != 0:
-            self.train_authority = 0
+            if self.prev_vel != 0:
+                self.train_authority = 0
+        
       
         self.speedLimit = float(self.BlockModels[self.curr_block-1].speedLimit)*0.277778
         if self.speedLimit >= self.suggSpeed:

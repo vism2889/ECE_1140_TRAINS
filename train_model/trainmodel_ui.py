@@ -86,8 +86,14 @@ class TrainModel(QtWidgets.QMainWindow):
         self.t.pm.power = msg['power']
     
     def setBrake(self, msg):
-       self.t.service_brake = msg['serviceBrake'] 
-       self.t.e_brake = msg['emergencyBrake'] 
+        self.t.service_brake = msg['serviceBrake'] 
+        self.t.e_brake = msg['emergencyBrake'] 
+
+        if self.t.service_brake:
+            self.t.pm.brake(0)
+        elif self.t.e_brake:
+            self.t.pm.brake(1)
+
 
     def nonVitals(self,msg):
         for key in msg:
@@ -103,7 +109,7 @@ class TrainModel(QtWidgets.QMainWindow):
         self.t.pm.waysideAuthority = msg[2]
     
     def speedup(self, msg):
-        self.t.pm.speed_up = int(msg)
+        self.t.pm.speedUp = int(msg)
     def UI(self):
         
         self.signals.dispatchTrainSignal.connect(self.dispatch)
@@ -236,13 +242,13 @@ class TrainModel(QtWidgets.QMainWindow):
             # print("inside if statement")
             if self.t.e_brake == False and self.t.service_brake == False and self.t.dispatched:
                 self.t.set_power(self.t.pm.power)
-                self.signals.currentSpeedOfTrainModel.emit(self.t.pm.curr_vel)
+                self.signals.currentSpeedOfTrainModel.emit([self.t.id, self.t.pm.curr_vel])
                 # print(f'Occ_list is: {self.t.pm.occ_list}')
                 # print(f'Curr Pos in block {self.qt.t.pm.curr_block} is: {self.qt.t.pm.curr_pos}')
                 self.signals.occupancyFromTrainSignal.emit(self.t.pm.occ_list)
-                self.signals.commandedSpeedSignal.emit(self.t.pm.cmdSpeed)
-                self.signals.speedLimitSignal.emit(self.t.pm.speedLimit)
-                self.signals.authoritySignal.emit(self.t.pm.train_authority)
+                self.signals.commandedSpeedSignal.emit([self.t.id,self.t.pm.cmdSpeed])
+                self.signals.speedLimitSignal.emit([self.t.id,self.t.pm.speedLimit])
+                self.signals.authoritySignal.emit([self.t.id,self.t.pm.train_authority])
                 self.last_update = time.time()
                 # print('PUBLISHING!!!')
                 
