@@ -46,6 +46,12 @@ class TrainModel(QtWidgets.QMainWindow):
         self.signals.trackBlocksToTrainModelSignal.connect(self.set_blocks)
         self.brake_update = time.time()
 
+    def beaconSignal(self,msg):
+        if len(msg) > 1:
+            self.t.stationSide = msg[0]
+            self.t.stationName = msg[1]
+            self.t.underground = msg[2]
+
     def set_blocks(self,msg):
         #red is msg[0] and green is msg[1]
         self.blockList = msg
@@ -107,6 +113,7 @@ class TrainModel(QtWidgets.QMainWindow):
         self.signals.ctcAuthoritySignal.connect(self.ctc_authority)
         self.signals.clockSpeedSignal.connect(self.speedup)
         self.signals.waysideAuthority.connect(self.wayside_authority)
+        self.signals.beaconFromTrackModelSignal.connect(self.beaconSignal)
         # if sys.argv[1] == 'user':
         #     self.test_win.setVisible(False)
         # else:
@@ -240,9 +247,6 @@ class TrainModel(QtWidgets.QMainWindow):
                 # print('PUBLISHING!!!')
                 
                 if self.hw:
-                    print('--------------publishing----------------')
-                    print(f'|       Authority: {self.t.pm.train_authority}      |')
-                    print('----------------------------------------')
                     self.mp.publish()
             if self.t.pm.stationStop:
                 self.signals.stationStop.emit(self.t.pm.stationStop)

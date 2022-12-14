@@ -374,7 +374,9 @@ class Train():
     def __init__ (self):
 
         self.id = None
-        
+        self.stationSide = ''
+        self.underground = ''
+        self.stationName = ''
         
         #block list
         # self.blocks          = [i for i in range(150)]
