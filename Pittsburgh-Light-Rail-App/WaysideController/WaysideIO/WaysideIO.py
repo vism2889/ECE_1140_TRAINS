@@ -1,7 +1,7 @@
 import os
 import sys
 import importlib
-sys.path.append('./extract_layout')
+sys.path.append('/track_layout')
 
 # import threading
 from PLCParser import PLCParser
@@ -45,24 +45,26 @@ class Controller():
 
             ## Switches
             for switch in self.layout['sections'][section]['switches']:
-                self.track['switch'][switch] = True
+                self.track['switch'][int(switch)] = True
 
             ## Crossings
             for crossing in self.layout['sections'][section]['crossing']:
-                self.track['crossing'][crossing] = False
+                self.track['crossing'][int(crossing)] = False
 
         self.id = controllerNum
+        switches = self.track['switch']
 
         ## Initalizing track component values
         self.updateCrossing()
         self.updateSwitch()
 
         ## Setup PLC interface
-        self.parser = PLCParser(controllerNum)
-        if self.line == 'green':
-            file = open(f"plc/controller{self.id}.plc")
-            self.uploadPLC(file)
-            self.maintenance = False
+        self.parser = PLCParser(controllerNum, self.line)
+        
+        ## Load the default PLC programs 
+        file = open(f"plc/{self.line}/{self.line}line_controller{self.id}.plc")
+        self.uploadPLC(file)
+        self.maintenance = False
 
     ###############
     ## BLOCK OPS ##
@@ -167,7 +169,8 @@ class Controller():
             try:
                 self.plc(self.track)
             except:
-                print(f'Error: PLC script cannot run (controller{self.id})')
+                # print(e)
+                print(f'Error: PLC script cannot run ({self.line}controller{self.id})')
                 self.plcGood = False
 
     ## Upload a PLC
@@ -175,10 +178,10 @@ class Controller():
         if self.maintenance:
             modname = self.parser.parseFile(file)
             try:
-                mod = importlib.import_module("plc."+modname)
+                mod = importlib.import_module(f"plc.{self.line}."+modname)
                 # mod.run(self.track)
             except ImportError:
-                print(f"Errror: Could not import plc script for controller {self.id}")
+                print(f"Errror: Could not import plc script for {self.line}line controller {self.id}")
                 self.plcGood = False
             else:
                 self.plc = mod.run
@@ -241,6 +244,7 @@ class WaysideIO(QWidget):
 
         if line == 0:
             authority= self.planAuthority('red', self.redlineControllers, self.redlineTrack, curr, prev)
+            print(authority)
             self.signals.waysideAuthority.emit([0, id, authority])
 
         if line == 1:
@@ -358,6 +362,24 @@ class WaysideIO(QWidget):
             #     self.greenline_controllers[c[0]].updateCrossing(blockNum, state)
 
     #############
+    ## GETTERS ##
+    #############
+    def getOccupancy(self, line, blockNum):
+        occupied = True
+        controllers = self.lookupBlock(line, blockNum)['controller']
+        
+        # exit(0)
+        if line == 'red':
+            for c in controllers:
+                occupied &= self.redlineControllers[c[0]].blockState(blockNum)
+        
+        if line == 'green':
+            for c in controllers:
+                occupied &= self.greenlineControllers[c[0]].blockState(blockNum)
+
+        return occupied
+        
+    #############
     ## HELPERS ##
     #############
     ## Figure out the next 1-5 blocks that are traversable
@@ -373,8 +395,11 @@ class WaysideIO(QWidget):
             nextBlock = track.getNextBlock(currentBlock, previousBlock)
             if nextBlock == -1:
                 ## Set a 2 block buffer for the authority
-                authority.pop(-1)
-                authority.pop(-1)
+                if len(authority) > 2: 
+                    authority.pop(-1)
+                    authority.pop(-1)
+                elif len(authority) > 1:
+                    authority.pop(-1)
                 return authority
 
             ## Check if it's the yard
