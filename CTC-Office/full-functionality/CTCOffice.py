@@ -52,6 +52,7 @@ class CTCOffice(QWidget):
         self.signals.switchState.connect(self.updateSwitchState)
         self.signals.clockSpeedSignal.connect(self.changeClockSpeed)
         self.signals.waysideAuthority.connect(self.showAuthority)
+        self.signals.trackFailuresSignal.connect(self.readFaultSignal)
 
     def setupLayout(self):
         # getting lists of blocks
@@ -644,6 +645,18 @@ class CTCOffice(QWidget):
             self.greenLineBlocks.setOccupancy(str(block+1), occupancySignal[1][block])
         for block in range(0, len(occupancySignal[0])):
             self.redLineBlocks.setOccupancy(str(block+1), occupancySignal[0][block])
+
+    def readFaultSignal(self, faultSignal):
+        for block in range(0, len(faultSignal[1])):
+            if faultSignal[1][block] != 0:
+                self.greenLineBlocks.setFaultState(str(block+1), True)
+            else:
+                self.greenLineBlocks.setFaultState(str(block+1), False)
+        for block in range(0, len(faultSignal[0])):
+            if faultSignal[0][block] != 0:
+                self.redLineBlocks.setFaultState(str(block+1), True)
+            else:
+                self.redLineBlocks.setFaultState(str(block+1), False)
 
     def toggleDispatchMode(self):
         if self.manualMode:

@@ -41,6 +41,9 @@ class BlockDictionary:
     def toggleFaultState(self, blockNum):
         self.blockList[blockNum].faultState = not self.blockList[blockNum].faultState
 
+    def setFaultState(self, blockNum, state):
+        self.blockList[blockNum].faultState = state
+
     def setSwitchState(self, blockNum, state):
         if blockNum in self.switchList:
             self.switchList[blockNum][1] = state
