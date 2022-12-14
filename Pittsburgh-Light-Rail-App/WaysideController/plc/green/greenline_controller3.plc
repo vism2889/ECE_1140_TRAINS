@@ -1,0 +1,11 @@
+for blk in range(77, 86):
+    if #block_blk == True: 
+        return 
+
+if #block_75 == True and #block_100 == False:
+    #switch_76 = False
+    #switch_85 = False
+    
+elif #block_99 == True and #block_75 == False:
+    #switch_76 = True
+    #switch_85 = True
