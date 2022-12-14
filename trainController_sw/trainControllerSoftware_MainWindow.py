@@ -662,34 +662,40 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
             self.trainID = msg
         
     def setCurrentSpeedSignal(self, msg):
-        msg[0]
-        self.currentSpeed = msg
-        self.setPID()
-        self.setAuthority()
-        if(self.TabWigets.currentIndex() != 1 & self.TabWigets.currentIndex() != 2):     
-            #self.setAutoCommandedSpeed()
-            self.setAutoServiceBrake()
+        if(msg[0] == self.trainID):
+            self.currentSpeed = msg[1]
+            self.setPID()
+            self.setAuthority()
+            if(self.TabWigets.currentIndex() != 1 & self.TabWigets.currentIndex() != 2):     
+                #self.setAutoCommandedSpeed()
+                #self.setAutoServiceBrake()
+                pass
     
     def setAuthoritySignal(self, msg):
-        self.authority = msg
-        self.setAuthority()
+        if(msg[0] == self.trainID):
+            self.authority = msg[1]
+            self.setAuthority()
           
     def setBlockFailuresSignal(self, msg):
-        self.blockFailures = msg
-        self.checkFailures()
+        if(msg[0] == self.trainID):
+            self.blockFailures = msg[1]
+            self.checkFailures()
 
     def setSpeedLimitSignal(self, msg):
-        # msg (m/s)
-        self.speedLimit = msg
-        self.setAutoSpeedLimit()
+        # msg[1] (m/s)
+        if(msg[0] == self.trainID):
+            self.speedLimit = msg[1]
+            self.setAutoSpeedLimit()
     
     def setCommandedSpeedSignal(self, msg):
-        self.commandedSpeedSignal = msg
-        self.setAutoCommandedSpeed()
+        if(msg[0] == self.trainID):
+            self.commandedSpeedSignal = msg[1]
+            self.setAutoCommandedSpeed()
     
     def setTrainFailuresSignal(self, msg):
-        self.trainFailure = msg
-        self.checkFailures()
+        if(msg[0] == self.trainID):
+            self.trainFailure = msg[1]
+            self.checkFailures()
     
     def setBeaconSignal(self, msg):
         if(len(msg) > 1):
