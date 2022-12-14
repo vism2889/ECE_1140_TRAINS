@@ -23,6 +23,7 @@ class DispatchPopUp(object):
         self.redLineTrains = redLineTrains
         self.greenLineTrains = greenLineTrains
         self.trainCount = trainCount
+        self.scheduledTime = False
 
         font = QtGui.QFont()
         font.setPointSize(14)
@@ -32,13 +33,20 @@ class DispatchPopUp(object):
         self.clockLabel.setAlignment(QtCore.Qt.AlignCenter)
         self.clockLabel.setFont(font)
 
+        self.scheduledTimeLabel = QtWidgets.QLabel(dispatchPopUp)
+        self.scheduledTimeLabel.setGeometry(QtCore.QRect(110,31,80,23))
+        self.scheduledTimeLabel.setStyleSheet("background-color: #7b8fb0; border: 1px solid black")
+        self.scheduledTimeLabel.setAlignment(QtCore.Qt.AlignCenter)
+        self.scheduledTimeLabel.setFont(font)
+        self.scheduledTimeLabel.hide()
+
         self.hourSpinBox = QtWidgets.QSpinBox(dispatchPopUp)
-        self.hourSpinBox.setGeometry(QtCore.QRect(110,31,55,23))
+        self.hourSpinBox.setGeometry(QtCore.QRect(190,31,15,23))
         self.hourSpinBox.setRange(0,23)
         self.hourSpinBox.hide()
 
         self.minuteSpinBox = QtWidgets.QSpinBox(dispatchPopUp)
-        self.minuteSpinBox.setGeometry(QtCore.QRect(165,31,55,23))
+        self.minuteSpinBox.setGeometry(QtCore.QRect(205,31,15,23))
         self.minuteSpinBox.setRange(0,60)
         self.minuteSpinBox.hide()
 
@@ -88,25 +96,41 @@ class DispatchPopUp(object):
             item.setText(_translate("MainWindow", key))
             self.stationTable.setItem(self.index, 0, item)
             spinBox = QtWidgets.QSpinBox()
-            spinBox.setRange(2,5)
+            spinBox.setRange(1,5)
             self.stationTable.setCellWidget(self.index, 1, spinBox)
             self.index += 1
 
     def setTimeSelection(self):
         if self.timeSelection.isChecked():
+            self.scheduledTime = True
+            self.scheduledTimeLabel.show()
             self.hourSpinBox.show()
             self.minuteSpinBox.show()
             self.clockLabel.hide()
+            self.dispatch.setText("Schedule")
         else:
+            self.scheduledTime = False
+            self.scheduledTimeLabel.hide()
             self.hourSpinBox.hide()
             self.minuteSpinBox.hide()
             self.clockLabel.show()
+            self.dispatch.setText("Dispatch")
 
     def showTime(self, msg):
-        mins = ('%02d' % msg[1])
-        hours = ('%02d' % msg[0])
+        # set time values
+        self.scheduledMins = self.minuteSpinBox.value()
+        self.scheduledHours = self.hourSpinBox.value()
+        if not self.scheduledTime:
+            mins = ('%02d' % msg[1])
+            hours = ('%02d' % msg[0])
+        else:
+            mins = ('%02d' % self.scheduledMins)
+            hours = ('%02d' % self.scheduledHours)
+            self.showScheduledTime()
         time = hours + ":" + mins
         self.clockLabel.setText(time)
+
+        # update dispatch/arrival times
         if (self.currentLine == "Red Line"):
             self.destinationList = self.redLineStations
             self.stationTable.setRowCount(len(self.redLineStations))
@@ -132,6 +156,14 @@ class DispatchPopUp(object):
                 item.setText(hours + ":" + mins)
                 self.stationTable.setItem(self.index, 2, item)
                 self.index += 1
+
+    def showScheduledTime(self):
+        mins = ('%02d' % self.scheduledMins)
+        hours = ('%02d' % self.scheduledHours)
+        time = hours + ":" + mins
+        self.scheduledTime = time
+        self.scheduledTimeLabel.setText(time)
+
 
     def getArrivalTime(self, hours, mins, TTS):
         mins = mins + TTS
@@ -161,7 +193,7 @@ class DispatchPopUp(object):
                 item.setText(key)
                 self.stationTable.setItem(self.index, 0, item)
                 spinBox = QtWidgets.QSpinBox()
-                spinBox.setRange(2,5)
+                spinBox.setRange(1,5)
                 self.stationTable.setCellWidget(self.index, 1, spinBox)
                 self.index += 1
 
@@ -176,7 +208,7 @@ class DispatchPopUp(object):
                 item.setText(key)
                 self.stationTable.setItem(self.index, 0, item)
                 spinBox = QtWidgets.QSpinBox()
-                spinBox.setRange(2,5)
+                spinBox.setRange(1,5)
                 self.stationTable.setCellWidget(self.index, 1, spinBox)
                 self.index += 1
 
@@ -192,15 +224,22 @@ class DispatchPopUp(object):
             TTS = spinBox.value()
             self.totalTTS += int(TTS)
 
-        self.trainList.addTrain(self.trainName, self.destinationList, 0, 0)
-        self.trainList.setSuggestedSpeed(self.trainName, self.totalTTS, self.currentLine)
-        self.suggestedSpeed = self.trainList.getSuggestedSpeed(self.trainName)
+        if self.scheduledTime:
+            self.trainList.addScheduledTrain(self.scheduledTime, self.destinationList, 0, 0)
+            self.trainList.setSuggestedSpeed(self.scheduledTime, self.totalTTS, self.currentLine, True)
 
-        # add dispatch destinations to list
-        for destination in self.selectedDestinations:
-            self.trainList.toggleDestination(self.trainName, destination.text(), False)
+            for destination in self.selectedDestinations:
+                self.trainList.toggleDestination(self.scheduledTime, destination.text(), True)
+        else:
+            self.trainList.addTrain(self.trainName, self.destinationList, 0, 0)
+            self.trainList.setSuggestedSpeed(self.trainName, self.totalTTS, self.currentLine, False)
+            self.suggestedSpeed = self.trainList.getSuggestedSpeed(self.trainName)
 
-        self.trainList.sendAuthority(self.trainName, self.signals)
-        self.signals.dispatchTrainSignal.emit([self.trainName, self.currentLine, self.suggestedSpeed])
+            # add dispatch destinations to list
+            for destination in self.selectedDestinations:
+                self.trainList.toggleDestination(self.trainName, destination.text(), False)
+
+            self.signals.dispatchTrainSignal.emit([self.trainName, self.currentLine, self.suggestedSpeed])
+            self.trainList.sendAuthority(self.trainName, self.signals)
 
 
