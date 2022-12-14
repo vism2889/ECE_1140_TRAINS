@@ -71,8 +71,8 @@ QTabWidget {
     background-color: #858e9e;
 }
 
-QGroupBox {
-    background-color: #858e9e;
+QComboBox {
+    background-color: #e8c33c;
 }
 """
 
@@ -89,7 +89,7 @@ class PittsburghLightRail(QWidget):
         self.waysideController = WaysideController(self.signals)
 
         if not hw:
-            self.trainController = Ui_TrainControllerSW_MainWindow(self.signals)
+            self.trainController = Ui_TrainControllerSW_MainWindow(self.signals, 'Initial')
             self.trainController.setStyleSheet(styleSheet)
 
         #train model
@@ -148,11 +148,14 @@ class PittsburghLightRail(QWidget):
         self.showTrainModelButton.setFont(font)
 
         ## Train Controller
-        self.showTrainControllerButton = QPushButton(self)
-        self.showTrainControllerButton.setGeometry(35,190,150,25)
-        self.showTrainControllerButton.clicked.connect(self.trainController.show)
-        self.showTrainControllerButton.setText("Train Controller")
-        self.showTrainControllerButton.setFont(font)
+        self.trainList = []
+        self.controllerInstances = []
+        self.trainControllerComboBox = QComboBox(self)
+        self.trainControllerComboBox.addItem("Train Controller")
+        self.trainControllerComboBox.setGeometry(35,190,150,25)
+        self.trainControllerComboBox.setFont(font)
+        self.signals.dispatchTrainSignal.connect(self.addDispatchedTrain)
+        self.trainControllerComboBox.currentIndexChanged.connect(self.showTrainController)
 
         ## Icons
         self.trainImage          = QLabel(self)
@@ -182,7 +185,19 @@ class PittsburghLightRail(QWidget):
         value = int(self.speedController.value())
         self.signals.clockSpeedSignal.emit(value)
 
-
+    def addDispatchedTrain(self, msg):
+        self.trainID = msg[0]
+        self.trainControllerComboBox.addItem(self.trainID)
+        self.index = self.trainControllerComboBox.currentIndex()
+        self.trainList.append(self.trainID)
+        self.controllerInstances.append(Ui_TrainControllerSW_MainWindow(self.signals, self.trainID))
+        
+            
+    def showTrainController(self):
+        self.controllerInstances[self.index].show()
+        
+        
+    
 ## Commandline CTRL-C ##
 def handler(signum, frame):
     print("CTRL-C was pressed")

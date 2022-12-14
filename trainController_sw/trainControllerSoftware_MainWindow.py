@@ -22,15 +22,12 @@ from signalSender import signalSender
 
 
 class Ui_TrainControllerSW_MainWindow(QWidget):
-    def __init__(self, signals):
+    def __init__(self, signals, trainID):
         super().__init__()
         self.signals = signals
         self.setupUi()
         self.timer = QtCore.QTimer()
-        #self.connect()
-        #self.ManualControl_Connect()
-        
-        #self.show()
+        self.trainID = trainID
         
 
     def setupUi(self):      
@@ -570,7 +567,7 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
         self.signals.commandedSpeedSignal.connect(self.setCommandedSpeedSignal)
         self.signals.trainFailuresSignal.connect(self.setTrainFailuresSignal)
         self.signals.beaconFromTrackModelSignal.connect(self.setBeaconSignal) # station side, nanme of station, underground
-        self.signals.dispatchTrainSignal.connect(self.setTrainIDSignal)
+        #self.signals.dispatchTrainSignal.connect(self.setTrainIDSignal)
 
     def setOperationMode(self):
         if(self.TabWigets.currentIndex() == 0):     # Automatic Mode
@@ -602,7 +599,7 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
         self.commandedSpeed = 13.4112 # commanded speed input as m/s
         self.kp = 24000
         self.ki = 100
-        self.trainID = "Initial"
+        #self.trainID = 'Initial'
         
         # Variables for incoming data
         self.authority = 0
@@ -657,9 +654,10 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
         }
              
 ##### Set Signal Inputs      
-    def setTrainIDSignal(self, msg):
-        if(self.trainID == "Initial"):
-            self.trainID = msg
+    # def setTrainIDSignal(self, msg):
+    #     print("Train ID: ", msg)
+    #     if(self.trainID == 'Initial'):
+    #         self.trainID = msg
         
     def setCurrentSpeedSignal(self, msg):
         if(msg[0] == self.trainID):
