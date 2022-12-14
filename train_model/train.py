@@ -302,7 +302,7 @@ class PointMassModel():
         
 
         
-        self.speedLimit = float(self.BlockModels[self.curr_block-1].speedLimit)*0.277778
+        self.speedLimit = int(self.BlockModels[self.curr_block-1].speedLimit)*0.277778
         if self.speedLimit >= self.suggSpeed:
             self.cmdSpeed = self.suggSpeed
         else:
