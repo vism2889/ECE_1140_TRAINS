@@ -24,6 +24,8 @@ class to_TC(msg):
 		self.__vars__.append(self.engine_failure)
 		self.signalPickup_failure = None
 		self.__vars__.append(self.signalPickup_failure)
+		self.stationStop = None
+		self.__vars__.append(self.stationStop)
 		self.__data_types__.append("float")
 		self.__data_types__.append("float")
 		self.__data_types__.append("float")
@@ -31,6 +33,7 @@ class to_TC(msg):
 		self.__data_types__.append("string")
 		self.__data_types__.append("string")
 		self.__data_types__.append("string")
+		self.__data_types__.append("bool")
 		self.__data_types__.append("bool")
 		self.__data_types__.append("bool")
 		self.__data_types__.append("bool")
@@ -47,6 +50,7 @@ class to_TC(msg):
 		self.__vars__[7] = self.brake_failure
 		self.__vars__[8] = self.engine_failure
 		self.__vars__[9] = self.signalPickup_failure
+		self.__vars__[10] = self.stationStop
 		return self.__serialize__(self.__vars__)
 
 	def deserialize(self, buffer):
@@ -61,3 +65,4 @@ class to_TC(msg):
 		self.brake_failure = self.__vars__[7]
 		self.engine_failure = self.__vars__[8]
 		self.signalPickup_failure = self.__vars__[9]
+		self.stationStop = self.__vars__[10]

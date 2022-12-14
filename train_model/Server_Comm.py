@@ -22,6 +22,10 @@ class MyPub:
         self.tc_message.brake_failure = self.train.brake_failure
         self.tc_message.signalPickup_failure = self.train.signal_pickup_failure
         self.tc_message.engine_failure = self.train.train_engine_failure
+        self.tc_message.stationStop = self.train.pm.stationStop
+        self.tc_message.stationSide = self.train.stationSide
+        self.tc_message.stationName = self.train.stationName
+        self.tc_message.underground = self.train.underground
        
         self.tc_pub.publish(self.tc_message)
 

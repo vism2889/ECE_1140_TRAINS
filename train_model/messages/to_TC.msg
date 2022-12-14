@@ -8,3 +8,4 @@ string underground
 bool brake_failure
 bool engine_failure
 bool signalPickup_failure
+bool stationStop
