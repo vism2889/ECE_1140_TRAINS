@@ -49,6 +49,12 @@ from trainmodel_ui import TrainModel
 sys.path.append("../trainController_sw/")
 from trainControllerSoftware_MainWindow import Ui_TrainControllerSW_MainWindow
 
+if hasattr(Qt, 'AA_EnableHighDpiScaling'):
+    QApplication.setAttribute(Qt.AA_EnableHighDpiScaling, True)
+
+if hasattr(Qt, 'AA_UseHighDpiPixmaps'):
+    QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps, True)
+
 # Style sheet
 styleSheet = """
 QWidget {
@@ -91,7 +97,7 @@ class PittsburghLightRail(QWidget):
         self.setupUi()
 
     def setupUi(self):
-        self.setGeometry(1630,50,220,330)
+        self.setGeometry(1680,50,220,330)
 
         font = QFont()
         font.setPointSize(16)
