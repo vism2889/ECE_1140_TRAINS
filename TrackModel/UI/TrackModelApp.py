@@ -58,8 +58,10 @@ class TrackModel(QWidget):
 
         self.currGreenLineBlock      = None
         self.currGreenLineBlockIndex = None
-        self.currRedLineBlock        = None
-        self.currRedLineBlockIndex   = None
+        # self.currRedLineBlock        = None
+        # self.currRedLineBlockIndex   = None
+        self.lastBlockIndices        = [0,0]
+        self.lastClickedBlock        = [0,0]
 
         # Layout Information
         self.lineNames               = []    # List of Strings holding line names
@@ -146,6 +148,7 @@ class TrackModel(QWidget):
         self.trackModelImage.setPixmap(self.pixmap)
         self.trackModelImage.resize(175,100)
         self.trackModelImage.move(self.width-160, self.height-100)
+        print("FUCK")
 
     def displayTemperatureButton(self):
         '''
@@ -511,13 +514,13 @@ class TrackModel(QWidget):
         self.blockInfolistwidget.insertItem(0,  "Track Line:           ")
         self.blockInfolistwidget.insertItem(1,  "Section:              ")
         self.blockInfolistwidget.insertItem(2,  "Block Number:         ")
-        self.blockInfolistwidget.insertItem(3,  "Block Length:         ")
-        self.blockInfolistwidget.insertItem(4,  "Block Grade:          ")
-        self.blockInfolistwidget.insertItem(5,  "Speed Limit:          ")
+        self.blockInfolistwidget.insertItem(3,  "Block Length (ft):    ")
+        self.blockInfolistwidget.insertItem(4,  "Block Grade (%):      ")
+        self.blockInfolistwidget.insertItem(5,  "Speed Limit (mph):    ")
         self.blockInfolistwidget.insertItem(6,  "Infrastructure:       ")
         self.blockInfolistwidget.insertItem(7,  "Station Side:         ")
-        self.blockInfolistwidget.insertItem(8,  "Elevation:            ")
-        self.blockInfolistwidget.insertItem(9,  "Cumulative Elevation: ")
+        self.blockInfolistwidget.insertItem(8,  "Elevation (feet):     ")
+        self.blockInfolistwidget.insertItem(9,  "Cum. Elevation (feet):")
         self.blockInfolistwidget.insertItem(10, "Seconds To Traverse:  ")
         for i in range(0,10):
             self.blockInfolistwidget.item(i).setForeground(QtCore.Qt.cyan) 
@@ -555,6 +558,27 @@ class TrackModel(QWidget):
                         self.stations[k].append([block.blockNumber, block.station])
                         self.departingPassengers[k].append(self.generateBoardingPassengers())
                         self.boardingPassengers[k].append(self.generateLeavingPassengers())
+
+        self.currBlockIndex                       = 0
+        self.currLineIndex                        = 1
+        self.currBlock                            = self.lineBlocks[self.currLineIndex][self.currBlockIndex]
+        self.lastClickedBlock[self.currLineIndex] = self.currBlock 
+        self.lastBlockIndices[self.currLineIndex] = self.currBlockIndex
+        self.lastClickedBlock[0] = self.lineBlocks[0][self.currBlockIndex]
+        self.lastBlockIndices[0] = self.currBlockIndex
+        
+        
+        self.updateBlockInfo(self.currBlockIndex)
+        self.loadBlocks()
+        self.switchInfoLabel.setText(self.lineNames[self.currLineIndex]  + " Line Switch Information")
+        self.stationInfoLabel.setText(self.lineNames[self.currLineIndex] + " Line Station Information")
+        self.displayLineStations()
+        self.displayLineSwitches()
+        self.loadBeaconInformation()
+        self.currBlockDisplay.setText("BLOCK: "+str(self.currBlock.line)+"-"+str(self.currBlock.section)+"-"+str(self.currBlock.blockNumber))
+        self.trackFault1.setEnabled(True)
+        self.trackFault2.setEnabled(True)
+        self.trackFault3.setEnabled(True)
 
     def loadBlocks(self):
         '''
@@ -666,6 +690,7 @@ class TrackModel(QWidget):
         Sets the current line based on the selection make from the list of lines
         and loads the blocks for that line.
         '''
+        print(self.currBlockIndex)
         currLine = item.text()
         self.currLineIndex = self.lineNames.index(currLine)
         # print(currLine, self.currLineIndex)
@@ -675,6 +700,12 @@ class TrackModel(QWidget):
         self.displayLineSwitches()
         self.loadBlocks()
         self.updateBlocksOccupancyUI(self.currLineIndex)
+        self.loadBeaconInformation()
+
+
+        self.currBlock      = self.lastClickedBlock[self.currLineIndex]
+        self.currBlockIndex = self.lastBlockIndices[self.currLineIndex]
+        self.loadBeaconInformation()
         #print(self.boardingPassengers)
         #print(self.stations)
 
@@ -683,30 +714,49 @@ class TrackModel(QWidget):
         Sets the current block selected from the current lines block list
         and loads that blocks information into the block information values list.
         '''
+
+        self.lastClickedBlock[self.currLineIndex] = self.currBlock 
+        self.lastBlockIndices[self.currLineIndex] = self.currBlockIndex
         self.currBlockIndex = int(item.text().split(" ")[1]) -1
         self.currBlock      = self.lineBlocks[self.currLineIndex][self.currBlockIndex]
+
         self.updateBlockInfo(self.currBlockIndex)
         self.currBlockDisplay.setText("BLOCK: "+str(self.currBlock.line)+"-"+str(self.currBlock.section)+"-"+str(self.currBlock.blockNumber))
         self.trackFault1.setEnabled(True)
         self.trackFault2.setEnabled(True)
         self.trackFault3.setEnabled(True)
 
+        self.loadBeaconInformation()
+        
+    def loadBeaconInformation(self):
         if len(self.currBlock.forwardBeacon) > 2:
             self.beaconInformationVallistwidget.item(0).setText(self.currBlock.forwardBeacon.split(',')[1])
+            self.beaconInformationVallistwidget.item(0).setForeground(QtCore.Qt.yellow)
             self.beaconInformationVallistwidget.item(1).setText(self.currBlock.forwardBeacon.split(',')[0])
-            self.beaconInformationVallistwidget.item(2).setText(self.currBlock.reverseBeacon.split(',')[1])
-            self.beaconInformationVallistwidget.item(3).setText(self.currBlock.reverseBeacon.split(',')[0])
+            self.beaconInformationVallistwidget.item(1).setForeground(QtCore.Qt.red)
         else:
             self.beaconInformationVallistwidget.item(0).setText('NA')
+            self.beaconInformationVallistwidget.item(0).setForeground(QtCore.Qt.black)
             self.beaconInformationVallistwidget.item(1).setText('NA')
+            self.beaconInformationVallistwidget.item(1).setForeground(QtCore.Qt.black)
+
+        if len(self.currBlock.reverseBeacon) > 2:
+            self.beaconInformationVallistwidget.item(2).setText(self.currBlock.reverseBeacon.split(',')[1])
+            self.beaconInformationVallistwidget.item(2).setForeground(QtCore.Qt.yellow)
+            self.beaconInformationVallistwidget.item(3).setText(self.currBlock.reverseBeacon.split(',')[0])
+            self.beaconInformationVallistwidget.item(3).setForeground(QtCore.Qt.red)
+        else:
             self.beaconInformationVallistwidget.item(2).setText('NA')
+            self.beaconInformationVallistwidget.item(2).setForeground(QtCore.Qt.black)
             self.beaconInformationVallistwidget.item(3).setText('NA')
-        
+            self.beaconInformationVallistwidget.item(3).setForeground(QtCore.Qt.black)
+
     def updateBlockInfo(self, pCurrBlockIndex):
         '''
         Updates the displayed information in the block information list to that of
         the currently selected block.
         '''
+        print("CURR BLOCK", self.currBlockIndex)
         if self.currBlockIndex != None:
             if self.currBlock.faultsText:
                 self.currBlockDisplay.setStyleSheet("background-color: red; color: black;")
@@ -750,7 +800,7 @@ class TrackModel(QWidget):
             else:
                 self.blockVallistwidget.insertItem(10,currBlock.secsToTraverseBlock)
 
-            self.blockVallistwidget.insertItem(11,"NA")
+            self.blockVallistwidget.insertItem(11,currBlock.blockDirection)
             self.blockVallistwidget.item(11).setForeground(QtCore.Qt.gray) 
 
             self.currBlock.occupancy = self.occupancy[self.currLineIndex][self.currBlockIndex]

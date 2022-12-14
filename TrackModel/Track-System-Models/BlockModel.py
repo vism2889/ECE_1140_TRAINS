@@ -15,7 +15,8 @@ class BlockModel:
     '''
     def __init__(self, pLine='', pSection='', pBlockNumber='', pBlockLength='',
                 pGrade='', pSpeedLimit='', pInfrastructure='NA', pStationSide='NA', 
-                pElevation='',  pCumulativeElevation='', pSecsToTraverseBlock='', pForwardBeacon='NA', pReverseBeacon='NA'):
+                pElevation='',  pCumulativeElevation='', pSecsToTraverseBlock='', 
+                pForwardBeacon='NA', pReverseBeacon='NA', pBlockDirection = ''):
         self.line                   = pLine
         self.section                = pSection
         self.blockNumber            = pBlockNumber
@@ -30,6 +31,8 @@ class BlockModel:
         self.forwardBeacon          = pForwardBeacon
         self.reverseBeacon          = pReverseBeacon
         self.occupancy              = False
+
+        self.blockDirection         = pBlockDirection
 
         self.faultPresence          = False
         self.faultsText             = []
