@@ -110,50 +110,16 @@ class PointMassModel():
         self.elapsed_time = (self.curr_time-self.prev_time) * self.speedUp
 
         self.power = power
-        
-       
+
         self.calcForce()
         self.calcAccel()
         self.calcVel()
         self.calcPos()
-
-    def e_brake(self):
-        self.curr_accel = self._td.emergency_brake
-        
-        #setting time values
-        self.prev_time = self.curr_time
-        self.curr_time = time.time()
-        self.elapsed_time = self.curr_time-self.prev_time
-
-        if self.curr_vel > 0:
-            # print(f'Ebrake velocity before deceleration:{self.curr_vel}')
-            self.prev_vel = self.curr_vel
-            self.prev_accel = self.curr_accel
-            self.curr_accel = self.dec_force()
-           
-            self.curr_vel = self.prev_vel + (self.elapsed_time/2)*(self.prev_accel+self.curr_accel)
-            self.curr_speed = round(self.curr_vel * (1/1000) * (0.62) * (3600))
-            self.curr_pos = self.prev_pos + (self.elapsed_time/2)*(self.prev_vel + self.curr_vel)
-
-            if self.curr_vel < 0:
-                self.curr_vel = 0
-                
-            self.prev_accel = self.curr_accel
-
-            self.prev_time = self.curr_time
-            self.curr_time = time.time()
-            # print(f'Ebrake decreasing velocity:{self.curr_vel}')
-        
-        self.power = 0
-        self.force = 0
-        self.prev_accel = 0
-        self.curr_accel = 0
     
     def brake(self, val):
-
+        #if val is 0 it is service brake
+        #if val is 1 it is e brake
         self.power = 0
-        
-
         #setting time values
         self.prev_time = self.curr_time
         self.curr_time = time.time()
