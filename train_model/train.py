@@ -49,6 +49,7 @@ class PointMassModel():
         self.speed_up = 1
         self.waysideAuthority = []
         self.train_authority = 0
+        self.stationStop = False
         
         self.suggested_speed = 0
         #track model to train comms
@@ -293,25 +294,34 @@ class PointMassModel():
         for c_bl in self.ctc_authority:
             if c_bl in self.waysideAuthority:
                 ind = self.waysideAuthority.index(c_bl)
-                if self.curr_vel != 0:
+                if self.curr_vel != 0 and not self.stationStop:
                     self.waysideAuthority = self.waysideAuthority[0:ind+1]
                 if c_bl == self.curr_block and self.curr_vel == 0:
+                    if not self.stationStop:
+                        self.stationStop = True
+                    else:
+                        self.stationStop = False
+                elif c_bl == self.prev_block:
+                    self.stationStop = False
                     self.ctc_authority.remove(c_bl)
 
-                
+        #Calculating Authority distance when train not at stopping block               
         if len(self.waysideAuthority) > 1:
             if self.curr_block == self.waysideAuthority[0]:
                 wayside = self.waysideAuthority[1:len(self.waysideAuthority)]
-                self.train_authority += float(self.BlockModels[self.curr_block-1].blockLength)-self.curr_pos
-                for b in wayside:
-                    self.train_authority += float(self.BlockModels[b-1].blockLength)
             elif self.curr_block == self.waysideAuthority[1]:
                 wayside = self.waysideAuthority[2:len(self.waysideAuthority)]
-                self.train_authority += float(self.BlockModels[self.curr_block-1].blockLength)-self.curr_pos
-                for b in wayside:
-                    self.train_authority += float(self.BlockModels[b-1].blockLength)
+            
+            self.train_authority += float(self.BlockModels[self.curr_block-1].blockLength)-self.curr_pos
+            for b in wayside[0:len(wayside)-1]:
+                self.train_authority += float(self.BlockModels[b-1].blockLength)
+            
+            if len(wayside) > 0:
+                lastBlock = wayside[-1]
+                self.train_authority += float(self.BlockModels[lastBlock-1].blockLength)/4
         elif len(self.waysideAuthority) == 1 and self.curr_vel != 0:
-            self.train_authority = 0
+            if not self.stationStop:
+                self.train_authority = 0
         
 
         
