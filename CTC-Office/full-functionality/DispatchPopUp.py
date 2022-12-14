@@ -164,7 +164,6 @@ class DispatchPopUp(object):
         self.scheduledTime = time
         self.scheduledTimeLabel.setText(time)
 
-
     def getArrivalTime(self, hours, mins, TTS):
         mins = mins + TTS
         if mins > 59:
@@ -237,7 +236,8 @@ class DispatchPopUp(object):
 
             # add dispatch destinations to list
             for destination in self.selectedDestinations:
-                self.trainList.toggleDestination(self.trainName, destination.text(), False)
+                if not(':' in destination.text()):
+                    self.trainList.toggleDestination(self.trainName, destination.text(), False)
 
             self.signals.dispatchTrainSignal.emit([self.trainName, self.currentLine, self.suggestedSpeed])
             self.trainList.sendAuthority(self.trainName, self.signals)
