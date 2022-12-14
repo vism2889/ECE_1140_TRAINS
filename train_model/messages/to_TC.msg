@@ -1,8 +1,11 @@
 float current_speed
-int commanded_speed
-int speed_limit
+float commanded_speed
+float speed_limit
 float authority
-string next_station
+string stationSide
+string stationName
+string underground
 bool brake_failure
 bool engine_failure
 bool signalPickup_failure
+bool stationStop
