@@ -19,15 +19,15 @@ sys.path.append('../block-functionality/')
 sys.path.append('../schedule-functionality/')
 sys.path.append('../../SystemSignals/')
 from TrainDictionary import TrainDictionary
-from LayoutParser import LayoutParser
+from LayoutParserCTC import LayoutParserCTC
 from DispatchPopUp import DispatchPopUp
 from ScheduleParser import ScheduleParser
 
-if hasattr(Qt, 'AA_EnableHighDpiScaling'):
-    QApplication.setAttribute(Qt.AA_EnableHighDpiScaling, True)
+# if hasattr(Qt, 'AA_EnableHighDpiScaling'):
+#     QApplication.setAttribute(Qt.AA_EnableHighDpiScaling, True)
 
-if hasattr(Qt, 'AA_UseHighDpiPixmaps'):
-    QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps, True)
+# if hasattr(Qt, 'AA_UseHighDpiPixmaps'):
+#     QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps, True)
 
 class CTCOffice(QWidget):
     dispatchSignal = QtCore.pyqtSignal(bool)
@@ -56,7 +56,7 @@ class CTCOffice(QWidget):
     def setupLayout(self):
         # getting lists of blocks
         layoutFile              = 'Track_Layout_PGH_Light_Rail.csv'
-        trackLayout             = LayoutParser(layoutFile)
+        trackLayout             = LayoutParserCTC(layoutFile)
         self.redLineBlocks, self.greenLineBlocks = trackLayout.process()
 
         # Create default station dictionary
@@ -534,7 +534,6 @@ class CTCOffice(QWidget):
                 self.redLineBlockTable.item(int(key)-1,0).setBackground(QtGui.QColor(135,201,153))
             else:
                 self.redLineBlockTable.item(int(key)-1,0).setBackground(QtGui.QColor(116,124,138))
-
 
     def updateOccupancy(self):
         item = QtWidgets.QTableWidgetItem()
