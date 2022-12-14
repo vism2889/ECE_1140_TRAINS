@@ -60,19 +60,13 @@ class CTCOffice(QWidget):
 
         # define station lists in order
         self.redLineStations["SHADYSIDE"]           = ["7", False]
-        self.redLineStations["HERRON AVE (OUT)"]    = ["16", False]
-        self.redLineStations["SWISSVILLE (OUT)"]    = ["21", False]
-        self.redLineStations["PENN STATION (OUT)"]  = ["25", False]
-        self.redLineStations["STEEL PLAZA (OUT)"]   = ["35", False]
-        self.redLineStations["FIRST AVE (OUT)"]     = ["45", False]
-        self.redLineStations["STATION SQ. (OUT)"]   = ["48", False]
+        self.redLineStations["HERRON AVE"]          = ["16", False]
+        self.redLineStations["SWISSVILLE"]          = ["21", False]
+        self.redLineStations["PENN STATION"]        = ["25", False]
+        self.redLineStations["STEEL PLAZA"]         = ["35", False]
+        self.redLineStations["FIRST AVE"]           = ["45", False]
+        self.redLineStations["STATION SQUARE"]      = ["48", False]
         self.redLineStations["SOUTH HILLS JUNC."]   = ["60", False]
-        self.redLineStations["STATION SQ. (IN)"]    = ["48", False]
-        self.redLineStations["FIRST AVE (IN)"]      = ["45", False]
-        self.redLineStations["STEEL PLAZA (IN)"]    = ["35", False]
-        self.redLineStations["PENN STATION (IN)"]   = ["25", False]
-        self.redLineStations["SWISSVILLE (IN)"]     = ["21", False]
-        self.redLineStations["HERRON AVE (IN)"]     = ["16", False]
 
         self.greenLineStations["GLENBURY"]          = ["65", False]
         self.greenLineStations["DORMONT (OUT)"]     = ["73", False]
@@ -234,10 +228,10 @@ class CTCOffice(QWidget):
 
     ##################### TRAIN INFO ########################
         self.destinationTable = QtWidgets.QTableWidget(self)
-        self.destinationTable.setGeometry(10,450,250,120)
+        self.destinationTable.setGeometry(10,450,285,120)
         self.destinationTable.setColumnCount(2)
         self.destinationTable.setColumnWidth(0, 160)
-        self.destinationTable.setColumnWidth(1, 88)
+        self.destinationTable.setColumnWidth(1, 123)
         self.destinationTable.verticalHeader().hide()
         self.destinationTable.setHorizontalHeaderLabels(['Station', 'Stopping'])
         self.destinationTable.setSelectionBehavior(QAbstractItemView.SelectRows)
@@ -263,25 +257,25 @@ class CTCOffice(QWidget):
         self.toggleDispatchModeButton.clicked.connect(self.toggleDispatchMode)
 
         self.toggleDestinationsButton = QtWidgets.QPushButton(self)
-        self.toggleDestinationsButton.setGeometry(265,545,140,20)
+        self.toggleDestinationsButton.setGeometry(300,545,140,20)
         self.toggleDestinationsButton.setText("Toggle Destinations")
         self.toggleDestinationsButton.clicked.connect(self.toggleDestinations)
         self.toggleDestinationsButton.show()
 
         self.suggestedSpeedLabel = QtWidgets.QLabel(self)
-        self.suggestedSpeedLabel.setGeometry(265,520,140,20)
+        self.suggestedSpeedLabel.setGeometry(300,520,140,20)
         self.suggestedSpeedLabel.setText("Suggested Speed: N/A")
         self.suggestedSpeedLabel.show()
 
         self.selectedTrainLabel = QtWidgets.QLabel(self)
-        self.selectedTrainLabel.setGeometry(265,495,140,20)
+        self.selectedTrainLabel.setGeometry(300,495,140,20)
         self.selectedTrainLabel.setText("Selected Train: N/A")
         self.selectedTrainLabel.show()
 
         self.trainImage          = QtWidgets.QLabel(self)
         self.pixmap              = QPixmap('LogoCTCOffice1.png')
         self.trainImage.setPixmap(self.pixmap)
-        self.trainImage.setGeometry(450,440,200,120)
+        self.trainImage.setGeometry(500,440,200,120)
 
         self.populateRedLineTable()
         self.populateGreenLineTable()
@@ -411,7 +405,7 @@ class CTCOffice(QWidget):
         self.currentRedLineBacklog = []
         for i in range(self.redLineBacklogTable.rowCount()):
             time = self.redLineBacklogTable.item(i,0).text()
-            if time not in self.redLineTrains.backlogs():
+            if not(time in self.redLineTrains.backlogs()):
                 self.redLineBacklogTable.removeRow(i)
             self.currentRedLineBacklog.append(time)
 
@@ -443,8 +437,8 @@ class CTCOffice(QWidget):
         self.currentGreenLineBacklog = []
         for i in range(self.greenLineBacklogTable.rowCount()):
             time = self.greenLineBacklogTable.item(i,0).text()
-            if time not in self.greenLineTrains.backlogs():
-                self.redLineBacklogTable.removeRow(i)
+            if not(time in self.greenLineTrains.backlogs()):
+                self.greenLineBacklogTable.removeRow(i)
             self.currentGreenLineBacklog.append(time)
 
         for train in self.greenLineTrains.backlogs():
@@ -620,11 +614,17 @@ class CTCOffice(QWidget):
         for train in list(self.redLineTrains.backlogs()):
             if str(train) == self.clockWithoutSeconds:
                 self.redLineTrains.dispatchScheduledTrain(self.clockWithoutSeconds, trainName)
+                suggestedSpeed = self.redLineTrains.getSuggestedSpeed(trainName)
+                self.signals.dispatchTrainSignal.emit([trainName, "Red Line", suggestedSpeed])
+                self.redLineTrains.sendAuthority(trainName, self.signals)
                 self.trainCount += 1
 
         for train in list(self.greenLineTrains.backlogs()):
             if str(train) == self.clockWithoutSeconds:
                 self.greenLineTrains.dispatchScheduledTrain(self.clockWithoutSeconds, trainName)
+                suggestedSpeed = self.greenLineTrains.getSuggestedSpeed(trainName)
+                self.signals.dispatchTrainSignal.emit([trainName, "Green Line", suggestedSpeed])
+                self.greenLineTrains.sendAuthority(trainName, self.signals)
                 self.trainCount += 1
 
     def toggleDestinations(self):
@@ -657,12 +657,11 @@ class CTCOffice(QWidget):
             self.manualMode = True
 
     def showAuthority(self, msg):
-        print(msg[2])
         pass
         # red line
         if msg[0] == 0:
             for block in self.redLineBlocks.keys():
-                if block in msg[2]:
+                if int(block) in msg[2]:
                     self.redLineBlocks.setAuthority(block, True)
                 else:
                     self.redLineBlocks.setAuthority(block, False)

@@ -96,7 +96,7 @@ class DispatchPopUp(object):
             item.setText(_translate("MainWindow", key))
             self.stationTable.setItem(self.index, 0, item)
             spinBox = QtWidgets.QSpinBox()
-            spinBox.setRange(2,5)
+            spinBox.setRange(1,5)
             self.stationTable.setCellWidget(self.index, 1, spinBox)
             self.index += 1
 
@@ -193,7 +193,7 @@ class DispatchPopUp(object):
                 item.setText(key)
                 self.stationTable.setItem(self.index, 0, item)
                 spinBox = QtWidgets.QSpinBox()
-                spinBox.setRange(2,5)
+                spinBox.setRange(1,5)
                 self.stationTable.setCellWidget(self.index, 1, spinBox)
                 self.index += 1
 
@@ -227,6 +227,9 @@ class DispatchPopUp(object):
         if self.scheduledTime:
             self.trainList.addScheduledTrain(self.scheduledTime, self.destinationList, 0, 0)
             self.trainList.setSuggestedSpeed(self.scheduledTime, self.totalTTS, self.currentLine, True)
+
+            for destination in self.selectedDestinations:
+                self.trainList.toggleDestination(self.scheduledTime, destination.text(), True)
         else:
             self.trainList.addTrain(self.trainName, self.destinationList, 0, 0)
             self.trainList.setSuggestedSpeed(self.trainName, self.totalTTS, self.currentLine, False)
@@ -236,7 +239,7 @@ class DispatchPopUp(object):
             for destination in self.selectedDestinations:
                 self.trainList.toggleDestination(self.trainName, destination.text(), False)
 
-            self.trainList.sendAuthority(self.trainName, self.signals)
             self.signals.dispatchTrainSignal.emit([self.trainName, self.currentLine, self.suggestedSpeed])
+            self.trainList.sendAuthority(self.trainName, self.signals)
 
 
