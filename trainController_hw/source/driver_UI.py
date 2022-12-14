@@ -177,7 +177,7 @@ class Ui_MainWindow():
         self.timer.timeout.connect(self.announce_manual)
         self.timer.timeout.connect(self.deploy_serviceBrake_manual)
         self.timer.timeout.connect(self.sendData)
-        self.timer.start(1)
+        self.timer.start(10)
 
 if __name__ == "__main__":
     import sys

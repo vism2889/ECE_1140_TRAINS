@@ -16,7 +16,6 @@
 #   + two different methods of calculating power
 #   + stop train if disparity
 # - External lights are turned on and off for underground stations
-# - Open doors at arrival of station, close upon departure 
 ##############################################################################
 
 import RPi.GPIO as GPIO
@@ -24,7 +23,7 @@ from simple_pid import PID
 from pygame import mixer
 from outputData import OutputData
 from trainData import TrainData
-import time
+from time import sleep
 
 GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BCM)
@@ -58,6 +57,7 @@ class Control():
         self.ebrakeCommand = False
         self.brakeCommand = False
         self.current_speed = 0
+        self.stationStop = False
         self.speed_limit = 15 
         self.temperature = 0
         self.k_p = 24e3
@@ -152,7 +152,8 @@ class Control():
     # TODO: implement speed limit
     def limitSpeed(self, speed):
         speed_limit = self.input.getSpeedLimit()
-        if(speed_limit != None and speed > self.speed_limit):
+        if(speed_limit != None and speed > speed_limit):
+            print("\nSpeed limit: ", speed_limit * 2.3694)
             self.vital_override = True  
             self.deployServiceBrake(True)
             return False
@@ -161,18 +162,26 @@ class Control():
             self.vital_override = False 
             return True
 
-    def getSpeedLimit(self):
-        limit = self.input.getSpeedLimit()
-        if limit != None:
-            print("\nSpeed Limit: %5.2f" % limit)
-
     # TODO: implement authority
     def checkAuthority(self):
         if self.input.getAuthority() != None:
+            stop = self.input.stationStop
+            if stop == True:
+                self.stationStop = True
             self.authority = self.input.getAuthority() 
         
         self.calculateBrakingDistance()
- 
+        
+        if self.stationStop  == True and self.current_speed == 0:
+            self.station_procedure()
+
+        underground = self.input.getUnderground()
+        if underground == "YES":
+            self.setExternalLights(True)
+
+        elif underground == "NO":
+            self.setExternalLights(False)
+        
     def set_kp_ki(kp_val, ki_val, self):
         self.k_p = kp_val
         self.k_i = ki_val
@@ -188,7 +197,6 @@ class Control():
         
         if self.operating_mode == True and self.input.getCommandedSpeed() != None:
             self.pid.setpoint = self.input.getCommandedSpeed()
-            print("\nCommanded speed: ", self.input.getCommandedSpeed())
 
         elif commanded_speed != None:
             self.commanded_speed = commanded_speed
@@ -227,7 +235,7 @@ class Control():
         distance = (self.current_speed ** 2) * 1.2 
     
         # if minimum safe distance is < 90% of authority, override manual commands and deploy service brake
-        if distance >= self.authority *.9:
+        if distance >= self.authority *.8:
             self.vital_override = True
             self.deployServiceBrake(True)
         else:
@@ -241,11 +249,34 @@ class Control():
             self.operating_mode = False
     
     def station_procedure(self):
-        # open doors 
+        side = self.input.getStationSide()   
+
+        self.vital_override = True
+        self.deployServiceBrake(True)
+        # open doors
+        self.stationSetDoors(side)  
         # dwell for 30 seconds
+        sleep(5)
         # close doors
+        self.stationSetDoors(side)
         # depart
-        return
+        self.deployServiceBrake(False)
+        self.vital_override = False
+        self.stationStop = False
+
+    def stationSetDoors(self, side):
+        if side == "Left":
+            self.setLeftDoor(not self.door_state_left)
+
+        elif side == "Right":
+            self.setRightDoor(not self.door_state_right)
+
+        elif side == "Left/Right":
+            self.setLeftDoor(not self.door_state_left)
+            self.setRightDoor(not self.door_state_right)
+
+        else:
+            return
 
     # used for server interface testing to send dummy data to a client acting as train model
     def sendRandom(self):

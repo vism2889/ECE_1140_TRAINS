@@ -32,17 +32,7 @@ class ManualControl():
         self.c = obj
         self.anal_in = AnalogIn()
         self.commandedSpeed = 0
-        self.service_brake_state = False 
-        self.light_state_internal = False
-        self.light_state_external = False
-        self.door_state_left = False
-        self.door_state_right = False
-        self.announce_state = False
-        self.c.setInternalLights(self.light_state_internal)
-        self.c.setExternalLights(self.light_state_external)
-        self.c.setLeftDoor(self.door_state_left)
-        self.c.setRightDoor(self.door_state_right)
-        self.c.announceStation(self.announce_state, 0)
+        self.c.setInternalLights(True)
         self.c.deployServiceBrake(False)
         self.station_audio = ["shadyside_herron.mp3", "herron_swissvale.mp3", 
                               "swissvale_penn.mp3", "penn_steelplaza.mp3", 
@@ -67,31 +57,31 @@ class ManualControl():
     def lightsButton(self):
         if not self.c.operating_mode:
             if GPIO.input(25) == GPIO.HIGH:
-                self.light_state_internal = not self.light_state_internal
-                self.c.setInternalLights(self.light_state_internal)
+                self.c.light_state_internal = not self.c.light_state_internal
+                self.c.setInternalLights(self.c.light_state_internal)
                 sleep(.5)
 
             if GPIO.input(8) == GPIO.HIGH:
-                self.light_state_external = not self.light_state_external
-                self.c.setExternalLights(self.light_state_external)
+                self.c.light_state_external = not self.c.light_state_external
+                self.c.setExternalLights(self.c.light_state_external)
                 sleep(.5)
 
     def doorsButton(self):
         if not self.c.operating_mode:
             if GPIO.input(7) == GPIO.HIGH:
-                self.door_state_left = not self.door_state_left
-                self.c.setLeftDoor(self.door_state_left)
+                self.c.door_state_left = not self.c.door_state_left
+                self.c.setLeftDoor(self.c.door_state_left)
                 sleep(.5)
 
             if GPIO.input(16) == GPIO.HIGH:
-                self.door_state_right = not self.door_state_right
-                self.c.setRightDoor(self.door_state_right)
+                self.c.door_state_right = not self.c.door_state_right
+                self.c.setRightDoor(self.c.door_state_right)
                 sleep(.5)
 
     def announceButton(self, station_idx):
         if GPIO.input(26) == GPIO.HIGH:
-            self.announce_state = not self.announce_state
-            self.c.announceStation(self.announce_state, station_idx)
+            self.c.announce_state = not self.c.announce_state
+            self.c.announceStation(self.c.announce_state, station_idx)
             sleep(.5)
 
     def ebrake_button(self):
