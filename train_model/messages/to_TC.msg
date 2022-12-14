@@ -1,6 +1,6 @@
 float current_speed
-int commanded_speed
-int speed_limit
+float commanded_speed
+float speed_limit
 float authority
 string next_station
 bool brake_failure

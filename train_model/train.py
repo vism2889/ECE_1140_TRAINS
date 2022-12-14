@@ -299,10 +299,8 @@ class PointMassModel():
                 self.train_authority += float(self.BlockModels[lastBlock-1].blockLength)/4
         elif len(self.waysideAuthority) == 1 and self.curr_vel != 0:
             self.train_authority = 0
-        
-
-        
-        self.speedLimit = int(self.BlockModels[self.curr_block-1].speedLimit)*0.277778
+      
+        self.speedLimit = float(self.BlockModels[self.curr_block-1].speedLimit)*0.277778
         if self.speedLimit >= self.suggSpeed:
             self.cmdSpeed = self.suggSpeed
         else:
