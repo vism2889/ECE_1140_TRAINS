@@ -48,20 +48,23 @@ class TrainModel(QtWidgets.QMainWindow):
 
     def set_blocks(self,msg):
         #red is msg[0] and green is msg[1]
-        self.t.pm.BlockModels = msg[1]
+        self.blockList = msg
+        # self.t.pm.BlockModels = msg[1]
 
     def dispatch(self, msg):
 
-        
         self.t.id = msg[0]
         if msg[1] == 'Green Line':
+            self.t.pm.BlockModels = self.blockList[1]
             self.t.line = 1
             self.t.pm.prev_block = 0
             self.t.pm.curr_block = 63
         else:
+            self.t.pm.BlockModels = self.blockList[0]
             self.t.pm.prev_block = 0
             self.t.pm.curr_block = 9
             self.t.line = 0
+           
         
         self.t.pm.suggSpeed = float(msg[2])
         self.trainDict.update({msg[0]: self.t})
@@ -242,7 +245,8 @@ class TrainModel(QtWidgets.QMainWindow):
                     print(f'|       Authority: {self.t.pm.train_authority}      |')
                     print('----------------------------------------')
                     self.mp.publish()
-            
+            if self.t.pm.stationStop:
+                self.signals.stationStop.emit(self.t.pm.stationStop)
             
             # elif type(self.t.line) != int:
             #     print("LINE not int")
