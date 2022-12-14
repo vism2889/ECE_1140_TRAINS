@@ -118,12 +118,12 @@ class DispatchPopUp(object):
 
     def showTime(self, msg):
         # set time values
-        self.scheduledMins = self.minuteSpinBox.value()
-        self.scheduledHours = self.hourSpinBox.value()
         if not self.scheduledTime:
             mins = ('%02d' % msg[1])
             hours = ('%02d' % msg[0])
         else:
+            self.scheduledMins = self.minuteSpinBox.value()
+            self.scheduledHours = self.hourSpinBox.value()
             mins = ('%02d' % self.scheduledMins)
             hours = ('%02d' % self.scheduledHours)
             self.showScheduledTime()
@@ -163,7 +163,6 @@ class DispatchPopUp(object):
         time = hours + ":" + mins
         self.scheduledTime = time
         self.scheduledTimeLabel.setText(time)
-
 
     def getArrivalTime(self, hours, mins, TTS):
         mins = mins + TTS
@@ -229,7 +228,8 @@ class DispatchPopUp(object):
             self.trainList.setSuggestedSpeed(self.scheduledTime, self.totalTTS, self.currentLine, True)
 
             for destination in self.selectedDestinations:
-                self.trainList.toggleDestination(self.scheduledTime, destination.text(), True)
+                if not(':' in destination.text()):
+                    self.trainList.toggleDestination(self.scheduledTime, destination.text(), True)
         else:
             self.trainList.addTrain(self.trainName, self.destinationList, 0, 0)
             self.trainList.setSuggestedSpeed(self.trainName, self.totalTTS, self.currentLine, False)
@@ -237,7 +237,8 @@ class DispatchPopUp(object):
 
             # add dispatch destinations to list
             for destination in self.selectedDestinations:
-                self.trainList.toggleDestination(self.trainName, destination.text(), False)
+                if not(':' in destination.text()):
+                    self.trainList.toggleDestination(self.trainName, destination.text(), False)
 
             self.signals.dispatchTrainSignal.emit([self.trainName, self.currentLine, self.suggestedSpeed])
             self.trainList.sendAuthority(self.trainName, self.signals)

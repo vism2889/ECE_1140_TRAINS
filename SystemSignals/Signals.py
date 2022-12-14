@@ -58,15 +58,15 @@ class Signals(QWidget):
     blockLengthSignal        = QtCore.pyqtSignal(list)
     gradeSignal              = QtCore.pyqtSignal(list)
     trainLocation            = QtCore.pyqtSignal(list) # List of length 4 that identifies a unique trains location in the track [(int) line, (int) train id, (int) previos block, (int) current block]
-    stationStop              = QtCore.pyqtSignal(bool) #Boolean Value that indicates whether the stop is at a station
+    stationStop              = QtCore.pyqtSignal(dict) #List of length 2[(string) train id, (bool) stationStop]
     # Train Controller (SW) Input Signals
-    authoritySignal          = QtCore.pyqtSignal(float) #float in meters of the upcoming authority
-    commandedSpeedSignal     = QtCore.pyqtSignal(float)
-    speedLimitSignal         = QtCore.pyqtSignal(float)
-    trainFailuresSignal      = QtCore.pyqtSignal(list) 
+    authoritySignal          = QtCore.pyqtSignal(list) #List of length 2 [(string) train id, (float) authority]
+    commandedSpeedSignal     = QtCore.pyqtSignal(list) #List of length 2 [(string) train id, (float) commanded speed]
+    speedLimitSignal         = QtCore.pyqtSignal(list) #List of length 2 [(string) train id, (float) speed limit]
+    trainFailuresSignal      = QtCore.pyqtSignal(list) #List of length 2 [(string) train id, (list, length 3) [(bool) train engine, (bool) signal pickup, (bool) brake]]
     beaconSignal             = QtCore.pyqtSignal(list)        # Next Station and Station Side
     infrastructureSignal     = QtCore.pyqtSignal(list)        # Underground
-    currentSpeedOfTrainModel = QtCore.pyqtSignal(float)
+    currentSpeedOfTrainModel = QtCore.pyqtSignal(list)
 
     # Train Controller (SW) Ouputs to Train Model Signals
     powerSignal              = QtCore.pyqtSignal(dict) # Dictionary containing 'trainID' and 'power' 

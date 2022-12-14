@@ -34,7 +34,7 @@ class TrainData():
     serv_brake = float = 1.2  #m/s^2
     emergency_brake = 2.73    #m/s^2
 
-    kinetic_fric_constant = float = 0.1 #Newtons
+    kinetic_fric_constant = float = 0.2 #Newtons
     static_fric_constant = float = 0.6
     
 
@@ -46,7 +46,7 @@ class PointMassModel():
         self.grade = 0
         self.count = 0
         self.ctc_authority = []
-        self.speed_up = 1
+        self.speedUp = 1
         self.waysideAuthority = []
         self.train_authority = 0
         self.stationStop = False
@@ -107,7 +107,7 @@ class PointMassModel():
             self.prev_time = self.curr_time
             self.curr_time = t
 
-        self.elapsed_time = (self.curr_time-self.prev_time) * self.speed_up
+        self.elapsed_time = (self.curr_time-self.prev_time) * self.speedUp
 
         self.power = power
         
@@ -157,9 +157,8 @@ class PointMassModel():
         #setting time values
         self.prev_time = self.curr_time
         self.curr_time = time.time()
-        self.elapsed_time = (self.curr_time-self.prev_time) * self.speed_up
+        self.elapsed_time = (self.curr_time-self.prev_time) * self.speedUp
 
-        temp_start_t = 0
         # print(f'Serv Brake velocity before decleration:{self.curr_speed}')
         # print(f'Serv Brake force before deceleration: {self.force}')
         # print(f'Deceleration force is: {self._td.mass_empty * self._td.serv_brake}')
@@ -168,40 +167,16 @@ class PointMassModel():
         
         if self.curr_vel > 0:
             self.prev_accel = self.curr_accel
-            if self.elapsed_time > 0.5:
-                self.curr_accel = self.dec_force(val)
-                self.calcVel()
-                self.calcPos()
-
-                self.prev_time = self.curr_time
-            
-            self.curr_time = time.time()
-            self.elapsed_time = self.curr_time- self.prev_time
-
+            self.curr_accel = self.dec_force(val)
+            self.calcVel()
+            self.calcPos()
             if self.curr_vel <= 0:
                 self.curr_vel = 0
-                
-            self.prev_accel = self.curr_accel
-
-            
-            if time.time() - temp_start_t > 5:
-                # print(f'Current Force is: {self.force}')
-                # print(f'Current Acceleration is: {self.curr_accel}')
-                # print(f'Current Velocity is: {self.curr_vel}')
-                # print(f'Serv Brake decreasing velocity:{self.curr_speed} in {self.elapsed_time}\n')
-                temp_start_t = time.time()
-        # elif self.curr_speed <= 0:
-        #     if self.count == 1:
-        #         total_time = time.time()-self.brake_time
-        #         print(f'Braking from {self.brake_start_vel}mph took {total_time} seconds')
-        #         print(f'Train Travelled {self.brake_distance}meters')
-
-        #         self.count += 1
-
-        self.power = 0  
-        self.force = 0
-        self.prev_accel = 0
-        self.curr_accel = 0
+        else:
+            self.power = 0  
+            self.force = 0
+            self.prev_accel = 0
+            self.curr_accel = 0
 
     def dec_force(self, val):
         # print(f"Current force is: {self.force}")
@@ -244,9 +219,8 @@ class PointMassModel():
         self.curr_accel = float(self.force)/float(self._td.mass_empty)
     
     def calcVel(self):
-
         self.prev_vel = self.curr_vel
-        self.curr_vel = self.prev_vel + (self.elapsed_time/2)*(self.prev_accel+self.curr_accel)*(1/self.speed_up)
+        self.curr_vel = self.prev_vel + ((self.elapsed_time)/2)*(self.prev_accel+self.curr_accel)
         if self.curr_vel < 0:
             self.curr_vel = 0
         if self.curr_vel > 19.444444:
@@ -320,11 +294,10 @@ class PointMassModel():
                 lastBlock = wayside[-1]
                 self.train_authority += float(self.BlockModels[lastBlock-1].blockLength)/4
         elif len(self.waysideAuthority) == 1 and self.curr_vel != 0:
-            if not self.stationStop:
+            if self.prev_vel != 0:
                 self.train_authority = 0
         
-
-        
+      
         self.speedLimit = float(self.BlockModels[self.curr_block-1].speedLimit)*0.277778
         if self.speedLimit >= self.suggSpeed:
             self.cmdSpeed = self.suggSpeed
@@ -399,7 +372,9 @@ class Train():
     def __init__ (self):
 
         self.id = None
-        
+        self.stationSide = ''
+        self.underground = ''
+        self.stationName = ''
         
         #block list
         # self.blocks          = [i for i in range(150)]
@@ -460,12 +435,12 @@ class Train():
 
     def e_brake_func(self):
         if self.e_brake == True and self.pm.curr_vel > 0:
-            self.pm.e_brake()
+            self.pm.brake(1)
     
     def serv_brake_func(self):
         print('inside service brake')
         if self.service_brake == True and self.pm.curr_vel > 0:
-            self.pm.serv_brake()
+            self.pm.brake(0)
 
     def dispatch(self):
         self.dispatched = True
