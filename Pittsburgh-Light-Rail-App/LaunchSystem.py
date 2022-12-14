@@ -103,7 +103,7 @@ class PittsburghLightRail(QWidget):
         self.setGeometry(1630,50,220,330)
 
         font = QFont()
-        font.setPointSize(16)
+        font.setPointSize(14)
         self.clockLabel = QLabel(self)
         self.clockLabel.setGeometry(QRect(60, 40, 100, 25))
         self.clockLabel.setObjectName("clockLabel")
@@ -119,7 +119,7 @@ class PittsburghLightRail(QWidget):
         self.speedController.valueChanged.connect(self.sendClockSpeed)
 
         ## CTC Offic3
-        font.setPointSize(14)
+        font.setPointSize(10)
         self.showCTCButton = QPushButton(self)
         self.showCTCButton.setGeometry(35,70,150,25)
         self.showCTCButton.clicked.connect(self.CTCOffice.show)

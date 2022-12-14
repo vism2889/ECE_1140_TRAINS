@@ -25,6 +25,7 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
     def __init__(self, signals, trainID):
         super().__init__()
         self.trainID = trainID
+        print(self.trainID)
         self.signals = signals
         self.setupUi()
         self.timer = QtCore.QTimer()  
@@ -504,7 +505,7 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
 
     def retranslateUi(self):
         _translate = QtCore.QCoreApplication.translate
-        self.setWindowTitle(_translate("self", "MainWindow"))
+        self.setWindowTitle(_translate("self", self.trainID))
         self.label_5.setText(_translate("self", "Next Station:"))
         self.pushButton.setText(_translate("self", "I/0"))
         self.ManualMode_GroupBox.setTitle(_translate("self", "Automatic Mode"))
