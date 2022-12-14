@@ -63,7 +63,7 @@ class SignalSenderUI(QWidget):
         self.currBlockIndex  = 0
         self.timerr          = 0
         
-        self.occupancy       = [[False for i in range(76)],[False for i in range(150)]] # only Green line for right not
+        self.occupancy       = [1,5] # only Green line for right not
         self.faults          = [[0 for i in range(76)],[0 for i in range(150)]]     # only Green line for right not
         self.maintenance     = [[0 for i in range(76)],[0 for i in range(150)]]
         self.line            = "Green"
@@ -154,14 +154,21 @@ class SignalSenderUI(QWidget):
             self.currBlockIndex += 1
             self.distance                            = 0
             self.timerr                              = 0
-            self.occupancy[1][self.currBlockIndex-1] = 0
-            self.occupancy[1][self.currBlockIndex]   = 1
+            # self.occupancy[1][i-1] = 0
+            # self.occupancy[1][i+1] = 1
+
             self.currBlocklabel.setText('Curr Block: '+str(self.currBlockIndex+1))
             
             self.logger.info("NEW OCCUPANCY: " + str(self.currBlockIndex))
-
+            
         # Emit Occupancy    
-        self.signals.occupancyFromTrainSignal.emit(self.occupancy)
+            
+            blockList = [self.currBlockIndex+1, self.currBlockIndex+2, self.currBlockIndex+3, self.currBlockIndex+4, self.currBlockIndex+5, self.currBlockIndex+6]
+            self.signals.trainLocation.emit([1, 1, self.currBlockIndex, self.currBlockIndex+1])
+            self.signals.waysideAuthority.emit([1,1,blockList])
+            
+            self.signals.trainLocation.emit([0, 1, self.currBlockIndex, self.currBlockIndex+1])
+            self.signals.waysideAuthority.emit([0,1,blockList])
         
         self.logger.info("From sender: Train on Block: " + str(self.currBlockIndex+1))
         self.logger.info("From sender: FAULTS:\n" + str(self.faults))

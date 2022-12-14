@@ -88,6 +88,7 @@ class TrackModel(QWidget):
         self.orderedGreenLine()
         self.authorityFromWayside    = []
         self.globalAuthority         = []
+        self.removeFromAuthority     = None
         
         # System Communication Signals
         if signals:
@@ -620,7 +621,7 @@ class TrackModel(QWidget):
                 if self.currBlockIndex == i: 
                     self.currBlockDisplay.setStyleSheet("background-color: rgb(200,200,50); color: black;")
 
-            elif self.authorityFromWayside != None and (i+1) in self.authorityFromWayside:
+            elif self.globalAuthority[self.currLineIndex] != None and (i+1) in self.globalAuthority[self.currLineIndex]:
                 self.blockslistwidget.item(i).setBackground(QtCore.Qt.green)
 
             else:
@@ -650,7 +651,6 @@ class TrackModel(QWidget):
         Used to display all the switches for a given line, the switch state, 
         and the block at which the switch exists
         '''
-        
         self.switchInfoTable.setRowCount(0)
         self.switchInfoTable.setRowCount(10) 
         for i in range(len(self.switchText[self.currLineIndex])):
@@ -668,12 +668,12 @@ class TrackModel(QWidget):
         currLine = item.text()
         self.currLineIndex = self.lineNames.index(currLine)
         # print(currLine, self.currLineIndex)
-        
         self.switchInfoLabel.setText(self.lineNames[self.currLineIndex] + " Line Switch Information")
         self.stationInfoLabel.setText(self.lineNames[self.currLineIndex] + " Line Station Information")
         self.displayLineStations()
         self.displayLineSwitches()
         self.loadBlocks()
+        self.updateBlocksOccupancyUI(self.currLineIndex)
         #print(self.boardingPassengers)
         #print(self.stations)
 
@@ -835,13 +835,23 @@ class TrackModel(QWidget):
         # print("GUI OCCUPANCY", self.occupancy)
         self.occupancy[int(line)][int(lastBlock)-1] = 0
         self.occupancy[int(line)][int(currBlock)-1] = 1
+        self.removeFromAuthority = lastBlock
         self.signals.globalOccupancyFromTrackModelSignal.emit(self.occupancy) # should emit a new global occupancy
         self.updateBlockOccupancyCallback(line) # needs to send line index to this update method
 
     def getAuthority(self, authority):
+        line = authority[0]
         self.authorityFromWayside = authority[2]
+        if len(self.globalAuthority[line]) > 0 and self.removeFromAuthority in self.globalAuthority[line]:
+            self.globalAuthority[line].remove(self.removeFromAuthority)
+        for i in range(len(authority[2])):
+            currAuthItem = authority[2][i]
+            if currAuthItem not in self.globalAuthority[line]:
+                self.globalAuthority[line].append(currAuthItem)
+        print("AUTHORITY", self.globalAuthority)
+            
         #print('authority from track model:', self.authorityFromWayside)
-        self.updateBlocksOccupancyUI(authority[0])
+        self.updateBlocksOccupancyUI(self.currLineIndex)
 
 
     def addPassngersToStations(self):
