@@ -22,7 +22,12 @@ from TrainDictionary import TrainDictionary
 from LayoutParser import LayoutParser
 from DispatchPopUp import DispatchPopUp
 from ScheduleParser import ScheduleParser
-## from Signals import Signals
+
+if hasattr(Qt, 'AA_EnableHighDpiScaling'):
+    QApplication.setAttribute(Qt.AA_EnableHighDpiScaling, True)
+
+if hasattr(Qt, 'AA_UseHighDpiPixmaps'):
+    QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps, True)
 
 class CTCOffice(QWidget):
     dispatchSignal = QtCore.pyqtSignal(bool)
@@ -70,10 +75,9 @@ class CTCOffice(QWidget):
 
         self.greenLineStations["GLENBURY"]          = ["65", False]
         self.greenLineStations["DORMONT (OUT)"]     = ["73", False]
-        self.greenLineStations["MT-LEBANON (OUT)"]  = ["77", False]
+        self.greenLineStations["MT-LEBANON"]        = ["77", False]
         self.greenLineStations["POPLAR"]            = ["88", False]
         self.greenLineStations["CASTE SHANNON"]     = ["96", False]
-        self.greenLineStations["MT-LEBANON (IN)"]   = ["77", False]
         self.greenLineStations["GLENBURY"]          = ["114", False]
         self.greenLineStations["OVERBROOK (OUT)"]   = ["122", False]
         self.greenLineStations["INGLEWOOD (OUT)"]   = ["131", False]
@@ -96,7 +100,7 @@ class CTCOffice(QWidget):
 
     def setupUi(self):
         self.setObjectName("self")
-        self.setGeometry(10, 10, 700, 580)
+        self.setGeometry(50, 50, 700, 580)
         self.setMouseTracking(True)
         self.redLineMaintenance   = False
         self.greenLineMaintenance = False
