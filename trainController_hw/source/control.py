@@ -21,6 +21,8 @@
 import RPi.GPIO as GPIO
 from simple_pid import PID
 from pygame import mixer
+from gtts import gTTS
+import os
 from outputData import OutputData
 from trainData import TrainData
 from time import sleep
@@ -133,11 +135,14 @@ class Control():
         self.output.setTemperatureValue(self.temperature)
 
     # need to refactor to take in next station data from train model
-    def announceStation(self, start, file_idx):
+    def announceStation(self, start):
+        station = self.input.getStationName()
         self.output.setAnnounceState(start)
-        mixer.music.load("audio/" +  self.station_audio[file_idx])
-        if(start) : mixer.music.play()
-        if(not start) : mixer.music.stop()
+        
+        if station != None and station != "":
+            mixer.music.load("audio/" + station)
+            if(start) : mixer.music.play()
+            if(not start) : mixer.music.stop()
 
     def deployEbrake(self, deploy=None):
         if deploy != None:
@@ -153,7 +158,7 @@ class Control():
     def limitSpeed(self, speed):
         speed_limit = self.input.getSpeedLimit()
         if(speed_limit != None and speed > speed_limit):
-            print("\nSpeed limit: ", speed_limit * 2.3694)
+            #  print("\nSpeed limit: ", speed_limit * 2.3694)
             self.vital_override = True  
             self.deployServiceBrake(True)
             return False
@@ -165,8 +170,9 @@ class Control():
     # TODO: implement authority
     def checkAuthority(self):
         if self.input.getAuthority() != None:
-            stop = self.input.stationStop
+            stop = self.input.getStationStop()
             if stop == True:
+                self.announceStation(True) # announce when approaching a station
                 self.stationStop = True
             self.authority = self.input.getAuthority() 
         

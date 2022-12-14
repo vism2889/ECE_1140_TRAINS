@@ -124,7 +124,7 @@ class Ui_MainWindow():
             self.powerGauge.update_value(power)
 
     def announce_manual(self):
-        self.mc.announceButton(0)
+        self.mc.announceButton()
 
     def setTemperature_manual(self):
         self.mc.setTemperature_manual()

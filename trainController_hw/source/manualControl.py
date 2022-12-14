@@ -78,11 +78,11 @@ class ManualControl():
                 self.c.setRightDoor(self.c.door_state_right)
                 sleep(.5)
 
-    def announceButton(self, station_idx):
+    def announceButton(self):
         if GPIO.input(26) == GPIO.HIGH:
             self.c.announce_state = not self.c.announce_state
-            self.c.announceStation(self.c.announce_state, station_idx)
-            sleep(.5)
+            self.c.announceStation(self.c.announce_state)
+            sleep(.25)
 
     def ebrake_button(self):
         if self.c.vital_override == True and self.c.operating_mode == False:
