@@ -11,9 +11,6 @@ class TrackControllerWindow(QtWidgets.QWidget):
         self.greenline_maintenance_mode = []
         self.numBlocksPerController = 12
 
-        ## Get the look up table
-        # self.lookUpTable = waysideio.getLookUpTable()
-
         self.redline_reference = {
             'name' : 'redline',
             'controllers': [],
@@ -31,7 +28,7 @@ class TrackControllerWindow(QtWidgets.QWidget):
         }
 
         self.waysideio_ref = waysideio
-        self.FAULTS = ["OK", "BROKEN RAIL", "CIRCUIT FAILURE", "POWER FAILURE","UNDEFINED"]
+        self.FAULTS = ["OK", "BR", "PF", "CF", "UNDEFINED"]
 
     ## Main window generation
     def setupUi(self, main_window):
@@ -155,10 +152,10 @@ class TrackControllerWindow(QtWidgets.QWidget):
                 file , check = QtWidgets.QFileDialog.getOpenFileName(None, "Select PLC Script",
                                                     "", "PLC Files (*.plc)")
                 if os.path.exists(file):
-                    with open(file) as f:
-                        self.waysideio_ref.uploadPLC('red', idx, file)
-                        # print(f.readline())
-                        f.close()
+                    f = open(file)
+                    self.waysideio_ref.uploadPLC('red', idx, f)
+                    # print(f.readline())
+                    f.close()
 
         if "greenline" in loc.objectName():
             if self.greenline_reference['maintenance'][int(idx)]:
@@ -166,10 +163,10 @@ class TrackControllerWindow(QtWidgets.QWidget):
                 file , check = QtWidgets.QFileDialog.getOpenFileName(None, "Select PLC Script",
                                                     "", "PLC Files (*.plc)")
                 if os.path.exists(file):
-                    with open(file) as f:
-                        self.waysideio_ref.uploadPLC('red', idx, file)
-                        # print(f.readline())
-                        f.close()
+                    f = open(file)
+                    self.waysideio_ref.uploadPLC('red', idx, f)
+                    # print(f.readline())
+                    f.close()
 
     def addTab(self, prefix, controllers, controller, layout, reference, isView=False):
         ## Dictionary information for reference
@@ -528,7 +525,7 @@ class TrackControllerWindow(QtWidgets.QWidget):
         for i,fault in enumerate(fault_ids):
             text_str+=self.FAULTS[fault]
             if i != len(fault_ids)-1:
-                text_str+= "\n"
+                text_str+= " "
 
         if line == 'red':
             for i in controller_indices:

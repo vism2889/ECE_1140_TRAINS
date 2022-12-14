@@ -16,7 +16,7 @@ from re import I
 from Block import Block
 from BlockDictionary import BlockDictionary
 
-class LayoutParser:
+class LayoutParserCTC:
 
     def __init__(self, pLayoutFile):
         self.filename  = pLayoutFile
