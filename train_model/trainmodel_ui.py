@@ -71,22 +71,18 @@ class TrainModel(QtWidgets.QMainWindow):
         self.t.dispatched = True
         self.update_display()
 
-    def curr_t_power(self, msg):
+    def setTrainPower(self, msg):
         # print(f'Message is:{msg}')
         # print(f'Message type is: {type(msg)}')
         # print(f'---------RECEIVED POWER IS: {p}------------------')
         self.t.pm.power = msg['power']
     
-    def tc_servbrake(self, msg):
-        self.t.service_brake = msg   
-         
-    def tc_ebrake(self, msg):
-        self.t.e_brake = msg
+    def setBrake(self, msg):
+       self.t.service_brake = msg['serviceBrake'] 
+       self.t.e_brake = msg['emergencyBrake'] 
 
-    def non_vitals(self,msg):
+    def nonVitals(self,msg):
         for key in msg:
-            if key == 'ext_lights':
-                print(msg[key])
             setattr(self.t, key, msg[key])
     
     def ctc_authority(self, msg):
@@ -103,10 +99,9 @@ class TrainModel(QtWidgets.QMainWindow):
     def UI(self):
         
         self.signals.dispatchTrainSignal.connect(self.dispatch)
-        self.signals.powerSignal.connect(self.curr_t_power)
-        self.signals.serviceBrakeSignal.connect(self.tc_servbrake)
-        self.signals.emergencyBrakeSignal.connect(self.tc_ebrake)
-        self.signals.nonVitalDictSignal.connect(self.non_vitals)
+        self.signals.powerSignal.connect(self.setTrainPower)
+        self.signals.brakeDictSignal.connect(self.setBrake)
+        self.signals.nonVitalDictSignal.connect(self.nonVitals)
         self.signals.ctcAuthoritySignal.connect(self.ctc_authority)
         self.signals.clockSpeedSignal.connect(self.speedup)
         self.signals.waysideAuthority.connect(self.wayside_authority)
@@ -173,6 +168,7 @@ class TrainModel(QtWidgets.QMainWindow):
     def update_display(self):
         if self.hw:
             self.ms.spinOnce()
+
         #lights
         if self.t.int_lights:
             self.int_lights_disp.setText('On')

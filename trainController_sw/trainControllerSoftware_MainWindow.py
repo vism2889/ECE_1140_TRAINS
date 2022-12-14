@@ -662,7 +662,6 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
             self.trainID = msg
         
     def setCurrentSpeedSignal(self, msg):
-        msg[0]
         self.currentSpeed = msg
         self.setPID()
         self.setAuthority()
