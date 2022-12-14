@@ -38,7 +38,7 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
         self.pixmap              = QPixmap('TrainController.png')
         self.trainImage.setPixmap(self.pixmap)
         self.trainImage.setGeometry(0,220,250,110)
-        self.setStyleSheet("background-color: #747c8a;")
+        #self.setStyleSheet("background-color: #747c8a;")
          
         self.setObjectName("self")
         self.resize(835, 423)
@@ -225,7 +225,7 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
         self.Manual_Frame.setGeometry(QtCore.QRect(10, 10, 471, 321))
         self.Manual_Frame.setObjectName("Manual_Frame")
         self.Manual_Advertisements_CheckBox = QtWidgets.QCheckBox(self.Manual_Frame)
-        self.Manual_Advertisements_CheckBox.setGeometry(QtCore.QRect(390, 150, 61, 23))
+        self.Manual_Advertisements_CheckBox.setGeometry(QtCore.QRect(390, 150, 23, 23))
         self.Manual_Advertisements_CheckBox.setObjectName("Manual_Advertisements_CheckBox")
         self.label_10 = QtWidgets.QLabel(self.Manual_Frame)
         self.label_10.setGeometry(QtCore.QRect(150, 100, 91, 41))
@@ -246,7 +246,7 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
         self.label_3.setAlignment(QtCore.Qt.AlignCenter)
         self.label_3.setObjectName("label_3")
         self.Manual_Annoucements_CheckBox = QtWidgets.QCheckBox(self.Manual_Frame)
-        self.Manual_Annoucements_CheckBox.setGeometry(QtCore.QRect(390, 180, 61, 23))
+        self.Manual_Annoucements_CheckBox.setGeometry(QtCore.QRect(390, 180, 23, 23))
         self.Manual_Annoucements_CheckBox.setObjectName("Manual_Annoucements_CheckBox")
         self.Manual_temperature_box = QtWidgets.QDoubleSpinBox(self.Manual_Frame)
         self.Manual_temperature_box.setGeometry(QtCore.QRect(360, 30, 91, 32))
@@ -392,12 +392,12 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
         self.Authority_lcdDisplay.setFont(font)
         self.Authority_lcdDisplay.setObjectName("Authority_lcdDisplay")
         self.faultsframe = QtWidgets.QFrame(self.centralwidget)
-        self.faultsframe.setGeometry(QtCore.QRect(550, 230, 111, 161))
+        self.faultsframe.setGeometry(QtCore.QRect(550, 230, 111, 180))
         self.faultsframe.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.faultsframe.setFrameShadow(QtWidgets.QFrame.Plain)
         self.faultsframe.setObjectName("faultsframe")
         self.label_7 = QtWidgets.QLabel(self.faultsframe)
-        self.label_7.setGeometry(QtCore.QRect(0, -10, 111, 41))
+        self.label_7.setGeometry(QtCore.QRect(25, -5, 50, 35))
         font = QtGui.QFont()
         font.setPointSize(10)
         font.setBold(True)
@@ -417,22 +417,22 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
         self.label_29.setFont(font)
         self.label_29.setObjectName("label_29")
         self.EngineFault_DisplayBox = QtWidgets.QCheckBox(self.faultsframe)
-        self.EngineFault_DisplayBox.setGeometry(QtCore.QRect(80, 30, 31, 24))
+        self.EngineFault_DisplayBox.setGeometry(QtCore.QRect(80, 30, 20, 24))
         self.EngineFault_DisplayBox.setText("")
         self.EngineFault_DisplayBox.setCheckable(False)
         self.EngineFault_DisplayBox.setObjectName("EngineFault_DisplayBox")
         self.PowerFault_DisplayBox = QtWidgets.QCheckBox(self.faultsframe)
-        self.PowerFault_DisplayBox.setGeometry(QtCore.QRect(80, 60, 31, 24))
+        self.PowerFault_DisplayBox.setGeometry(QtCore.QRect(80, 60, 20, 24))
         self.PowerFault_DisplayBox.setText("")
         self.PowerFault_DisplayBox.setCheckable(False)
         self.PowerFault_DisplayBox.setObjectName("PowerFault_DisplayBox")
         self.CircuitFault_DisplayBox = QtWidgets.QCheckBox(self.faultsframe)
-        self.CircuitFault_DisplayBox.setGeometry(QtCore.QRect(80, 120, 21, 24))
+        self.CircuitFault_DisplayBox.setGeometry(QtCore.QRect(80, 120, 20, 24))
         self.CircuitFault_DisplayBox.setText("")
         self.CircuitFault_DisplayBox.setCheckable(False)
         self.CircuitFault_DisplayBox.setObjectName("CircuitFault_DisplayBox")
         self.TrackFault_DisplayBox = QtWidgets.QCheckBox(self.faultsframe)
-        self.TrackFault_DisplayBox.setGeometry(QtCore.QRect(80, 90, 31, 24))
+        self.TrackFault_DisplayBox.setGeometry(QtCore.QRect(80, 90, 20, 24))
         self.TrackFault_DisplayBox.setText("")
         self.TrackFault_DisplayBox.setCheckable(False)
         self.TrackFault_DisplayBox.setObjectName("TrackFault_DisplayBox")
@@ -570,6 +570,7 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
         self.signals.commandedSpeedSignal.connect(self.setCommandedSpeedSignal)
         self.signals.trainFailuresSignal.connect(self.setTrainFailuresSignal)
         self.signals.beaconFromTrackModelSignal.connect(self.setBeaconSignal) # station side, nanme of station, underground
+        self.signals.dispatchTrainSignal.connect(self.setTrainIDSignal)
 
     def setOperationMode(self):
         if(self.TabWigets.currentIndex() == 0):     # Automatic Mode
@@ -601,12 +602,14 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
         self.commandedSpeed = 13.4112 # commanded speed input as m/s
         self.kp = 24000
         self.ki = 100
+        self.trainID = "Initial"
         
         # Variables for incoming data
         self.authority = 0
         self.currentSpeed = 0
         self.nextStation = "Station"
         self.blockFailures = [0]
+        self.trainFailure = [0]
         self.speedLimit = 18
         self.stationSide = ''
         self.stationName = ''
@@ -634,14 +637,13 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
         self.pid = PID(self.kp, self.ki, 0, setpoint=(self.commandedSpeed))
         self.pid.output_limits = (0, 120000) #clamp at 120kW
         self.powerDict = {
-                'power' : self.PowerOutput_lcdDisplay.value()
-                #'train_id' : 
-                }
-        self.vitalDict = {
+            'power' : self.PowerOutput_lcdDisplay.value(),
+            'trainID' : self.trainID
+        }
+        self.brakeDict = {
             'serviceBrake' : self.serviceBrakeState,
             'emergencyBrake' : self.emergencyBrakeState,
-            'commandedSpeed' : self.commandedSpeed
-            #'train_id': 
+            'trainID': self.trainID
         }
         self.nonVitalDict = {
             'int_lights' : self.internalLightState,
@@ -651,10 +653,14 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
             'right_doors' : self.leftDoorState,
             'announceState' : self.announceState,
             'advertisementState' : self.advertisementState,
-            #'train_id': self.train_id,
+            'trainID': self.trainID
         }
              
 ##### Set Signal Inputs      
+    def setTrainIDSignal(self, msg):
+        if(self.trainID == "Initial"):
+            self.trainID = msg
+        
     def setCurrentSpeedSignal(self, msg):
         msg[0]
         self.currentSpeed = msg
@@ -669,7 +675,8 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
         self.setAuthority()
           
     def setBlockFailuresSignal(self, msg):
-        pass
+        self.blockFailures = msg
+        self.checkFailures()
 
     def setSpeedLimitSignal(self, msg):
         # msg (m/s)
@@ -681,7 +688,8 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
         self.setAutoCommandedSpeed()
     
     def setTrainFailuresSignal(self, msg):
-        pass
+        self.trainFailure = msg
+        self.checkFailures()
     
     def setBeaconSignal(self, msg):
         if(len(msg) > 1):
@@ -698,14 +706,18 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
         if(self.commandedSpeed < (self.currentSpeed)):
             self.serviceBrakeState = True
             self.braking_Slider.setValue(True)
-            self.signals.serviceBrakeSignal.emit(self.serviceBrakeState)
+            self.emitBrakes()
         else:
             self.serviceBrakeState = False
             self.braking_Slider.setValue(False)
-            self.signals.serviceBrakeSignal.emit(self.serviceBrakeState)
+            self.emitBrakes()
+    
+    def checkFailures(self):
+        if(self.blockFailures != 0 | self.trainFailure != 0):
+            self.emergencyBrakeState = True
+            self.emitBrakes()
+            self.setManualControl_EmergencyBrake()
             
-    def EmergencyBrakeDisplay(self):
-        self.EmergencyBrakeDisplayBox.setCheckable(True)
 
 ###### Automatic Control Functions
     def setAutoCommandedSpeed(self):
@@ -718,7 +730,7 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
     
     def setAutoServiceBrake(self):
         self.Auto_BrakingDisplay.display(self.serviceBrakeState)
-        self.signals.emergencyBrakeSignal.emit(self.serviceBrakeState)            
+        self.emitBrakes()            
 
     def setAutoTemperature(self):
         self.Temperature_DisplayBox.display(self.temperature)
@@ -775,7 +787,7 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
             self.currentSpeed_lcdDisplay.display(0)
             self.speed_Slider.setValue(0)
             self.EmergencyBrakeDisplayBox.setCheckState(True)
-            self.signals.emergencyBrakeSignal.emit(True)            
+            self.emitBrakes()            
 
 ####### ManualControl Functions
     def setManualControl_CommandedSpeed(self):
@@ -790,21 +802,21 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
         
     def setManualControl_ServiceBrake(self):
         self.serviceBrakeState = self.braking_Slider.value()
-        self.signals.serviceBrakeSignal.emit(self.serviceBrakeState)
+        self.emitBrakes()
     
     def setManualControl_EmergencyBrake(self):
         # if E brake is already set and the button is clicked, then it turns off the e brake
         if(self.EmergencyBrakeDisplayBox.isChecked() == True):
             self.EmergencyBrakeDisplayBox.setCheckState(False)           
             self.emergencyBrakeState = False
-            self.signals.emergencyBrakeSignal.emit(False)
+            self.emitBrakes()
 
         elif(self.EmergencyBrakeDisplayBox.isChecked() == False):
             self.currentSpeed_lcdDisplay.display(0)
             self.speed_Slider.setValue(0)
             self.EmergencyBrakeDisplayBox.setCheckState(True)
             self.emergencyBrakeState = True
-            self.signals.emergencyBrakeSignal.emit(True)
+            self.emitBrakes()
         
     def setManualControl_Temperature(self):
         self.temperature = self.Manual_temperature_box.value()
@@ -893,24 +905,22 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
         if(((self.currentSpeed ** 2) * 1.2) >= (self.authority * 0.9)):
             self.serviceBrakeState = True
             self.braking_Slider.setValue(1)
-            self.signals.serviceBrakeSignal.emit(True)
+            self.emitBrakes()
         else:
             self.serviceBrakeState = False
             self.braking_Slider.setValue(0)
-            self.signals.serviceBrakeSignal.emit(False)        
+            self.emitBrakes()
     
     def waitUntilStopped(self):
-        while(self.currentSpeed != 0):
-            time.sleep(0.001)
-            self.signals.serviceBrakeSignal.emit(1)
-        else:
-            #wait 30 seconds at station
-            print("STOPPED AT STAION")
-            time.sleep(30) 
-            self.signals.serviceBrakeSignal.emit(False)
+        pass
 
     def emitPower(self):
-        self.signals.powerSignal.emit(self.powerDict)     
+        self.signals.powerSignal.emit(self.powerDict)   
+        
+    def emitBrakes(self):
+        self.brakeDict['serviceBrake'] = self.serviceBrakeState
+        self.brakeDict['emergencyBrake'] = self.emergencyBrakeState
+        self.signals.brakeDictSignal.emit(self.brakeDict)
             
     def emitNonVital(self):
         self.nonVitalDict['temperature'] = self.temperature

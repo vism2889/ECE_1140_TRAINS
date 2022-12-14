@@ -63,23 +63,15 @@ class Signals(QWidget):
     authoritySignal          = QtCore.pyqtSignal(float) #float in meters of the upcoming authority
     commandedSpeedSignal     = QtCore.pyqtSignal(float)
     speedLimitSignal         = QtCore.pyqtSignal(float)
-    trainFailuresSignal      = QtCore.pyqtSignal(list) #
+    trainFailuresSignal      = QtCore.pyqtSignal(list) 
     beaconSignal             = QtCore.pyqtSignal(list)        # Next Station and Station Side
     infrastructureSignal     = QtCore.pyqtSignal(list)        # Underground
     currentSpeedOfTrainModel = QtCore.pyqtSignal(float)
 
     # Train Controller (SW) Ouputs to Train Model Signals
-    powerSignal              = QtCore.pyqtSignal(dict)
-    # lightSignal              = QtCore.pyqtSignal(int)
-    # doorSignal               = QtCore.pyqtSignal(int)
-    # temperatureSignal        = QtCore.pyqtSignal(int)
-    # announcementsSignal      = QtCore.pyqtSignal(bool)
-    # advertisementsSignals    = QtCore.pyqtSignal(list)
-    serviceBrakeSignal       = QtCore.pyqtSignal(bool)
-    emergencyBrakeSignal     = QtCore.pyqtSignal(bool)
-
-
-    nonVitalDictSignal       = QtCore.pyqtSignal(dict)
+    powerSignal              = QtCore.pyqtSignal(dict) # Dictionary containing 'trainID' and 'power' 
+    brakeDictSignal          = QtCore.pyqtSignal(dict) # Dictionary containing 'serviceBrake', 'emergencyBrake', and 'trainID'
+    nonVitalDictSignal       = QtCore.pyqtSignal(dict) # Dictionary containing 'int_lights', 'ext_lights', 'temperature', 'left_doors', 'right_doors', 'announceState', 'advertisementState', and 'trainID'
 
     # Train Controller (HW) Signals
 

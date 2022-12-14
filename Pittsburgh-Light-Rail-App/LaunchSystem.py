@@ -66,6 +66,14 @@ QTableWidget {
 QListWidget {
     background-color: #747c8a;
 }
+
+QTabWidget {
+    background-color: #858e9e;
+}
+
+QGroupBox {
+    background-color: #858e9e;
+}
 """
 
 class PittsburghLightRail(QWidget):
@@ -82,6 +90,7 @@ class PittsburghLightRail(QWidget):
 
         if not hw:
             self.trainController = Ui_TrainControllerSW_MainWindow(self.signals)
+            self.trainController.setStyleSheet(styleSheet)
 
         #train model
         file = f'{os.getcwd()}/train.ui'
