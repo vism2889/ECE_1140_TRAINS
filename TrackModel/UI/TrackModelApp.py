@@ -262,13 +262,14 @@ class TrackModel(QWidget):
             blockNum = int(self.switchText[self.currLineIndex][i][0])
             if switch[0] == blockNum:
                 # print('switch signal 2:', switch, ', current line switch', )
-                self.lineBlocks[self.currLineIndex][switch[0]-1].switchState = switch[1]
                 if switch[1] == True:
                     self.switchInfoTable.item(i,1).setBackground(QtCore.Qt.green)
                     self.switchInfoTable.item(i,2).setBackground(QtCore.Qt.red)
+                    self.lineBlocks[self.currLineIndex][switch[0]-1].switchState = 'FORWARD'
                 else:
                     self.switchInfoTable.item(i,1).setBackground(QtCore.Qt.red)
                     self.switchInfoTable.item(i,2).setBackground(QtCore.Qt.green)
+                    self.lineBlocks[self.currLineIndex][switch[0]-1].switchState = 'REVERSE'
 
     def updateCtcSwitchState(self, switchState):
         print("CTC Switch State Signal", switchState)
@@ -547,8 +548,8 @@ class TrackModel(QWidget):
                 for block in section.blocks:
                     self.lineBlocks[k].append(block)
                     i+=1
-                    if block.switch != "":
-                        self.switches[k][i] = [8,25]
+                    if block.switch != "NA":
+                        #self.switches[k][i] = [8,25]
                         self.switchText[k].append([block.blockNumber, block.switch, block.switchForward, block.switchReverse])
                     if block.station:
                         self.stations[k].append([block.blockNumber, block.station])
@@ -689,6 +690,13 @@ class TrackModel(QWidget):
         self.trackFault1.setEnabled(True)
         self.trackFault2.setEnabled(True)
         self.trackFault3.setEnabled(True)
+
+        if len(self.currBlock.forwardBeacon) > 2:
+            self.beaconInformationVallistwidget.item(0).setText(self.currBlock.forwardBeacon.split(',')[1])
+            self.beaconInformationVallistwidget.item(1).setText(self.currBlock.forwardBeacon.split(',')[0])
+        else:
+            self.beaconInformationVallistwidget.item(0).setText('NA')
+            self.beaconInformationVallistwidget.item(1).setText('NA')
         
     def updateBlockInfo(self, pCurrBlockIndex):
         '''
@@ -778,8 +786,8 @@ class TrackModel(QWidget):
             self.blockVallistwidget.insertItem(19,currBlock.station)
             self.blockVallistwidget.item(19).setForeground(QtCore.Qt.yellow)
 
-            if self.currBlock.switch:
-                self.blockSwitchIndicator.setText('SWITCH STATE: '+str(self.lineBlocks[1][self.currBlockIndex].switchState)) #TODO: Update here to reflect new switchState signal
+            if self.currBlock.switch != 'NA':
+                self.blockSwitchIndicator.setText('SWITCH STATE: '+str(self.lineBlocks[self.currLineIndex][self.currBlockIndex].switchState)) #TODO: Update here to reflect new switchState signal
                 self.blockSwitchIndicator.show()
                 self.blockSwitchIndicator.move(130, 120)
                 self.blockSwitchIndicator.resize(300, 20)
@@ -822,6 +830,10 @@ class TrackModel(QWidget):
         self.beaconInformationVallistwidget.move(280,168)
         self.beaconInformationVallistwidget.resize(150,80) 
         self.beaconInformationVallistwidget.setStyleSheet("background-color: gray;")
+        self.beaconInformationVallistwidget.insertItem(0, "NA")
+        self.beaconInformationVallistwidget.insertItem(1, "NA")
+        self.beaconInformationVallistwidget.insertItem(2, "NA")
+        self.beaconInformationVallistwidget.insertItem(3, "NA")
     
     def getOccupancy(self, occupancy):
         '''

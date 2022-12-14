@@ -166,9 +166,9 @@ class SignalSenderUI(QWidget):
             blockList = [self.currBlockIndex+1, self.currBlockIndex+2, self.currBlockIndex+3, self.currBlockIndex+4, self.currBlockIndex+5, self.currBlockIndex+6]
             self.signals.trainLocation.emit([1, 1, self.currBlockIndex, self.currBlockIndex+1])
             self.signals.waysideAuthority.emit([1,1,blockList])
-            
-            self.signals.trainLocation.emit([0, 1, self.currBlockIndex, self.currBlockIndex+1])
-            self.signals.waysideAuthority.emit([0,1,blockList])
+
+            self.signals.trainLocation.emit([0, 1, self.currBlockIndex+4, self.currBlockIndex+5])
+            self.signals.waysideAuthority.emit([0,1,[i+5 for i in blockList]])
         
         self.logger.info("From sender: Train on Block: " + str(self.currBlockIndex+1))
         self.logger.info("From sender: FAULTS:\n" + str(self.faults))

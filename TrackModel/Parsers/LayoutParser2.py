@@ -182,6 +182,7 @@ class LayoutParser:
                 # print("switch:      ", switch)
                 if type(self.currBlock.switchForward) ==list:
                     self.currBlock.switchForward = self.currBlock.switchForward[0]
+                self.currBlock.switchState = 'FORWARD'
                 # print('forward', self.currBlock.switchForward)
                 
                 # print('reverse', self.currBlock.switchReverse)
