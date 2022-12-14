@@ -72,7 +72,6 @@ class TrainModel(QtWidgets.QMainWindow):
 
         # print(f'------------DISPATCHED!!!!!!!!!!!------------------')
         self.t.dispatched = True
-        self.update_display()
 
     def setTrainPower(self, msg):
         # print(f'Message is:{msg}')

@@ -159,7 +159,6 @@ class PointMassModel():
         self.curr_time = time.time()
         self.elapsed_time = (self.curr_time-self.prev_time) * self.speed_up
 
-        temp_start_t = 0
         # print(f'Serv Brake velocity before decleration:{self.curr_speed}')
         # print(f'Serv Brake force before deceleration: {self.force}')
         # print(f'Deceleration force is: {self._td.mass_empty * self._td.serv_brake}')
@@ -168,35 +167,14 @@ class PointMassModel():
         
         if self.curr_vel > 0:
             self.prev_accel = self.curr_accel
-            if self.elapsed_time > 0.5:
-                self.curr_accel = self.dec_force(val)
-                self.calcVel()
-                self.calcPos()
-
-                self.prev_time = self.curr_time
             
-            self.curr_time = time.time()
-            self.elapsed_time = self.curr_time- self.prev_time
+            self.curr_accel = self.dec_force(val)
+            self.calcVel()
+            self.calcPos()
+
 
             if self.curr_vel <= 0:
                 self.curr_vel = 0
-                
-            self.prev_accel = self.curr_accel
-
-            
-            if time.time() - temp_start_t > 5:
-                # print(f'Current Force is: {self.force}')
-                # print(f'Current Acceleration is: {self.curr_accel}')
-                # print(f'Current Velocity is: {self.curr_vel}')
-                # print(f'Serv Brake decreasing velocity:{self.curr_speed} in {self.elapsed_time}\n')
-                temp_start_t = time.time()
-        # elif self.curr_speed <= 0:
-        #     if self.count == 1:
-        #         total_time = time.time()-self.brake_time
-        #         print(f'Braking from {self.brake_start_vel}mph took {total_time} seconds')
-        #         print(f'Train Travelled {self.brake_distance}meters')
-
-        #         self.count += 1
 
         self.power = 0  
         self.force = 0
@@ -320,8 +298,7 @@ class PointMassModel():
                 lastBlock = wayside[-1]
                 self.train_authority += float(self.BlockModels[lastBlock-1].blockLength)/4
         elif len(self.waysideAuthority) == 1 and self.curr_vel != 0:
-            if not self.stationStop:
-                self.train_authority = 0
+            self.train_authority = 0
         
 
         
@@ -460,12 +437,12 @@ class Train():
 
     def e_brake_func(self):
         if self.e_brake == True and self.pm.curr_vel > 0:
-            self.pm.e_brake()
+            self.pm.brake(1)
     
     def serv_brake_func(self):
         print('inside service brake')
         if self.service_brake == True and self.pm.curr_vel > 0:
-            self.pm.serv_brake()
+            self.pm.brake(0)
 
     def dispatch(self):
         self.dispatched = True

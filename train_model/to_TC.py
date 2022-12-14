@@ -9,7 +9,7 @@ class to_TC(msg):
 		self.commanded_speed = None
 		self.__vars__.append(self.commanded_speed)
 		self.speed_limit = None
-		self.__vars__.append(self.speed_limit)
+		self.__vars__.append(int(self.speed_limit))
 		self.authority = None
 		self.__vars__.append(self.authority)
 		self.next_station = None
