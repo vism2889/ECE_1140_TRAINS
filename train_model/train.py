@@ -125,7 +125,7 @@ class PointMassModel():
         self.elapsed_time = self.curr_time-self.prev_time
 
         if self.curr_vel > 0:
-            print(f'Ebrake velocity before deceleration:{self.curr_vel}')
+            # print(f'Ebrake velocity before deceleration:{self.curr_vel}')
             self.prev_vel = self.curr_vel
             self.prev_accel = self.curr_accel
             self.curr_accel = self.dec_force()
@@ -141,7 +141,7 @@ class PointMassModel():
 
             self.prev_time = self.curr_time
             self.curr_time = time.time()
-            print(f'Ebrake decreasing velocity:{self.curr_vel}')
+            # print(f'Ebrake decreasing velocity:{self.curr_vel}')
         
         self.power = 0
         self.force = 0

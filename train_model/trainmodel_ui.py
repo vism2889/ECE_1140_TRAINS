@@ -240,7 +240,11 @@ class TrainModel(QtWidgets.QMainWindow):
                 self.signals.authoritySignal.emit(self.t.pm.train_authority)
                 self.last_update = time.time()
                 # print('PUBLISHING!!!')
+                
                 if self.hw:
+                    print('--------------publishing----------------')
+                    print(f'|       Authority: {self.t.pm.train_authority}      |')
+                    print('----------------------------------------')
                     self.mp.publish()
             
             
@@ -344,7 +348,7 @@ class ServBrake(QObject):
         if self.qt.t.service_brake == True and self.qt.t.pm.curr_vel > 0:
             self.qt.t.pm.serv_brake()
         
-        print('train stopped')
+        # print('train stopped')
         self.stopped.emit()
 
 class Ebrake(QObject):
@@ -355,11 +359,11 @@ class Ebrake(QObject):
         self.qt = qt
     
     def run(self):
-        print('EBrake initiated')
+        # print('EBrake initiated')
         if self.qt.t.e_brake == True and self.qt.t.pm.curr_vel > 0:
             self.qt.t.e_brake_func()
 
-        print('train stopped')
+        # print('train stopped')
         self.stopped.emit()
 
 # class DisplayWorker(QObject):
@@ -468,7 +472,7 @@ class TestWindow(QtWidgets.QMainWindow):
             curr_pwr = float(self.cmd_pwr_edit.toPlainText()) * 1000
             self.dict['curr_power'] = curr_pwr
 
-        print(self.temp_edit.toPlainText())
+        # print(self.temp_edit.toPlainText())
         self.test_clicked.emit(self.dict)
     
     def sig_failure(self):
