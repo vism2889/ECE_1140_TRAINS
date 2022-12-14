@@ -49,12 +49,33 @@ from trainmodel_ui import TrainModel
 sys.path.append("../trainController_sw/")
 from trainControllerSoftware_MainWindow import Ui_TrainControllerSW_MainWindow
 
+# Style sheet
+styleSheet = """
+QWidget {
+    background-color: #747c8a;
+}
+
+QPushButton {
+    background-color: #e8c33c;
+}
+
+QTableWidget {
+    background-color: #747c8a;
+}
+
+QListWidget {
+    background-color: #747c8a;
+}
+"""
+
 class PittsburghLightRail(QWidget):
     def __init__(self, hw):
         super().__init__()
         self.signals    = Signals()
         self.trackModel = TrackModel(self.signals)
         self.CTCOffice  = CTCOffice(self.signals)
+        self.CTCOffice.setStyle(QStyleFactory.create('Fusion'))
+        self.CTCOffice.setStyleSheet(styleSheet)
 
         ## Launch Wayside Controller
         self.waysideController = WaysideController(self.signals)
@@ -71,7 +92,6 @@ class PittsburghLightRail(QWidget):
 
     def setupUi(self):
         self.setGeometry(1630,50,220,330)
-        self.setStyleSheet("background-color: #747c8a;")
 
         font = QFont()
         font.setPointSize(16)
@@ -86,14 +106,13 @@ class PittsburghLightRail(QWidget):
         self.speedController = QSlider(Qt.Horizontal,self)
         self.speedController.setGeometry(50,10,120,20)
         self.speedController.setMinimum(1)
-        self.speedController.setMaximum(100)
+        self.speedController.setMaximum(10)
         self.speedController.valueChanged.connect(self.sendClockSpeed)
 
         ## CTC Offic3
         font.setPointSize(14)
         self.showCTCButton = QPushButton(self)
         self.showCTCButton.setGeometry(35,70,150,25)
-        self.showCTCButton.setStyleSheet("background-color: #e8c33c; ")
         self.showCTCButton.clicked.connect(self.CTCOffice.show)
         self.showCTCButton.setText("CTC Office")
         self.showCTCButton.setFont(font)
@@ -101,7 +120,6 @@ class PittsburghLightRail(QWidget):
         ## Wayside Controller
         self.showWaysideControllerButton = QPushButton(self)
         self.showWaysideControllerButton.setGeometry(35,100,150,25)
-        self.showWaysideControllerButton.setStyleSheet("background-color: #e8c33c; ")
         self.showWaysideControllerButton.clicked.connect(self.waysideController.show)
         self.showWaysideControllerButton.setText("Track Controller")
         self.showWaysideControllerButton.setFont(font)
@@ -109,7 +127,6 @@ class PittsburghLightRail(QWidget):
         ## Track Model
         self.showTrackModelButton = QPushButton(self)
         self.showTrackModelButton.setGeometry(35,130,150,25)
-        self.showTrackModelButton.setStyleSheet("background-color: #e8c33c; ")
         self.showTrackModelButton.clicked.connect(self.trackModel.show)
         self.showTrackModelButton.setText("Track Model")
         self.showTrackModelButton.setFont(font)
@@ -117,7 +134,6 @@ class PittsburghLightRail(QWidget):
         ## Train Model
         self.showTrainModelButton = QPushButton(self)
         self.showTrainModelButton.setGeometry(35,160,150,25)
-        self.showTrainModelButton.setStyleSheet("background-color: #e8c33c; ")
         self.showTrainModelButton.clicked.connect(self.trainModel.show)
         self.showTrainModelButton.setText("Train Model")
         self.showTrainModelButton.setFont(font)
@@ -125,7 +141,6 @@ class PittsburghLightRail(QWidget):
         ## Train Controller
         self.showTrainControllerButton = QPushButton(self)
         self.showTrainControllerButton.setGeometry(35,190,150,25)
-        self.showTrainControllerButton.setStyleSheet("background-color: #e8c33c; ")
         self.showTrainControllerButton.clicked.connect(self.trainController.show)
         self.showTrainControllerButton.setText("Train Controller")
         self.showTrainControllerButton.setFont(font)
@@ -175,5 +190,7 @@ if __name__ == '__main__':
         hardWare = False
 
     app = QApplication(sys.argv)
+    app.setStyle(QStyleFactory.create('Fusion'))
+    app.setStyleSheet(styleSheet)
     ex = PittsburghLightRail(hardWare)
     sys.exit(app.exec_())

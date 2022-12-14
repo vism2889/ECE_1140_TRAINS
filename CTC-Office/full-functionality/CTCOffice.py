@@ -46,6 +46,7 @@ class CTCOffice(QWidget):
         self.signals.globalOccupancyFromTrackModelSignal.connect(self.readOccupancySignal)
         self.signals.switchState.connect(self.updateSwitchState)
         self.signals.clockSpeedSignal.connect(self.changeClockSpeed)
+        self.signals.waysideAuthority.connect(self.showAuthority)
 
     def setupLayout(self):
         # getting lists of blocks
@@ -103,7 +104,6 @@ class CTCOffice(QWidget):
         self.setObjectName("self")
         self.setGeometry(10, 10, 700, 580)
         self.setMouseTracking(True)
-        self.setStyleSheet("background-color: #747c8a;")
         self.redLineMaintenance   = False
         self.greenLineMaintenance = False
         self.manualMode           = True
@@ -119,18 +119,12 @@ class CTCOffice(QWidget):
         self.clockLabel.setAlignment(QtCore.Qt.AlignCenter)
         self.clockLabel.setFont(font)
 
-        # self.changeClockSpeedButton = QtWidgets.QPushButton(self)
-        # self.changeClockSpeedButton.setGeometry(550,15,140,20)
-        # self.changeClockSpeedButton.setText("Change clock speed")
-        # self.changeClockSpeedButton.setStyleSheet("background-color: #e8c33c;")
-        # self.changeClockSpeedButton.clicked.connect(self.toggleTenTimeSpeed)
-
     ##################### RED LINE ##########################
         font.setPointSize(10)
         self.redLineLabelTable = QTableWidget(self)
         self.redLineLabelTable.setRowCount(0)
         self.redLineLabelTable.setColumnCount(1)
-        self.redLineLabelTable.setGeometry(10,15,260,20)
+        self.redLineLabelTable.setGeometry(10,10,260,25)
         self.redLineLabelTable.setColumnWidth(0, 260)
         self.redLineLabelTable.setHorizontalHeaderLabels(['Red Line'])
         self.redLineBlockTable = QTableWidget(self)
@@ -175,7 +169,7 @@ class CTCOffice(QWidget):
         self.greenLineLabelTable = QTableWidget(self)
         self.greenLineLabelTable.setRowCount(0)
         self.greenLineLabelTable.setColumnCount(1)
-        self.greenLineLabelTable.setGeometry(280,15,260,20)
+        self.greenLineLabelTable.setGeometry(280,10,260,25)
         self.greenLineLabelTable.setColumnWidth(0, 260)
         self.greenLineLabelTable.setHorizontalHeaderLabels(['Green Line'])
         self.greenLineBlockTable = QTableWidget(self)
@@ -228,14 +222,12 @@ class CTCOffice(QWidget):
 
         self.toggleMaintenanceButton = QtWidgets.QPushButton(self)
         self.toggleMaintenanceButton.setGeometry(550,310,140,20)
-        self.toggleMaintenanceButton.setStyleSheet("background-color: #e8c33c;")
         self.toggleMaintenanceButton.setText("Toggle Maintenance")
         self.toggleMaintenanceButton.clicked.connect(self.toggleMaintenance)
         self.toggleMaintenanceButton.show()
 
         self.toggleSwitchButton = QtWidgets.QPushButton(self)
         self.toggleSwitchButton.setGeometry(550,330,140,20)
-        self.toggleSwitchButton.setStyleSheet("background-color: #e8c33c;")
         self.toggleSwitchButton.setText("Toggle Switch")
         self.toggleSwitchButton.clicked.connect(self.toggleSwitch)
         self.toggleSwitchButton.show()
@@ -254,28 +246,24 @@ class CTCOffice(QWidget):
 
         self.dispatchTrainButton = QtWidgets.QPushButton(self)
         self.dispatchTrainButton.setGeometry(550,70,140,25)
-        self.dispatchTrainButton.setStyleSheet("background-color: #e8c33c;")
         self.dispatchTrainButton.setText("Dispatch")
         self.dispatchTrainButton.show()
         self.dispatchTrainButton.clicked.connect(self.launchDispatchPopUp)
 
         self.uploadScheduleButton = QtWidgets.QPushButton(self)
         self.uploadScheduleButton.setGeometry(550,70,140,25)
-        self.uploadScheduleButton.setStyleSheet("background-color: #e8c33c;")
         self.uploadScheduleButton.setText("Upload Schedule")
         self.uploadScheduleButton.clicked.connect(self.uploadSchedule)
         self.uploadScheduleButton.hide()
 
         self.toggleDispatchModeButton = QtWidgets.QPushButton(self)
         self.toggleDispatchModeButton.setGeometry(550,105,140,25)
-        self.toggleDispatchModeButton.setStyleSheet("background-color: #e8c33c;")
         self.toggleDispatchModeButton.setText("Toggle Dispatch Mode")
         self.toggleDispatchModeButton.show()
         self.toggleDispatchModeButton.clicked.connect(self.toggleDispatchMode)
 
         self.toggleDestinationsButton = QtWidgets.QPushButton(self)
         self.toggleDestinationsButton.setGeometry(265,545,140,20)
-        self.toggleDestinationsButton.setStyleSheet("background-color: #e8c33c;")
         self.toggleDestinationsButton.setText("Toggle Destinations")
         self.toggleDestinationsButton.clicked.connect(self.toggleDestinations)
         self.toggleDestinationsButton.show()
@@ -524,7 +512,9 @@ class CTCOffice(QWidget):
             elif self.greenLineBlocks.getFaultState(key):
                 self.greenLineBlockTable.item(int(key)-1,0).setBackground(QtGui.QColor(255,0,0))
             elif self.greenLineBlocks.getOccupancy(key):
-                self.greenLineBlockTable.item(int(key)-1,0).setBackground(QtGui.QColor(0,255,0))
+                self.greenLineBlockTable.item(int(key)-1,0).setBackground(QtGui.QColor(20,107,43))
+            elif self.greenLineBlocks.getAuthority(key):
+                self.greenLineBlockTable.item(int(key)-1,0).setBackground(QtGui.QColor(135,201,153))
             else:
                 self.greenLineBlockTable.item(int(key)-1,0).setBackground(QtGui.QColor(116,124,138))
 
@@ -534,7 +524,9 @@ class CTCOffice(QWidget):
             elif self.redLineBlocks.getFaultState(key):
                 self.redLineBlockTable.item(int(key)-1,0).setBackground(QtGui.QColor(255,0,0))
             elif self.redLineBlocks.getOccupancy(key):
-                self.redLineBlockTable.item(int(key)-1,0).setBackground(QtGui.QColor(0,255,0))
+                self.redLineBlockTable.item(int(key)-1,0).setBackground(QtGui.QColor(20,107,43))
+            elif self.redLineBlocks.getAuthority(key):
+                self.redLineBlockTable.item(int(key)-1,0).setBackground(QtGui.QColor(135,201,153))
             else:
                 self.redLineBlockTable.item(int(key)-1,0).setBackground(QtGui.QColor(116,124,138))
 
@@ -584,17 +576,18 @@ class CTCOffice(QWidget):
         if self.selectedBlockLine == self.greenLineBlocks and self.greenLineMaintenance:
             self.selectedBlockLine.setSwitchState(str(self.selectedBlock), not currentSwitchState[1])
             currentSwitch = self.selectedBlockLine.switch(str(self.selectedBlock))
+            self.signals.ctcSwitchState.emit([1,int(self.selectedBlock),not currentSwitchState[1]])
         elif self.selectedBlockLine == self.redLineBlocks and self.redLineMaintenance:
             self.selectedBlockLine.setSwitchState(str(self.selectedBlock), not currentSwitchState[1])
             currentSwitch = self.selectedBlockLine.switch(str(self.selectedBlock))
+            self.signals.ctcSwitchState.emit([0,int(self.selectedBlock),not currentSwitchState[1]])
         else:
             return
-        # change switch label and emit new state
+        # change switch label
         item = QtWidgets.QTableWidgetItem()
-        item.setText(str(currentSwitch[0]) + " " + str(currentSwitch[1]))
+        item.setText(str(currentSwitch[0]) + " " + str(not currentSwitchState[1]))
         item.setFont(font)
         self.selectedBlockTable.setItem(int(self.selectedBlock)-1,1,item)
-        # TODO emit switch signal
 
     def launchDispatchPopUp(self):
         self.dispatchWidget = QtWidgets.QWidget()
@@ -609,7 +602,10 @@ class CTCOffice(QWidget):
 
     def uploadSchedule(self):
         fileName = QFileDialog.getOpenFileName(QtWidgets.QStackedWidget(), 'open file', '/home/garrett/git/ECE_1140_TRAINS/CTC-Office', 'csv files (*.csv)')
-        self.scheduleParser.loadSchedule(fileName[0], self.redLineStations, self.greenLineStations, self.redLineTrains, self.greenLineTrains)
+        if self.scheduleParser.loadSchedule(fileName[0], self.redLineStations, self.greenLineStations, self.redLineTrains, self.greenLineTrains, self.trainCount):
+            self.trainCount += 1
+        else:
+            print("ERROR: invalid schedule uploaded")
 
     def checkForScheduledTrains(self):
         for train in list(self.redLineTrains.backlogs()):
@@ -639,14 +635,34 @@ class CTCOffice(QWidget):
         if self.manualMode:
             self.dispatchTrainButton.hide()
             self.toggleMaintenanceButton.hide()
+            self.toggleSwitchButton.hide()
             self.uploadScheduleButton.show()
             self.manualMode = False
         else:
             self.dispatchTrainButton.show()
             self.toggleMaintenanceButton.show()
+            self.toggleSwitchButton.show()
             self.uploadScheduleButton.hide()
             self.manualMode = True
 
+    def showAuthority(self, msg):
+        print(msg[2])
+        pass
+        # red line
+        if msg[0] == 0:
+            for block in self.redLineBlocks.keys():
+                if block in msg[2]:
+                    self.redLineBlocks.setAuthority(block, True)
+                else:
+                    self.redLineBlocks.setAuthority(block, False)
+        elif msg[0] == 1:
+            for block in self.greenLineBlocks.keys():
+                if int(block) in msg[2]:
+                    self.greenLineBlocks.setAuthority(block, True)
+                else:
+                    self.greenLineBlocks.setAuthority(block, False)
+        else:
+            return
 
 if __name__ == "__main__":
     import sys
