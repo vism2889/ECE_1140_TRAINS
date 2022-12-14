@@ -60,26 +60,20 @@ class CTCOffice(QWidget):
 
         # define station lists in order
         self.redLineStations["SHADYSIDE"]           = ["7", False]
-        self.redLineStations["HERRON AVE (OUT)"]    = ["16", False]
-        self.redLineStations["SWISSVILLE (OUT)"]    = ["21", False]
-        self.redLineStations["PENN STATION (OUT)"]  = ["25", False]
-        self.redLineStations["STEEL PLAZA (OUT)"]   = ["35", False]
-        self.redLineStations["FIRST AVE (OUT)"]     = ["45", False]
-        self.redLineStations["STATION SQ. (OUT)"]   = ["48", False]
+        self.redLineStations["HERRON AVE"]          = ["16", False]
+        self.redLineStations["SWISSVILLE"]          = ["21", False]
+        self.redLineStations["PENN STATION"]        = ["25", False]
+        self.redLineStations["STEEL PLAZA"]         = ["35", False]
+        self.redLineStations["FIRST AVE"]           = ["45", False]
+        self.redLineStations["STATION SQUARE"]      = ["48", False]
         self.redLineStations["SOUTH HILLS JUNC."]   = ["60", False]
-        self.redLineStations["STATION SQ. (IN)"]    = ["48", False]
-        self.redLineStations["FIRST AVE (IN)"]      = ["45", False]
-        self.redLineStations["STEEL PLAZA (IN)"]    = ["35", False]
-        self.redLineStations["PENN STATION (IN)"]   = ["25", False]
-        self.redLineStations["SWISSVILLE (IN)"]     = ["21", False]
-        self.redLineStations["HERRON AVE (IN)"]     = ["16", False]
 
         self.greenLineStations["GLENBURY"]          = ["65", False]
-        self.greenLineStations["DORMONT"]           = ["73", False]
-        self.greenLineStations["MT-LEBANON"]        = ["77", False]
+        self.greenLineStations["DORMONT (OUT)"]     = ["73", False]
+        self.greenLineStations["MT-LEBANON (OUT)"]  = ["77", False]
         self.greenLineStations["POPLAR"]            = ["88", False]
         self.greenLineStations["CASTE SHANNON"]     = ["96", False]
-        self.greenLineStations["MT-LEBANON"]        = ["77", False]
+        self.greenLineStations["MT-LEBANON (IN)"]   = ["77", False]
         self.greenLineStations["GLENBURY"]          = ["114", False]
         self.greenLineStations["OVERBROOK (OUT)"]   = ["122", False]
         self.greenLineStations["INGLEWOOD (OUT)"]   = ["131", False]
@@ -234,10 +228,10 @@ class CTCOffice(QWidget):
 
     ##################### TRAIN INFO ########################
         self.destinationTable = QtWidgets.QTableWidget(self)
-        self.destinationTable.setGeometry(10,450,250,120)
+        self.destinationTable.setGeometry(10,450,285,120)
         self.destinationTable.setColumnCount(2)
         self.destinationTable.setColumnWidth(0, 160)
-        self.destinationTable.setColumnWidth(1, 88)
+        self.destinationTable.setColumnWidth(1, 123)
         self.destinationTable.verticalHeader().hide()
         self.destinationTable.setHorizontalHeaderLabels(['Station', 'Stopping'])
         self.destinationTable.setSelectionBehavior(QAbstractItemView.SelectRows)
@@ -263,25 +257,25 @@ class CTCOffice(QWidget):
         self.toggleDispatchModeButton.clicked.connect(self.toggleDispatchMode)
 
         self.toggleDestinationsButton = QtWidgets.QPushButton(self)
-        self.toggleDestinationsButton.setGeometry(265,545,140,20)
+        self.toggleDestinationsButton.setGeometry(300,545,140,20)
         self.toggleDestinationsButton.setText("Toggle Destinations")
         self.toggleDestinationsButton.clicked.connect(self.toggleDestinations)
         self.toggleDestinationsButton.show()
 
         self.suggestedSpeedLabel = QtWidgets.QLabel(self)
-        self.suggestedSpeedLabel.setGeometry(265,520,140,20)
+        self.suggestedSpeedLabel.setGeometry(300,520,140,20)
         self.suggestedSpeedLabel.setText("Suggested Speed: N/A")
         self.suggestedSpeedLabel.show()
 
         self.selectedTrainLabel = QtWidgets.QLabel(self)
-        self.selectedTrainLabel.setGeometry(265,495,140,20)
+        self.selectedTrainLabel.setGeometry(300,495,140,20)
         self.selectedTrainLabel.setText("Selected Train: N/A")
         self.selectedTrainLabel.show()
 
         self.trainImage          = QtWidgets.QLabel(self)
         self.pixmap              = QPixmap('LogoCTCOffice1.png')
         self.trainImage.setPixmap(self.pixmap)
-        self.trainImage.setGeometry(450,440,200,120)
+        self.trainImage.setGeometry(500,440,200,120)
 
         self.populateRedLineTable()
         self.populateGreenLineTable()
@@ -323,6 +317,7 @@ class CTCOffice(QWidget):
         secs = ('%02d' % int(self.seconds))
         mins = ('%02d' % int(self.minutes))
         hours = ('%02d' % int(self.hours))
+        self.clockWithoutSeconds = (str(hours) + ":" + str(mins))
         self.clockLabel.setText(str(hours) + ":" + str(mins) + ":" + str(secs))
         self.signals.timeSignal.emit([self.hours, self.minutes, self.seconds])
 
@@ -409,7 +404,10 @@ class CTCOffice(QWidget):
     def updateRedLineBacklog(self):
         self.currentRedLineBacklog = []
         for i in range(self.redLineBacklogTable.rowCount()):
-            self.currentRedLineBacklog.append(self.redLineBacklogTable.item(i,0).text())
+            time = self.redLineBacklogTable.item(i,0).text()
+            if not(time in self.redLineTrains.backlogs()):
+                self.redLineBacklogTable.removeRow(i)
+            self.currentRedLineBacklog.append(time)
 
         for train in self.redLineTrains.backlogs():
             if ((train in self.currentRedLineBacklog) == False):
@@ -438,7 +436,10 @@ class CTCOffice(QWidget):
     def updateGreenLineBacklog(self):
         self.currentGreenLineBacklog = []
         for i in range(self.greenLineBacklogTable.rowCount()):
-            self.currentGreenLineBacklog.append(self.greenLineBacklogTable.item(i,0).text())
+            time = self.greenLineBacklogTable.item(i,0).text()
+            if not(time in self.greenLineTrains.backlogs()):
+                self.greenLineBacklogTable.removeRow(i)
+            self.currentGreenLineBacklog.append(time)
 
         for train in self.greenLineTrains.backlogs():
             if ((train in self.currentGreenLineBacklog) == False):
@@ -597,8 +598,9 @@ class CTCOffice(QWidget):
         self.dispatchWidget.show()
 
     def closeDispatchPopUp(self):
+        if self.dispatchPopUp.dispatch.text() == "Dispatch":
+            self.trainCount += 1
         self.dispatchWidget.close()
-        self.trainCount += 1
 
     def uploadSchedule(self):
         fileName = QFileDialog.getOpenFileName(QtWidgets.QStackedWidget(), 'open file', '/home/garrett/git/ECE_1140_TRAINS/CTC-Office', 'csv files (*.csv)')
@@ -608,13 +610,22 @@ class CTCOffice(QWidget):
             print("ERROR: invalid schedule uploaded")
 
     def checkForScheduledTrains(self):
+        trainName = "Train " + str(self.trainCount)
         for train in list(self.redLineTrains.backlogs()):
-            if str(train) == self.clockLabel.text():
-                self.redLineTrains.dispatchScheduledTrain(str(train))
+            if str(train) == self.clockWithoutSeconds:
+                self.redLineTrains.dispatchScheduledTrain(self.clockWithoutSeconds, trainName)
+                suggestedSpeed = self.redLineTrains.getSuggestedSpeed(trainName)
+                self.signals.dispatchTrainSignal.emit([trainName, "Red Line", suggestedSpeed])
+                self.redLineTrains.sendAuthority(trainName, self.signals)
+                self.trainCount += 1
 
         for train in list(self.greenLineTrains.backlogs()):
-            if str(train) == self.clockLabel.text():
-                self.greenLineTrains.dispatchScheduledTrain(str(train))
+            if str(train) == self.clockWithoutSeconds:
+                self.greenLineTrains.dispatchScheduledTrain(self.clockWithoutSeconds, trainName)
+                suggestedSpeed = self.greenLineTrains.getSuggestedSpeed(trainName)
+                self.signals.dispatchTrainSignal.emit([trainName, "Green Line", suggestedSpeed])
+                self.greenLineTrains.sendAuthority(trainName, self.signals)
+                self.trainCount += 1
 
     def toggleDestinations(self):
         self.selectedDestinations = self.destinationTable.selectedIndexes()
@@ -646,12 +657,11 @@ class CTCOffice(QWidget):
             self.manualMode = True
 
     def showAuthority(self, msg):
-        print(msg[2])
         pass
         # red line
         if msg[0] == 0:
             for block in self.redLineBlocks.keys():
-                if block in msg[2]:
+                if int(block) in msg[2]:
                     self.redLineBlocks.setAuthority(block, True)
                 else:
                     self.redLineBlocks.setAuthority(block, False)
