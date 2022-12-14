@@ -34,7 +34,7 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
         self.trainImage          = QLabel(self)
         self.pixmap              = QPixmap('TrainController.png')
         self.trainImage.setPixmap(self.pixmap)
-        self.trainImage.setGeometry(0,220,250,110)
+        self.trainImage.setGeometry(750,380,100,110)
         #self.setStyleSheet("background-color: #747c8a;")
          
         self.setObjectName("self")
