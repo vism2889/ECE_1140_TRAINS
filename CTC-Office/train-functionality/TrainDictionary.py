@@ -12,17 +12,21 @@ class TrainDictionary:
     def addScheduledTrain(self, name, destinations, suggestedSpeed, authority):
         self.backLog[name] = Train(destinations, suggestedSpeed, authority)
 
-    def dispatchScheduledTrain(self, name):
-        self.trainList[name] = self.backLog[name]
-        self.backLog.pop(name)
+    def dispatchScheduledTrain(self, time, name):
+        self.trainList[name] = self.backLog[time]
+        self.backLog.pop(time)
 
-    def setSuggestedSpeed(self, name, TTS, line):
+    def setSuggestedSpeed(self, name, TTS, line, scheduled):
         if line == "Green Line":
             distance = 14552.6
         else:
             distance = 5548.2
         velocity = distance/(TTS*60)
-        self.trainList[name].suggestedSpeed = velocity
+
+        if scheduled:
+            self.backLog[name].suggestedSpeed = velocity
+        else:
+            self.trainList[name].suggestedSpeed = velocity
 
     def keys(self):
         return self.trainList.keys()
