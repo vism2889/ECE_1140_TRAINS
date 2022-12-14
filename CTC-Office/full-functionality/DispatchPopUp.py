@@ -118,12 +118,12 @@ class DispatchPopUp(object):
 
     def showTime(self, msg):
         # set time values
-        self.scheduledMins = self.minuteSpinBox.value()
-        self.scheduledHours = self.hourSpinBox.value()
         if not self.scheduledTime:
             mins = ('%02d' % msg[1])
             hours = ('%02d' % msg[0])
         else:
+            self.scheduledMins = self.minuteSpinBox.value()
+            self.scheduledHours = self.hourSpinBox.value()
             mins = ('%02d' % self.scheduledMins)
             hours = ('%02d' % self.scheduledHours)
             self.showScheduledTime()
