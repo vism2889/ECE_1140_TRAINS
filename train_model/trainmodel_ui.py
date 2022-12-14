@@ -33,6 +33,7 @@ class TrainModel(QtWidgets.QMainWindow):
         uic.loadUi(ui, self)
         self.t = Train()
         self.hw = hw
+        
 
         if self.hw:
             from Server_Comm import MyPub, MySub
@@ -40,8 +41,8 @@ class TrainModel(QtWidgets.QMainWindow):
             self.ms = MySub(self.t)
 
         self.signals = signals
-        self.last_update = 0
         self.UI()
+        self.last_update = 0
         #self.show()
         self.signals.trackBlocksToTrainModelSignal.connect(self.set_blocks)
         self.brake_update = time.time()
@@ -78,16 +79,17 @@ class TrainModel(QtWidgets.QMainWindow):
 
         # print(f'------------DISPATCHED!!!!!!!!!!!------------------')
         self.t.dispatched = True
+        self.comboTrain.addItem(msg[0])
 
     def setTrainPower(self, msg):
         # print(f'Message is:{msg}')
         # print(f'Message type is: {type(msg)}')
         # print(f'---------RECEIVED POWER IS: {p}------------------')
-        self.t = self.trainDict['trainID']
+        self.t = self.trainDict[msg['trainID']]
         self.t.pm.power = msg['power']
     
     def setBrake(self, msg):
-        self.t = msg['trainID']
+        self.t = self.trainDict[msg['trainID']]
         self.t.service_brake = msg['serviceBrake'] 
         self.t.e_brake = msg['emergencyBrake'] 
 
@@ -104,14 +106,14 @@ class TrainModel(QtWidgets.QMainWindow):
                 setattr(self.t, key, msg[key])
     
     def ctc_authority(self, msg):
-        for i,m in enumerate(msg):
-            msg[i] = int(m)
+        for i,m in enumerate(msg[1]):
+            msg[1][i] = int(m)
         self.t = self.trainDict[msg[0]]
         self.t.pm.ctc_authority.extend(msg)
 
     
     def wayside_authority(self,msg):
-        self.t = self.trainDict[msg[0]]
+        self.t = self.trainDict[msg[1]]
         self.t.pm.waysideAuthority = msg[2]
     
     def speedup(self, msg):
@@ -135,7 +137,7 @@ class TrainModel(QtWidgets.QMainWindow):
         #     self.test_win.setVisible(True)
 
        
-        self.test_win.clicked.connect(self.test_window)
+        # self.test_win.clicked.connect(self.test_window)
         #connecting failure buttons to respective slots
         self.sig_fail.clicked.connect(self.sig_failure)
         self.train_eng_fail.clicked.connect(self.train_eng_failure)
@@ -192,6 +194,10 @@ class TrainModel(QtWidgets.QMainWindow):
     def update_display(self):
         if self.hw:
             self.ms.spinOnce()
+
+        if len(self.trainDict) > 0:
+            if self.comboTrain.currentText() != 'Choose Train':
+                self.t = self.trainDict[self.comboTrain.currentText()]
 
         #lights
         if self.t.int_lights:
@@ -256,7 +262,6 @@ class TrainModel(QtWidgets.QMainWindow):
                 # print("inside if statement")
                 if self.t.e_brake == False and self.t.service_brake == False and self.t.dispatched:
                     self.t.set_power(self.t.pm.power)
-                    print(f'{self.t.id}, {self.t.pm.curr_vel}')
                     self.signals.currentSpeedOfTrainModel.emit([self.t.id, self.t.pm.curr_vel])
                     # print(f'Occ_list is: {self.t.pm.occ_list}')
                     # print(f'Curr Pos in block {self.qt.t.pm.curr_block} is: {self.qt.t.pm.curr_pos}')
