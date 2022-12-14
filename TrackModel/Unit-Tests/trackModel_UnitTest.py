@@ -18,7 +18,7 @@ class TestTrackModel(unittest.TestCase):
     #startup
     def test_uploadcsv_lines(self):
         self.parser = LP("")
-        lineNames, lines = parser.process()
+        lineNames, lines = self.parser.process()
         print("testing testing csv tracklayout upload: Line Test")
         self.assertTrue(len(lineNames) == 2) # there should be 2 lines
         self.assertTrue(len(lines) == 2) # there should be 2 line names
@@ -26,21 +26,21 @@ class TestTrackModel(unittest.TestCase):
 
     def test_uploadcsv_sections(self):
         self.parser = LP("")
-        lineNames, lines = parser.process()
+        lineNames, lines = self.parser.process()
         print("testing testing csv tracklayout upload: Section Test")
         self.assertTrue(len(lines[0]) == 20) #redline should have 20 sections
         self.assertTrue(len(lines[1]) == 26) #greenline should have 26 sections
 
     def test_uploadcsv_blocks(self):
         self.parser = LP("")
-        lineNames, lines = parser.process()
+        lineNames, lines = self.parser.process()
         print("testing testing csv tracklayout upload: Block Test")
         self.assertTrue(len(lines[0][0]) == 3) #redline first section should have 3 blocks
         self.assertTrue(len(lines[1][0]) == 3) #greenline first section should have 3 blocks
     
     def test_uploadcsv_blockdata(self):
         self.parser = LP("")
-        lineNames, lines = parser.process()
+        lineNames, lines = self.parser.process()
         print("testing testing csv tracklayout upload: Block Data Test")
         block = lines[0][0][0] #redline,section A, block 1
         self.assertTrue(block.line == "red")
