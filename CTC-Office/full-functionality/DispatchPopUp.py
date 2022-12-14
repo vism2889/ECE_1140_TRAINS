@@ -228,7 +228,8 @@ class DispatchPopUp(object):
             self.trainList.setSuggestedSpeed(self.scheduledTime, self.totalTTS, self.currentLine, True)
 
             for destination in self.selectedDestinations:
-                self.trainList.toggleDestination(self.scheduledTime, destination.text(), True)
+                if not(':' in destination.text()):
+                    self.trainList.toggleDestination(self.scheduledTime, destination.text(), True)
         else:
             self.trainList.addTrain(self.trainName, self.destinationList, 0, 0)
             self.trainList.setSuggestedSpeed(self.trainName, self.totalTTS, self.currentLine, False)
