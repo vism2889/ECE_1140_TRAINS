@@ -87,6 +87,7 @@ class TrackModel(QWidget):
         self.orderedGreenLineList    = []
         self.orderedGreenLine()
         self.authorityFromWayside    = []
+        self.globalAuthority         = []
         
         # System Communication Signals
         if signals:
@@ -283,13 +284,13 @@ class TrackModel(QWidget):
         sec5     = [i for i in range(13, 58)]
         self.orderedGreenLineList = sec1 + sec2 + sec3 + sec4 + sec5
 
-    def updateBlockOccupancyCallback(self):
+    def updateBlockOccupancyCallback(self, line):
         '''
         Checks to see if a line has been loaded, if so then the occupancy is 
         displayed over the list of blocks for that line
         '''
         if self.currLineIndex != None and self.blocksLoaded == True:
-            self.updateBlocksOccupancy()
+            self.updateBlocksOccupancyUI(line)
 
     def displayLoadLayoutButton(self):
         '''
@@ -455,6 +456,7 @@ class TrackModel(QWidget):
         #self.signals.blockFailures.emit(self.faults)
         if self.signals:
             self.signals.trackFailuresSignal.emit(self.faults)
+            print("FAULTS", self.faults)
 
     def openFileNameDialog(self):
         '''
@@ -491,7 +493,7 @@ class TrackModel(QWidget):
         '''
         for i in range(len(self.lines)):
             self.lineBlocks.append([])
-
+            self.globalAuthority.append([])
             self.switchText.append([])
             self.stations.append([])
             self.departingPassengers.append([])
@@ -579,7 +581,28 @@ class TrackModel(QWidget):
             self.signals.trackBlocksToTrainModelSignal.emit(self.lineBlocks)
             self.signals.greenLineTrackBlockSignal.emit(self.orderedGreenLineList)
             
-    def updateBlocksOccupancy(self):
+    def updateBlockOccupancyGlobal(self, line):
+        for i in range(len(self.occupancy[line])):
+            if self.faults[self.currLineIndex][i] == True:
+                self.blockslistwidget.item(i).setBackground(QColor(255,0,0))
+                self.blockslistwidget.item(i).setIcon(QIcon("../images/alert.png"))
+
+            elif self.occupancy[self.currLineIndex][i] == True:
+                self.blockslistwidget.item(i).setBackground(QColor(200,200,50))
+                self.signals.beaconFromTrackModelSignal.emit(self.lineBlocks[self.currLineIndex][i].forwardBeacon.split(','))
+                print(self.lineBlocks[self.currLineIndex][i].forwardBeacon.split(','))
+                if self.currBlockIndex == i: 
+                    self.currBlockDisplay.setStyleSheet("background-color: rgb(200,200,50); color: black;")
+
+            elif self.authorityFromWayside != None and (i+1) in self.authorityFromWayside:
+                self.blockslistwidget.item(i).setBackground(QtCore.Qt.green)
+
+            else:
+                self.blockslistwidget.item(i).setBackground(QColor(134, 132, 130))
+                self.blockslistwidget.item(i).setIcon(QIcon(""))
+        return 42
+
+    def updateBlocksOccupancyUI(self, line):
         '''
         Updates the background color of all the blocks in the current lines
         block selection list with colors reflecting thier fault and occupancy states.
@@ -588,21 +611,22 @@ class TrackModel(QWidget):
         for i in range(len(self.occupancy[self.currLineIndex])):
             if self.faults[self.currLineIndex][i] == True:
                 self.blockslistwidget.item(i).setBackground(QColor(255,0,0))
-                
                 self.blockslistwidget.item(i).setIcon(QIcon("../images/alert.png"))
+
             elif self.occupancy[self.currLineIndex][i] == True:
                 self.blockslistwidget.item(i).setBackground(QColor(200,200,50))
                 self.signals.beaconFromTrackModelSignal.emit(self.lineBlocks[self.currLineIndex][i].forwardBeacon.split(','))
                 print(self.lineBlocks[self.currLineIndex][i].forwardBeacon.split(','))
                 if self.currBlockIndex == i: 
                     self.currBlockDisplay.setStyleSheet("background-color: rgb(200,200,50); color: black;")
-            elif self.authorityFromWayside != None and (i+1) in self.authorityFromWayside:
 
+            elif self.authorityFromWayside != None and (i+1) in self.authorityFromWayside:
                 self.blockslistwidget.item(i).setBackground(QtCore.Qt.green)
+
             else:
                 self.blockslistwidget.item(i).setBackground(QColor(134, 132, 130))
-                
                 self.blockslistwidget.item(i).setIcon(QIcon(""))
+
         # updates the current block information display
         self.updateBlockInfo(self.currBlockIndex)
 
@@ -812,12 +836,12 @@ class TrackModel(QWidget):
         self.occupancy[int(line)][int(lastBlock)-1] = 0
         self.occupancy[int(line)][int(currBlock)-1] = 1
         self.signals.globalOccupancyFromTrackModelSignal.emit(self.occupancy) # should emit a new global occupancy
-        self.updateBlockOccupancyCallback()
+        self.updateBlockOccupancyCallback(line) # needs to send line index to this update method
 
     def getAuthority(self, authority):
         self.authorityFromWayside = authority[2]
         #print('authority from track model:', self.authorityFromWayside)
-        self.updateBlocksOccupancy()
+        self.updateBlocksOccupancyUI(authority[0])
 
 
     def addPassngersToStations(self):
