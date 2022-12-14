@@ -19,20 +19,17 @@ class Signals(QWidget):
     # List of length N where N is the number of blocks in the track
     ## Track Failure = 0x01, Circuit Failure = 0x02, Power Failure = 0x04
     #   - any combination of the three should be logically OR'd together (i.e. TF + CF = 0x03)
+    trackFailuresSignal                 = QtCore.pyqtSignal(list)
     blockFailures                       = QtCore.pyqtSignal(list)
-
     globalOccupancyFromTrackModelSignal = QtCore.pyqtSignal(list)
     trackModelLayoutLoadedSignal        = QtCore.pyqtSignal(list) # Lets other modules know that the TrackLayout has been successfully loaded
     occupancyFromTrainSignal            = QtCore.pyqtSignal(list) # List of booleans, length of a single trackline
-    switchStatesSignal                  = QtCore.pyqtSignal(list) # List of integers, length of a single trackline
-    maintenanceSignal                   = QtCore.pyqtSignal(list) # List of booleans, length of a single trackline
-    trackFailuresSignal                 = QtCore.pyqtSignal(list) # List of booleans, length of a single trackline
-    lineSignal                          = QtCore.pyqtSignal(str)  # String Name of trackline
+    #switchStatesSignal                  = QtCore.pyqtSignal(list) # List of integers, length of a single trackline
+    #maintenanceSignal                   = QtCore.pyqtSignal(list) # List of booleans, length of a single trackline
+    #lineSignal                          = QtCore.pyqtSignal(str)  # String Name of trackline
 
     trackBlocksToTrainModelSignal       = QtCore.pyqtSignal(list) # List of block objects, sent to train
     greenLineTrackBlockSignal           = QtCore.pyqtSignal(list) # List of integer block numbers in the correct order for the green line.
-
-
     beaconFromTrackModelSignal          = QtCore.pyqtSignal(list) # List containing information from beacon
 
     # Above could be a single list signal formatted as below:

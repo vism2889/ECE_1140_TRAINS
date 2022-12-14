@@ -52,7 +52,6 @@ class LayoutParser:
         Description Here
         '''
         with open(self.filename, 'r') as csvfile:
-            # print("\tParsing Track Layout File: ", self.filename)
             csvreader   = csv.reader(csvfile)
             self.fields = next(csvreader)
             for row in csvreader:
@@ -63,7 +62,7 @@ class LayoutParser:
             if currTrackLineName not in self.trackLineNames:
                 self.addTrackLine(currTrackLineName)
             else:
-                self.updateTrackLine(self.currTrackLine)
+                self.updateTrackLine()
         return self.trackLines
 
     def displayData(self):
@@ -87,12 +86,11 @@ class LayoutParser:
         self.trackLines.append(self.currTrackLine)
         self.addSections()
 
-    def updateTrackLine(self, currTrackLine):
+    def updateTrackLine(self):
         '''
         Description Here
         '''
         self.addSections()
-        return 42
 
     def addSections(self):
         '''
@@ -171,8 +169,6 @@ class LayoutParser:
                                 newSwitch.append(val)
                         else:
                             newSwitch.append(x)
-                        #print('item', x)
-                # print('SWITCH', newSwitch)
                 switch = newSwitch
                 if len(switch) > 1 and type(switch)==list:
                     self.currBlock.switchForward = switch[0]
@@ -180,17 +176,10 @@ class LayoutParser:
                 else:
                     self.currBlock.switchForward = switch
                 self.currBlock.switch = switch
-                # print("switch:      ", switch)
                 if type(self.currBlock.switchForward) ==list:
                     self.currBlock.switchForward = self.currBlock.switchForward[0]
                 self.currBlock.switchState = 'FORWARD'
-                # print('forward', self.currBlock.switchForward)
-                
-                # print('reverse', self.currBlock.switchReverse)
 
-            # else:
-            #     switch = switch[0]
-            #     self.currBlock.switch = switch
             if 'CROSSING' in infra:
                 self.currBlock.crossingPresence = True
             if 'UNDERGROUND' in infra:
@@ -200,7 +189,6 @@ def main():
     vLayout = "../Layout-Files/Track_Layout_PGH_Light_Rail.csv"
     parser = LayoutParser(vLayout)
     parser.process()
-    #parser.displayData()
 
 if __name__ == "__main__":
     main()

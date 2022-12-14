@@ -45,11 +45,11 @@ class TrackModel(QWidget):
         '''
         Description here
         '''
+        print("TrackModelApp.__init__() called")
         super().__init__()
         
         today                        = date.today()
         self.currDate                = today.strftime("%d/%m/%Y")
-        #print("d1 =", self.currDate)
 
         # Current Selections
         self.currBlock               = None
@@ -96,16 +96,19 @@ class TrackModel(QWidget):
         if signals:
             self.signals = signals # system signals instance 
 
+            # -------------------- TRAIN MODEL SIGNAL CONNECTIONS        --------------------
             self.signals.trainLocation.connect(self.getOccupancy)          # from train model: (used for occupancy)
+            # self.signals.stoppedBlocks.connect(self.updateStoppedBlocks) # sets a list = [list of blocks that trains are stopped at]
 
+            # -------------------- WAYSIDE CONTROLLER SIGNAL CONNECTIONS --------------------
             self.signals.waysideAuthority.connect(self.getAuthority)       # from wayside: (used for authority)
             # self.signals.crossingState.connect()                         # from wayside: List of length two indicating a block and it's crossing state [(int) block #, (bool) state]
             self.signals.switchState.connect(self.updateSwitchState)       # from wayside: List of length 2 [(int) block #, (bool) state]
 
-
+            # -------------------- CTC OFFICE SIGNAL CONNECTIONS         --------------------
             self.signals.ctcSwitchState.connect(self.updateCtcSwitchState) # from ctc office: List of length 3 [(int) line, (int) block #, (bool) switch state]
 
-            # self.signals.stoppedBlocks.connect(self.updateStoppedBlocks) # sets a list = [list of blocks that trains are stopped at]
+           
 
         # Signals local to module
         #self.heaterSignal
@@ -117,6 +120,7 @@ class TrackModel(QWidget):
         Initializes all of the objects in the base UI before a given track layout 
         has been loaded or a track line has been selected
         '''
+        print("TrackModelApp.initUI() called")
         # Pyqt Window Properties
         self.title               = 'Track Model - Pittsburgh Light Rail'
         self.left                = 40
@@ -125,11 +129,8 @@ class TrackModel(QWidget):
         self.height              = 750
         self.setWindowTitle(self.title)
         self.setGeometry(self.left, self.top, self.width, self.height)
-        #self.setFixedHeight(self.height)
-        #self.setFixedWidth(self.width)
         self.setStyleSheet("background-color: rgb(150,137,130);")
         self.displayLoadLayoutButton()
-        # self.center() # Opens UI in the center of the current screen
         self.displayTrackBlockList()
         self.displayBlockInformationSection()
         self.displayLargeSelectedBlockLabel()
@@ -148,7 +149,6 @@ class TrackModel(QWidget):
         self.trackModelImage.setPixmap(self.pixmap)
         self.trackModelImage.resize(175,100)
         self.trackModelImage.move(self.width-160, self.height-100)
-        print("FUCK")
 
     def displayTemperatureButton(self):
         '''
@@ -187,7 +187,6 @@ class TrackModel(QWidget):
         updates the temperature to be what the user inputs into the temperature prompt
         '''
         self.temp, done = QInputDialog.getInt(self, 'Temperature Edit', 'Enter Track Line Temperature:')
-        #print(self.temp)
         self.temperatureVal.setText("Temp: " + str(self.temp) + ' F')
         if self.temp <= 32:
             self.heaterSignal.emit(True)
@@ -201,7 +200,6 @@ class TrackModel(QWidget):
         '''
         # Switch Information / State Label
         self.switchInfoLabel = QLabel("Switch Information", self)
-        
         self.switchInfoLabel.setAlignment(QtCore.Qt.AlignCenter)
         self.switchInfoLabel.move(440, 470)
         self.switchInfoLabel.resize(300, 50)
@@ -238,7 +236,6 @@ class TrackModel(QWidget):
 
         # Switch State Table
         self.stationInfoTable = QTableWidget(self)
-        #self.stationInfoTable.horizontalHeader().setDefaultAlignment(QtCore.Qt.AlignHCenter | Qt.Alignment(QtCore.Qt.TextWordWrap))
         self.stationInfoTable.move(440, 160)
         self.stationInfoTable.resize(410, 300)
         self.stationInfoTable.setStyleSheet("background-color: gray; color: black;")
@@ -261,10 +258,8 @@ class TrackModel(QWidget):
         updates the swicthes for a given line
         '''
         for i in range(len(self.switchText)):
-            # print('TEXT', self.switchText[self.currLineIndex][i][0])
             blockNum = int(self.switchText[self.currLineIndex][i][0])
             if switch[0] == blockNum:
-                # print('switch signal 2:', switch, ', current line switch', )
                 if switch[1] == True:
                     self.switchInfoTable.item(i,1).setBackground(QtCore.Qt.green)
                     self.switchInfoTable.item(i,2).setBackground(QtCore.Qt.red)
@@ -281,7 +276,6 @@ class TrackModel(QWidget):
         '''
         Creates an green line for temporary use when presenting progress
         '''
-        #print("Ordered green line being created")
         sec1     = [i for i in range(63, 101)]
         sec2     = [i for i in range(85, 76, -1)]
         sec3     = [i for i in range(101, 151)]
@@ -329,7 +323,6 @@ class TrackModel(QWidget):
         Displays the list of track lines loaded from the track layout file.
         '''
         self.linesLabel = QLabel("TRACK LINES", self)
-        
         self.linesLabel.setAlignment(QtCore.Qt.AlignCenter)
         self.linesLabel.setStyleSheet("background-color: cyan; color: black;")
         self.linesLabel.move(5,40)
@@ -415,7 +408,6 @@ class TrackModel(QWidget):
         '''
         Updates all the fault related information for a given block when a fault it triggered.
         '''
-        #print(faultName)
         faultNum = 0
         if faultName == 'Track Fault':
             faultNum = 1
@@ -454,25 +446,22 @@ class TrackModel(QWidget):
             self.blockslistwidget.item(int(self.currBlock.blockNumber)-1).setIcon(QIcon(""))
         
         x = [x for x in self.faults[self.currLineIndex] if x != 0]
-        #print(x)
+
         if len(x)==0:
             self.linelistwidget.item(int(self.currLineIndex)).setIcon(QIcon(""))
 
-        #self.signals.blockFailures.emit(self.faults)
         if self.signals:
             self.signals.trackFailuresSignal.emit(self.faults)
-            print("FAULTS", self.faults)
 
     def openFileNameDialog(self):
         '''
         Launchs the file dialog allowing a user to load a trackline diagram.
         '''
-        dial = QFileDialog()
-        options = dial.Options()
-        options |= QFileDialog.DontUseNativeDialog
+        dial        = QFileDialog()
+        options     = dial.Options()
+        options    |= QFileDialog.DontUseNativeDialog
         fileName, _ = QFileDialog.getOpenFileName(self,"Track Layout Selection", "../Layout-Files","All Files (*);;Python Files (*.py)", options=options)
         if fileName:
-            #print(fileName)
             self.layoutFile = fileName
             self.initLayout()
 
@@ -486,7 +475,6 @@ class TrackModel(QWidget):
         self.lines = parser.process()
         for line in self.lines:
             self.lineNames.append(line.name)
-            #print(line.name)
 
         self.loadLines()
         self.displayBlockInfoLabels()
@@ -537,7 +525,6 @@ class TrackModel(QWidget):
         self.blockInfolistwidget.insertItem(20, "Switch:               ")
         self.blockInfolistwidget.insertItem(21, "Underground:          ")
         self.blockInfolistwidget.insertItem(22, "Track Heater:         ")
-        #self.blockInfolistwidget.insertItem(23, "Beacon:               ")
 
     def loadAllLinesBlocks(self):
         '''
@@ -552,9 +539,8 @@ class TrackModel(QWidget):
                     self.lineBlocks[k].append(block)
                     i+=1
                     if block.switch != "NA":
-                        #self.switches[k][i] = [8,25]
                         self.switchText[k].append([block.blockNumber, block.switch, block.switchForward, block.switchReverse])
-                    if block.station:
+                    if block.station != "NA":
                         self.stations[k].append([block.blockNumber, block.station])
                         self.departingPassengers[k].append(self.generateBoardingPassengers())
                         self.boardingPassengers[k].append(self.generateLeavingPassengers())
@@ -564,9 +550,8 @@ class TrackModel(QWidget):
         self.currBlock                            = self.lineBlocks[self.currLineIndex][self.currBlockIndex]
         self.lastClickedBlock[self.currLineIndex] = self.currBlock 
         self.lastBlockIndices[self.currLineIndex] = self.currBlockIndex
-        self.lastClickedBlock[0] = self.lineBlocks[0][self.currBlockIndex]
-        self.lastBlockIndices[0] = self.currBlockIndex
-        
+        self.lastClickedBlock[0]                  = self.lineBlocks[0][self.currBlockIndex]
+        self.lastBlockIndices[0]                  = self.currBlockIndex
         
         self.updateBlockInfo(self.currBlockIndex)
         self.loadBlocks()
@@ -590,9 +575,10 @@ class TrackModel(QWidget):
         for section in self.lines[self.currLineIndex].sections:
             for block in section.blocks:
                 vBlockNumber = str(block.blockNumber)
-                item = QListWidgetItem("BLOCK "+vBlockNumber)
+                item         = QListWidgetItem("BLOCK "+vBlockNumber)
                 self.blockslistwidget.insertItem(i+1, item)
-                if block.faultsText:
+                if len(block.faultsText) > 0:
+                    print("FAULTS", block.faultsText)
                     self.blockslistwidget.item(i).setBackground(QColor(255,0,0))
                     self.blockslistwidget.item(i).setIcon(QIcon("../images/alert.png"))
                 else:
@@ -606,34 +592,12 @@ class TrackModel(QWidget):
         if self.signals:
             self.signals.trackBlocksToTrainModelSignal.emit(self.lineBlocks)
             self.signals.greenLineTrackBlockSignal.emit(self.orderedGreenLineList)
-            
-    def updateBlockOccupancyGlobal(self, line):
-        for i in range(len(self.occupancy[line])):
-            if self.faults[self.currLineIndex][i] == True:
-                self.blockslistwidget.item(i).setBackground(QColor(255,0,0))
-                self.blockslistwidget.item(i).setIcon(QIcon("../images/alert.png"))
-
-            elif self.occupancy[self.currLineIndex][i] == True:
-                self.blockslistwidget.item(i).setBackground(QColor(200,200,50))
-                self.signals.beaconFromTrackModelSignal.emit(self.lineBlocks[self.currLineIndex][i].forwardBeacon.split(','))
-                print(self.lineBlocks[self.currLineIndex][i].forwardBeacon.split(','))
-                if self.currBlockIndex == i: 
-                    self.currBlockDisplay.setStyleSheet("background-color: rgb(200,200,50); color: black;")
-
-            elif self.authorityFromWayside != None and (i+1) in self.authorityFromWayside:
-                self.blockslistwidget.item(i).setBackground(QtCore.Qt.green)
-
-            else:
-                self.blockslistwidget.item(i).setBackground(QColor(134, 132, 130))
-                self.blockslistwidget.item(i).setIcon(QIcon(""))
-        return 42
 
     def updateBlocksOccupancyUI(self, line):
         '''
         Updates the background color of all the blocks in the current lines
         block selection list with colors reflecting thier fault and occupancy states.
         '''
-        #print("Block Update Called")
         for i in range(len(self.occupancy[self.currLineIndex])):
             if self.faults[self.currLineIndex][i] == True:
                 self.blockslistwidget.item(i).setBackground(QColor(255,0,0))
@@ -642,7 +606,7 @@ class TrackModel(QWidget):
             elif self.occupancy[self.currLineIndex][i] == True:
                 self.blockslistwidget.item(i).setBackground(QColor(200,200,50))
                 self.signals.beaconFromTrackModelSignal.emit(self.lineBlocks[self.currLineIndex][i].forwardBeacon.split(','))
-                print(self.lineBlocks[self.currLineIndex][i].forwardBeacon.split(','))
+                # print(self.lineBlocks[self.currLineIndex][i].forwardBeacon.split(','))
                 if self.currBlockIndex == i: 
                     self.currBlockDisplay.setStyleSheet("background-color: rgb(200,200,50); color: black;")
 
@@ -668,8 +632,6 @@ class TrackModel(QWidget):
             self.stationInfoTable.setItem(i, 1, QTableWidgetItem(self.stations[self.currLineIndex][i][1]))
             self.stationInfoTable.setItem(i, 2, QTableWidgetItem(str(self.boardingPassengers[self.currLineIndex][i])))
             self.stationInfoTable.setItem(i, 3, QTableWidgetItem('0'))
-        
-        #print(self.stations)
 
     def displayLineSwitches(self):
         '''
@@ -690,31 +652,24 @@ class TrackModel(QWidget):
         Sets the current line based on the selection make from the list of lines
         and loads the blocks for that line.
         '''
-        print(self.currBlockIndex)
         currLine = item.text()
         self.currLineIndex = self.lineNames.index(currLine)
-        # print(currLine, self.currLineIndex)
         self.switchInfoLabel.setText(self.lineNames[self.currLineIndex] + " Line Switch Information")
         self.stationInfoLabel.setText(self.lineNames[self.currLineIndex] + " Line Station Information")
         self.displayLineStations()
         self.displayLineSwitches()
+        self.currBlock      = self.lastClickedBlock[self.currLineIndex]
+        self.currBlockIndex = self.lastBlockIndices[self.currLineIndex]
         self.loadBlocks()
         self.updateBlocksOccupancyUI(self.currLineIndex)
         self.loadBeaconInformation()
-
-
-        self.currBlock      = self.lastClickedBlock[self.currLineIndex]
-        self.currBlockIndex = self.lastBlockIndices[self.currLineIndex]
-        self.loadBeaconInformation()
-        #print(self.boardingPassengers)
-        #print(self.stations)
+        self.currBlockDisplay.setText("BLOCK: "+str(self.currBlock.line)+"-"+str(self.currBlock.section)+"-"+str(self.currBlock.blockNumber))
 
     def onClickedBlock(self, item):
         '''
         Sets the current block selected from the current lines block list
         and loads that blocks information into the block information values list.
         '''
-
         self.lastClickedBlock[self.currLineIndex] = self.currBlock 
         self.lastBlockIndices[self.currLineIndex] = self.currBlockIndex
         self.currBlockIndex = int(item.text().split(" ")[1]) -1
@@ -729,6 +684,9 @@ class TrackModel(QWidget):
         self.loadBeaconInformation()
         
     def loadBeaconInformation(self):
+        '''
+        Description here
+        '''
         if len(self.currBlock.forwardBeacon) > 2:
             self.beaconInformationVallistwidget.item(0).setText(self.currBlock.forwardBeacon.split(',')[1])
             self.beaconInformationVallistwidget.item(0).setForeground(QtCore.Qt.yellow)
@@ -756,7 +714,6 @@ class TrackModel(QWidget):
         Updates the displayed information in the block information list to that of
         the currently selected block.
         '''
-        print("CURR BLOCK", self.currBlockIndex)
         if self.currBlockIndex != None:
             if self.currBlock.faultsText:
                 self.currBlockDisplay.setStyleSheet("background-color: red; color: black;")
@@ -858,7 +815,6 @@ class TrackModel(QWidget):
             self.blockVallistwidget.item(21).setForeground(QtCore.Qt.red)
             
             self.blockVallistwidget.insertItem(22,str(self.heaterOn))
-            #self.blockVallistwidget.insertItem(23, str(self.lineBlocks[1][self.currBlockIndex].forwardBeacon))
         
     def displayBeaconInformationLabels(self):
         '''
@@ -893,12 +849,10 @@ class TrackModel(QWidget):
         '''
         Updates all occupancy related displays and emits a new global occupancy
         '''
-        #print(occupancy)
         line      = occupancy[0]
         lastBlock = occupancy[2]
         currBlock = occupancy[3]
 
-        # print("GUI OCCUPANCY", self.occupancy)
         self.occupancy[int(line)][int(lastBlock)-1] = 0
         self.occupancy[int(line)][int(currBlock)-1] = 1
         self.removeFromAuthority = lastBlock
@@ -906,6 +860,9 @@ class TrackModel(QWidget):
         self.updateBlockOccupancyCallback(line) # needs to send line index to this update method
 
     def getAuthority(self, authority):
+        '''
+        Description here
+        '''
         line = authority[0]
         self.authorityFromWayside = authority[2]
         if len(self.globalAuthority[line]) > 0 and self.removeFromAuthority in self.globalAuthority[line]:
@@ -914,9 +871,7 @@ class TrackModel(QWidget):
             currAuthItem = authority[2][i]
             if currAuthItem not in self.globalAuthority[line]:
                 self.globalAuthority[line].append(currAuthItem)
-        print("AUTHORITY", self.globalAuthority)
             
-        #print('authority from track model:', self.authorityFromWayside)
         self.updateBlocksOccupancyUI(self.currLineIndex)
 
 
@@ -947,10 +902,8 @@ class TrackModel(QWidget):
         should update the track heater to be True for all blocks on both lines
         '''
         if state:
-            #print("heater on")
             self.heaterOn = True
         else:
-           # print("heater off")
             self.heaterOn = False
         
         if self.currBlockIndex != None:
