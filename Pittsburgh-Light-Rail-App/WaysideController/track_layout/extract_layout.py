@@ -77,6 +77,7 @@ def parseTrackLayout(path, jsonPath):
         layout = json.load(jsonFile)
 
         if trackLayout['line'].lower() not in layout['track']:
+            print(trackLayout['line'].lower())
             print("Invalid line in json file")
             exit(1)
 

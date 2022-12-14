@@ -1,1 +1,5 @@
-pass
+if #block_65 or #block_66: 
+    #switch_52 = True
+
+if #block_52 or #block_51:
+    #switch_52 = False
