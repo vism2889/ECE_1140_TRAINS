@@ -534,7 +534,7 @@ class TrackModel(QWidget):
         self.blockInfolistwidget.insertItem(20, "Switch:               ")
         self.blockInfolistwidget.insertItem(21, "Underground:          ")
         self.blockInfolistwidget.insertItem(22, "Track Heater:         ")
-        self.blockInfolistwidget.insertItem(23, "Beacon:               ")
+        #self.blockInfolistwidget.insertItem(23, "Beacon:               ")
 
     def loadAllLinesBlocks(self):
         '''
@@ -694,9 +694,13 @@ class TrackModel(QWidget):
         if len(self.currBlock.forwardBeacon) > 2:
             self.beaconInformationVallistwidget.item(0).setText(self.currBlock.forwardBeacon.split(',')[1])
             self.beaconInformationVallistwidget.item(1).setText(self.currBlock.forwardBeacon.split(',')[0])
+            self.beaconInformationVallistwidget.item(2).setText(self.currBlock.reverseBeacon.split(',')[1])
+            self.beaconInformationVallistwidget.item(3).setText(self.currBlock.reverseBeacon.split(',')[0])
         else:
             self.beaconInformationVallistwidget.item(0).setText('NA')
             self.beaconInformationVallistwidget.item(1).setText('NA')
+            self.beaconInformationVallistwidget.item(2).setText('NA')
+            self.beaconInformationVallistwidget.item(3).setText('NA')
         
     def updateBlockInfo(self, pCurrBlockIndex):
         '''
@@ -804,7 +808,7 @@ class TrackModel(QWidget):
             self.blockVallistwidget.item(21).setForeground(QtCore.Qt.red)
             
             self.blockVallistwidget.insertItem(22,str(self.heaterOn))
-            self.blockVallistwidget.insertItem(23, str(self.lineBlocks[1][self.currBlockIndex].forwardBeacon))
+            #self.blockVallistwidget.insertItem(23, str(self.lineBlocks[1][self.currBlockIndex].forwardBeacon))
         
     def displayBeaconInformationLabels(self):
         '''
