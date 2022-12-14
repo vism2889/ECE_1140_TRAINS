@@ -29,7 +29,6 @@ from   PyQt5.QtCore          import *
 
 # Developer Imports
 from   TrackModelApp         import TrackModel
-from   occupancySignalSender import SendOccupancy
 sys.path.append("..\..\SystemSignals") # tell interpreter where to look for model files
 from   Signals import Signals
 
@@ -75,6 +74,7 @@ class SignalSenderUI(QWidget):
         self.signals.greenLineTrackBlockSignal.connect(self.loadGreenLineBlocks)
         self.signals.trackFailuresSignal.connect(self.updateFaults)
         self.signals.trackBlocksToTrainModelSignal.connect(self.updateLineBlocks)
+        self.signals.switchState.connect(self.updateSwitch)
         
     def UiComponents(self):
         self.logger.info(self.logHeader + " Creating UI Components...")
@@ -100,6 +100,9 @@ class SignalSenderUI(QWidget):
         self.startTestTrainButton.setGeometry(25, 190, 150, 50)
         self.startTestTrainButton.clicked.connect(self.launchModelUI)
 
+        self.startTestTrainButton = QPushButton("Set Stop", self)
+        self.startTestTrainButton.setGeometry(25, 255, 150, 50)
+
         self.label = QLabel("Block", self)
         self.label.setGeometry(180, 135, 50, 50)
         self.label.setFont(QFont("Arial",10))
@@ -116,6 +119,15 @@ class SignalSenderUI(QWidget):
         self.label.setGeometry(335, 135, 50, 50)
         self.label.setFont(QFont("Arial",20))
         self.logger.info(self.logHeader + " Finished Creating UI Components...")
+
+    def updateSwitch(self, blockNum, switchState):
+        self.signals.switchState.emit([blockNum, switchState])
+
+    def setStop(self, blockNum):
+        return 42
+
+    def onClickedSwitchButton(self):
+        return 42
 
     def launchModelUI(self):
         self.modelUI.show()
@@ -161,9 +173,10 @@ class SignalSenderUI(QWidget):
             
             self.logger.info("NEW OCCUPANCY: " + str(self.currBlockIndex))
             
-        # Emit Occupancy    
-            
-            blockList = [self.currBlockIndex+1, self.currBlockIndex+2, self.currBlockIndex+3, self.currBlockIndex+4, self.currBlockIndex+5, self.currBlockIndex+6]
+            # Emit Train Location for Occupancy w/ an authority of 5 
+            blockList = [self.currBlockIndex+1, self.currBlockIndex+2, 
+                        self.currBlockIndex+3, self.currBlockIndex+4, 
+                        self.currBlockIndex+5, self.currBlockIndex+6]
             self.signals.trainLocation.emit([1, 1, self.currBlockIndex, self.currBlockIndex+1])
             self.signals.waysideAuthority.emit([1,1,blockList])
 

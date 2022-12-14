@@ -91,27 +91,24 @@ class TrackModel(QWidget):
         self.authorityFromWayside    = []
         self.globalAuthority         = []
         self.removeFromAuthority     = None
-        
+         
         # System Communication Signals
         if signals:
             self.signals = signals # system signals instance 
 
             # -------------------- TRAIN MODEL SIGNAL CONNECTIONS        --------------------
-            self.signals.trainLocation.connect(self.getOccupancy)          # from train model: (used for occupancy)
-            # self.signals.stoppedBlocks.connect(self.updateStoppedBlocks) # sets a list = [list of blocks that trains are stopped at]
+            self.signals.trainLocation.connect(self.updateGlobalOccupancy)          # from train model: (used for occupancy)
+            # self.signals.stoppedBlocks.connect(self.updateStoppedBlocks)          # sets a list = [list of blocks that trains are stopped at]
 
             # -------------------- WAYSIDE CONTROLLER SIGNAL CONNECTIONS --------------------
-            self.signals.waysideAuthority.connect(self.getAuthority)       # from wayside: (used for authority)
-            # self.signals.crossingState.connect()                         # from wayside: List of length two indicating a block and it's crossing state [(int) block #, (bool) state]
-            self.signals.switchState.connect(self.updateSwitchState)       # from wayside: List of length 2 [(int) block #, (bool) state]
+            self.signals.waysideAuthority.connect(self.getAuthority)                # from wayside: (used for authority)
+            # self.signals.crossingState.connect()                                  # from wayside: List of length two indicating a block and it's crossing state [(int) block #, (bool) state]
+            self.signals.switchState.connect(self.updateSwitchState)                # from wayside: List of length 2 [(int) block #, (bool) state]
 
             # -------------------- CTC OFFICE SIGNAL CONNECTIONS         --------------------
-            self.signals.ctcSwitchState.connect(self.updateCtcSwitchState) # from ctc office: List of length 3 [(int) line, (int) block #, (bool) switch state]
-
-           
+            self.signals.ctcSwitchState.connect(self.updateCtcSwitchState)          # from ctc office: List of length 3 [(int) line, (int) block #, (bool) switch state]
 
         # Signals local to module
-        #self.heaterSignal
         self.heaterSignal.connect(self.updateHeaterState)
         self.initUI()
     
@@ -133,7 +130,7 @@ class TrackModel(QWidget):
         self.displayLoadLayoutButton()
         self.initializeTrackBlockList()
         self.displayBlockInformationSection()
-        self.displayLargeSelectedBlockLabel()
+        self.initializeLargeSelectedBlockLabel()
         self.displayTrackLineList()
         self.displayFaultButtons()
         self.displayBeaconInformationLabels()
@@ -154,6 +151,7 @@ class TrackModel(QWidget):
         '''
         Displays the UI components for interacting with the temperature
         '''
+        # Pushbutton to allow a user provided temperature
         self.temperatureDisplay = QPushButton("Set Temperature:", self)
         self.temperatureDisplay.move(440, 40)
         self.temperatureDisplay.resize(200, 50)
@@ -161,8 +159,8 @@ class TrackModel(QWidget):
         self.temperatureDisplay.setFont(QFont('Arial', 10))
         self.temperatureDisplay.clicked.connect(self.updateTemperature)
 
+        # Displays the current temperature
         self.temperatureVal = QLabel("Temp:"+ str(self.currTemp) + ' F', self)
-        
         self.temperatureVal.setStyleSheet("background-color: white; color: black;")
         self.temperatureVal.move(650, 40)
         self.temperatureVal.resize(95, 50)
@@ -172,6 +170,7 @@ class TrackModel(QWidget):
         '''
         generates temperature based on averages for the month based on past data
         '''
+        # Average temperatures per month, taken from pittsburgh 2021 --> https://www.weather.gov/media/pbz/records/histemp.pdf
         avgTemps      = [23.6, 31.9, 42.7, 48.9, 62.8, 69.6, 74.2, 72.1, 64.3, 50.7, 44.3, 40.9]
         month         = self.currDate[3:5]
         self.currTemp = avgTemps[int(month)-1]
@@ -188,6 +187,7 @@ class TrackModel(QWidget):
         '''
         self.temp, done = QInputDialog.getInt(self, 'Temperature Edit', 'Enter Track Line Temperature:')
         self.temperatureVal.setText("Temp: " + str(self.temp) + ' F')
+
         if self.temp <= 32:
             self.heaterSignal.emit(True)
         else:
@@ -227,6 +227,7 @@ class TrackModel(QWidget):
         Creates the table that shows all of the stations and their information 
         respective to the currently loaded line
         '''
+        # Station Information Table
         self.stationInfoLabel = QLabel("Station Information", self)
         self.stationInfoLabel.setAlignment(QtCore.Qt.AlignCenter)
         self.stationInfoLabel.move(440, 100)
@@ -255,7 +256,7 @@ class TrackModel(QWidget):
 
     def updateSwitchState(self, switch):
         '''
-        updates the swicthes for a given line
+        updates the swicthes for all railway lines
         '''
         for i in range(len(self.switchText)):
             blockNum = int(self.switchText[self.currLineIndex][i][0])
@@ -274,7 +275,9 @@ class TrackModel(QWidget):
 
     def orderedGreenLine(self):
         '''
-        Creates an green line for temporary use when presenting progress
+        Creates a list of block indices that represent a green line, with the blocks in the order
+        a train would need take in order to traverse the the green line in a full loop without 
+        considering switch states.
         '''
         sec1     = [i for i in range(63, 101)]
         sec2     = [i for i in range(85, 76, -1)]
@@ -300,7 +303,7 @@ class TrackModel(QWidget):
         self.bt1.setStyleSheet("background-color: orange ; color: black;")
         self.bt1.clicked.connect(self.openFileNameDialog)
 
-    def displayLargeSelectedBlockLabel(self):
+    def initializeLargeSelectedBlockLabel(self):
         '''
         Displays a large block label to get important information for a block quickly
         '''
@@ -545,6 +548,7 @@ class TrackModel(QWidget):
                         self.departingPassengers[k].append(self.generateBoardingPassengers())
                         self.boardingPassengers[k].append(self.generateLeavingPassengers())
 
+        # Initializes the currLine and currBlock after a layout is loaded, defaults to block #1 on the green line.
         self.currBlockIndex                       = 0
         self.currLineIndex                        = 1
         self.currBlock                            = self.lineBlocks[self.currLineIndex][self.currBlockIndex]
@@ -553,6 +557,7 @@ class TrackModel(QWidget):
         self.lastClickedBlock[0]                  = self.lineBlocks[0][self.currBlockIndex]
         self.lastBlockIndices[0]                  = self.currBlockIndex
         
+        # Used to update the other information widgets to the initialized currLine and currBlock.
         self.updateBlockInfo(self.currBlockIndex)
         self.updateBlockListOnLineChange()
         self.switchInfoLabel.setText(self.lineNames[self.currLineIndex]  + " Line Switch Information")
@@ -652,7 +657,7 @@ class TrackModel(QWidget):
         Sets the current line based on the selection make from the list of lines
         and loads the blocks for that line.
         '''
-        currLine = item.text()
+        currLine           = item.text()
         self.currLineIndex = self.lineNames.index(currLine)
         self.switchInfoLabel.setText(self.lineNames[self.currLineIndex] + " Line Switch Information")
         self.stationInfoLabel.setText(self.lineNames[self.currLineIndex] + " Line Station Information")
@@ -845,7 +850,7 @@ class TrackModel(QWidget):
         self.beaconInformationVallistwidget.insertItem(2, "NA")
         self.beaconInformationVallistwidget.insertItem(3, "NA")
     
-    def getOccupancy(self, occupancy):
+    def updateGlobalOccupancy(self, occupancy):
         '''
         Updates all occupancy related displays and emits a new global occupancy
         '''
