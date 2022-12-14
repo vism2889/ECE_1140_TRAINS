@@ -24,11 +24,10 @@ from signalSender import signalSender
 class Ui_TrainControllerSW_MainWindow(QWidget):
     def __init__(self, signals, trainID):
         super().__init__()
+        self.trainID = trainID
         self.signals = signals
         self.setupUi()
-        self.timer = QtCore.QTimer()
-        self.trainID = trainID
-        
+        self.timer = QtCore.QTimer()  
 
     def setupUi(self):      
         self.trainImage          = QLabel(self)
