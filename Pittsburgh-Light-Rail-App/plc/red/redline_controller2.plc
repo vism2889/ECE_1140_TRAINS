@@ -1,0 +1,9 @@
+if #block_45 == True or #block_46 == True or #block_47 == True or #block_48 == True or #block_49 == True:
+    #crossing_47 = True
+else: 
+    #crossing_47 = False
+
+#switch_27 = True
+#switch_32 = True
+#switch_38 = True
+#switch_43 = True

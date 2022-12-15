@@ -39,11 +39,14 @@ class TrainDictionary:
 
     def sendAuthority(self, name, signals):
         destinationList = self.trainList[name].destinations
+        blockStopList = self.trainList[name].blockStops
         stops = []
         for destination in destinationList.keys():
             if destinationList[destination][1]:
                 stops.append(destinationList[destination][0])
-        signals.ctcAuthoritySignal.emit(stops)
+        for block in blockStopList:
+            stops.append(block)
+        signals.ctcAuthoritySignal.emit([name, stops])
 
     def getDestination(self, name):
         return self.trainList[name].destinations
@@ -53,3 +56,9 @@ class TrainDictionary:
             self.backLog[name].destinations[destination][1] = not self.backLog[name].destinations[destination][1]
         else:
             self.trainList[name].destinations[destination][1] = not self.trainList[name].destinations[destination][1]
+
+    def addBlockStop(self, name, block, scheduled):
+        if scheduled:
+            self.backLog[name].blockStops.append(block)
+        else:
+            self.trainList[name].blockStops.append(block)

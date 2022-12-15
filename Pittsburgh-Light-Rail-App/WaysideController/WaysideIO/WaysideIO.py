@@ -1,7 +1,7 @@
 import os
 import sys
 import importlib
-sys.path.append('./extract_layout')
+sys.path.append('/track_layout')
 
 # import threading
 from PLCParser import PLCParser
@@ -45,11 +45,11 @@ class Controller():
 
             ## Switches
             for switch in self.layout['sections'][section]['switches']:
-                self.track['switch'][switch] = True
+                self.track['switch'][int(switch)] = True
 
             ## Crossings
             for crossing in self.layout['sections'][section]['crossing']:
-                self.track['crossing'][crossing] = False
+                self.track['crossing'][int(crossing)] = False
 
         self.id = controllerNum
 
@@ -58,11 +58,12 @@ class Controller():
         self.updateSwitch()
 
         ## Setup PLC interface
-        self.parser = PLCParser(controllerNum)
-        if self.line == 'green':
-            file = open(f"plc/controller{self.id}.plc")
-            self.uploadPLC(file)
-            self.maintenance = False
+        self.parser = PLCParser(controllerNum, self.line)
+        
+        ## Load the default PLC programs 
+        file = open(f"plc/{self.line}/{self.line}line_controller{self.id}.plc")
+        self.uploadPLC(file)
+        self.maintenance = False
 
     ###############
     ## BLOCK OPS ##
@@ -140,7 +141,10 @@ class Controller():
     ## Updates the crossing state of the controller
     def updateCrossing(self):
         for crossing in self.track['crossing']:
-            self.parent.setCrossing(self.line, crossing, self.track['crossing'][crossing])
+            if self.id == 2 and self.line == 'red':
+                state = self.track['crossing'][crossing]
+                # print(f'switch {crossing}: {state}')
+            self.parent.setCrossing(self.line, int(crossing), self.track['crossing'][crossing])
             self.ui.setCrossingState(self.line, int(crossing), self.track['crossing'][crossing])
 
         ## Run PLC program
@@ -163,11 +167,14 @@ class Controller():
 
     ## Run the PLCs
     def run(self):
-        if self.plcGood and not self.maintenance:
+        if self.plcGood and not self.maintenance: 
+            # if self.id == 3 and self.line == 'red':
+            #     print(f'track: {self.track}')
             try:
                 self.plc(self.track)
-            except:
-                print(f'Error: PLC script cannot run (controller{self.id})')
+            except Exception as e:
+                print(e)
+                print(f'Error: PLC script cannot run ({self.line}line controller {self.id})')
                 self.plcGood = False
 
     ## Upload a PLC
@@ -175,13 +182,13 @@ class Controller():
         if self.maintenance:
             modname = self.parser.parseFile(file)
             try:
-                mod = importlib.import_module("plc."+modname)
-                # mod.run(self.track)
+                mod = importlib.import_module(f"plc.{self.line}."+modname)
             except ImportError:
-                print(f"Errror: Could not import plc script for controller {self.id}")
+                print(f"Errror: Could not import plc script for {self.line}line controller {self.id}")
                 self.plcGood = False
             else:
                 self.plc = mod.run
+                # self.plc(self.track)
                 self.plcGood = True
         else:
             print(f"Error: Controller {self.id} not in maintenance mode for PLC upload")
@@ -336,13 +343,21 @@ class WaysideIO(QWidget):
                 self.greenlineControllers[c[0]].updateMaintenance(blockNum, state)
 
     def setSwitch(self, line, blockNum, state):
+        controllers = self.lookupBlock(line, blockNum)['controller']
+        # print(controllers)
         ## redline
         if self.lines[0] == line.lower():
+            for c in controllers:
+                if len(self.redlineControllers) > c[0]:
+                    self.redlineControllers[c[0]].track['switch'][blockNum] = state
             self.signals.switchState.emit([int(blockNum), state])
             res = self.redlineTrack.setSwitch(int(blockNum), state)
 
         ## greenline
         if self.lines[1] == line.lower():
+            for c in controllers:
+                if len(self.greenlineControllers) > c[0]:
+                    self.greenlineControllers[c[0]].track['switch'][blockNum] = state
             self.signals.switchState.emit([int(blockNum), state])
             res = self.greenlineTrack.setSwitch(int(blockNum), state)
 
@@ -357,6 +372,24 @@ class WaysideIO(QWidget):
             # for c in controllers:
             #     self.greenline_controllers[c[0]].updateCrossing(blockNum, state)
 
+    #############
+    ## GETTERS ##
+    #############
+    def getOccupancy(self, line, blockNum):
+        occupied = True
+        controllers = self.lookupBlock(line, blockNum)['controller']
+        
+        # exit(0)
+        if line == 'red':
+            for c in controllers:
+                occupied &= self.redlineControllers[c[0]].blockState(blockNum)
+        
+        if line == 'green':
+            for c in controllers:
+                occupied &= self.greenlineControllers[c[0]].blockState(blockNum)
+
+        return occupied
+        
     #############
     ## HELPERS ##
     #############
@@ -373,8 +406,11 @@ class WaysideIO(QWidget):
             nextBlock = track.getNextBlock(currentBlock, previousBlock)
             if nextBlock == -1:
                 ## Set a 2 block buffer for the authority
-                authority.pop(-1)
-                authority.pop(-1)
+                if len(authority) > 2: 
+                    authority.pop(-1)
+                    authority.pop(-1)
+                elif len(authority) > 1:
+                    authority.pop(-1)
                 return authority
 
             ## Check if it's the yard
@@ -469,6 +505,8 @@ class WaysideIO(QWidget):
         self.signals.signalMaintenance.connect(self.maintenanceCallback)
         self.signals.trainLocation.connect(self.trainLocationCallback)
         self.signals.ctcSwitchState.connect(self.ctcSetSwitch)
+
+        # print(self.redlineControllers[2].track['crossing'])
 
 if __name__ == '__main__':
 

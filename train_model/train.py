@@ -6,6 +6,9 @@ from PyQt5 import QtWidgets
 import sys
 from PyQt5.QtCore import pyqtSignal
 import random
+sys.path.append("../SystemSignals")
+from Signals import Signals
+
 
 
 # class PointMassModel():
@@ -50,6 +53,7 @@ class PointMassModel():
         self.waysideAuthority = []
         self.train_authority = 0
         self.stationStop = False
+        self.ctcStopBlock = None
         
         self.suggested_speed = 0
         #track model to train comms
@@ -77,7 +81,7 @@ class PointMassModel():
         self.occ_list = [0 for i in range(150)]
         self.occ_index = 0
 
-
+        self.ctcStationStop = []
         #time independent values
         self.power = 0
         self.force = 0
@@ -139,6 +143,7 @@ class PointMassModel():
             if self.curr_vel <= 0:
                 self.curr_vel = 0
         else:
+            self.calcPos()
             self.power = 0  
             self.force = 0
             self.prev_accel = 0
@@ -204,8 +209,9 @@ class PointMassModel():
         self.train_authority = 0
         
         #position calculation
-        self.prev_pos = self.curr_pos
-        self.curr_pos = self.prev_pos + (self.elapsed_time/2)*(self.prev_vel +self.curr_vel)
+        if self.curr_vel != 0:
+            self.prev_pos = self.curr_pos
+            self.curr_pos = self.prev_pos + (self.elapsed_time/2)*(self.prev_vel +self.curr_vel)
         # self.brake_pos = (self.elapsed_time/2)*(self.prev_vel + self.curr_vel)
 
         #block object length calculation
@@ -213,9 +219,9 @@ class PointMassModel():
         self.curr_block_len = curr_block_object.blockLength
         self.curr_block_len = float(self.curr_block_len)
 
-        
+    
         # print(f'-------------------Position: {self.curr_pos}-----------------------------')
-        if self.curr_pos >= self.curr_block_len:
+        if self.curr_pos >= self.curr_block_len and self.curr_block != 0:
             # self.occ_list[self.occ_index] = 0
             #resetting position
             self.curr_pos = self.curr_pos-self.curr_block_len
@@ -225,9 +231,18 @@ class PointMassModel():
             if len(self.waysideAuthority) > 1:
                 self.curr_block = self.waysideAuthority[1]
                 self.prev_block = self.waysideAuthority[0]
+                if self.curr_block == 0:
+                    self.train_authority = 0
+                    return
             if len(self.waysideAuthority) == 1:
                 self.curr_block = self.waysideAuthority[0]
                 self.prev_block = self.prev_block
+            elif self.curr_block == 0:
+                self.train_authority = 0
+                return
+        elif self.curr_block == 0:
+            self.train_authority = 0
+            return 
                 
         
         
@@ -256,7 +271,7 @@ class PointMassModel():
             for b in wayside[0:len(wayside)-1]:
                 self.train_authority += float(self.BlockModels[b-1].blockLength)
             
-            if len(wayside) > 0:
+            if len(wayside) > 0 and wayside[-1] != 0:
                 lastBlock = wayside[-1]
                 self.train_authority += float(self.BlockModels[lastBlock-1].blockLength)/4
         elif len(self.waysideAuthority) == 1 and self.curr_vel != 0:
@@ -404,7 +419,7 @@ class Train():
             self.pm.brake(1)
     
     def serv_brake_func(self):
-        print('inside service brake')
+        # print('inside service brake')
         if self.service_brake == True and self.pm.curr_vel > 0:
             self.pm.brake(0)
 
@@ -420,7 +435,7 @@ class Train():
 
         for f in (self.Failures):
             if self.Failures[f]:
-                print(f"Error {f} failure")
+                # print(f"Error {f} failure")
                 return 
         
         if(self.dispatched):

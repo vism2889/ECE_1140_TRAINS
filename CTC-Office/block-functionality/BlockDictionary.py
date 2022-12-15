@@ -21,7 +21,6 @@ class BlockDictionary:
                 try:
                     re.split('; |: ', newBlock.infrastructure)[1]
                 except:
-                    print("Missing station name on block", newBlock.number)
                     return
                 station = re.split('; |: ', newBlock.infrastructure)[1]
                 self.stationList[newBlock.number] = station
@@ -40,6 +39,9 @@ class BlockDictionary:
 
     def toggleFaultState(self, blockNum):
         self.blockList[blockNum].faultState = not self.blockList[blockNum].faultState
+
+    def setFaultState(self, blockNum, state):
+        self.blockList[blockNum].faultState = state
 
     def setSwitchState(self, blockNum, state):
         if blockNum in self.switchList:

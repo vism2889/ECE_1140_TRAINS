@@ -1,0 +1,4 @@
+if #block_50 == True or #block_51 == True:
+    #switch_52 = True
+elif #block_65 == True or #block_64 == True:
+    #switch_52 = False

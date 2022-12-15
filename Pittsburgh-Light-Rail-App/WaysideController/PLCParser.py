@@ -4,7 +4,7 @@ import sys
 from copy import deepcopy
 
 class PLCParser():
-    def __init__(self, controllerId):
+    def __init__(self, controllerId, prefix):
 
         self.VAR_TYPES = ['#block_', '#switch_', '#crossing_']
 
@@ -22,10 +22,10 @@ class PLCParser():
         self.outfilePath = ""
         self.outfileName = ""
         if os.name == 'posix':
-            self.outfilePath = os.getcwd() + f'{dir}/controller_plc_{controllerId}.py'
+            self.outfilePath = os.getcwd() + f'{dir}/{prefix}/controller_plc_{controllerId}.py'
             self.outfileName = f"controller_plc_{controllerId}"
         elif os.name == 'nt':
-            self.outfilePath = os.getcwd() + f'{dir}\\controller_plc_{controllerId}.py'
+            self.outfilePath = os.getcwd() + f'{dir}\\{prefix}\\controller_plc_{controllerId}.py'
             self.outfileName = f"controller_plc_{controllerId}"
 
     def parseFile(self, file):
@@ -46,7 +46,6 @@ class PLCParser():
         outfile.write("def run(input):\n")
 
         for l in lines:
-            # outfile.write(l + "\n")
             outfile.write(l)
 
         outfile.close()
