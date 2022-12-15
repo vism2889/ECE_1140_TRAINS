@@ -564,9 +564,14 @@ class CTCOffice(QWidget):
         self.blockInfoTable.setItem(4,0,item)
 
     def updateSwitchState(self, switchSignal):
-        self.greenLineBlocks.setSwitchState(switchSignal[0], switchSignal[1])
         item = QtWidgets.QTableWidgetItem()
-        #item.setText(self.greenLineBlocks.switch(switchSignal[0])[0] + " " + str(self.greenLineBlocks.switch(switchSignal[0])[1]))
+        if switchSignal[0] == 0:
+            self.redLineBlocks.setSwitchState(switchSignal[1], switchSignal[2])
+            #print(self.redLineBlocks.switch(switchSignal[1]))
+            #item.setText(self.redLineBlocks.switch(switchSignal[1])[0] + " " + str(self.greenLineBlocks.switch(switchSignal[1])[1]))
+        else:
+            self.redLineBlocks.setSwitchState(switchSignal[1], switchSignal[2])
+            #item.setText(self.greenLineBlocks.switch(switchSignal[1])[0] + " " + str(self.greenLineBlocks.switch(switchSignal[1])[1]))
 
     def toggleMaintenance(self):
         self.selectedBlockLine.toggleMaintenanceState(str(self.selectedBlock))
