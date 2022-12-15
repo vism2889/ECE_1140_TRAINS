@@ -22,13 +22,11 @@ from signalSender import signalSender
 
 
 class Ui_TrainControllerSW_MainWindow(QWidget):
-    def __init__(self, signals, trainID):
+    def __init__(self, signals, trainID = None):
         super().__init__()
         self.trainID = trainID
-        print(self.trainID)
-        self.signals = signals
+        self.signals = signals 
         self.setupUi()
-        self.timer = QtCore.QTimer()  
 
     def setupUi(self):      
         self.trainImage          = QLabel(self)
@@ -36,7 +34,7 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
         self.trainImage.setPixmap(self.pixmap)
         self.trainImage.setGeometry(750,380,100,110)
         #self.setStyleSheet("background-color: #747c8a;")
-         
+        
         self.setObjectName("self")
         self.resize(835, 423)
         self.setAutoFillBackground(False)
@@ -57,13 +55,6 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
         font.setBold(True)
         self.currentSpeed_lcdDisplay.setFont(font)
         self.currentSpeed_lcdDisplay.setObjectName("currentSpeed_lcdDisplay")
-        self.pushButton = QtWidgets.QPushButton(self.centralwidget)
-        self.pushButton.setGeometry(QtCore.QRect(1360, 20, 71, 30))
-        font = QtGui.QFont()
-        font.setPointSize(14)
-        font.setBold(True)
-        self.pushButton.setFont(font)
-        self.pushButton.setObjectName("pushButton")
         self.TabWigets = QtWidgets.QTabWidget(self.centralwidget)
         self.TabWigets.setGeometry(QtCore.QRect(20, 10, 521, 381))
         self.TabWigets.setObjectName("TabWigets")
@@ -502,12 +493,14 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
         self.setOperationMode()
         self.inputSignals()        
         self.retranslateUi()
+        
+        self.timer = QtCore.QTimer()
+        self.startTime = 0
 
     def retranslateUi(self):
         _translate = QtCore.QCoreApplication.translate
         self.setWindowTitle(_translate("self", self.trainID))
         self.label_5.setText(_translate("self", "Next Station:"))
-        self.pushButton.setText(_translate("self", "I/0"))
         self.ManualMode_GroupBox.setTitle(_translate("self", "Automatic Mode"))
         self.label_11.setText(_translate("self", "Vital Controls"))
         self.label_13.setText(_translate("self", "Speed Limit(MPH)"))
@@ -567,7 +560,8 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
         self.signals.commandedSpeedSignal.connect(self.setCommandedSpeedSignal)
         self.signals.trainFailuresSignal.connect(self.setTrainFailuresSignal)
         self.signals.beaconFromTrackModelSignal.connect(self.setBeaconSignal) # station side, nanme of station, underground
-        #self.signals.dispatchTrainSignal.connect(self.setTrainIDSignal)
+        self.signals.stationStop.connect(self.setStationStopSignal)
+        self.signals.clockSpeedSignal.connect(self.setClockSpeedSignal)
 
     def setOperationMode(self):
         if(self.TabWigets.currentIndex() == 0):     # Automatic Mode
@@ -599,7 +593,7 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
         self.commandedSpeed = 13.4112 # commanded speed input as m/s
         self.kp = 24000
         self.ki = 100
-        #self.trainID = 'Initial'
+        self.vitalOverride = False
         
         # Variables for incoming data
         self.authority = 0
@@ -612,6 +606,8 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
         self.stationName = ''
         self.underground = ''
         self.commandedSpeedSignal = 13.4112
+        self.stationStop = False
+        self.clockSpeed = 1
         
         # Variables for outgoing data
         self.internalLightState = True        
@@ -623,6 +619,7 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
         self.serviceBrakeState = False
         self.emergencyBrakeState = False
         self.temperature = 72
+        self.stoppedAtStation = False
         
         self.Manual_lights_ComboBox.setCurrentIndex(3)
         self.Manual_doors_ComboBox.setCurrentIndex(0)
@@ -637,11 +634,13 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
             'power' : self.PowerOutput_lcdDisplay.value(),
             'trainID' : self.trainID
         }
+        
         self.brakeDict = {
             'serviceBrake' : self.serviceBrakeState,
             'emergencyBrake' : self.emergencyBrakeState,
             'trainID': self.trainID
         }
+        
         self.nonVitalDict = {
             'int_lights' : self.internalLightState,
             'ext_lights' : self.externalLightState,
@@ -652,22 +651,25 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
             'advertisementState' : self.advertisementState,
             'trainID': self.trainID
         }
-             
-##### Set Signal Inputs      
-    # def setTrainIDSignal(self, msg):
-    #     print("Train ID: ", msg)
-    #     if(self.trainID == 'Initial'):
-    #         self.trainID = msg
         
+        self.stoppedAtStationDict = {
+            'stoppedAtStation' : self.stoppedAtStation,
+            'trainID' : self.trainID
+        }
+        
+             
+##### Set Signal Inputs        
     def setCurrentSpeedSignal(self, msg):
         if(msg[0] == self.trainID):
             self.currentSpeed = msg[1]
             self.setPID()
             self.setAuthority()
-            if(self.TabWigets.currentIndex() != 1 & self.TabWigets.currentIndex() != 2):     
+            #if(self.currentSpeed == 0):
+             #   self.checkStationStop()
+            #if(self.TabWigets.currentIndex() != 1 & self.TabWigets.currentIndex() != 2):     
                 #self.setAutoCommandedSpeed()
                 #self.setAutoServiceBrake()
-                pass
+                #pass
     
     def setAuthoritySignal(self, msg):
         if(msg[0] == self.trainID):
@@ -704,7 +706,20 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
         self.setAutoLights()
         self.setStationName()
         
-        
+    def setStationStopSignal(self, msg):
+        if(msg[0] == self.trainID):
+            self.stationStop = msg[1]
+            if((self.stationStop == True) & (self.currentSpeed == 0)):
+                print("StationStop:", self.stationStop)
+                self.stoppedAtStation = True
+                self.emitStoppedAtStation()
+                self.startTime = time.time()
+                self.timer.timeout.connect(self.waitAtStation)  
+                self.timer.start(100)
+                
+    def setClockSpeedSignal(self, msg):
+        self.clockSpeed = msg
+            
 ###### Helper Functions                
     def checkCurrentSpeed(self, msg):
         if(self.commandedSpeed < (self.currentSpeed)):
@@ -756,7 +771,7 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
         self.emitNonVital() 
    
     def setAutoDoors(self):
-        if(self.currentSpeed == 0): # and we are at a station
+        if(self.currentSpeed == 0 & self.stationStop == True): # and we are at a station
             if(self.stationSide == 'Left'):
                 self.leftDoorState = True
                 self.rightDoorState = False
@@ -805,7 +820,11 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
             self.Manual_CommandedSpeed_lcdDisplay.display(int(self.commandedSpeed * 2.23694))    # display in mph
         
     def setManualControl_ServiceBrake(self):
+        self.vitalOverride = True
         self.serviceBrakeState = self.braking_Slider.value()
+        print("service Brake state Manual:", self.serviceBrakeState)
+        if(self.braking_Slider.value() == 0):
+            self.vitalOverride = False
         self.emitBrakes()
     
     def setManualControl_EmergencyBrake(self):
@@ -908,22 +927,38 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
         # velocity (m/s)
         if(((self.currentSpeed ** 2) * 1.2) >= (self.authority * 0.9)):
             self.serviceBrakeState = True
-            self.braking_Slider.setValue(1)
-            self.emitBrakes()
+            self.Auto_BrakingDisplay.display(1)
         else:
-            self.serviceBrakeState = False
-            self.braking_Slider.setValue(0)
-            self.emitBrakes()
-    
-    def waitUntilStopped(self):
-        pass
+            if self.vitalOverride:
+                return
+            else:
+                self.serviceBrakeState = False
+                self.Auto_BrakingDisplay.display(0)
+        self.emitBrakes()
 
+            
+        
+    def waitAtStation(self):
+        self.difference = (time.time() - self.startTime)   
+        if((self.difference) > (30 / self.clockSpeed)):
+            # wait
+            self.serviceBrakeState = False
+            self.braking_Slider.setValue(False)
+            self.emitBrakes()   
+
+    def emitStoppedAtStation(self):
+        self.stoppedAtStationDict['stoppedAtStation'] = self.stoppedAtStation
+        self.stoppedAtStationDict['trainID'] = self.trainID
+        self.signals.stoppedAtStationSignal.emit(self.stoppedAtStationDict)
+    
     def emitPower(self):
+        self.powerDict['trainID'] = self.trainID
         self.signals.powerSignal.emit(self.powerDict)   
         
     def emitBrakes(self):
         self.brakeDict['serviceBrake'] = self.serviceBrakeState
         self.brakeDict['emergencyBrake'] = self.emergencyBrakeState
+        self.brakeDict['trainID'] = self.trainID
         self.signals.brakeDictSignal.emit(self.brakeDict)
             
     def emitNonVital(self):
@@ -932,6 +967,7 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
         self.nonVitalDict['ext_lights'] = self.externalLightState
         self.nonVitalDict['left_doors'] = self.leftDoorState
         self.nonVitalDict['right_doors'] = self.rightDoorState
+        self.nonVitalDict['trainID'] = self.trainID
         self.signals.nonVitalDictSignal.emit(self.nonVitalDict) 
  
 if __name__ == "__main__":
