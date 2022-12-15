@@ -404,7 +404,7 @@ class Train():
             self.pm.brake(1)
     
     def serv_brake_func(self):
-        print('inside service brake')
+        # print('inside service brake')
         if self.service_brake == True and self.pm.curr_vel > 0:
             self.pm.brake(0)
 
@@ -420,7 +420,7 @@ class Train():
 
         for f in (self.Failures):
             if self.Failures[f]:
-                print(f"Error {f} failure")
+                # print(f"Error {f} failure")
                 return 
         
         if(self.dispatched):
