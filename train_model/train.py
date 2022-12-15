@@ -54,7 +54,8 @@ class PointMassModel():
         self.train_authority = 0
         self.stationStop = False
         self.ctcStopBlock = None
-        
+        self.stopAtStation = False
+
         self.suggested_speed = 0
         #track model to train comms
         self.speedLimit = 0
@@ -252,13 +253,13 @@ class PointMassModel():
                 if self.curr_vel != 0 and not self.stationStop:
                     self.waysideAuthority = self.waysideAuthority[0:ind+1]
                 if c_bl == self.curr_block and self.curr_vel == 0:
-                    if not self.stationStop:
-                        self.stationStop = True
-                    else:
-                        self.stationStop = False
+                    self.stationStop = True
                 elif c_bl == self.prev_block:
                     self.stationStop = False
+                    self.stopAtStation = False
                     self.ctc_authority.remove(c_bl)
+            
+
 
         #Calculating Authority distance when train not at stopping block               
         if len(self.waysideAuthority) > 1:
