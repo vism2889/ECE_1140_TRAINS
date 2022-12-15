@@ -290,6 +290,7 @@ class Train():
         self.stationSide                        = ''
         self.underground                        = ''
         self.stationName                        = ''
+        self.stations                           = []
 
         #point Mass model
         self.pm                                 = PointMassModel()
@@ -317,7 +318,7 @@ class Train():
 
         self.int_lights                         = False
         self.ext_lights                         = False
-        self.crew_count                         = 0
+        self.crew_count                         = 1
         self.curr_speed                         = self.pm.curr_speed
         self.passenger_count                    = 0
         self.temperature                        = 0
@@ -325,8 +326,8 @@ class Train():
         self.right_doors                        = False
         self.announcements                      = False
 
-        self.last_station                       = 'Pitt'
-        self.next_station                       = 'Phil'
+        self.last_station                       = 'Yard'
+        self.next_station                       = 'Glenbury'
 
         self.ctcAuthority                       = []
         self.authority                          = 20
