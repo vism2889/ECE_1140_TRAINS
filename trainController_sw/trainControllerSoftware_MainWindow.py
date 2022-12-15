@@ -869,7 +869,7 @@ class Ui_TrainControllerSW_MainWindow(QWidget)          :
     def setManualControl_CommandedSpeed(self)           : 
         if((self.speed_Slider.value() / 2.23694) > self.speedLimit):
             self.commandedSpeed                         = self.speedLimit
-            self.speed_Slider.setMaximum(self.commandedSpeed * 2.23694);
+            self.speed_Slider.setMaximum(int(self.commandedSpeed * 2.23694));
             self.speed_Slider.setValue(int(self.commandedSpeed * 2.23694))   # display in mph
             self.Manual_CommandedSpeed_lcdDisplay.display(int(self.commandedSpeed * 2.23694))    # display in mph
         else                                            : 
