@@ -869,7 +869,7 @@ class Ui_TrainControllerSW_MainWindow(QWidget)          :
     def setManualControl_CommandedSpeed(self)           : 
         if((self.speed_Slider.value() / 2.23694) > self.speedLimit):
             self.commandedSpeed                         = self.speedLimit
-            self.speed_Slider.setMaximum(self.commandedSpeed * 2.23694);
+            self.speed_Slider.setMaximum(int(self.commandedSpeed * 2.23694));
             self.speed_Slider.setValue(int(self.commandedSpeed * 2.23694))   # display in mph
             self.Manual_CommandedSpeed_lcdDisplay.display(int(self.commandedSpeed * 2.23694))    # display in mph
         else                                            : 
@@ -934,10 +934,15 @@ class Ui_TrainControllerSW_MainWindow(QWidget)          :
             self.emitNonVital() 
     
     def setManualControl_Advertisements(self)           : 
-        self.advertisementState                         = self.Manual_Advertisements_CheckBox.checkState()
+        if(self.Manual_Advertisements_CheckBox.isChecked() == True):
+            self.advertisementState                         = True
+        elif(self.Manual_Advertisements_CheckBox.isChecked() == False):
+            self.advertisementState                         = False
+        self.emitNonVital() 
 
     def setManualControl_Announcements(self)            : 
         self.announceState                              = self.Manual_Annoucements_CheckBox.checkState()
+        self.emitNonVital() 
 
     # Power and Ebrake
     def ActivateEmergencyBrake(self)                    : 

@@ -3,7 +3,7 @@
 ##############################################################################
 # AUTHOR(S):    Morgan Visnesky, Garrett Marcinak, Nathaniel Mallick, Gwen Litwak
 # DATE:         11/13/2022
-# FILENAME:     occupancySignalSender.py
+# FILENAME:     Signals.py
 # DESCRIPTION:
 #   Used to hold all signals used for inter-module communications in the
 #   Pittsburgh Light Rail Track System

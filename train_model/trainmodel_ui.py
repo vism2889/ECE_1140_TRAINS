@@ -54,8 +54,14 @@ class TrainModel(QtWidgets.QMainWindow):
     def beaconSignal(self,msg):
         if len(msg) > 1:
             self.t.stationSide = msg[0]
-            self.t.stationName = msg[1]
             self.t.underground = msg[2]
+
+            if len(self.t.stations) <= 1:
+                self.t.stations.append(msg[1])
+            if len(self.t.stations) == 2:
+                if self.t.stations[1] != msg[1]: 
+                    self.t.stations.pop(0)
+                    self.t.stations.append(msg[1])
 
     def set_blocks(self,msg):
         #red is msg[0] and green is msg[1]
@@ -136,9 +142,9 @@ class TrainModel(QtWidgets.QMainWindow):
         print('here')
 
     def addPassengers(self,msg):
-        if self.t.id == msg[0]:
+        if self.t.id == msg[1]:
             print(f'Getting Passengers {msg[1]}')
-            self.t.passenger_count = msg[1]
+            self.t.passenger_count = msg[0]
 
     def UI(self):
         self.signals.dispatchTrainSignal.connect(self.dispatch)
@@ -150,6 +156,7 @@ class TrainModel(QtWidgets.QMainWindow):
         self.signals.waysideAuthority.connect(self.wayside_authority)
         self.signals.beaconFromTrackModelSignal.connect(self.beaconSignal)
         self.signals.stoppedAtStationSignal.connect(self.trainStopped)
+        self.signals.passengersToTrainModelSignal.connect(self.addPassengers)
         
         #connecting failure buttons to respective slots
         self.sig_fail.clicked.connect(self.sig_failure)
@@ -267,8 +274,15 @@ class TrainModel(QtWidgets.QMainWindow):
         self.grade_disp.setText(f'{self.t.pm.grade * 100} %')
 
         #stations
-        self.last_st_disp.setText(f'{self.t.last_station}')
-        self.next_st_disp.setText(f'{self.t.next_station}')
+        if len(self.t.stations) > 0:
+            self.last_st_disp.setText(f'{self.t.stations[0]}')
+            if len(self.t.stations) > 1:
+                self.next_st_disp.setText(f'{self.t.stations[1]}')
+            else:
+                self.next_st_disp.setText(f'')
+        else:
+            self.last_st_disp.setText(f'')
+            self.next_st_disp.setText(f'')
         
       
         if time.time()-self.last_update > 0.1:
@@ -277,7 +291,6 @@ class TrainModel(QtWidgets.QMainWindow):
             if self.t.pm.stationStop and not self.t.pm.stopAtStation:
                 print('Sending stationStop')
                 self.signals.stationStop.emit([self.t.id, self.t.pm.stationStop, self.t.line, self.t.pm.curr_block])
-                self.t.passenger_count = 0
             else:
                 if self.t.line != None and self.t.pm.prev_block != None and self.t.pm.curr_block != 0:
                     self.signals.trainLocation.emit([int(self.t.line), self.t.id, int(self.t.pm.prev_block), int(self.t.pm.curr_block)])
