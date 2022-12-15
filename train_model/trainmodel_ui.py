@@ -276,7 +276,7 @@ class TrainModel(QtWidgets.QMainWindow):
                         self.mp.publish()
 
                 if self.t.pm.stationStop:
-                    self.signals.stationStop.emit([self.t.id, self.t.pm.stationStop])
+                    self.signals.stationStop.emit([self.t.id, self.t.pm.stationStop, self.t.line, self.t.pm.curr_block])
                 
                 # elif type(self.t.line) != int:
                 #     print("LINE not int")
