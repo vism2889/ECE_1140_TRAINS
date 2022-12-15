@@ -326,6 +326,7 @@ class TrackModel(QWidget):
         '''
         Updates the Station Ticket Sales and Passengers Boarding
         '''
+        print("STOP MSG", stopMessage)
         msgTrain   = stopMessage[0]
         msgLine    = stopMessage[2]
         msgBlock   = stopMessage[3]
