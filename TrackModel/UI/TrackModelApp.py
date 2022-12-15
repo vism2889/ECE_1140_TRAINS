@@ -141,7 +141,7 @@ class TrackModel(QWidget):
 
         # Track Model System Themed Logo
         self.trackModelImage     = QLabel(self)
-        self.pixmap              = QPixmap('../images/TrackModel.png')
+        self.pixmap              = QPixmap('images/TrackModel.png')
         self.pixmap              = self.pixmap.scaled(QtCore.QSize(160, 100))
         self.trackModelImage.setPixmap(self.pixmap)
         self.trackModelImage.resize(175,100)
@@ -152,7 +152,7 @@ class TrackModel(QWidget):
         Displays the UI components for interacting with the temperature
         '''
         # Pushbutton to allow a user provided temperature
-        self.temperatureDisplay = QPushButton("Set Temperature:", self)
+        self.temperatureDisplay = QPushButton("Set System Temperature:", self)
         self.temperatureDisplay.move(440, 40)
         self.temperatureDisplay.resize(200, 50)
         self.temperatureDisplay.setStyleSheet("background-color: cyan; color: black;")
@@ -259,16 +259,17 @@ class TrackModel(QWidget):
         updates the swicthes for all railway lines
         '''
         for i in range(len(self.switchText)):
-            blockNum = int(self.switchText[self.currLineIndex][i][0])
-            if switch[0] == blockNum:
-                if switch[1] == True:
-                    self.switchInfoTable.item(i,1).setBackground(QtCore.Qt.green)
-                    self.switchInfoTable.item(i,2).setBackground(QtCore.Qt.red)
-                    self.lineBlocks[self.currLineIndex][switch[0]-1].switchState = 'FORWARD'
-                else:
-                    self.switchInfoTable.item(i,1).setBackground(QtCore.Qt.red)
-                    self.switchInfoTable.item(i,2).setBackground(QtCore.Qt.green)
-                    self.lineBlocks[self.currLineIndex][switch[0]-1].switchState = 'REVERSE'
+            for j in range(len(self.switchText[i])):
+                blockNum = int(self.switchText[i][j][0])
+                if switch[0] == blockNum and i == self.currLineIndex:
+                    if switch[1] == True:
+                        self.switchInfoTable.item(j,1).setBackground(QtCore.Qt.green)
+                        self.switchInfoTable.item(j,2).setBackground(QtCore.Qt.red)
+                        self.lineBlocks[i][switch[0]-1].switchState = 'FORWARD'
+                    else:
+                        self.switchInfoTable.item(j,1).setBackground(QtCore.Qt.red)
+                        self.switchInfoTable.item(j,2).setBackground(QtCore.Qt.green)
+                        self.lineBlocks[i][switch[0]-1].switchState = 'REVERSE'
 
     def updateCtcSwitchState(self, switchState):
         print("CTC Switch State Signal", switchState)
@@ -329,10 +330,10 @@ class TrackModel(QWidget):
         self.linesLabel.setAlignment(QtCore.Qt.AlignCenter)
         self.linesLabel.setStyleSheet("background-color: cyan; color: black;")
         self.linesLabel.move(5,40)
-        self.linesLabel.resize(100,18)
+        self.linesLabel.resize(120,18)
         self.linelistwidget = QListWidget(self)
         self.linelistwidget.move(5,58)
-        self.linelistwidget.resize(100,50)
+        self.linelistwidget.resize(120,80)
         self.linelistwidget.setStyleSheet("background-color: gray;")
 
     def initializeTrackBlockList(self):
@@ -427,8 +428,8 @@ class TrackModel(QWidget):
             self.faults[self.currLineIndex][self.currBlockIndex] += faultNum
             self.currBlock.faultsText.append(faultName)
             self.blockslistwidget.item(int(self.currBlock.blockNumber)-1).setBackground(QColor(255,0,0))
-            self.blockslistwidget.item(int(self.currBlock.blockNumber)-1).setIcon(QIcon("../images/alert.png"))
-            self.linelistwidget.item(int(self.currLineIndex)).setIcon(QIcon("../images/alert.png"))
+            self.blockslistwidget.item(int(self.currBlock.blockNumber)-1).setIcon(QIcon("images/alert.png"))
+            self.linelistwidget.item(int(self.currLineIndex)).setIcon(QIcon("images/alert.png"))
             self.updateBlockInfo(self.currBlockIndex)
         
         elif self.currBlock.faultPresence == True and faultName not in self.currBlock.faultsText: 
@@ -585,7 +586,7 @@ class TrackModel(QWidget):
                 if len(block.faultsText) > 0:
                     print("FAULTS", block.faultsText)
                     self.blockslistwidget.item(i).setBackground(QColor(255,0,0))
-                    self.blockslistwidget.item(i).setIcon(QIcon("../images/alert.png"))
+                    self.blockslistwidget.item(i).setIcon(QIcon("images/alert.png"))
                 else:
                     self.blockslistwidget.item(i).setBackground(QColor(134, 132, 130))
                     
@@ -606,7 +607,7 @@ class TrackModel(QWidget):
         for i in range(len(self.occupancy[self.currLineIndex])):
             if self.faults[self.currLineIndex][i] == True:
                 self.blockslistwidget.item(i).setBackground(QColor(255,0,0))
-                self.blockslistwidget.item(i).setIcon(QIcon("../images/alert.png"))
+                self.blockslistwidget.item(i).setIcon(QIcon("images/alert.png"))
 
             elif self.occupancy[self.currLineIndex][i] == True:
                 self.blockslistwidget.item(i).setBackground(QColor(200,200,50))

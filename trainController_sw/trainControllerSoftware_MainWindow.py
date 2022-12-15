@@ -22,7 +22,7 @@ from signalSender import signalSender
 
 
 class Ui_TrainControllerSW_MainWindow(QWidget):
-    def __init__(self, signals, trainID):
+    def __init__(self, signals, trainID = None):
         super().__init__()
         self.trainID = trainID
         print(self.trainID)
