@@ -52,7 +52,7 @@ class CTCOffice(QWidget):
         self.greenLineTotalPassengers   = [0]
         self.redLineThroughput          = 0
         self.greenLineThroughput        = 0
-        self.totalHours                 = 0
+        self.totalHours                 = 1
 
         # connect to necessary signals
         self.signals.globalOccupancyFromTrackModelSignal.connect(self.readOccupancySignal)
