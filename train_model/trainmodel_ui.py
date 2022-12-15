@@ -271,10 +271,11 @@ class TrainModel(QtWidgets.QMainWindow):
         self.next_st_disp.setText(f'{self.t.next_station}')
         
       
-        if time.time()-self.last_update > 0.2:
+        if time.time()-self.last_update > 0.1:
             # if len(self.t.pm.waysideAuthority) == 0:
             #     self.signals.trainLocation.emit([int(self.t.line), self.t.id, int(self.t.pm.prev_block), int(self.t.pm.curr_block)])
             if self.t.pm.stationStop and not self.t.pm.stopAtStation:
+                print('Sending stationStop')
                 self.signals.stationStop.emit([self.t.id, self.t.pm.stationStop, self.t.line, self.t.pm.curr_block])
                 self.t.passenger_count = 0
             else:
@@ -312,7 +313,7 @@ class TrainModel(QtWidgets.QMainWindow):
                                                     self.t.signal_pickup_failure,
                                                     self.t.brake_failure]])
             self.last_update = time.time()
-            print('Exiting loop')
+          
 
 
     def update_model(self, dict):

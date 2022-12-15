@@ -159,23 +159,26 @@ class PointMassModel()                          :
         return self.curr_accel
 
     def calcForce(self, brake                   = False):
-        if self.curr_block                      : 
-            self.grade                          = float(self.BlockModels[self.curr_block-1].grade)/100
-        if self.power != 0:
-            kinetic_friction_force              = self._td.mass_empty*9.8*self._td.kinetic_fric_constant*0.01
-        else                                    : 
-            kinetic_friction_force              = self._td.mass_empty*9.8*self._td.kinetic_fric_constant
-        gradeForce                              = self._td.mass_empty*9.8*(self.grade)/(1+self.grade**2)**0.5
 
-        if self.curr_vel > 0                    : 
-            self.force                          = float(self.power)/float(self.curr_vel)
-            self.force                          -= kinetic_friction_force
-            self.force                          -= gradeForce
-        else                                    : 
-            self.force                          = self.power*2
-            static_friction_force               = self._td.mass_empty*9.8*self._td.static_fric_constant
-            self.force                          -= static_friction_force
-            self.force                          -= gradeForce
+        if self.power >= 0 or self.stopAtStation == False:
+            if self.curr_block: 
+                self.grade                          = float(self.BlockModels[self.curr_block-1].grade)/100
+            if self.power != 0:
+                kinetic_friction_force              = self._td.mass_empty*9.8*self._td.kinetic_fric_constant*0.01
+            else                                    : 
+                kinetic_friction_force              = self._td.mass_empty*9.8*self._td.kinetic_fric_constant
+            gradeForce                              = self._td.mass_empty*9.8*(self.grade)/(1+self.grade**2)**0.5
+
+            if self.curr_vel > 0: 
+                self.force                          = float(self.power)/float(self.curr_vel)
+                self.force                          -= kinetic_friction_force
+                self.force                          -= gradeForce
+            else: 
+                if self.power > 0:
+                    self.force                          = self.power*2
+                    static_friction_force               = self._td.mass_empty*9.8*self._td.static_fric_constant
+                    self.force                          -= static_friction_force
+                    self.force                          -= gradeForce
     
     def calcAccel(self)                         : 
         self.prev_accel                         = self.curr_accel
@@ -197,7 +200,7 @@ class PointMassModel()                          :
 
 
     
-    def calcPos(self)                           : 
+    def calcPos(self): 
         self.train_authority                    = 0
         
         #position calculation
@@ -234,13 +237,13 @@ class PointMassModel()                          :
                 
         
         
-        for c_bl in self.ctc_authority          : 
-            if c_bl in self.waysideAuthority    : 
+        for c_bl in self.ctc_authority: 
+            if c_bl in self.waysideAuthority: 
                 ind                             = self.waysideAuthority.index(c_bl)
                 
                 if self.curr_vel != 0 and not self.stationStop:
                     self.waysideAuthority       = self.waysideAuthority[0:ind+1]
-                if c_bl == self.curr_block and self.curr_vel == 0:
+                if c_bl == self.curr_block and self.curr_vel == 0 and not self.stopAtStation:
                     self.stationStop            = True
                 elif c_bl == self.prev_block:
                     self.stationStop            = False
@@ -253,7 +256,7 @@ class PointMassModel()                          :
 
 
         #Calculating Authority distance when train not at stopping block               
-        if len(self.waysideAuthority) > 1: 
+        if len(self.waysideAuthority) > 1 and self.waysideAuthority[-1] != 0: 
             if self.curr_block == self.waysideAuthority[0]:
                 wayside                         = self.waysideAuthority[1:len(self.waysideAuthority)]
             elif self.curr_block == self.waysideAuthority[1]:
