@@ -640,8 +640,8 @@ class Ui_TrainControllerSW_MainWindow(QWidget)          :
         self.externalLightState                         = True
         self.leftDoorState                              = False
         self.rightDoorState                             = False
-        self.announceState                              = False
-        self.advertisementState                         = False
+        self.announceState                              = True
+        self.advertisementState                         = True
         self.serviceBrakeState                          = False
         self.emergencyBrakeState                        = False
         self.temperature                                = 72
