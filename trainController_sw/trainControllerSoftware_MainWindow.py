@@ -762,17 +762,30 @@ class Ui_TrainControllerSW_MainWindow(QWidget)          :
     
     def checkFailures(self)                             : 
         # Track Failures: Track Failure, Circuit Failure, Power Failure
-        self.TrackFault_DisplayBox.setChecked(self.trackFailure)
+        self.TrackFault_DisplayBox.setCheckable(True)
         
         # Train Failures: Engine Failure, Signal Pickup Failure, Brake Failure
-        self.EngineFault_DisplayBox.setChecked(self.engineFailure)
-        self.SignalFailure_DisplayBox.setChecked(self.signalFailure)
-        self.BrakeFailure_DisplayBox.setChecked(self.brakeFailure)
+        self.EngineFault_DisplayBox.setCheckable(True)
+        self.SignalFailure_DisplayBox.setCheckable(True)
+        self.BrakeFailure_DisplayBox.setCheckable(True)
         
         if((self.engineFailure) | (self.signalFailure) | (self.brakeFailure)):
+            self.currentSpeed_lcdDisplay.display(0)
+            self.speed_Slider.setValue(0)
+            self.EmergencyBrakeDisplayBox.setCheckState(True)
             self.emergencyBrakeState                    = True
+            self.EngineFault_DisplayBox.setChecked(self.engineFailure)
+            self.SignalFailure_DisplayBox.setChecked(self.signalFailure)
+            self.BrakeFailure_DisplayBox.setChecked(self.brakeFailure)
             self.emitBrakes()
-            self.setManualControl_EmergencyBrake()
+        elif((self.engineFailure == False) | (self.signalFailure == False) | (self.brakeFailure == False)):
+            self.EmergencyBrakeDisplayBox.setCheckState(False)
+            self.emergencyBrakeState                    = False
+            self.EngineFault_DisplayBox.setChecked(self.engineFailure)
+            self.SignalFailure_DisplayBox.setChecked(self.signalFailure)
+            self.BrakeFailure_DisplayBox.setChecked(self.brakeFailure)
+            self.emitBrakes()
+            
             
 
 ###### Automatic Control Functions
@@ -947,7 +960,6 @@ class Ui_TrainControllerSW_MainWindow(QWidget)          :
         if((self.EmergencyBrakeDisplayBox.isChecked() == True) or (self.currentSpeed > self.commandedSpeed) or (self.serviceBrakeState == True) or (self.stationStop == True)):
             self.power                                  = 0
             self.powerDict['power']                     = self.power
-            print("No Power", self.power)
         else                                            : 
             # Calculate power using pid
             self.pid.setpoint                           = self.commandedSpeed
@@ -1029,6 +1041,7 @@ class Ui_TrainControllerSW_MainWindow(QWidget)          :
         self.nonVitalDict['ext_lights']                 = self.externalLightState
         self.nonVitalDict['left_doors']                 = self.leftDoorState
         self.nonVitalDict['right_doors']                = self.rightDoorState
+        self.nonVitalDict['advertisementState']         = self.advertisementState
         self.nonVitalDict['trainID']                    = self.trainID
         self.signals.nonVitalDictSignal.emit(self.nonVitalDict) 
  
