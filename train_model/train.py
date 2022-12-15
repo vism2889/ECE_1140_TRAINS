@@ -123,9 +123,6 @@ class PointMassModel()                          :
         self.curr_time                          = time.time()
      
         self.elapsed_time                       = (self.curr_time-self.prev_time) * self.speedUp
-        print(f'elapsed time is: {self.elapsed_time} ')
-        # else:
-        #     self.elapsed_time                       = (self.curr_time-self.prev_time) * self.speedUp*1.5
         
         if self.curr_vel > 0                    : 
             self.prev_accel                     = self.curr_accel
@@ -256,7 +253,7 @@ class PointMassModel()                          :
 
 
         #Calculating Authority distance when train not at stopping block               
-        if len(self.waysideAuthority) > 1 and self.waysideAuthority[-1] != 0: 
+        if len(self.waysideAuthority) > 1: 
             if self.curr_block == self.waysideAuthority[0]:
                 wayside                         = self.waysideAuthority[1:len(self.waysideAuthority)]
             elif self.curr_block == self.waysideAuthority[1]:
@@ -269,6 +266,8 @@ class PointMassModel()                          :
             if len(wayside) > 0 and wayside[-1] != 0:
                 lastBlock                       = wayside[-1]
                 self.train_authority            += float(self.BlockModels[lastBlock-1].blockLength)/4
+            
+
                           
             
         elif len(self.waysideAuthority) == 1 and self.curr_vel != 0:
