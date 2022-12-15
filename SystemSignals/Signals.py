@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 ##############################################################################
-# AUTHOR(S):    Morgan Visnesky, Garrett Marcinak, Nathaniel Mallick
+# AUTHOR(S):    Morgan Visnesky, Garrett Marcinak, Nathaniel Mallick, Gwen Litwak
 # DATE:         11/13/2022
 # FILENAME:     occupancySignalSender.py
 # DESCRIPTION:
