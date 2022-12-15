@@ -20,7 +20,7 @@ class Controller():
 
         ## Function to run PLC program
         self.plc = None
-        self.plcGood = True
+        self.plcGood = False
 
         ##
         self.maintenance = True
@@ -111,24 +111,25 @@ class Controller():
     def updateMaintenance(self, blockNum, state):
         self.track['block-maintenance'][blockNum] = state
         self.parent.ui.setMaintenance(self.line, blockNum, state)
-
+        self.maintenance = state
         ## Plubish maintenance state
         if self.line == 'red':
             self.parent.publishMaintenance(0, blockNum, state)
         if self.line == 'green':
             self.parent.publishMaintenance(1, blockNum, state)
 
-        if state == True:
-            self.maintenance = True
-            return
+        # if state == True:
+        #     self.maintenance = True
+        #     return
 
-        for block in self.track['block-maintenance']:
-            if self.track['block-maintenance'][block] == True:
-                self.maintenance = True
-                return
+        # print(f'state: {state}')
+        # for block in self.track['block-maintenance']:
+        #     if self.track['block-maintenance'][block] == True:
+        #         self.maintenance = True
+        #         return
 
-        self.maintenance = False
-        return self.track['block-maintenance']
+        # self.maintenance = state
+        return 
 
     ## Switches and crossing only get update with the PLC program
     def updateSwitch(self):
@@ -141,19 +142,16 @@ class Controller():
     ## Updates the crossing state of the controller
     def updateCrossing(self):
         for crossing in self.track['crossing']:
-            if self.id == 2 and self.line == 'red':
-                state = self.track['crossing'][crossing]
-                # print(f'switch {crossing}: {state}')
-            self.parent.setCrossing(self.line, int(crossing), self.track['crossing'][crossing])
+            self.parent.setCrossing(self.line, crossing, self.track['crossing'][crossing])
             self.ui.setCrossingState(self.line, int(crossing), self.track['crossing'][crossing])
 
         ## Run PLC program
         return self.track['crossing']
 
-    ## Toggle maintenance mode (FOR THE CONTROLLER) - This could potentially be removed
-    def toggleMaintence(self):
-        self.maintenance != self.maintenance
-        return self.maintenance
+    # ## Toggle maintenance mode (FOR THE CONTROLLER) - This could potentially be removed
+    # def toggleMaintence(self):
+    #     self.maintenance != self.maintenance
+    #     return self.maintenance
 
     ## Manually setting switches
     def setSwitch(self, blockNum, state):
@@ -167,28 +165,31 @@ class Controller():
 
     ## Run the PLCs
     def run(self):
-        if self.plcGood and not self.maintenance: 
-            # if self.id == 3 and self.line == 'red':
-            #     print(f'track: {self.track}')
+        if self.plcGood and not self.maintenance:
             try:
-                self.plc(self.track)
-            except Exception as e:
-                print(e)
-                print(f'Error: PLC script cannot run ({self.line}line controller {self.id})')
+                self.plc.run(self.track)
+            except:
+                # print(e)
+                print(f'Error: PLC script cannot run ({self.line}controller{self.id})')
                 self.plcGood = False
 
     ## Upload a PLC
     def uploadPLC(self, file):
+        # print(f'func: {self.maintenance}')
         if self.maintenance:
             modname = self.parser.parseFile(file)
             try:
-                mod = importlib.import_module(f"plc.{self.line}."+modname)
+                if self.plc == None:
+                    self.plc = importlib.import_module(f"plc.{self.line}."+modname)
+                else:
+                    importlib.reload(self.plc)
             except ImportError:
                 print(f"Errror: Could not import plc script for {self.line}line controller {self.id}")
-                self.plcGood = False
+                self.plcGood = False                
             else:
-                self.plc = mod.run
-                # self.plc(self.track)
+                print(f'Succesfully uploaded plc to {self.line}line controller {self.id} ')
+                
+                self.plc.run(self.track)
                 self.plcGood = True
         else:
             print(f"Error: Controller {self.id} not in maintenance mode for PLC upload")
@@ -232,6 +233,11 @@ class WaysideIO(QWidget):
             'green' : {}
         }
 
+        self.activeTrains = {
+            0 : {}, ## Red
+            1 : {} ## Green
+        }
+
     ###############
     ## CALLBACKS ##
     ###############
@@ -245,6 +251,9 @@ class WaysideIO(QWidget):
         id = loc[1] ## train id
         prev = loc[2]
         curr = loc[3]
+
+        ## Save train location for speed
+        self.activeTrains[line][id] = curr
 
         if line == 0:
             authority= self.planAuthority('red', self.redlineControllers, self.redlineTrack, curr, prev)
@@ -343,22 +352,14 @@ class WaysideIO(QWidget):
                 self.greenlineControllers[c[0]].updateMaintenance(blockNum, state)
 
     def setSwitch(self, line, blockNum, state):
-        controllers = self.lookupBlock(line, blockNum)['controller']
-        # print(controllers)
         ## redline
         if self.lines[0] == line.lower():
-            for c in controllers:
-                if len(self.redlineControllers) > c[0]:
-                    self.redlineControllers[c[0]].track['switch'][blockNum] = state
-            self.signals.switchState.emit([int(blockNum), state])
+            self.signals.switchState.emit([0, int(blockNum), state])
             res = self.redlineTrack.setSwitch(int(blockNum), state)
 
         ## greenline
         if self.lines[1] == line.lower():
-            for c in controllers:
-                if len(self.greenlineControllers) > c[0]:
-                    self.greenlineControllers[c[0]].track['switch'][blockNum] = state
-            self.signals.switchState.emit([int(blockNum), state])
+            self.signals.switchState.emit([1, int(blockNum), state])
             res = self.greenlineTrack.setSwitch(int(blockNum), state)
 
     def setCrossing(self, line, blockNum, state):
@@ -379,7 +380,6 @@ class WaysideIO(QWidget):
         occupied = True
         controllers = self.lookupBlock(line, blockNum)['controller']
         
-        # exit(0)
         if line == 'red':
             for c in controllers:
                 occupied &= self.redlineControllers[c[0]].blockState(blockNum)
@@ -393,6 +393,17 @@ class WaysideIO(QWidget):
     #############
     ## HELPERS ##
     #############
+
+    ## Check speed
+    def checkSpeed(self):
+
+        ## Redline
+        for trains in self.activeTrains[0]:
+            self.activeTrains[trains]
+
+        ## Greenline
+        for trains in self.activeTrains[1]:
+            self.actionEvent[trains] = 
     ## Figure out the next 1-5 blocks that are traversable
     def planAuthority(self, line, controllers, track, curr, prev):
         previousBlock = prev
@@ -505,8 +516,7 @@ class WaysideIO(QWidget):
         self.signals.signalMaintenance.connect(self.maintenanceCallback)
         self.signals.trainLocation.connect(self.trainLocationCallback)
         self.signals.ctcSwitchState.connect(self.ctcSetSwitch)
-
-        # print(self.redlineControllers[2].track['crossing'])
+        self.signals.suggestedSpeedSignal.connect(self.checkSpeed)
 
 if __name__ == '__main__':
 
