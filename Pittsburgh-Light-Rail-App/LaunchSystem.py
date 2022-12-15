@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 ##############################################################################
-# AUTHOR(S):   Morgan Visnesky, ADD YOUR NAMES HERE
+# AUTHOR(S):   Morgan Visnesky, Gwen Litwak
 # DATE:     11/13/2022
 # FILENAME: LaunchSystem.py
 # DESCRIPTION:
@@ -219,13 +219,10 @@ class PittsburghLightRail(QWidget):
         self.index = self.trainControllerComboBox.currentIndex()
         self.trainList.append(self.trainID)
         self.controllerInstances.append(Ui_TrainControllerSW_MainWindow(self.signals, self.trainID))
-        
-            
+
     def showTrainController(self):
         self.controllerInstances[self.index].show()
-        
-        
-    
+
 ## Commandline CTRL-C ##
 def handler(signum, frame):
     print("CTRL-C was pressed")
