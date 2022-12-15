@@ -5,7 +5,7 @@
 # DATE:     11/03/2022
 # FILENAME: TrackModelApp.py
 # DESCRIPTION:
-#
+# Commit Flex
 #############################################################################
 
 # Python Imports
@@ -687,7 +687,6 @@ class TrackModel(QWidget):
                     self.blockslistwidget.item(i).setIcon(QIcon("images/alert.png"))
                 else:
                     self.blockslistwidget.item(i).setBackground(QColor(116, 124, 138))
-                    
                     self.blockslistwidget.item(i).setIcon(QIcon(""))
                 i+=1
         self.blockslistwidget.itemClicked.connect(self.onClickedBlock)
