@@ -9,6 +9,10 @@ class TrainDictionary:
     def addTrain(self, name, destinations, suggestedSpeed, authority):
         self.trainList[name] = Train(destinations, suggestedSpeed, authority)
 
+    def removeTrain(self, name):
+        if name in self.trainList:
+            self.trainList.pop(name)
+
     def addScheduledTrain(self, name, destinations, suggestedSpeed, authority):
         self.backLog[name] = Train(destinations, suggestedSpeed, authority)
 
@@ -33,6 +37,9 @@ class TrainDictionary:
 
     def backlogs(self):
         return self.backLog.keys()
+
+    def trains(self):
+        return self.trainList.keys()
 
     def getSuggestedSpeed(self, name):
         return self.trainList[name].suggestedSpeed

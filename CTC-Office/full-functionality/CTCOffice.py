@@ -39,13 +39,20 @@ class CTCOffice(QWidget):
 
         self.setupLayout()
         self.setupUi()
-        self.signals        = signals
-        self.trainCount     = 1
+        self.signals                    = signals
+        self.trainCount                 = 1
 
-        current_time        = QTime.currentTime()
-        self.seconds        = current_time.toString('ss')
-        self.minutes        = current_time.toString('mm')
-        self.hours          = current_time.toString('hh')
+        current_time                    = QTime.currentTime()
+        self.seconds                    = current_time.toString('ss')
+        self.minutes                    = current_time.toString('mm')
+        self.hours                      = current_time.toString('hh')
+        self.startHours                 = self.hours
+        self.startMins                  = self.minutes
+        self.redLineTotalPassengers     = [0]
+        self.greenLineTotalPassengers   = [0]
+        self.redLineThroughput          = 0
+        self.greenLineThroughput        = 0
+        self.totalHours                 = 0
 
         # connect to necessary signals
         self.signals.globalOccupancyFromTrackModelSignal.connect(self.readOccupancySignal)
@@ -53,6 +60,8 @@ class CTCOffice(QWidget):
         self.signals.clockSpeedSignal.connect(self.changeClockSpeed)
         self.signals.waysideAuthority.connect(self.showAuthority)
         self.signals.trackFailuresSignal.connect(self.readFaultSignal)
+        self.signals.lineTicketSalesToCtcOfficeSignal.connect(self.calculateThroughPut)
+        self.signals.trainLocation.connect(self.checkYardedTrain)
 
     def setupLayout(self):
         # getting lists of blocks
@@ -74,12 +83,12 @@ class CTCOffice(QWidget):
         self.redLineStations["STATION SQUARE"]      = ["48", False]
         self.redLineStations["SOUTH HILLS JUNC."]   = ["60", False]
 
-        self.greenLineStations["GLENBURY"]          = ["65", False]
+        self.greenLineStations["GLENBURY (OUT)"]    = ["65", False]
         self.greenLineStations["DORMONT (OUT)"]     = ["73", False]
         self.greenLineStations["MT-LEBANON"]        = ["77", False]
         self.greenLineStations["POPLAR"]            = ["88", False]
         self.greenLineStations["CASTE SHANNON"]     = ["96", False]
-        self.greenLineStations["GLENBURY"]          = ["114", False]
+        self.greenLineStations["GLENBURY (IN)"]     = ["114", False]
         self.greenLineStations["OVERBROOK (OUT)"]   = ["122", False]
         self.greenLineStations["INGLEWOOD (OUT)"]   = ["131", False]
         self.greenLineStations["CENTRAL (OUT)"]     = ["140", False]
@@ -304,6 +313,7 @@ class CTCOffice(QWidget):
         self.timer.timeout.connect(self.checkForScheduledTrains)
         self.timer.timeout.connect(self.updateAllBlocks)
         self.timer.timeout.connect(self.showTime)
+        self.timer.timeout.connect(self.updateThroughput)
         self.timer.start(10)
 
         # set up clock timer
@@ -405,6 +415,9 @@ class CTCOffice(QWidget):
         self.currentRedLineTrains = []
         for i in range(self.redLineTrainTable.rowCount()):
             self.currentRedLineTrains.append(self.redLineTrainTable.item(i,0).text())
+            train = self.redLineTrainTable.item(i,0).text()
+            if not(train in self.redLineTrains.trains()):
+                self.redLineTrainTable.removeRow(i)
         # checking for new trains
         for key in self.redLineTrains.keys():
             if ((key in self.currentRedLineTrains) == False):
@@ -437,6 +450,9 @@ class CTCOffice(QWidget):
         self.currentGreenLineTrains = []
         for i in range(self.greenLineTrainTable.rowCount()):
             self.currentGreenLineTrains.append(self.greenLineTrainTable.item(i,0).text())
+            train = self.greenLineTrainTable.item(i,0).text()
+            if not(train in self.greenLineTrains.trains()):
+                self.greenLineTrainTable.removeRow(i)
         # checking for new trains
         for key in self.greenLineTrains.keys():
             if ((key in self.currentGreenLineTrains) == False):
@@ -482,6 +498,14 @@ class CTCOffice(QWidget):
         speed = int(self.selectedTrainLine.getSuggestedSpeed(self.selectedTrain))
         self.suggestedSpeedLabel.setText("Suggested Speed: " + str(speed*2.23694) + " mph")
         self.selectedTrainLabel.setText("Selected Train: " + self.selectedTrain)
+
+    def updateThroughput(self):
+        item1 = QtWidgets.QTableWidgetItem()
+        item2 = QtWidgets.QTableWidgetItem()
+        item1.setText(str(self.redLineThroughput))
+        self.throughPutTable.setItem(0,0,item1)
+        item2.setText(str(self.greenLineThroughput))
+        self.throughPutTable.setItem(1,0,item2)
 
     def redBlockSelectionChanged(self):
         self.selectedBlock = self.redLineBlockTable.currentRow() + 1
@@ -711,6 +735,19 @@ class CTCOffice(QWidget):
                     self.greenLineBlocks.setAuthority(block, False)
         else:
             return
+
+    def checkYardedTrain(self, msg):
+        if msg[3] == 9 and msg[0] == 0:
+            self.redLineTrains.removeTrain(msg[1])
+        elif msg[3] == 57 and msg[0] == 1:
+            self.greenLineTrains.removeTrain(msg[1])
+
+    def calculateThroughPut(self, msg):
+        if self.startMins == self.minutes and self.startHours != self.hours:
+            self.totalHours += 1
+
+        self.redLineThroughput  = msg[0] / self.totalHours
+        self.greenLineThroughput= msg[1] / self.totalHours
 
 if __name__ == "__main__":
     import sys

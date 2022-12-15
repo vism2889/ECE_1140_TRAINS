@@ -219,13 +219,10 @@ class PittsburghLightRail(QWidget):
         self.index = self.trainControllerComboBox.currentIndex()
         self.trainList.append(self.trainID)
         self.controllerInstances.append(Ui_TrainControllerSW_MainWindow(self.signals, self.trainID))
-        
-            
+
     def showTrainController(self):
         self.controllerInstances[self.index].show()
-        
-        
-    
+
 ## Commandline CTRL-C ##
 def handler(signum, frame):
     print("CTRL-C was pressed")
