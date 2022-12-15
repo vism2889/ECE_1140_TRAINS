@@ -274,8 +274,10 @@ class TrackModel(QWidget):
 
     def updateStationStop(self, stopMessage):
 
-        msgLine = stopMessage[2]
+        msgLine  = stopMessage[2]
         msgBlock = stopMessage[3]
+
+        
     def updateCtcSwitchState(self, switchState):
         print("CTC Switch State Signal", switchState)
 
