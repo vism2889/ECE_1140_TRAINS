@@ -1,12 +1,15 @@
 def run(input):
+	
+	occupied = False
 	for blk in range(77, 86):
 	    if input['block'][blk] == True: 
-	        return 
+	        occupied = False
+	        break
 	
-	if input['block'][75] == True and input['block'][100] == False:
-	    input['switch'][76] = False
-	    input['switch'][85] = False
-	    
-	elif input['block'][99] == True and input['block'][75] == False:
+	if not occupied and (input['block'][75] == True or input['block'][74] == True):
 	    input['switch'][76] = True
 	    input['switch'][85] = True
+	    
+	elif not occupied and (input['block'][99] == True or input['block'][100] == True):
+	    input['switch'][76] = False
+	    input['switch'][85] = False

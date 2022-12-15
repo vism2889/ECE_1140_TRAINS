@@ -362,9 +362,9 @@ class TrackControllerWindow(QtWidgets.QWidget):
                     if i.index(j) == 2:
                         value = ""
                         if bool(j):
-                            value = "ON"
+                            value = "FORWARD"
                         else:
-                            value = "OFF"
+                            value = "REVERSE"
                         item = QtWidgets.QTableWidgetItem(value)
                         item.setTextAlignment(4)
                         if not j:
@@ -592,9 +592,9 @@ class TrackControllerWindow(QtWidgets.QWidget):
 
         value = ""
         if state:
-            value = "ON"
+            value = "FORWARD"
         else:
-            value = "OFF"
+            value = "REVERSE"
 
         if line == 'red':
             for i in controller_indices:
@@ -642,13 +642,16 @@ class TrackControllerWindow(QtWidgets.QWidget):
 
         if line == 'red':
             for i in controller_indices:
+                # print(f'dat: {i}')
                 item = QtWidgets.QTableWidgetItem(str(value))
                 item.setTextAlignment(4)
 
                 item = QtWidgets.QTableWidgetItem(str(value))
                 item.setTextAlignment(4)
 
-                if value:
+                if state:
+                    item.setBackground(QtGui.QColor(0xbf, 0xe3, 0xb4))
+                else:
                     item.setBackground(QtGui.QColor(0xf4, 0x71, 0x74))
 
                 controller_table = self.redline_reference['controllers'][i[0]]
@@ -666,7 +669,9 @@ class TrackControllerWindow(QtWidgets.QWidget):
                 item = QtWidgets.QTableWidgetItem(str(value))
                 item.setTextAlignment(4)
 
-                if value:
+                if state:
+                    item.setBackground(QtGui.QColor(0xbf, 0xe3, 0xb4))
+                else:
                     item.setBackground(QtGui.QColor(0xf4, 0x71, 0x74))
 
                 controller_table = self.greenline_reference['controllers'][i[0]]

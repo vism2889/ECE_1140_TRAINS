@@ -52,7 +52,6 @@ class Controller():
                 self.track['crossing'][int(crossing)] = False
 
         self.id = controllerNum
-        switches = self.track['switch']
 
         ## Initalizing track component values
         self.updateCrossing()
@@ -142,7 +141,10 @@ class Controller():
     ## Updates the crossing state of the controller
     def updateCrossing(self):
         for crossing in self.track['crossing']:
-            self.parent.setCrossing(self.line, crossing, self.track['crossing'][crossing])
+            if self.id == 2 and self.line == 'red':
+                state = self.track['crossing'][crossing]
+                # print(f'switch {crossing}: {state}')
+            self.parent.setCrossing(self.line, int(crossing), self.track['crossing'][crossing])
             self.ui.setCrossingState(self.line, int(crossing), self.track['crossing'][crossing])
 
         ## Run PLC program
@@ -165,12 +167,14 @@ class Controller():
 
     ## Run the PLCs
     def run(self):
-        if self.plcGood and not self.maintenance:
+        if self.plcGood and not self.maintenance: 
+            # if self.id == 3 and self.line == 'red':
+            #     print(f'track: {self.track}')
             try:
                 self.plc(self.track)
-            except:
-                # print(e)
-                print(f'Error: PLC script cannot run ({self.line}controller{self.id})')
+            except Exception as e:
+                print(e)
+                print(f'Error: PLC script cannot run ({self.line}line controller {self.id})')
                 self.plcGood = False
 
     ## Upload a PLC
@@ -179,12 +183,12 @@ class Controller():
             modname = self.parser.parseFile(file)
             try:
                 mod = importlib.import_module(f"plc.{self.line}."+modname)
-                # mod.run(self.track)
             except ImportError:
                 print(f"Errror: Could not import plc script for {self.line}line controller {self.id}")
                 self.plcGood = False
             else:
                 self.plc = mod.run
+                # self.plc(self.track)
                 self.plcGood = True
         else:
             print(f"Error: Controller {self.id} not in maintenance mode for PLC upload")
@@ -244,7 +248,6 @@ class WaysideIO(QWidget):
 
         if line == 0:
             authority= self.planAuthority('red', self.redlineControllers, self.redlineTrack, curr, prev)
-            print(authority)
             self.signals.waysideAuthority.emit([0, id, authority])
 
         if line == 1:
@@ -340,13 +343,21 @@ class WaysideIO(QWidget):
                 self.greenlineControllers[c[0]].updateMaintenance(blockNum, state)
 
     def setSwitch(self, line, blockNum, state):
+        controllers = self.lookupBlock(line, blockNum)['controller']
+        # print(controllers)
         ## redline
         if self.lines[0] == line.lower():
+            for c in controllers:
+                if len(self.redlineControllers) > c[0]:
+                    self.redlineControllers[c[0]].track['switch'][blockNum] = state
             self.signals.switchState.emit([int(blockNum), state])
             res = self.redlineTrack.setSwitch(int(blockNum), state)
 
         ## greenline
         if self.lines[1] == line.lower():
+            for c in controllers:
+                if len(self.greenlineControllers) > c[0]:
+                    self.greenlineControllers[c[0]].track['switch'][blockNum] = state
             self.signals.switchState.emit([int(blockNum), state])
             res = self.greenlineTrack.setSwitch(int(blockNum), state)
 
@@ -494,6 +505,8 @@ class WaysideIO(QWidget):
         self.signals.signalMaintenance.connect(self.maintenanceCallback)
         self.signals.trainLocation.connect(self.trainLocationCallback)
         self.signals.ctcSwitchState.connect(self.ctcSetSwitch)
+
+        # print(self.redlineControllers[2].track['crossing'])
 
 if __name__ == '__main__':
 
