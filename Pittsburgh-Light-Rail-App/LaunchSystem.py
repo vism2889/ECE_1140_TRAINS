@@ -107,6 +107,8 @@ class PittsburghLightRail(QWidget):
         self.setupUi()
 
     def setupUi(self):
+        self.title = 'Pittsburgh Light Rail'
+        self.setWindowTitle(self.title)
         self.setGeometry(1680,50,220,330)
 
         font = QFont()
