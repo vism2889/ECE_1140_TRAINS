@@ -936,8 +936,6 @@ class Ui_TrainControllerSW_MainWindow(QWidget):
                 self.Auto_BrakingDisplay.display(0)
         self.emitBrakes()
 
-            
-        
     def waitAtStation(self):
         self.difference = (time.time() - self.startTime)   
         if((self.difference) > (30 / self.clockSpeed)):
