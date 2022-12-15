@@ -219,7 +219,7 @@ class TrainModel(QtWidgets.QMainWindow):
         self.cmd_pwr_disp.setText(f'{round(float(self.t.pm.power)/1000)} kW')
         # self.qt.t.set_power(round(float(self.qt.t.curr_power)/1000))
 
-        self.cmd_speed_disp.setText('%.1f mph' %(float(self.t.pm.cmdSpeed)*2.23694))
+        self.cmd_speed_disp.setText('%d mph' %(int(self.t.pm.cmdSpeed)*2.23694))
         
         self.curr_speed_disp.setText(f'{self.t.pm.curr_speed} mph')
 
@@ -238,9 +238,6 @@ class TrainModel(QtWidgets.QMainWindow):
         else:
             self.right_doors_disp.setText('Closed')
 
-        
-        
-        
         self.pass_disp.setText(f'{self.t.passenger_count}')
         self.crew_disp.setText(f'{self.t.crew_count}')
 
@@ -250,9 +247,8 @@ class TrainModel(QtWidgets.QMainWindow):
         elif self.t.service_brake == 0:
             self.serv_brake_disp.setText('Off')
         self.ebrake_disp.setText(f'{self.t.e_brake}')
-        self.auth_disp.setText(f'{self.t.pm.train_authority}')
+        self.auth_disp.setText('%d'%int(self.t.pm.train_authority))
         self.grade_disp.setText(f'{self.t.pm.grade * 100} %')
-        self.switch_disp.setText(f'{self.t.switch} miles')
 
         #stations
         self.last_st_disp.setText(f'{self.t.last_station}')
@@ -266,52 +262,26 @@ class TrainModel(QtWidgets.QMainWindow):
                     self.signals.trainLocation.emit([int(self.t.line), self.t.id, int(self.t.pm.prev_block), int(self.t.pm.curr_block)])
                 # print("inside if statement")
                 if self.t.e_brake == False and self.t.service_brake == False and self.t.dispatched:
-                    self.t.set_power(self.t.pm.power)
-                    self.signals.currentSpeedOfTrainModel.emit([self.t.id, self.t.pm.curr_vel])
-                    # print(f'Occ_list is: {self.t.pm.occ_list}')
-                    # print(f'Curr Pos in block {self.qt.t.pm.curr_block} is: {self.qt.t.pm.curr_pos}')
-                    self.signals.occupancyFromTrainSignal.emit(self.t.pm.occ_list)
-                    self.signals.commandedSpeedSignal.emit([self.t.id,self.t.pm.cmdSpeed])
-                    self.signals.speedLimitSignal.emit([self.t.id,self.t.pm.speedLimit])
-                    self.signals.authoritySignal.emit([self.t.id,self.t.pm.train_authority])
-                    self.last_update = time.time()
-                    # print('PUBLISHING!!!')
-                    
+                    self.t.pm.setPower(self.t.pm.power, time.time())
                     if self.hw:
                         self.mp.publish()
-
-                if self.t.pm.stationStop and not self.t.pm.stopAtStation:
+                elif self.t.pm.stationStop and not self.t.pm.stopAtStation:
                     self.signals.stationStop.emit([self.t.id, self.t.pm.stationStop, self.t.line, self.t.pm.curr_block])
-                
-                # elif type(self.t.line) != int:
-                #     print("LINE not int")
-                # elif type(self.t.pm.prev_block ) != int:
-                #     print("LINE not int")
-                # elif type(self.t.pm.curr_block ) != int:
-                #     print("LINE not int")
-                # if time.time()-self.brake_update > 0.6/self.t.pm.speedUp:
-                if self.t.service_brake == True:
+                elif self.t.service_brake == True:
                     self.t.pm.brake(0)
-
                     if self.hw:
-                        self.mp.publish()
-
-                    self.signals.currentSpeedOfTrainModel.emit([self.t.id, self.t.pm.curr_vel])
-                    # self.signals.occupancyFromTrainSignal.emit(self.t.pm.occ_list)
-                    self.signals.commandedSpeedSignal.emit([self.t.id, self.t.pm.speedLimit])
-                    # self.brake_update = time.time()
+                        self.mp.publish()  
                 elif self.t.e_brake == True:
                     self.t.pm.brake(1)
-
                     if self.hw:
                         self.mp.publish()
-
-                    self.signals.currentSpeedOfTrainModel.emit(self.t.pm.curr_vel)
-                    self.signals.occupancyFromTrainSignal.emit(self.t.pm.occ_list)
-                    self.signals.commandedSpeedSignal.emit(self.t.pm.speedLimit)
-                    # self.brake_update = time.time()
                 
-                self.signals.ctcctcStopBlock.emit([self.t.line, self.t.pm.ctcStationStop])
+                self.signals.currentSpeedOfTrainModel.emit([self.t.id, self.t.pm.curr_vel])
+                self.signals.commandedSpeedSignal.emit([self.t.id,self.t.pm.cmdSpeed])
+                self.signals.speedLimitSignal.emit([self.t.id,self.t.pm.speedLimit])
+                self.signals.authoritySignal.emit([self.t.id,self.t.pm.train_authority])
+                self.signals.ctcStopBlock.emit([self.t.line, self.t.pm.ctcStationStop])
+                self.last_update = time.time()
 
 
     def update_model(self, dict):

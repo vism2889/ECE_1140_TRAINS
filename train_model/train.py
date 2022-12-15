@@ -37,8 +37,8 @@ class TrainData():
     serv_brake = float = 1.2  #m/s^2
     emergency_brake = 2.73    #m/s^2
 
-    kinetic_fric_constant = float = 0.2 #Newtons
-    static_fric_constant = float = 0.6
+    kinetic_fric_constant = float = 0.09 #Newtons
+    static_fric_constant = float = 0.4
     
 
 
@@ -149,6 +149,10 @@ class PointMassModel():
             self.force = 0
             self.prev_accel = 0
             self.curr_accel = 0
+            self.curr_vel = 0
+            self.prev_vel = 0
+            self.prev_time = 0
+
 
     def dec_force(self, val):
         # print(f"Current force is: {self.force}")
@@ -159,10 +163,7 @@ class PointMassModel():
 
         kinetic_friction_force = self._td.mass_empty*9.8*self._td.kinetic_fric_constant
 
-        # if self.force > 0: 
         self.force = self.force-dec_force-kinetic_friction_force
-        # else:
-        #     self.force -= kinetic_friction_force
             
         self.curr_accel = self.force/self._td.mass_empty
         return self.curr_accel
@@ -170,8 +171,11 @@ class PointMassModel():
     def calcForce(self, brake = False):
         if self.curr_block:
             self.grade = float(self.BlockModels[self.curr_block-1].grade)/100
-        static_friction_force = self._td.mass_empty*9.8*self._td.static_fric_constant
-        kinetic_friction_force = self._td.mass_empty*9.8*self._td.kinetic_fric_constant*0.1
+        if self.power != 0:
+            kinetic_friction_force = self._td.mass_empty*9.8*self._td.kinetic_fric_constant*0.01
+        else:
+            kinetic_friction_force = self._td.mass_empty*9.8*self._td.kinetic_fric_constant
+
         gradeForce = self._td.mass_empty*9.8*(self.grade)/(1+self.grade**2)**0.5
 
         if self.curr_vel > 0:
@@ -179,12 +183,10 @@ class PointMassModel():
             self.force -= kinetic_friction_force
             self.force -= gradeForce
         else:
-            self.force = 120000 * 2
+            self.force = self.power*2
+            static_friction_force = self._td.mass_empty*9.8*self._td.static_fric_constant
             self.force -= static_friction_force
             self.force -= gradeForce
-            # print(f'force - static force = {self.force}')
-
-                
     
     def calcAccel(self):
         self.prev_accel = self.curr_accel
@@ -290,68 +292,6 @@ class PointMassModel():
         else:
             self.cmdSpeed = self.speedLimit
 
-
-
-                
-
-        # self.occ_index = self.blocks[self.curr_block-1]
-        # self.occ_list[self.occ_index] = 1
-
-        # for authority in self.ctc_authority:
-        #     if authority == self.blocks[self.curr_block]:
-        #         if self.train_authority:
-        #             self.train_authority = [False]
-        #         else:
-        #             self.train_authority = [True]
-        #         self.ctc_authority.remove(authority)
-        #     else:
-        #         self.train_authority = [True]
-
-            
-        # self.calc_authority()
-    
-    # def calc_authority(self):
-    #     Length = 0
-    #     i = self.curr_block
-    #     occ_index = self.blocks[i]
-    #     temp_ctc_authority = self.ctc_authority
-
-    #     while i < len(self.blocks)-1:
-            
-    #         curr_block_object = self.glBlockModels[occ_index]
-    #         Length += float(curr_block_object.blockLength)
-
-    #         if Length < 0:
-    #             print("NO")
-
-    #         occ_index = self.blocks[i]
-    #         i += 1
-    #         for nums in temp_ctc_authority:
-    #             if self.blocks[i] == nums:
-    #                 break
-            
-    #         if i >= len(self.blocks):
-    #             i = 0
-    #             while i < len(self.blocks) -1:
-    #                 curr_block_object = self.glBlockModels[occ_index]
-    #                 Length += float(curr_block_object.blockLength)
-    #                 occ_index = self.blocks[i]
-    #                 i += 1
-    #                 for nums in temp_ctc_authority:
-    #                     if self.blocks[i] == nums:
-    #                         break
-
-        
-    #     distTravelled = self.curr_pos/1609.34
-    #     self.train_authority = round(float( (Length/1609.34) - distTravelled), 2)
-    #     if self.train_authority < 0:
-    #         print("NO")
-        
-        
-        
-        
-
-
         
 
 class Train():
@@ -361,10 +301,6 @@ class Train():
         self.stationSide = ''
         self.underground = ''
         self.stationName = ''
-        
-        #block list
-        # self.blocks          = [i for i in range(150)]
-        # self.blockLens       = [random.randint(10,25) for i in range(150)]
 
         #point Mass model
         self.pm = PointMassModel()
@@ -405,14 +341,7 @@ class Train():
         self.ctcAuthority = []
         self.authority = 20
         self.grade = 0
-        self.switch = 0
-
-        currentTime = time.time() * 10
-        
-    # def launch_ui(self):
-    #     app = QtWidgets.QApplication(sys.argv)
-    #     window = TrainModel(self)
-    #     app.exec_()
+   
     def get_temperature(self):
         return self.temperature
 
@@ -444,12 +373,12 @@ class Train():
                 return 
         
         if(self.dispatched):
-            if self.service_brake == True and self.pm.curr_vel > 0:
-                self.serv_brake_func()
-            elif self.e_brake == True and self.pm.curr_vel>0:
-                self.e_brake_func()
-            else:
-                self.pm.setPower(self.curr_power, time.time() )
+            # if self.service_brake == True and self.pm.curr_vel > 0:
+            #     self.serv_brake_func()
+            # elif self.e_brake == True and self.pm.curr_vel>0:
+            #     self.e_brake_func()
+            # else:
+            self.pm.setPower(self.curr_power, time.time() )
 
                 # print('\nTrain Model Object Values')
                 # print(f'time_elapsed: {self.pm.elapsed_time}')
