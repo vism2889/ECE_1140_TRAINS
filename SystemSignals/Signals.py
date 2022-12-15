@@ -16,24 +16,27 @@ from PyQt5.QtWidgets import QWidget
 class Signals(QWidget):
     # Track Model Signals
 
+    # NEED REMOVED
+    blockFailures                       = QtCore.pyqtSignal(list) # THIS SHOULD NOT BE USED, use trackFailuresSignal instead
+    trackModelLayoutLoadedSignal        = QtCore.pyqtSignal(list) # Lets other modules know that the TrackLayout has been successfully loaded, this is unused i beleive
+    occupancyFromTrainSignal            = QtCore.pyqtSignal(list) # List of booleans, length of a single trackline, use trainLocationSignal instead
+
     # List of length N where N is the number of blocks in the track
+    # each containing a list of length M where M is the number of blocks in the trackline
     ## Track Failure = 0x01, Circuit Failure = 0x02, Power Failure = 0x04
     #   - any combination of the three should be logically OR'd together (i.e. TF + CF = 0x03)
     trackFailuresSignal                 = QtCore.pyqtSignal(list)
-    blockFailures                       = QtCore.pyqtSignal(list)
-    globalOccupancyFromTrackModelSignal = QtCore.pyqtSignal(list)
-    trackModelLayoutLoadedSignal        = QtCore.pyqtSignal(list) # Lets other modules know that the TrackLayout has been successfully loaded
-    occupancyFromTrainSignal            = QtCore.pyqtSignal(list) # List of booleans, length of a single trackline
-    #switchStatesSignal                  = QtCore.pyqtSignal(list) # List of integers, length of a single trackline
-    #maintenanceSignal                   = QtCore.pyqtSignal(list) # List of booleans, length of a single trackline
-    #lineSignal                          = QtCore.pyqtSignal(str)  # String Name of trackline
+    
+    # List of length N where N is the number of tracklines, 
+    # each containing a list of length M where M is the number of blocks in the trackline
+    globalOccupancyFromTrackModelSignal = QtCore.pyqtSignal(list) 
 
-    trackBlocksToTrainModelSignal       = QtCore.pyqtSignal(list) # List of block objects, sent to train
-    greenLineTrackBlockSignal           = QtCore.pyqtSignal(list) # List of integer block numbers in the correct order for the green line.
-    beaconFromTrackModelSignal          = QtCore.pyqtSignal(list) # List containing information from beacon
+    beaconFromTrackModelSignal          = QtCore.pyqtSignal(list) # List containing information from beacon [(string) stationside, (string) station, (string) underground]
+    trackBlocksToTrainModelSignal       = QtCore.pyqtSignal(list) # List of block objects, sent to train so the train can use blocklength to calculate stopping distance
+    greenLineTrackBlockSignal           = QtCore.pyqtSignal(list) # List of integer block numbers in the correct order for the green line.  This should only be used for testing.
 
-    # Above could be a single list signal formatted as below:
-    # ["TrackLineName", [lineOccupancy], [lineSwitchStates], [lineMaintenance], [lineFailures]]
+    passengersToTrainModelSignal        = QtCore.pyqtSignal(list) # List of length 2 [(string) train id, (int) number of passengers]
+    lineTicketSalesToCtcOfficeSignal    = QtCore.pyqtSignal(list) # List of length 2 [(int) tickets sold RED LINE, (int) tickets sold GREEN LINE]
 
     # CTC Office Signals
     dispatchTrainSignal      = QtCore.pyqtSignal(list) # List of lenfth 3 [(string) train id,  (string) line, (int) suggested speed]
@@ -55,7 +58,7 @@ class Signals(QWidget):
     blockLengthSignal        = QtCore.pyqtSignal(list)
     gradeSignal              = QtCore.pyqtSignal(list)
     trainLocation            = QtCore.pyqtSignal(list) # List of length 4 that identifies a unique trains location in the track [(int) line, (int) train id, (int) previos block, (int) current block]
-    stationStop              = QtCore.pyqtSignal(list) #List of length 2[(string) train id, (bool) stationStop, (int) line, (int) current block]
+    stationStop              = QtCore.pyqtSignal(list) #List of length 4 [(string) train id, (bool) stationStop, (int) line, (int) current block]
     ctcStopBlock             = QtCore.pyqtSignal(list) #List of length 2 [(int) line, (int) block]
 
     # Train Controller (SW) Input Signals
