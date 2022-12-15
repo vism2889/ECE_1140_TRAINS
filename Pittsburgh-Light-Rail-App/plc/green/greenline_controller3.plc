@@ -1,14 +1,14 @@
 
 occupied = False
 for blk in range(77, 86):
-    if #block_blk == True: 
+    if #block_blk == True:
         occupied = False
         break
 
 if not occupied and (#block_75 == True or #block_74 == True):
     #switch_76 = True
     #switch_85 = True
-    
+
 elif not occupied and (#block_99 == True or #block_100 == True):
     #switch_76 = False
     #switch_85 = False

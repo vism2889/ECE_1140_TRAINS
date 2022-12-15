@@ -55,7 +55,7 @@ class BlockDictionary:
 
     def getSwitchState(self, blockNum):
         if blockNum in self.switchList:
-            return self.switchList[blockNum]
+            return self.switchList[blockNum][1]
 
     def getStation(self, blockNum):
         if blockNum in self.stationList:
@@ -89,7 +89,7 @@ class BlockDictionary:
 
     def switch(self, key):
         try:
-            return self.switchList[key]
+            return self.switchList[key][0]
         except KeyError as K:
             return 0
 

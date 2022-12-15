@@ -102,7 +102,7 @@ class TrainModel(QtWidgets.QMainWindow):
                     setattr(self.t, key, msg[key])
                 
                 if key == 'advertisementState':
-                    if msg[key]:
+                    if msg[key] == True:
                         self.advertisement.show()
                     else:
                         self.advertisement.hide()
