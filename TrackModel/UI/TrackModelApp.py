@@ -259,16 +259,17 @@ class TrackModel(QWidget):
         updates the swicthes for all railway lines
         '''
         for i in range(len(self.switchText)):
-            blockNum = int(self.switchText[self.currLineIndex][i][0])
-            if switch[0] == blockNum:
-                if switch[1] == True:
-                    self.switchInfoTable.item(i,1).setBackground(QtCore.Qt.green)
-                    self.switchInfoTable.item(i,2).setBackground(QtCore.Qt.red)
-                    self.lineBlocks[self.currLineIndex][switch[0]-1].switchState = 'FORWARD'
-                else:
-                    self.switchInfoTable.item(i,1).setBackground(QtCore.Qt.red)
-                    self.switchInfoTable.item(i,2).setBackground(QtCore.Qt.green)
-                    self.lineBlocks[self.currLineIndex][switch[0]-1].switchState = 'REVERSE'
+            for j in range(len(self.switchText[i])):
+                blockNum = int(self.switchText[i][j][0])
+                if switch[0] == blockNum and i == self.currLineIndex:
+                    if switch[1] == True:
+                        self.switchInfoTable.item(j,1).setBackground(QtCore.Qt.green)
+                        self.switchInfoTable.item(j,2).setBackground(QtCore.Qt.red)
+                        self.lineBlocks[i][switch[0]-1].switchState = 'FORWARD'
+                    else:
+                        self.switchInfoTable.item(j,1).setBackground(QtCore.Qt.red)
+                        self.switchInfoTable.item(j,2).setBackground(QtCore.Qt.green)
+                        self.lineBlocks[i][switch[0]-1].switchState = 'REVERSE'
 
     def updateCtcSwitchState(self, switchState):
         print("CTC Switch State Signal", switchState)
