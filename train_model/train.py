@@ -250,6 +250,7 @@ class PointMassModel():
         for c_bl in self.ctc_authority:
             if c_bl in self.waysideAuthority:
                 ind = self.waysideAuthority.index(c_bl)
+                
                 if self.curr_vel != 0 and not self.stationStop:
                     self.waysideAuthority = self.waysideAuthority[0:ind+1]
                 if c_bl == self.curr_block and self.curr_vel == 0:
@@ -258,6 +259,9 @@ class PointMassModel():
                     self.stationStop = False
                     self.stopAtStation = False
                     self.ctc_authority.remove(c_bl)
+                
+                if self.ctcStationStop != c_bl:
+                    self.ctcStationStop = c_bl
             
 
 

@@ -310,6 +310,8 @@ class TrainModel(QtWidgets.QMainWindow):
                     self.signals.occupancyFromTrainSignal.emit(self.t.pm.occ_list)
                     self.signals.commandedSpeedSignal.emit(self.t.pm.speedLimit)
                     # self.brake_update = time.time()
+                
+                self.signals.ctcctcStopBlock.emit([self.t.line, self.t.pm.ctcStationStop])
 
 
     def update_model(self, dict):
