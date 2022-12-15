@@ -29,18 +29,22 @@ class TrainModel(QtWidgets.QMainWindow):
     trainDict = {}
     blockList = None
 
-    def __init__(self, ui, hw, signals):
+    def __init__(self, ui, hw, signals, secondaryUI=None, trainID = None):
         super().__init__()
         uic.loadUi(ui, self)
         self.t = Train()
         self.hw = hw
-        
+        if not secondaryUI:
+            self.primaryUI = True
+        else:
+            self.primaryUI = False
 
         if self.hw:
             from Server_Comm import MyPub, MySub
             self.mp = MyPub(self.t)
             self.ms = MySub(self.t)
 
+        self.t.id = trainID
         self.signals = signals
         self.UI()
         self.last_update = 0
@@ -58,8 +62,8 @@ class TrainModel(QtWidgets.QMainWindow):
         self.blockList = msg
 
     def dispatch(self, msg):
-
-        self.t.id = msg[0]
+        if not self.t.id:
+            self.t.id = msg[0]
         if msg[1] == 'Green Line':
             self.t.pm.BlockModels = self.blockList[1]
             self.t.line = 1
@@ -77,63 +81,66 @@ class TrainModel(QtWidgets.QMainWindow):
         
 
         self.t.dispatched = True
-        self.comboTrain.addItem(msg[0])
-        self.comboTrain.show()
+        if self.primaryUI:
+            self.comboTrain.addItem(msg[0])
+            self.comboTrain.show()
 
     def setTrainPower(self, msg):
-        self.t = self.trainDict[msg['trainID']]
-        self.t.pm.power = msg['power']
+        if self.t.id == msg['trainID']:
+            self.t.pm.power = msg['power']
     
     def setBrake(self, msg):
-        self.t = self.trainDict[msg['trainID']]
-        self.t.service_brake = msg['serviceBrake'] 
-        if msg['emergencyBrake']:
+        if self.t.id == msg['trainID']:
+            self.t.service_brake = msg['serviceBrake'] 
             self.t.e_brake = msg['emergencyBrake'] 
 
 
     def nonVitals(self,msg):
-        self.t = self.trainDict[msg['trainID']]
-        for key in msg:
-            if key != 'trainID':
-                setattr(self.t, key, msg[key])
-            
-            if key == 'advertisementState':
-                if msg[key]:
-                    self.advertisement.show()
-                else:
-                    self.advertisement.hide()
+        if self.t.id == msg['trainID']:
+            for key in msg:
+                if key != 'trainID':
+                    setattr(self.t, key, msg[key])
+                
+                if key == 'advertisementState':
+                    if msg[key]:
+                        self.advertisement.show()
+                    else:
+                        self.advertisement.hide()
     
     def ctc_authority(self, msg):
-        for i,m in enumerate(msg[1]):
-            msg[1][i] = int(m)
-        self.t = self.trainDict[msg[0]]
-        self.t.pm.ctc_authority.extend(msg[1])
+        if self.t.id == msg[0]:
+            for i,m in enumerate(msg[1]):
+                msg[1][i] = int(m)
+            self.t.pm.ctc_authority.extend(msg[1])
 
     
     def wayside_authority(self,msg):
-        self.t = self.trainDict[msg[1]]
-        self.t.pm.waysideAuthority = msg[2]
+        if self.t.id == msg[1]:
+            self.t.pm.waysideAuthority = msg[2]
     
     def speedup(self, msg):
-        for train in self.trainDict.values():
-            self.t = train
-            self.t.pm.speedUp = int(msg)
+        self.t.pm.speedUp = int(msg)
     
     def trainStopped (self, msg):
-        self.t = self.trainDict[msg['trainID']]
-        self.t.pm.stopAtStation = msg['stoppedAtStation']
+        if self.t.id == msg['trainID']:
+            self.t.pm.stopAtStation = msg['stoppedAtStation']
+            self.t.pm.stationStop = False
     
     def passEbrake(self,msg):
-        if self.t.e_brake:
-            self.t.e_brake = False
+        if self.t.passEbrake:
+            self.t.passEbrake = False
         else:
-            self.t.e_brake = True
+            self.t.passEbrake = True
+
+    def popUpTrain(self,msg):
+        print('here')
 
     def addPassengers(self,msg):
-        self.t = self.trainDict[msg[0]]
-        self.t.passenger_count = msg[1]
+        if self.t.id == msg[0]:
+            print(f'Getting Passengers {msg[1]}')
+            self.t.passenger_count = msg[1]
+
     def UI(self):
-        
         self.signals.dispatchTrainSignal.connect(self.dispatch)
         self.signals.powerSignal.connect(self.setTrainPower)
         self.signals.brakeDictSignal.connect(self.setBrake)
@@ -154,9 +161,12 @@ class TrainModel(QtWidgets.QMainWindow):
         self.brake_fail.setStyleSheet("background-color: gray")
 
         #passenger emergency brake button red color
-        self.comboTrain.hide()
         self.ebrake_button.clicked.connect(self.passEbrake)
         self.ebrake_button.setStyleSheet("background-color: red")
+
+        #combo box
+        self.comboTrain.hide()
+        self.comboTrain.activated.connect(self.popUpTrain)
 
         #advertisements
         self.advertisement         = QLabel(self)
@@ -216,6 +226,12 @@ class TrainModel(QtWidgets.QMainWindow):
         else:
             self.ext_lights_disp.setText('Off')
         
+        #dimensions
+        self.length_disp.setText('%d feet' %int(self.t.pm._td.length*3.28084))
+        self.height_disp.setText('%d feet' %int(self.t.pm._td.height*3.28084))
+        self.width_disp.setText('%d feet' %int(self.t.pm._td.width*3.28084))
+        self.mass_disp.setText('%d tons' %int(self.t.pm._td.mass_empty/907.185))
+        
         #power
         self.cmd_pwr_disp.setText(f'{round(float(self.t.pm.power)/1000)} kW')
         self.accel_disp.setText('%.1f ft/s^2' % float((self.t.pm.curr_accel)*3.28084) )        
@@ -245,7 +261,7 @@ class TrainModel(QtWidgets.QMainWindow):
             self.serv_brake_disp.setText('Off')
         if self.t.e_brake:
             self.ebrake_disp.setText('On')
-        if self.t.e_brake:
+        else:
             self.ebrake_disp.setText('Off')
         self.auth_disp.setText('%d'%int(self.t.pm.train_authority))
         self.grade_disp.setText(f'{self.t.pm.grade * 100} %')
@@ -254,19 +270,24 @@ class TrainModel(QtWidgets.QMainWindow):
         self.last_st_disp.setText(f'{self.t.last_station}')
         self.next_st_disp.setText(f'{self.t.next_station}')
         
-        for train in self.trainDict.values():
-            self.t = train
-            if time.time()-self.last_update > 0.1/self.t.pm.speedUp:
+      
+        if time.time()-self.last_update > 0.2:
+            # if len(self.t.pm.waysideAuthority) == 0:
+            #     self.signals.trainLocation.emit([int(self.t.line), self.t.id, int(self.t.pm.prev_block), int(self.t.pm.curr_block)])
+            if self.t.pm.stationStop and not self.t.pm.stopAtStation:
+                self.signals.stationStop.emit([self.t.id, self.t.pm.stationStop, self.t.line, self.t.pm.curr_block])
+                self.t.passenger_count = 0
+            else:
                 if self.t.line != None and self.t.pm.prev_block != None and self.t.pm.curr_block != 0:
                     self.signals.trainLocation.emit([int(self.t.line), self.t.id, int(self.t.pm.prev_block), int(self.t.pm.curr_block)])
-                if self.t.e_brake == False and self.t.service_brake == False and self.t.dispatched:
+                
+                if self.t.dispatched and not self.t.pm.stationStop:
                     self.t.pm.setPower(self.t.pm.power, time.time())
                     if self.hw:
-                        self.mp.publish()
-                elif self.t.pm.stationStop and not self.t.pm.stopAtStation:
-                    self.signals.stationStop.emit([self.t.id, self.t.pm.stationStop, self.t.line, self.t.pm.curr_block])
-                    self.t.passenger_count = 0
-                elif self.t.service_brake == True:
+                        self.mp.publish()    
+                
+                if self.t.service_brake == True:
+                    self.t.pm.power = 0
                     self.t.pm.brake(0)
                     if self.hw:
                         self.mp.publish()  
@@ -275,16 +296,23 @@ class TrainModel(QtWidgets.QMainWindow):
                     if self.hw:
                         self.mp.publish()
                 
-                self.signals.currentSpeedOfTrainModel.emit([self.t.id, self.t.pm.curr_vel])
-                self.signals.commandedSpeedSignal.emit([self.t.id,self.t.pm.cmdSpeed])
-                self.signals.speedLimitSignal.emit([self.t.id,self.t.pm.speedLimit])
-                self.signals.authoritySignal.emit([self.t.id,self.t.pm.train_authority])
-                self.signals.ctcStopBlock.emit([self.t.line, self.t.pm.ctcStationStop])
-                self.signals.trainFailuresSignal.emit([self.t.id, 
-                                                        [self.t.train_engine_failure,
-                                                        self.t.signal_pickup_failure,
-                                                        self.t.brake_failure]])
-                self.last_update = time.time()
+                if self.t.passEbrake:
+                    self.t.pm.brake(1)
+                    if self.hw:
+                        self.mp.publish()
+                
+            
+            self.signals.currentSpeedOfTrainModel.emit([self.t.id, self.t.pm.curr_vel])
+            self.signals.commandedSpeedSignal.emit([self.t.id,self.t.pm.cmdSpeed])
+            self.signals.speedLimitSignal.emit([self.t.id,self.t.pm.speedLimit])
+            self.signals.authoritySignal.emit([self.t.id,self.t.pm.train_authority])
+            self.signals.ctcStopBlock.emit([self.t.line, self.t.pm.ctcStationStop])
+            self.signals.trainFailuresSignal.emit([self.t.id, 
+                                                    [self.t.train_engine_failure,
+                                                    self.t.signal_pickup_failure,
+                                                    self.t.brake_failure]])
+            self.last_update = time.time()
+            print('Exiting loop')
 
 
     def update_model(self, dict):
