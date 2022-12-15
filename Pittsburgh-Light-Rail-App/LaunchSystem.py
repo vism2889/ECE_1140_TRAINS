@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 ##############################################################################
-# AUTHOR(S):   Morgan Visnesky, ADD YOUR NAMES HERE
+# AUTHOR(S):   Morgan Visnesky, Gwen Litwak
 # DATE:     11/13/2022
 # FILENAME: LaunchSystem.py
 # DESCRIPTION:
