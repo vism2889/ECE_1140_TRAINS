@@ -1,3 +1,10 @@
+##############################################################################
+# AUTHOR(S):    Sushmit Acharya
+# DATE:         12/15/2022
+# FILENAME:     train.py
+# DESCRIPTION:
+# Train Class representing a Train Object
+##############################################################################
 from dataclasses import dataclass
 from tokenize import Double
 from tracemalloc import start
@@ -11,9 +18,6 @@ from Signals import Signals
 
 
 
-# class PointMassModel():
-#     def __init__(self) -> None:
-#         pass
 
 @dataclass
 class TrainData():
@@ -57,48 +61,37 @@ class PointMassModel():
         self.stopAtStation = False
 
         self.suggested_speed = 0
-        #track model to train comms
         self.speedLimit = 0
 
         self._td = TrainData()
 
+        self.curr_block = None
         self.prev_block = None
         self.curr_block = None
         self.BlockModels = None
-        # fname = open(f'{os.getcwd()}/trackblocks', 'rb')
-        # self.glBlockMOdels = pickle.load(fname)
-        # fname.close()
-
-        # self.blocks          = [i for i in range(150)]
-        self.curr_block = 0
-        sec1 = [i for i in range(63, 101)]
-        sec2 = [i for i in range(85, 76, -1)]
-        sec3 = [i for i in range(101, 150)]
-        sec4 = [i for i in range(29, 0, -1)]
-        sec5 = [i for i in range(13, 58)]
-
-        self.blocks = sec1 + sec2 + sec3 + sec4 + sec5
-        # self.blockLens = [random.randint(10,25) for i in range(len(self.blocks))]        
-        self.occ_list = [0 for i in range(150)]
-        self.occ_index = 0
 
         self.ctcStationStop = []
+
         #time independent values
         self.power = 0
         self.force = 0
         self.mass = 0
 
+        #previous and current time for proper time based calculations
         self.prev_time = 0
         self.curr_time = 0
         self.elapsed_time = 0
         
+        #acceleration
         self.prev_accel = 0
         self.curr_accel = 0
 
+        #velocity(m/s) and speed(mph)
         self.prev_vel = 0
         self.curr_vel = 0
         self.curr_speed = 0
 
+        #position(m)
         self.prev_pos = 0
         self.curr_pos = 0
     
@@ -129,12 +122,6 @@ class PointMassModel():
         self.prev_time = self.curr_time
         self.curr_time = time.time()
         self.elapsed_time = (self.curr_time-self.prev_time) * self.speedUp
-
-        # print(f'Serv Brake velocity before decleration:{self.curr_speed}')
-        # print(f'Serv Brake force before deceleration: {self.force}')
-        # print(f'Deceleration force is: {self._td.mass_empty * self._td.serv_brake}')
-        # print(f'Train acceleration before stop seqeuence: {self.curr_accel}')
-        # print(f'Friction Force: {self._td.mass_empty*self._td.kinetic_fric_constant}\n')
         
         if self.curr_vel > 0:
             self.prev_accel = self.curr_accel
@@ -155,7 +142,6 @@ class PointMassModel():
 
 
     def dec_force(self, val):
-        # print(f"Current force is: {self.force}")
         if val == 0:
             dec_force = self._td.mass_empty * self._td.serv_brake
         else:
@@ -175,7 +161,6 @@ class PointMassModel():
             kinetic_friction_force = self._td.mass_empty*9.8*self._td.kinetic_fric_constant*0.01
         else:
             kinetic_friction_force = self._td.mass_empty*9.8*self._td.kinetic_fric_constant
-
         gradeForce = self._td.mass_empty*9.8*(self.grade)/(1+self.grade**2)**0.5
 
         if self.curr_vel > 0:
@@ -215,7 +200,6 @@ class PointMassModel():
         if self.curr_vel != 0:
             self.prev_pos = self.curr_pos
             self.curr_pos = self.prev_pos + (self.elapsed_time/2)*(self.prev_vel +self.curr_vel)
-        # self.brake_pos = (self.elapsed_time/2)*(self.prev_vel + self.curr_vel)
 
         #block object length calculation
         curr_block_object = self.BlockModels[self.curr_block-1]
@@ -223,13 +207,10 @@ class PointMassModel():
         self.curr_block_len = float(self.curr_block_len)
 
     
-        # print(f'-------------------Position: {self.curr_pos}-----------------------------')
         if self.curr_pos >= self.curr_block_len and self.curr_block != 0:
-            # self.occ_list[self.occ_index] = 0
             #resetting position
             self.curr_pos = self.curr_pos-self.curr_block_len
             self.prev_pos = 0
-            #incrementing curr_block
 
             if len(self.waysideAuthority) > 1:
                 self.curr_block = self.waysideAuthority[1]
@@ -348,20 +329,6 @@ class Train():
     def get_int_light_state(self):
         return self.int
 
-    def e_brake_func(self):
-        if self.e_brake == True and self.pm.curr_vel > 0:
-            self.pm.brake(1)
-    
-    def serv_brake_func(self):
-        # print('inside service brake')
-        if self.service_brake == True and self.pm.curr_vel > 0:
-            self.pm.brake(0)
-
-    def dispatch(self):
-        self.dispatched = True
-        self.pm.power = 120000
-        self.set_power(120000, time.time())
-
     def set_power(self, power, t = None):
 
         self.curr_speed = self.pm.curr_speed
@@ -369,27 +336,10 @@ class Train():
 
         for f in (self.Failures):
             if self.Failures[f]:
-                # print(f"Error {f} failure")
                 return 
         
         if(self.dispatched):
-            # if self.service_brake == True and self.pm.curr_vel > 0:
-            #     self.serv_brake_func()
-            # elif self.e_brake == True and self.pm.curr_vel>0:
-            #     self.e_brake_func()
-            # else:
             self.pm.setPower(self.curr_power, time.time() )
-
-                # print('\nTrain Model Object Values')
-                # print(f'time_elapsed: {self.pm.elapsed_time}')
-                # print(f'Current Power: {self.curr_power}')
-                # # print(f'Previous Vel:{self.pm.prev_vel}')
-                # # print(f'Force: {self.pm.force}')
-                # # print(f'Previous Accel:{self.pm.prev_accel}')
-                # # print(f'Current Accel:{self.pm.curr_accel}')
-                # print(f'Current_Vel: {self.pm.curr_vel}')
-                # print(f'Current Speed: {self.pm.curr_speed} mph')
-                # # print(f'Current Position: {self.pm.curr_pos} m \n')
             
                 
             
