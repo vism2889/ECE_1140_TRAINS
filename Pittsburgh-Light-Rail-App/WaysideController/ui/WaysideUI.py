@@ -154,7 +154,6 @@ class TrackControllerWindow(QtWidgets.QWidget):
                 if os.path.exists(file):
                     f = open(file)
                     self.waysideio_ref.uploadPLC('red', idx, f)
-                    # print(f.readline())
                     f.close()
 
         if "greenline" in loc.objectName():
@@ -164,8 +163,7 @@ class TrackControllerWindow(QtWidgets.QWidget):
                                                     "", "PLC Files (*.plc)")
                 if os.path.exists(file):
                     f = open(file)
-                    self.waysideio_ref.uploadPLC('red', idx, f)
-                    # print(f.readline())
+                    self.waysideio_ref.uploadPLC('green', idx, f)
                     f.close()
 
     def addTab(self, prefix, controllers, controller, layout, reference, isView=False):
