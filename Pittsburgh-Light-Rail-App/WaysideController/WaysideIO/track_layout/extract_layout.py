@@ -163,6 +163,10 @@ def generateTrackPath(path, name):
             prev = i['Previous']
             next = i['Next']
             
+            ## Speed Limit
+            sl = i['Speed Limit']
+            block.setSpeedLimite(sl)
+
             ## previous
             if ';' in prev: 
                 prev = prev.split(';')
