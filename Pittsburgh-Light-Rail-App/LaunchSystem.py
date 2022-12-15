@@ -124,7 +124,7 @@ class PittsburghLightRail(QWidget):
         self.speedController = QSlider(Qt.Horizontal,self)
         self.speedController.setGeometry(50,10,120,20)
         self.speedController.setMinimum(1)
-        self.speedController.setMaximum(10)
+        self.speedController.setMaximum(30)
         self.speedController.valueChanged.connect(self.sendClockSpeed)
 
         ## CTC Offic3

@@ -10,6 +10,7 @@
 ##############################################################################
 
 import sys
+import unittest
 # tell interpreter where to look for model files
 sys.path.insert(0,"../Track-System-Models")
 from BlockModel import BlockModel

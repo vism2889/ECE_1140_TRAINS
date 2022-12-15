@@ -143,7 +143,7 @@ class TrackModel(QWidget):
 
             # -------------------- CTC OFFICE SIGNAL CONNECTIONS         --------------------
             self.signals.ctcSwitchState.connect(self.updateCtcSwitchState)          # from ctc office: List of length 3 [(int) line, (int) block #, (bool) switch state]
-
+            self.signals.crossingState.connect(self.updateCrossingState)            # from ctc office: List of length 3 [(int) line, (int) block #, (bool) crossing state]
         # Signals local to module
         self.heaterSignal.connect(self.updateHeaterState)
         self.initUI()
@@ -182,6 +182,13 @@ class TrackModel(QWidget):
         self.trackModelImage.setPixmap(self.pixmap)
         self.trackModelImage.resize(215,160)
         self.trackModelImage.move(self.width-210, self.height-225)
+
+    def updateCrossingState(self, stateMsg):
+        print('CROSSING STATE', stateMsg)
+        line     = stateMsg[0]
+        blockNum = stateMsg[1]
+        state    = stateMsg[2]
+        self.lineBlocks[line][blockNum].crossingState = state
 
     def displayTemperatureButton(self):
         '''
@@ -326,7 +333,7 @@ class TrackModel(QWidget):
         '''
         Updates the Station Ticket Sales and Passengers Boarding
         '''
-        print("STOP MSG", stopMessage)
+        #print("STOP MSG", stopMessage)
         msgTrain   = stopMessage[0]
         msgLine    = stopMessage[2]
         msgBlock   = stopMessage[3]
@@ -365,13 +372,13 @@ class TrackModel(QWidget):
         sec5     = [i for i in range(13, 58)]
         self.orderedGreenLineList = sec1 + sec2 + sec3 + sec4 + sec5
 
-    def updateBlockOccupancyCallback(self, line):
+    def updateBlockOccupancyCallback(self, line, rmAuthBlock = None):
         '''
         Checks to see if a line has been loaded, if so then the occupancy is 
         displayed over the list of blocks for that line
         '''
         if self.currLineIndex != None and self.blocksLoaded == True:
-            self.updateBlocksOccupancyVisualization(line)
+            self.updateBlocksOccupancyVisualization(line, rmAuthBlock)
 
     def displayLoadLayoutButton(self):
         '''
@@ -690,7 +697,7 @@ class TrackModel(QWidget):
             self.signals.trackBlocksToTrainModelSignal.emit(self.lineBlocks)
             self.signals.greenLineTrackBlockSignal.emit(self.orderedGreenLineList)
 
-    def updateBlocksOccupancyVisualization(self, line):
+    def updateBlocksOccupancyVisualization(self, line, rmAuthBlock = None):
         '''
         Updates the background color of all the blocks in the current lines
         block selection list with colors reflecting thier fault and occupancy states.
@@ -708,11 +715,16 @@ class TrackModel(QWidget):
                     self.currBlockDisplay.setStyleSheet("background-color: rgb(200,200,50); color: black;")
 
             elif self.globalAuthority[self.currLineIndex] != None and (i+1) in self.globalAuthority[self.currLineIndex]:
-                self.blockslistwidget.item(i).setBackground(QtCore.Qt.green)
+                if rmAuthBlock == None:
+                    self.blockslistwidget.item(i).setBackground(QtCore.Qt.green)
+                else:
+                    self.blockslistwidget.item(i).setBackground(QColor(116, 124, 138))
 
             else:
                 self.blockslistwidget.item(i).setBackground(QColor(116, 124, 138))
                 self.blockslistwidget.item(i).setIcon(QIcon(""))
+        if rmAuthBlock == 57:
+            self.blockslistwidget.item(56).setBackground(QColor(116, 124, 138))
 
         # updates the current block information display
         self.updateBlockInfo(self.currBlockIndex)
@@ -949,16 +961,30 @@ class TrackModel(QWidget):
         line      = occupancy[0]
         lastBlock = occupancy[2]
         currBlock = occupancy[3]
+        #print("OCC", occupancy)
+        if currBlock == 57:
+            self.occupancy[int(line)][int(lastBlock)-1] = 0
+            
+            self.occupancy[int(line)][int(currBlock)-1] = 0
+            self.removeFromAuthority = currBlock
+            print("REMOVING TRAIN")
+            self.updateBlockOccupancyCallback(line, 57) # needs to send line index to this update method
+            self.blockslistwidget.item(56).setBackground(QColor(116, 124, 138))
+        else:
 
-        for i in range(len(self.lastTrainAtStation)):
-            if self.lastTrainAtStation[i][1] == lastBlock:
-                self.lastTrainAtStation.remove(self.lastTrainAtStation[i])
+            for i in range(len(self.lastTrainAtStation)):
+                if self.lastTrainAtStation[i][1] == lastBlock:
+                    self.lastTrainAtStation.remove(self.lastTrainAtStation[i])
 
-        self.occupancy[int(line)][int(lastBlock)-1] = 0
-        self.occupancy[int(line)][int(currBlock)-1] = 1
+            self.occupancy[int(line)][int(lastBlock)-1] = 0
+            self.occupancy[int(line)][int(currBlock)-1] = 1
         self.removeFromAuthority = lastBlock
         self.signals.globalOccupancyFromTrackModelSignal.emit(self.occupancy) # should emit a new global occupancy
-        self.updateBlockOccupancyCallback(line) # needs to send line index to this update method
+        self.updateBlockOccupancyCallback(line, 57) # needs to send line index to this update method
+        if currBlock == 57:
+            self.blockslistwidget.item(56).setBackground(QColor(116, 124, 138))
+            self.blockslistwidget.item(57).setBackground(QColor(116, 124, 138))
+            
 
     def getAuthority(self, authority):
         '''
