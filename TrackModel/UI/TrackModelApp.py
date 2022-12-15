@@ -80,7 +80,7 @@ class TrackModel(QWidget):
 
         # Variables to hold values for displaying stations and switches on a selected line
         self.switchText              = []
-        self.stations                = []
+        self.stations                = []   # List of station names
         self.boardingPassengers      = []
         self.departingPassengers     = []
         
@@ -91,6 +91,11 @@ class TrackModel(QWidget):
         self.authorityFromWayside    = []
         self.globalAuthority         = []
         self.removeFromAuthority     = None
+        self.globalTicketSales       = 0    # ticket sales for the track lines in the system
+        self.lineTicketSales         = [0,0] # ticket sales for each line
+        self.stationTicketSales      = [[],[]] # ticket sales for each station
+
+        self.lastTrainAtStation      = []
          
         # System Communication Signals
         if signals:
@@ -99,6 +104,7 @@ class TrackModel(QWidget):
             # -------------------- TRAIN MODEL SIGNAL CONNECTIONS        --------------------
             self.signals.trainLocation.connect(self.updateGlobalOccupancy)          # from train model: (used for occupancy)
             # self.signals.stoppedBlocks.connect(self.updateStoppedBlocks)          # sets a list = [list of blocks that trains are stopped at]
+            self.signals.stationStop.connect(self.updateStationStop)                # from train model: (used for station stop)
 
             # -------------------- WAYSIDE CONTROLLER SIGNAL CONNECTIONS --------------------
             self.signals.waysideAuthority.connect(self.getAuthority)                # from wayside: (used for authority)
@@ -270,6 +276,32 @@ class TrackModel(QWidget):
                         self.switchInfoTable.item(j,1).setBackground(QtCore.Qt.red)
                         self.switchInfoTable.item(j,2).setBackground(QtCore.Qt.green)
                         self.lineBlocks[i][switch[0]-1].switchState = 'REVERSE'
+
+    def updateStationStop(self, stopMessage):
+        '''
+        Updates the Station Ticket Sales and Passengers Boarding
+        '''
+        msgTrain   = stopMessage[0]
+        msgLine    = stopMessage[2]
+        msgBlock   = stopMessage[3]
+        passengers = 0
+
+        if [msgTrain, msgBlock] not in self.lastTrainAtStation:
+            self.lastTrainAtStation.append([msgTrain, msgBlock])
+
+            for i in range(len(self.stations[msgLine])):
+                if int(self.stations[msgLine][i][0]) == msgBlock:
+                    passengers                           = self.boardingPassengers[msgLine][i]
+                    self.boardingPassengers[msgLine][i]  = self.generateBoardingPassengers()
+                    self.globalTicketSales              += passengers
+                    self.lineTicketSales[msgLine]       += passengers
+                    self.stationTicketSales[msgLine][i] += passengers
+                # print("line", msgLine, "block", msgBlock, "passengers", passengers, "total", self.globalTicketSales, "line total", self.lineTicketSales[msgLine])
+        # print("Ticket Sales", self.globalTicketSales)
+        # print(msgLine, msgBlock)
+        self.displayLineStations()
+        self.signals.passengersToTrainModelSignal.emit([passengers, stopMessage[0]]) # sends number of passengers boarding to the train model
+        self.signals.lineTicketSalesToCtcOfficeSignal.emit(self.lineTicketSales)       # sends the updated ticket sales for each line to the CTC Office
 
     def updateCtcSwitchState(self, switchState):
         print("CTC Switch State Signal", switchState)
@@ -548,6 +580,7 @@ class TrackModel(QWidget):
                         self.stations[k].append([block.blockNumber, block.station])
                         self.departingPassengers[k].append(self.generateBoardingPassengers())
                         self.boardingPassengers[k].append(self.generateLeavingPassengers())
+                        self.stationTicketSales[k].append(0)
 
         # Initializes the currLine and currBlock after a layout is loaded, defaults to block #1 on the green line.
         self.currBlockIndex                       = 0
@@ -637,7 +670,7 @@ class TrackModel(QWidget):
             self.stationInfoTable.setItem(i, 0, QTableWidgetItem(self.stations[self.currLineIndex][i][0]))
             self.stationInfoTable.setItem(i, 1, QTableWidgetItem(self.stations[self.currLineIndex][i][1]))
             self.stationInfoTable.setItem(i, 2, QTableWidgetItem(str(self.boardingPassengers[self.currLineIndex][i])))
-            self.stationInfoTable.setItem(i, 3, QTableWidgetItem('0'))
+            self.stationInfoTable.setItem(i, 3, QTableWidgetItem(str(self.stationTicketSales[self.currLineIndex][i])))
 
     def displayLineSwitches(self):
         '''
@@ -858,6 +891,10 @@ class TrackModel(QWidget):
         line      = occupancy[0]
         lastBlock = occupancy[2]
         currBlock = occupancy[3]
+
+        for i in range(len(self.lastTrainAtStation)):
+            if self.lastTrainAtStation[i][1] == lastBlock:
+                self.lastTrainAtStation.remove(self.lastTrainAtStation[i])
 
         self.occupancy[int(line)][int(lastBlock)-1] = 0
         self.occupancy[int(line)][int(currBlock)-1] = 1

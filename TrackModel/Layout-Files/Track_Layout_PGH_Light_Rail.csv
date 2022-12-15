@@ -7,7 +7,7 @@ Red,B,5,50,1.5,40,,,0.75,3.25,,,,bi-directional
 Red,B,6,50,1,40,,,0.5,3.75,,"Left/Right,shadyside,NO",,bi-directional
 Red,C,7,75,0.5,40,STATION: SHADYSIDE,Left/Right,0.38,4.13,,"Left/Right,Herron-Ave,NO","Left/Right,Shadyside,NO",bi-directional
 Red,C,8,75,0,40,,,0,4.13,,,,bi-directional
-Red,C,9,75,0,40,SWITCH (75-yard),,0,4.13,,,,bi-directional
+Red,C,9,75,0,40,SWITCH (9-10; 9-yard),,0,4.13,,,,bi-directional
 Red,D,10,75,0,40,,,0,4.13,,,,bi-directional
 Red,D,11,75,-0.5,40,,,-0.38,3.75,,,,bi-directional
 Red,D,12,75,-1,40,,,-0.75,3,,,,bi-directional
@@ -132,11 +132,11 @@ Green,I,54,50,0,30,UNDERGROUND,,0,0.5,6,,,one-way
 Green,I,55,50,0,30,UNDERGROUND,,0,0.5,6,,,one-way
 Green,I,56,50,0,30,UNDERGROUND,,0,0.5,6,"Right,Overbrook,NO","Right,Inglewood,YES",one-way
 Green,I,57,50,0,30,STATION; OVERBROOK; UNDERGROUND,Right,0,0.5,6,,,one-way
-Green,J,58,50,0,30,SWITCH (57-yard),,0,0.5,6,"Right,Glenbury,NO","Right,Overbrook,NO",one-way
+Green,J,58,50,0,30,SWITCH (58-59; 57-yard),,0,0.5,6,"Right,Glenbury,NO","Right,Overbrook,NO",one-way
 Green,J,59,50,0,30,,,0,0.5,6,,,one-way
 Green,J,60,50,0,30,,,0,0.5,6,,,one-way
 Green,J,61,50,0,30,,,0,0.5,6,,,one-way
-Green,J,62,50,0,30,SWITCH (Yard-63),,0,0.5,6,,,one-way
+Green,J,62,50,0,30,SWITCH (62-63; Yard-63),,0,0.5,6,,,one-way
 Green,K,63,100,0,70,,,0,0.5,5.1,,,one-way
 Green,K,64,100,0,70,,,0,0.5,5.1,"Right,Glenbury,NO","Right,Overbrook,NO",one-way
 Green,K,65,200,0,70,STATION; GLENBURY,Right,0,0.5,10.3,,,one-way
