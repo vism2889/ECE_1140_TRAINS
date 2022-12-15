@@ -59,8 +59,8 @@ class Controller():
 
         ## Setup PLC interface
         self.parser = PLCParser(controllerNum, self.line)
-        
-        ## Load the default PLC programs 
+
+        ## Load the default PLC programs
         file = open(f"plc/{self.line}/{self.line}line_controller{self.id}.plc")
         self.uploadPLC(file)
         self.maintenance = False
@@ -129,7 +129,7 @@ class Controller():
         #         return
 
         # self.maintenance = state
-        return 
+        return
 
     ## Switches and crossing only get update with the PLC program
     def updateSwitch(self):
@@ -180,8 +180,8 @@ class Controller():
                     importlib.reload(self.plc)
             except ImportError:
                 print(f"Errror: Could not import plc script for {self.line}line controller {self.id}")
-                self.plcGood = False                
-            else:                
+                self.plcGood = False
+            else:
                 self.plc.run(self.track)
                 self.plcGood = True
         else:
@@ -230,7 +230,7 @@ class WaysideIO(QWidget):
             0 : {}, ## Red
             1 : {} ## Green
         }
-        
+
 
     ###############
     ## CALLBACKS ##
@@ -243,7 +243,7 @@ class WaysideIO(QWidget):
 
         # if msg[0] not in self.activeTrains[0]:
         #     self.activeTrains[0][msg[0]] = [None, msg[1]]
-        
+
         # if msg[0] not in self.activeTrains[1]:
         #     self.activeTrains[1][msg[0]] = [None, msg[1]]
 
@@ -263,12 +263,12 @@ class WaysideIO(QWidget):
         ## Save train location for speed
         if id in self.activeTrains[line]:
             self.activeTrains[line][id][0] = curr
-            
+
             if line == 0:
                 speedLim = self.redlineTrack.getBlock(curr).speedLimit
             if line == 1:
                 speedLim = self.greenlineTrack.getBlock(curr).speedLimit
-            
+
             if self.activeTrains[line][id][1] > int(speedLim):
                 speed = int(speedLim)
             else:
@@ -278,7 +278,7 @@ class WaysideIO(QWidget):
                 self.activeTrains[line][id] = [curr, int(self.redlineTrack.getBlock(curr).speedLimit)]
             if line == 1:
                 self.activeTrains[line][id] = [curr, int(self.greenlineTrack.getBlock(curr).speedLimit)]
-        
+
         # print(f'({line}) :\ttrain id {id}, speed {speed}, block {curr}')
         self.signals.regulatedSpeed.emit([line, id, speed])
 
@@ -379,23 +379,35 @@ class WaysideIO(QWidget):
                 self.greenlineControllers[c[0]].updateMaintenance(blockNum, state)
 
     def setSwitch(self, line, blockNum, state):
+        controllers = self.lookupBlock(line, blockNum)['controller']
+        # print(self.redlineControllers)
         ## redline
         if self.lines[0] == line.lower():
             self.signals.switchState.emit([0, int(blockNum), state])
             res = self.redlineTrack.setSwitch(int(blockNum), state)
 
+            for c in controllers:
+                if len(self.redlineControllers) > c[0]:
+                    self.redlineControllers[c[0]].track['switch'][blockNum] = state
+
         ## greenline
         if self.lines[1] == line.lower():
             self.signals.switchState.emit([1, int(blockNum), state])
             res = self.greenlineTrack.setSwitch(int(blockNum), state)
+            for c in controllers:
+                if len(self.greenlineControllers) > c[0]:
+                    self.greenlineControllers[c[0]].track['switch'][blockNum] = state
+
 
     def setCrossing(self, line, blockNum, state):
         if self.lines[0] == line.lower():
+            self.signals.crossingState.emit([0, int(blockNum), state])
             controllers = self.lookupBlock(self.lines[0], blockNum)['controller']
             # for c in controllers:
             #     self.redline_controllers[c[0]].updateCrossing(blockNum, state)
 
         if self.lines[1] == line.lower():
+            self.signals.crossingState.emit([1, int(blockNum), state])
             controllers = self.lookupBlock(self.lines[1], blockNum)['controller']
             # for c in controllers:
             #     self.greenline_controllers[c[0]].updateCrossing(blockNum, state)
@@ -406,17 +418,17 @@ class WaysideIO(QWidget):
     def getOccupancy(self, line, blockNum):
         occupied = True
         controllers = self.lookupBlock(line, blockNum)['controller']
-        
+
         if line == 'red':
             for c in controllers:
                 occupied &= self.redlineControllers[c[0]].blockState(blockNum)
-        
+
         if line == 'green':
             for c in controllers:
                 occupied &= self.greenlineControllers[c[0]].blockState(blockNum)
 
         return occupied
-        
+
     #############
     ## HELPERS ##
     #############
@@ -433,7 +445,7 @@ class WaysideIO(QWidget):
             nextBlock = track.getNextBlock(currentBlock, previousBlock)
             if nextBlock == -1:
                 ## Set a 2 block buffer for the authority
-                if len(authority) > 2: 
+                if len(authority) > 2:
                     authority.pop(-1)
                     authority.pop(-1)
                 elif len(authority) > 1:
