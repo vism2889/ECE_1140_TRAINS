@@ -738,7 +738,7 @@ class Ui_TrainControllerSW_MainWindow(QWidget)          :
     def setStationStopSignal(self, msg)                 : 
         if(msg[0] == self.trainID):
             self.stationStop                            = msg[1]
-            self.serviceBrakeState = True
+            self.serviceBrakeState                      = True
             if((self.stationStop == True) & (self.currentSpeed == 0)):
                 self.stoppedAtStation                   = True
                 self.emitStoppedAtStation()
