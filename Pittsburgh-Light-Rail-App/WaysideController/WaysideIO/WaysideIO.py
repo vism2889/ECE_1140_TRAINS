@@ -233,6 +233,11 @@ class WaysideIO(QWidget):
             'green' : {}
         }
 
+        self.activeTrains = {
+            0 : {}, ## Red
+            1 : {} ## Green
+        }
+
     ###############
     ## CALLBACKS ##
     ###############
@@ -247,13 +252,15 @@ class WaysideIO(QWidget):
         prev = loc[2]
         curr = loc[3]
 
+        ## Save train location for speed
+        self.activeTrains[line][id] = curr
+
         if line == 0:
             authority= self.planAuthority('red', self.redlineControllers, self.redlineTrack, curr, prev)
             self.signals.waysideAuthority.emit([0, id, authority])
 
         if line == 1:
             authority = self.planAuthority('green', self.greenlineControllers, self.greenlineTrack, curr, prev)
-            # print(authority)
             self.signals.waysideAuthority.emit([1, id, authority])
 
     ##  Driver for most of the logic
@@ -347,12 +354,12 @@ class WaysideIO(QWidget):
     def setSwitch(self, line, blockNum, state):
         ## redline
         if self.lines[0] == line.lower():
-            self.signals.switchState.emit([int(blockNum), state])
+            self.signals.switchState.emit([0, int(blockNum), state])
             res = self.redlineTrack.setSwitch(int(blockNum), state)
 
         ## greenline
         if self.lines[1] == line.lower():
-            self.signals.switchState.emit([int(blockNum), state])
+            self.signals.switchState.emit([1, int(blockNum), state])
             res = self.greenlineTrack.setSwitch(int(blockNum), state)
 
     def setCrossing(self, line, blockNum, state):
@@ -386,6 +393,17 @@ class WaysideIO(QWidget):
     #############
     ## HELPERS ##
     #############
+
+    ## Check speed
+    def checkSpeed(self):
+
+        ## Redline
+        for trains in self.activeTrains[0]:
+            self.activeTrains[trains]
+
+        ## Greenline
+        for trains in self.activeTrains[1]:
+            self.actionEvent[trains] = 
     ## Figure out the next 1-5 blocks that are traversable
     def planAuthority(self, line, controllers, track, curr, prev):
         previousBlock = prev
@@ -498,6 +516,7 @@ class WaysideIO(QWidget):
         self.signals.signalMaintenance.connect(self.maintenanceCallback)
         self.signals.trainLocation.connect(self.trainLocationCallback)
         self.signals.ctcSwitchState.connect(self.ctcSetSwitch)
+        self.signals.suggestedSpeedSignal.connect(self.checkSpeed)
 
 if __name__ == '__main__':
 
