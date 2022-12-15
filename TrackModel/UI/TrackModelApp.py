@@ -99,6 +99,7 @@ class TrackModel(QWidget):
             # -------------------- TRAIN MODEL SIGNAL CONNECTIONS        --------------------
             self.signals.trainLocation.connect(self.updateGlobalOccupancy)          # from train model: (used for occupancy)
             # self.signals.stoppedBlocks.connect(self.updateStoppedBlocks)          # sets a list = [list of blocks that trains are stopped at]
+            self.signals.stationStop.connect(self.updateStationStop)                # from train model: (used for station stop)
 
             # -------------------- WAYSIDE CONTROLLER SIGNAL CONNECTIONS --------------------
             self.signals.waysideAuthority.connect(self.getAuthority)                # from wayside: (used for authority)
@@ -271,6 +272,10 @@ class TrackModel(QWidget):
                         self.switchInfoTable.item(j,2).setBackground(QtCore.Qt.green)
                         self.lineBlocks[i][switch[0]-1].switchState = 'REVERSE'
 
+    def updateStationStop(self, stopMessage):
+
+        msgLine = stopMessage[2]
+        msgBlock = stopMessage[3]
     def updateCtcSwitchState(self, switchState):
         print("CTC Switch State Signal", switchState)
 
