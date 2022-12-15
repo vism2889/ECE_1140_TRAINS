@@ -185,7 +185,6 @@ class TrackModel(QWidget):
 
     def updateCrossingState(self, stateMsg):
         if self.lineBlocks != []:
-            print('CROSSING STATE', stateMsg)
             line     = stateMsg[0]
             blockNum = stateMsg[1]
             state    = stateMsg[2]
