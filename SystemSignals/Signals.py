@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 ##############################################################################
-# AUTHOR(S):    Morgan Visnesky, Garrett Marcinak, Nathaniel Mallick
+# AUTHOR(S):    Morgan Visnesky, Garrett Marcinak, Nathaniel Mallick, Gwen Litwak
 # DATE:         11/13/2022
 # FILENAME:     Signals.py
 # DESCRIPTION:
@@ -48,8 +48,8 @@ class Signals(QWidget):
     ctcSwitchState           = QtCore.pyqtSignal(list) # List of length 3 [(int) line, (int) block #, (bool) switch state]
 
     # Wayside Controller Signals
-    switchState              = QtCore.pyqtSignal(list) # List of length two indicating a block and it's switch state [(int) block #, (bool) state]
-    crossingState            = QtCore.pyqtSignal(list) # List of length two indicating a block and it's crossing state [(int) block #, (bool) state]
+    switchState              = QtCore.pyqtSignal(list) # List of length two indicating a block and it's switch state [(int) line, (int) block #, (bool) state]
+    crossingState            = QtCore.pyqtSignal(list) # List of length two indicating a block and it's crossing state [(int) line, (int) block #, (bool) state]
     waysideAuthority         = QtCore.pyqtSignal(list) # List of length 3 that specifices the authority for an individual train [(int) line,(...) train id, (list) blocks[]]
     blockMaintenance         = QtCore.pyqtSignal(list) # List of length 3 that specifies the maintenance state of a block [(int) line, (int) block #, (bool) state]
     regulatedSpeed           = QtCore.pyqtSignal(list) # List of length 3 that specificies the regulated speed of a train [(int) line, (str) train id, (int) speed]
@@ -75,7 +75,7 @@ class Signals(QWidget):
     powerSignal              = QtCore.pyqtSignal(dict) # Dictionary containing 'trainID' and 'power' 
     brakeDictSignal          = QtCore.pyqtSignal(dict) # Dictionary containing 'serviceBrake', 'emergencyBrake', and 'trainID'
     nonVitalDictSignal       = QtCore.pyqtSignal(dict) # Dictionary containing 'int_lights', 'ext_lights', 'temperature', 'left_doors', 'right_doors', 'announceState', 'advertisementState', and 'trainID'
-
+    stoppedAtStationSignal   = QtCore.pyqtSignal(dict) # Dictionary containing 'stoppedAtStation' and 'trainID
     # Train Controller (HW) Signals
 
 

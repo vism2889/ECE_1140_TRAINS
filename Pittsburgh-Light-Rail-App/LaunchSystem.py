@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 ##############################################################################
-# AUTHOR(S):   Morgan Visnesky, ADD YOUR NAMES HERE
+# AUTHOR(S):   Morgan Visnesky, Gwen Litwak
 # DATE:     11/13/2022
 # FILENAME: LaunchSystem.py
 # DESCRIPTION:
@@ -77,9 +77,26 @@ QTabWidget {
     background-color: #858e9e;
 }
 
-QComboBox {
-    background-color: #e8c33c;
+QTabBar {
+    background-color: #7b8fb0;
 }
+
+QComboBox {
+    background-color: #7b8fb0;
+}
+
+QDoubleSpinBox {
+    background-color: #7b8fb0;
+}
+
+QCheckBox {
+    background-color: #858e9e; border : 2px solid #7b8fb0;
+}
+
+QLCDNumber {
+    border : 2px solid #7b8fb0;
+}
+
 """
 
 class PittsburghLightRail(QWidget):
@@ -163,6 +180,7 @@ class PittsburghLightRail(QWidget):
         self.trainControllerComboBox.addItem("Train Controller")
         self.trainControllerComboBox.setGeometry(35,190,150,25)
         self.trainControllerComboBox.setFont(font)
+        self.trainControllerComboBox.setStyleSheet("background-color: #e8c33c;")
         if not self.hw: 
             self.signals.dispatchTrainSignal.connect(self.addDispatchedTrain)
         self.trainControllerComboBox.currentIndexChanged.connect(self.showTrainController)
@@ -201,13 +219,10 @@ class PittsburghLightRail(QWidget):
         self.index = self.trainControllerComboBox.currentIndex()
         self.trainList.append(self.trainID)
         self.controllerInstances.append(Ui_TrainControllerSW_MainWindow(self.signals, self.trainID))
-        
-            
+
     def showTrainController(self):
         self.controllerInstances[self.index].show()
-        
-        
-    
+
 ## Commandline CTRL-C ##
 def handler(signum, frame):
     print("CTRL-C was pressed")

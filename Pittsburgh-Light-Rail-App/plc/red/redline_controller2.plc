@@ -1,9 +1,14 @@
 if #block_45 == True or #block_46 == True or #block_47 == True or #block_48 == True or #block_49 == True:
     #crossing_47 = True
-else: 
+else:
     #crossing_47 = False
 
 #switch_27 = True
 #switch_32 = True
 #switch_38 = True
 #switch_43 = True
+
+if #block_50 == True or #block_51 == True:
+    #switch_52 = True
+elif #block_53 == True or #block_54 == True:
+    #switch_52 = False
