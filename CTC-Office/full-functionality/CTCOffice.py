@@ -625,18 +625,18 @@ class CTCOffice(QWidget):
         # if block has switch, toggle it
         currentSwitchState = self.selectedBlockLine.getSwitchState(str(self.selectedBlock))
         if self.selectedBlockLine == self.greenLineBlocks and self.greenLineMaintenance:
-            self.selectedBlockLine.setSwitchState(str(self.selectedBlock), not currentSwitchState[1])
+            self.selectedBlockLine.setSwitchState(str(self.selectedBlock), not currentSwitchState)
             currentSwitch = self.selectedBlockLine.switch(str(self.selectedBlock))
-            self.signals.ctcSwitchState.emit([1,int(self.selectedBlock),not currentSwitchState[1]])
+            self.signals.ctcSwitchState.emit([1,int(self.selectedBlock),not currentSwitchState])
         elif self.selectedBlockLine == self.redLineBlocks and self.redLineMaintenance:
-            self.selectedBlockLine.setSwitchState(str(self.selectedBlock), not currentSwitchState[1])
+            self.selectedBlockLine.setSwitchState(str(self.selectedBlock), not currentSwitchState)
             currentSwitch = self.selectedBlockLine.switch(str(self.selectedBlock))
-            self.signals.ctcSwitchState.emit([0,int(self.selectedBlock),not currentSwitchState[1]])
+            self.signals.ctcSwitchState.emit([0,int(self.selectedBlock),not currentSwitchState])
         else:
             return
         # change switch label
         item = QtWidgets.QTableWidgetItem()
-        item.setText(str(currentSwitch[0]) + " " + str(not currentSwitchState[1]))
+        item.setText(str(currentSwitch) + " " + str(not currentSwitchState))
         item.setFont(font)
         self.selectedBlockTable.setItem(int(self.selectedBlock)-1,1,item)
 
