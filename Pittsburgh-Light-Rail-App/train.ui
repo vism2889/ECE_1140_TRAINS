@@ -1327,7 +1327,7 @@ Brake</string>
      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;Height&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
-   <widget class="QLabel" name="height_disp_2">
+   <widget class="QLabel" name="width_disp">
     <property name="geometry">
      <rect>
       <x>820</x>
@@ -1393,7 +1393,7 @@ Brake</string>
      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;Mass&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
-   <widget class="QLabel" name="height_disp_3">
+   <widget class="QLabel" name="mass_disp">
     <property name="geometry">
      <rect>
       <x>820</x>

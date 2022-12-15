@@ -129,6 +129,9 @@ class TrainModel(QtWidgets.QMainWindow):
         else:
             self.t.e_brake = True
 
+    def addPassengers(self,msg):
+        self.t = self.trainDict[msg[0]]
+        self.t.passenger_count = msg[1]
     def UI(self):
         
         self.signals.dispatchTrainSignal.connect(self.dispatch)
@@ -241,10 +244,9 @@ class TrainModel(QtWidgets.QMainWindow):
         elif self.t.service_brake == 0:
             self.serv_brake_disp.setText('Off')
         if self.t.e_brake:
-            self.e_brake_disp.setText('On')
+            self.ebrake_disp.setText('On')
         if self.t.e_brake:
-            self.e_brake_disp.setText('Off')
-        self.ebrake_disp.setText(f'{self.t.e_brake}')
+            self.ebrake_disp.setText('Off')
         self.auth_disp.setText('%d'%int(self.t.pm.train_authority))
         self.grade_disp.setText(f'{self.t.pm.grade * 100} %')
 
@@ -263,6 +265,7 @@ class TrainModel(QtWidgets.QMainWindow):
                         self.mp.publish()
                 elif self.t.pm.stationStop and not self.t.pm.stopAtStation:
                     self.signals.stationStop.emit([self.t.id, self.t.pm.stationStop, self.t.line, self.t.pm.curr_block])
+                    self.t.passenger_count = 0
                 elif self.t.service_brake == True:
                     self.t.pm.brake(0)
                     if self.hw:
