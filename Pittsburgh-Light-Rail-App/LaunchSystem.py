@@ -77,9 +77,26 @@ QTabWidget {
     background-color: #858e9e;
 }
 
-QComboBox {
-    background-color: #e8c33c;
+QTabBar {
+    background-color: #7b8fb0;
 }
+
+QComboBox {
+    background-color: #7b8fb0;
+}
+
+QDoubleSpinBox {
+    background-color: #7b8fb0;
+}
+
+QCheckBox {
+    background-color: #858e9e; border : 2px solid #7b8fb0;
+}
+
+QLCDNumber {
+    border : 2px solid #7b8fb0;
+}
+
 """
 
 class PittsburghLightRail(QWidget):
@@ -161,6 +178,7 @@ class PittsburghLightRail(QWidget):
         self.trainControllerComboBox.addItem("Train Controller")
         self.trainControllerComboBox.setGeometry(35,190,150,25)
         self.trainControllerComboBox.setFont(font)
+        self.trainControllerComboBox.setStyleSheet("background-color: #e8c33c;")
         if not self.hw: 
             self.signals.dispatchTrainSignal.connect(self.addDispatchedTrain)
         self.trainControllerComboBox.currentIndexChanged.connect(self.showTrainController)
