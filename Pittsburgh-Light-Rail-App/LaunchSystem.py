@@ -90,13 +90,14 @@ class PittsburghLightRail(QWidget):
         self.CTCOffice  = CTCOffice(self.signals)
         self.CTCOffice.setStyle(QStyleFactory.create('Fusion'))
         self.CTCOffice.setStyleSheet(styleSheet)
+        self.hw = hw
 
         ## Launch Wayside Controller
         self.waysideController = WaysideController(self.signals)
 
-        if not hw:
-            self.trainController = Ui_TrainControllerSW_MainWindow(self.signals, 'Initial')
-            self.trainController.setStyleSheet(styleSheet)
+        # if not hw:
+        #     self.trainController = Ui_TrainControllerSW_MainWindow(self.signals)
+        #     self.trainController.setStyleSheet(styleSheet)
 
         #train model
         file = f'{os.getcwd()}/train.ui'
@@ -160,7 +161,8 @@ class PittsburghLightRail(QWidget):
         self.trainControllerComboBox.addItem("Train Controller")
         self.trainControllerComboBox.setGeometry(35,190,150,25)
         self.trainControllerComboBox.setFont(font)
-        self.signals.dispatchTrainSignal.connect(self.addDispatchedTrain)
+        if not self.hw: 
+            self.signals.dispatchTrainSignal.connect(self.addDispatchedTrain)
         self.trainControllerComboBox.currentIndexChanged.connect(self.showTrainController)
 
         ## Icons
