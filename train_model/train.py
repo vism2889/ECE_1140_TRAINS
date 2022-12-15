@@ -139,6 +139,7 @@ class PointMassModel():
             if self.curr_vel <= 0:
                 self.curr_vel = 0
         else:
+            self.calcPos()
             self.power = 0  
             self.force = 0
             self.prev_accel = 0
@@ -215,7 +216,7 @@ class PointMassModel():
 
     
         # print(f'-------------------Position: {self.curr_pos}-----------------------------')
-        if self.curr_pos >= self.curr_block_len:
+        if self.curr_pos >= self.curr_block_len and self.curr_block != 0:
             # self.occ_list[self.occ_index] = 0
             #resetting position
             self.curr_pos = self.curr_pos-self.curr_block_len
@@ -225,9 +226,18 @@ class PointMassModel():
             if len(self.waysideAuthority) > 1:
                 self.curr_block = self.waysideAuthority[1]
                 self.prev_block = self.waysideAuthority[0]
+                if self.curr_block == 0:
+                    self.train_authority = 0
+                    return
             if len(self.waysideAuthority) == 1:
                 self.curr_block = self.waysideAuthority[0]
                 self.prev_block = self.prev_block
+            elif self.curr_block == 0:
+                self.train_authority = 0
+                return
+        elif self.curr_block == 0:
+            self.train_authority = 0
+            return
                 
         
         
