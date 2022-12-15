@@ -401,11 +401,13 @@ class WaysideIO(QWidget):
 
     def setCrossing(self, line, blockNum, state):
         if self.lines[0] == line.lower():
+            self.signals.crossingState.emit([0, int(blockNum), state])
             controllers = self.lookupBlock(self.lines[0], blockNum)['controller']
             # for c in controllers:
             #     self.redline_controllers[c[0]].updateCrossing(blockNum, state)
 
         if self.lines[1] == line.lower():
+            self.signals.crossingState.emit([1, int(blockNum), state])
             controllers = self.lookupBlock(self.lines[1], blockNum)['controller']
             # for c in controllers:
             #     self.greenline_controllers[c[0]].updateCrossing(blockNum, state)
