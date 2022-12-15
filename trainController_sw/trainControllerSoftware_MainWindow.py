@@ -634,7 +634,7 @@ class Ui_TrainControllerSW_MainWindow(QWidget)          :
         self.engineFailure                              = False
         self.signalFailure                              = False
         self.brakeFailure                               = False
-        
+        self.trackFailure                               = False
         # Variables for outgoing data
         self.internalLightState                         = True
         self.externalLightState                         = True
@@ -720,7 +720,6 @@ class Ui_TrainControllerSW_MainWindow(QWidget)          :
             self.setAutoCommandedSpeed()
     
     def setTrainFailuresSignal(self, msg)               : 
-        print("TrainFailures", msg)
         if(msg[0] == self.trainID):
             self.engineFailure                          = msg[1][0]
             self.signalFailure                          = msg[1][1]
@@ -770,7 +769,7 @@ class Ui_TrainControllerSW_MainWindow(QWidget)          :
         self.SignalFailure_DisplayBox.setChecked(self.signalFailure)
         self.BrakeFailure_DisplayBox.setChecked(self.brakeFailure)
         
-        if((self.blockFailures != 0) | (self.trainFailure != 0)):
+        if((self.engineFailure) | (self.signalFailure) | (self.brakeFailure)):
             self.emergencyBrakeState                    = True
             self.emitBrakes()
             self.setManualControl_EmergencyBrake()
