@@ -7,3 +7,4 @@ class Train:
         self.destinations = copy.deepcopy(destinations)
         self.suggestedSpeed = suggestedSpeed
         self.authority = authority
+        self.blockStops = []
