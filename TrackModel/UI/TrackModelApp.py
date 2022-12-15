@@ -184,11 +184,12 @@ class TrackModel(QWidget):
         self.trackModelImage.move(self.width-210, self.height-225)
 
     def updateCrossingState(self, stateMsg):
-        print('CROSSING STATE', stateMsg)
-        line     = stateMsg[0]
-        blockNum = stateMsg[1]
-        state    = stateMsg[2]
-        self.lineBlocks[line][blockNum].crossingState = state
+        if self.lineBlocks != []:
+            print('CROSSING STATE', stateMsg)
+            line     = stateMsg[0]
+            blockNum = stateMsg[1]
+            state    = stateMsg[2]
+            self.lineBlocks[line][blockNum].crossingState = state
 
     def displayTemperatureButton(self):
         '''
