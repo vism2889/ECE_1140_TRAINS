@@ -3,7 +3,6 @@ def run(input):
 	    input['crossing'][19] = True
 	else:
 	    input['crossing'][19] = False
-	print('yo')
 	
 	occupied = False
 	for blk in range(13, 30):
