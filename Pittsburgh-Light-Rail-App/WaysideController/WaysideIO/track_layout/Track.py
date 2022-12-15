@@ -5,6 +5,7 @@ class Block():
         self.hasSwitch = False
         self.switch = None
         self.id = id
+        self.speedLimit = None
 
     def setRightNode(self, block):
         ## Check for duplicate blocks
@@ -19,6 +20,9 @@ class Block():
             if i.id == block.id:
                 return
         self.left.append(block)
+
+    def setSpeedLimit(self, speed):
+        self.speedLimit = speed
 
     def printBlock(self):
         print("Left")

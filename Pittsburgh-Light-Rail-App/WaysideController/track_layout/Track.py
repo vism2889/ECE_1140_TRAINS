@@ -4,7 +4,11 @@ class Block():
         self.right = []
         self.hasSwitch = False
         self.switch = None
+        self.speedLimit = None
         self.id = id
+
+    def setSpeedLimit(self, speed):
+        self.speedLimit = speed
 
     def setRightNode(self, block):
         ## Check for duplicate blocks

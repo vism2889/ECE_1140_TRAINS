@@ -148,11 +148,6 @@ class Controller():
         ## Run PLC program
         return self.track['crossing']
 
-    # ## Toggle maintenance mode (FOR THE CONTROLLER) - This could potentially be removed
-    # def toggleMaintence(self):
-    #     self.maintenance != self.maintenance
-    #     return self.maintenance
-
     ## Manually setting switches
     def setSwitch(self, blockNum, state):
         if blockNum not in self.track['block-maintenance']:
@@ -186,9 +181,7 @@ class Controller():
             except ImportError:
                 print(f"Errror: Could not import plc script for {self.line}line controller {self.id}")
                 self.plcGood = False                
-            else:
-                print(f'Succesfully uploaded plc to {self.line}line controller {self.id} ')
-                
+            else:                
                 self.plc.run(self.track)
                 self.plcGood = True
         else:
@@ -241,6 +234,13 @@ class WaysideIO(QWidget):
     ###############
     ## CALLBACKS ##
     ###############
+    def suggestSpeed(self, msg):
+        if msg[0] not in self.activeTrains[0]:
+            self.activeTrains[0][msg[0]] = [None, msg[1]]
+        
+        if msg[0] not in self.activeTrains[1]:
+            self.activeTrains[1][msg[0]] = [None, msg[1]]
+
     ## Train Location callback that determines authority
     def trainLocationCallback(self, loc):
         if len(loc) != 4:
@@ -252,8 +252,28 @@ class WaysideIO(QWidget):
         prev = loc[2]
         curr = loc[3]
 
+        speed = 0
+
         ## Save train location for speed
-        self.activeTrains[line][id] = curr
+        if id in self.activeTrains[line]:
+            self.activeTrains[line][id][0] = curr
+            
+            if line == 0:
+                speedLim = self.redlineTrack.getBlock(curr).speedLimit
+            if line == 1:
+                speedLim = self.greenlineTrack.getBlock(curr).speedLimit
+            
+            if self.activeTrains[line][id][1] > speedLim:
+                speed = speedLim
+            else:
+                speed = self.activeTrains[line][id][1]
+        else:
+            if line == 0:
+                self.activeTrains[line][id] = [curr, self.redlineTrack.getBlock(curr).speedLimit]
+            if line == 1:
+                self.activeTrains[line][id] = [curr, self.greenlineTrack.getBlock(curr).speedLimit]
+
+        self.signals.regulatedSpeed.emit([line, id, speed])
 
         if line == 0:
             authority= self.planAuthority('red', self.redlineControllers, self.redlineTrack, curr, prev)
@@ -393,17 +413,6 @@ class WaysideIO(QWidget):
     #############
     ## HELPERS ##
     #############
-
-    ## Check speed
-    def checkSpeed(self):
-
-        ## Redline
-        for trains in self.activeTrains[0]:
-            self.activeTrains[trains]
-
-        ## Greenline
-        for trains in self.activeTrains[1]:
-            self.actionEvent[trains] = 
     ## Figure out the next 1-5 blocks that are traversable
     def planAuthority(self, line, controllers, track, curr, prev):
         previousBlock = prev
@@ -516,7 +525,7 @@ class WaysideIO(QWidget):
         self.signals.signalMaintenance.connect(self.maintenanceCallback)
         self.signals.trainLocation.connect(self.trainLocationCallback)
         self.signals.ctcSwitchState.connect(self.ctcSetSwitch)
-        self.signals.suggestedSpeedSignal.connect(self.checkSpeed)
+        self.signals.suggestedSpeedSignal.connect(self.suggestSpeed)
 
 if __name__ == '__main__':
 
