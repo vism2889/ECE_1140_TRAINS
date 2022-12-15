@@ -264,13 +264,14 @@ class TrackModel(QWidget):
         '''
         updates the swicthes for all railway lines
         '''
-        print(len(switch))
-        # print(self.switchText)
+        print(switch)
+        print(len(self.switchText))
         for i in range(len(self.switchText)):
             for j in range(len(self.switchText[i])):
                 blockNum = int(self.switchText[i][j][0])
-                if switch[0] == blockNum and i == self.currLineIndex:
-                    if switch[1] == True:
+
+                if switch[1] == blockNum and switch[0] == self.currLineIndex:
+                    if switch[2] == True:
                         self.switchInfoTable.item(j,1).setBackground(QtCore.Qt.green)
                         self.switchInfoTable.item(j,2).setBackground(QtCore.Qt.red)
                         self.lineBlocks[i][switch[0]-1].switchState = 'FORWARD'

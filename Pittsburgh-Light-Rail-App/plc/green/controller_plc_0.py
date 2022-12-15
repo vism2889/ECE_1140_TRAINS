@@ -1,8 +1,9 @@
 def run(input):
 	if input['block'][18] == True or input['block'][19] == True or input['block'][20] == True or input['block'][21] == True:
-	    input['crossing'][19] = False
-	else:
 	    input['crossing'][19] = True
+	else:
+	    input['crossing'][19] = False
+	print('yo')
 	
 	occupied = False
 	for blk in range(13, 30):
