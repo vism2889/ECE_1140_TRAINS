@@ -109,7 +109,7 @@ class TrainModel(QtWidgets.QMainWindow):
         for i,m in enumerate(msg[1]):
             msg[1][i] = int(m)
         self.t = self.trainDict[msg[0]]
-        self.t.pm.ctc_authority.extend(msg)
+        self.t.pm.ctc_authority.extend(msg[1])
 
     
     def wayside_authority(self,msg):
@@ -274,6 +274,7 @@ class TrainModel(QtWidgets.QMainWindow):
                     
                     if self.hw:
                         self.mp.publish()
+
                 if self.t.pm.stationStop:
                     self.signals.stationStop.emit([self.t.id, self.t.pm.stationStop])
                 
