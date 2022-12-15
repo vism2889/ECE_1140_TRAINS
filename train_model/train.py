@@ -6,6 +6,9 @@ from PyQt5 import QtWidgets
 import sys
 from PyQt5.QtCore import pyqtSignal
 import random
+sys.path.append("../SystemSignals")
+from Signals import Signals
+
 
 
 # class PointMassModel():
@@ -50,6 +53,7 @@ class PointMassModel():
         self.waysideAuthority = []
         self.train_authority = 0
         self.stationStop = False
+        self.ctcStopBlock = None
         
         self.suggested_speed = 0
         #track model to train comms
@@ -77,7 +81,7 @@ class PointMassModel():
         self.occ_list = [0 for i in range(150)]
         self.occ_index = 0
 
-
+        self.ctcStationStop = []
         #time independent values
         self.power = 0
         self.force = 0
@@ -205,8 +209,9 @@ class PointMassModel():
         self.train_authority = 0
         
         #position calculation
-        self.prev_pos = self.curr_pos
-        self.curr_pos = self.prev_pos + (self.elapsed_time/2)*(self.prev_vel +self.curr_vel)
+        if self.curr_vel != 0:
+            self.prev_pos = self.curr_pos
+            self.curr_pos = self.prev_pos + (self.elapsed_time/2)*(self.prev_vel +self.curr_vel)
         # self.brake_pos = (self.elapsed_time/2)*(self.prev_vel + self.curr_vel)
 
         #block object length calculation
@@ -237,7 +242,7 @@ class PointMassModel():
                 return
         elif self.curr_block == 0:
             self.train_authority = 0
-            return
+            return 
                 
         
         

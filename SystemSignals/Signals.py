@@ -56,6 +56,8 @@ class Signals(QWidget):
     gradeSignal              = QtCore.pyqtSignal(list)
     trainLocation            = QtCore.pyqtSignal(list) # List of length 4 that identifies a unique trains location in the track [(int) line, (int) train id, (int) previos block, (int) current block]
     stationStop              = QtCore.pyqtSignal(list) #List of length 2[(string) train id, (bool) stationStop, (int) line, (int) current block]
+    ctcStopBlock             = QtCore.pyqtSignal(list) #List of length 2 [(int) line, (int) block]
+
     # Train Controller (SW) Input Signals
     authoritySignal          = QtCore.pyqtSignal(list) #List of length 2 [(string) train id, (float) authority]
     commandedSpeedSignal     = QtCore.pyqtSignal(list) #List of length 2 [(string) train id, (float) commanded speed]
