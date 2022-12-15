@@ -237,9 +237,9 @@ class WaysideIO(QWidget):
     ###############
     def suggestSpeed(self, msg):
         if msg[1] == 'Red Line':
-            self.activeTrains[0][msg[0]] = [None, msg[2]*1.60934]
+            self.activeTrains[0][msg[0]] = [None, msg[2]*3.6]
         if msg[1] == 'Green Line':
-            self.activeTrains[1][msg[0]] = [None, msg[2]*1.60934]
+            self.activeTrains[1][msg[0]] = [None, msg[2]*3.6]
 
         # if msg[0] not in self.activeTrains[0]:
         #     self.activeTrains[0][msg[0]] = [None, msg[1]]
@@ -279,7 +279,7 @@ class WaysideIO(QWidget):
             if line == 1:
                 self.activeTrains[line][id] = [curr, int(self.greenlineTrack.getBlock(curr).speedLimit)]
 
-        # print(f'({line}) :\ttrain id {id}, speed {speed}, block {curr}')
+        # print(f'({line}) :\ttrain id {id}, speed {speed/1.60934}, block {curr}')
         self.signals.regulatedSpeed.emit([line, id, speed])
 
         if line == 0:
