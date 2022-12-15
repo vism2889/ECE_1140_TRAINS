@@ -46,7 +46,7 @@ class TrainDictionary:
                 stops.append(destinationList[destination][0])
         for block in blockStopList:
             stops.append(block)
-        signals.ctcAuthoritySignal.emit(stops)
+        signals.ctcAuthoritySignal.emit([name, stops])
 
     def getDestination(self, name):
         return self.trainList[name].destinations
