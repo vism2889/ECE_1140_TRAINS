@@ -721,7 +721,6 @@ class Ui_TrainControllerSW_MainWindow(QWidget)          :
             self.setAutoCommandedSpeed()
     
     def setTrainFailuresSignal(self, msg)               : 
-        print("TrainFailures", msg)
         if(msg[0] == self.trainID):
             self.engineFailure                          = msg[1][0]
             self.signalFailure                          = msg[1][1]
