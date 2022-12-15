@@ -213,7 +213,7 @@ class PointMassModel():
         self.curr_block_len = curr_block_object.blockLength
         self.curr_block_len = float(self.curr_block_len)
 
-        
+    
         # print(f'-------------------Position: {self.curr_pos}-----------------------------')
         if self.curr_pos >= self.curr_block_len:
             # self.occ_list[self.occ_index] = 0
@@ -256,7 +256,7 @@ class PointMassModel():
             for b in wayside[0:len(wayside)-1]:
                 self.train_authority += float(self.BlockModels[b-1].blockLength)
             
-            if len(wayside) > 0:
+            if len(wayside) > 0 and wayside[-1] != 0:
                 lastBlock = wayside[-1]
                 self.train_authority += float(self.BlockModels[lastBlock-1].blockLength)/4
         elif len(self.waysideAuthority) == 1 and self.curr_vel != 0:
