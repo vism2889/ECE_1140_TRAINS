@@ -1,0 +1,4 @@
+PyQt5==5.15.7
+PySide6==6.4.1
+Zope2==4.0
+simple-pid==1.0.1
