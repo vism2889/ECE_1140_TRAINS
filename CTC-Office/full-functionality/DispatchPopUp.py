@@ -15,7 +15,7 @@ class DispatchPopUp(object):
         self.currentLine = "Red Line"
 
     def setupUi(self, dispatchPopUp, redLineStations, greenLineStations, redLineTrains, greenLineTrains, trainCount):
-        dispatchPopUp.setGeometry(400, 50, 220, 250)
+        dispatchPopUp.setGeometry(400, 50, 220, 275)
         dispatchPopUp.setStyleSheet("background-color: #747c8a;")
 
         self.redLineStations = redLineStations
@@ -24,6 +24,7 @@ class DispatchPopUp(object):
         self.greenLineTrains = greenLineTrains
         self.trainCount = trainCount
         self.scheduledTime = False
+        self.currentStationList = self.redLineStations
 
         font = QtGui.QFont()
         font.setPointSize(14)
@@ -60,6 +61,15 @@ class DispatchPopUp(object):
         self.timeSelection.setText("Set Dispatch Time")
         self.timeSelection.clicked.connect(self.setTimeSelection)
 
+        self.blockDispatch = QtWidgets.QCheckBox(dispatchPopUp)
+        self.blockDispatch.setGeometry(5,225,125,25)
+        self.blockDispatch.setText("Dispatch to Block")
+        self.blockDispatch.clicked.connect(self.setTimeSelection)
+
+        self.blockDispatchSpinBox = QtWidgets.QSpinBox(dispatchPopUp)
+        self.blockDispatchSpinBox.setGeometry(135,225,85,25)
+        self.blockDispatchSpinBox.setRange(1,76)
+
         self.stationTable = QtWidgets.QTableWidget(dispatchPopUp)
         self.stationTable.setGeometry(0,55,220,170)
         self.stationTable.setMouseTracking(True)
@@ -72,7 +82,7 @@ class DispatchPopUp(object):
         self.stationTable.verticalHeader().hide()
 
         self.dispatch = QtWidgets.QPushButton(dispatchPopUp)
-        self.dispatch.setGeometry(QtCore.QRect(0, 225, 220, 25))
+        self.dispatch.setGeometry(QtCore.QRect(0, 250, 220, 25))
         self.dispatch.setStyleSheet("background-color: #e8c33c;")
 
         self.retranslateUi()
@@ -185,6 +195,8 @@ class DispatchPopUp(object):
             self.trainList = self.redLineTrains
             self.destinationList = self.redLineStations
             self.stationTable.setRowCount(len(self.redLineStations))
+            self.blockDispatchSpinBox.setRange(1,76)
+            self.currentStationList = self.redLineStations
 
             self.index = 0
             for key in self.redLineStations.keys():
@@ -200,6 +212,8 @@ class DispatchPopUp(object):
             self.trainList = self.greenLineTrains
             self.destinationList = self.greenLineStations
             self.stationTable.setRowCount(len(self.greenLineStations))
+            self.blockDispatchSpinBox.setRange(1,150)
+            self.currentStationList = self.greenLineStations
 
             self.index = 0
             for key in self.greenLineStations.keys():
@@ -217,6 +231,7 @@ class DispatchPopUp(object):
         self.selectedDestinations = self.stationTable.selectedItems()
         self.trainName = "Train " + str(self.trainCount)
         self.totalTTS = 0
+        block = str(self.blockDispatchSpinBox.value())
 
         for row in range(0,self.stationTable.rowCount()):
             spinBox = self.stationTable.cellWidget(row, 1)
@@ -230,6 +245,9 @@ class DispatchPopUp(object):
             for destination in self.selectedDestinations:
                 if not(':' in destination.text()):
                     self.trainList.toggleDestination(self.scheduledTime, destination.text(), True)
+
+            if self.blockDispatch.isChecked():
+                self.trainList.addBlockStop(self.scheduledTime, block, True)
         else:
             self.trainList.addTrain(self.trainName, self.destinationList, 0, 0)
             self.trainList.setSuggestedSpeed(self.trainName, self.totalTTS, self.currentLine, False)
@@ -239,6 +257,9 @@ class DispatchPopUp(object):
             for destination in self.selectedDestinations:
                 if not(':' in destination.text()):
                     self.trainList.toggleDestination(self.trainName, destination.text(), False)
+
+            if self.blockDispatch.isChecked():
+                self.trainList.addBlockStop(self.trainName, block, False)
 
             self.signals.dispatchTrainSignal.emit([self.trainName, self.currentLine, self.suggestedSpeed])
             self.trainList.sendAuthority(self.trainName, self.signals)
