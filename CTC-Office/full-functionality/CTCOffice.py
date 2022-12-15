@@ -52,7 +52,7 @@ class CTCOffice(QWidget):
         self.greenLineTotalPassengers   = [0]
         self.redLineThroughput          = 0
         self.greenLineThroughput        = 0
-        self.totalHours                 = 0
+        self.totalHours                 = 1
 
         # connect to necessary signals
         self.signals.globalOccupancyFromTrackModelSignal.connect(self.readOccupancySignal)
@@ -496,7 +496,7 @@ class CTCOffice(QWidget):
 
     def updateTrainInfo(self):
         speed = int(self.selectedTrainLine.getSuggestedSpeed(self.selectedTrain))
-        self.suggestedSpeedLabel.setText("Suggested Speed: " + str(speed*2.23694) + " mph")
+        self.suggestedSpeedLabel.setText("Suggested Speed: " + str(int(speed*2.23694)) + " mph")
         self.selectedTrainLabel.setText("Selected Train: " + self.selectedTrain)
 
     def updateThroughput(self):
@@ -737,7 +737,7 @@ class CTCOffice(QWidget):
             return
 
     def checkYardedTrain(self, msg):
-        if msg[3] == 9 and msg[0] == 0:
+        if msg[3] == 8 and msg[0] == 0:
             self.redLineTrains.removeTrain(msg[1])
         elif msg[3] == 57 and msg[0] == 1:
             self.greenLineTrains.removeTrain(msg[1])
