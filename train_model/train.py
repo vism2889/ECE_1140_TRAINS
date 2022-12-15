@@ -269,6 +269,8 @@ class PointMassModel()                          :
             if len(wayside) > 0 and wayside[-1] != 0:
                 lastBlock                       = wayside[-1]
                 self.train_authority            += float(self.BlockModels[lastBlock-1].blockLength)/4
+                          
+            
         elif len(self.waysideAuthority) == 1 and self.curr_vel != 0:
             if self.prev_vel != 0:
                 self.train_authority            = 0
