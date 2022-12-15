@@ -230,16 +230,22 @@ class WaysideIO(QWidget):
             0 : {}, ## Red
             1 : {} ## Green
         }
+        
 
     ###############
     ## CALLBACKS ##
     ###############
     def suggestSpeed(self, msg):
-        if msg[0] not in self.activeTrains[0]:
-            self.activeTrains[0][msg[0]] = [None, msg[1]]
+        if msg[1] == 'Red Line':
+            self.activeTrains[0][msg[0]] = [None, msg[2]*1.60934]
+        if msg[1] == 'Green Line':
+            self.activeTrains[1][msg[0]] = [None, msg[2]*1.60934]
+
+        # if msg[0] not in self.activeTrains[0]:
+        #     self.activeTrains[0][msg[0]] = [None, msg[1]]
         
-        if msg[0] not in self.activeTrains[1]:
-            self.activeTrains[1][msg[0]] = [None, msg[1]]
+        # if msg[0] not in self.activeTrains[1]:
+        #     self.activeTrains[1][msg[0]] = [None, msg[1]]
 
     ## Train Location callback that determines authority
     def trainLocationCallback(self, loc):
@@ -263,16 +269,17 @@ class WaysideIO(QWidget):
             if line == 1:
                 speedLim = self.greenlineTrack.getBlock(curr).speedLimit
             
-            if self.activeTrains[line][id][1] > speedLim:
-                speed = speedLim
+            if self.activeTrains[line][id][1] > int(speedLim):
+                speed = int(speedLim)
             else:
                 speed = self.activeTrains[line][id][1]
         else:
             if line == 0:
-                self.activeTrains[line][id] = [curr, self.redlineTrack.getBlock(curr).speedLimit]
+                self.activeTrains[line][id] = [curr, int(self.redlineTrack.getBlock(curr).speedLimit)]
             if line == 1:
-                self.activeTrains[line][id] = [curr, self.greenlineTrack.getBlock(curr).speedLimit]
-
+                self.activeTrains[line][id] = [curr, int(self.greenlineTrack.getBlock(curr).speedLimit)]
+        
+        # print(f'({line}) :\ttrain id {id}, speed {speed}, block {curr}')
         self.signals.regulatedSpeed.emit([line, id, speed])
 
         if line == 0:
@@ -525,7 +532,7 @@ class WaysideIO(QWidget):
         self.signals.signalMaintenance.connect(self.maintenanceCallback)
         self.signals.trainLocation.connect(self.trainLocationCallback)
         self.signals.ctcSwitchState.connect(self.ctcSetSwitch)
-        self.signals.suggestedSpeedSignal.connect(self.suggestSpeed)
+        self.signals.dispatchTrainSignal.connect(self.suggestSpeed)
 
 if __name__ == '__main__':
 

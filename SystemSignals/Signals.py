@@ -75,7 +75,7 @@ class Signals(QWidget):
     powerSignal              = QtCore.pyqtSignal(dict) # Dictionary containing 'trainID' and 'power' 
     brakeDictSignal          = QtCore.pyqtSignal(dict) # Dictionary containing 'serviceBrake', 'emergencyBrake', and 'trainID'
     nonVitalDictSignal       = QtCore.pyqtSignal(dict) # Dictionary containing 'int_lights', 'ext_lights', 'temperature', 'left_doors', 'right_doors', 'announceState', 'advertisementState', and 'trainID'
-
+    stoppedAtStationSignal   = QtCore.pyqtSignal(dict) # Dictionary containing 'stoppedAtStation' and 'trainID
     # Train Controller (HW) Signals
 
 

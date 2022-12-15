@@ -120,6 +120,10 @@ class TrainModel(QtWidgets.QMainWindow):
         for train in self.trainDict.values():
             self.t = train
             self.t.pm.speedUp = int(msg)
+    
+    def trainStopped (self, msg):
+        self.t = self.trainDict[msg['trainID']]
+        self.t.pm.stopAtStation = msg['stoppedAtStation']
 
     def UI(self):
         
@@ -131,6 +135,7 @@ class TrainModel(QtWidgets.QMainWindow):
         self.signals.clockSpeedSignal.connect(self.speedup)
         self.signals.waysideAuthority.connect(self.wayside_authority)
         self.signals.beaconFromTrackModelSignal.connect(self.beaconSignal)
+        self.signals.stoppedAtStationSignal.connect(self.trainStopped)
         # if sys.argv[1] == 'user':
         #     self.test_win.setVisible(False)
         # else:
@@ -275,7 +280,7 @@ class TrainModel(QtWidgets.QMainWindow):
                     if self.hw:
                         self.mp.publish()
 
-                if self.t.pm.stationStop:
+                if self.t.pm.stationStop and not self.t.pm.stopAtStation:
                     self.signals.stationStop.emit([self.t.id, self.t.pm.stationStop, self.t.line, self.t.pm.curr_block])
                 
                 # elif type(self.t.line) != int:
