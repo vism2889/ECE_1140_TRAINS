@@ -118,6 +118,15 @@ class CTCOffice(QWidget):
         self.clockLabel.setAlignment(QtCore.Qt.AlignCenter)
         self.clockLabel.setFont(font)
 
+        self.throughPutTable = QTableWidget(self)
+        self.throughPutTable.setRowCount(2)
+        self.throughPutTable.setColumnCount(1)
+        self.throughPutTable.setGeometry(550, 180, 140, 60)
+        self.throughPutTable.verticalHeader().setDefaultSectionSize(20)
+        self.throughPutTable.setSelectionMode(QAbstractItemView.NoSelection)
+        self.throughPutTable.setVerticalHeaderLabels(['Red', 'Green'])
+        self.throughPutTable.setHorizontalHeaderLabels(['ThroughPut'])
+
     ##################### RED LINE ##########################
         font.setPointSize(10)
         self.redLineLabelTable = QTableWidget(self)
@@ -214,19 +223,19 @@ class CTCOffice(QWidget):
         self.blockInfoTable.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.blockInfoTable.setSelectionMode(QAbstractItemView.NoSelection)
         self.blockInfoTable.setColumnCount(1)
-        self.blockInfoTable.setGeometry(550,210,140,102)
+        self.blockInfoTable.setGeometry(550,260,140,102)
         self.blockInfoTable.horizontalHeader().hide()
         self.blockInfoTable.setVerticalHeaderLabels(['Line','Number','Occupancy','Fault','Maintenance'])
         self.blockInfoTable.show()
 
         self.toggleMaintenanceButton = QtWidgets.QPushButton(self)
-        self.toggleMaintenanceButton.setGeometry(550,310,140,20)
+        self.toggleMaintenanceButton.setGeometry(550,360,140,20)
         self.toggleMaintenanceButton.setText("Toggle Maintenance")
         self.toggleMaintenanceButton.clicked.connect(self.toggleMaintenance)
         self.toggleMaintenanceButton.show()
 
         self.toggleSwitchButton = QtWidgets.QPushButton(self)
-        self.toggleSwitchButton.setGeometry(550,330,140,20)
+        self.toggleSwitchButton.setGeometry(550,380,140,20)
         self.toggleSwitchButton.setText("Toggle Switch")
         self.toggleSwitchButton.clicked.connect(self.toggleSwitch)
         self.toggleSwitchButton.show()
