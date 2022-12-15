@@ -264,6 +264,8 @@ class TrackModel(QWidget):
         '''
         updates the swicthes for all railway lines
         '''
+        print(len(switch))
+        # print(self.switchText)
         for i in range(len(self.switchText)):
             for j in range(len(self.switchText[i])):
                 blockNum = int(self.switchText[i][j][0])
