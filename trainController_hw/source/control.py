@@ -7,25 +7,25 @@
 # for the RPi
 
 # TODO:
-# - Generate new message files to take authority as a distance
-# - implement failure states
-#   + failure indicators
-#   + stop train 
-# - Implement speed limit 
-#   + train cannot exceed speed limit
 # - Implement next station
 #   + display next station
 #   + use next station for announcements 
-# - Implement authority
-#   + stop train when authority is reached
 # - Implement station announcement audio for green line
+# - Manual mode cannot override under unsafe conditions
+# - Redundancy measures
+#   + two different methods of calculating power
+#   + stop train if disparity
+# - External lights are turned on and off for underground stations
 ##############################################################################
 
 import RPi.GPIO as GPIO
 from simple_pid import PID
 from pygame import mixer
+from gtts import gTTS
+import os
 from outputData import OutputData
 from trainData import TrainData
+from time import sleep
 
 GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BCM)
@@ -35,6 +35,11 @@ GPIO.setup(14, GPIO.OUT, initial=GPIO.LOW) # internal lights
 GPIO.setup(15, GPIO.OUT, initial=GPIO.LOW) # external lights
 GPIO.setup(23, GPIO.OUT, initial=GPIO.LOW) # left door
 GPIO.setup(24, GPIO.OUT, initial=GPIO.LOW) # right door
+GPIO.setup(6, GPIO.OUT, initial=GPIO.LOW) # brake failure
+GPIO.setup(12, GPIO.OUT, initial=GPIO.LOW) # engine failure 
+GPIO.setup(13, GPIO.OUT, initial=GPIO.LOW) # pickup failure 
+
+GPIO.setup(27, GPIO.IN, pull_up_down=GPIO.PUD_DOWN) # auto manual switch
 
 mixer.init()
 
@@ -42,6 +47,8 @@ class Control():
     def __init__(self):
         self.output = OutputData()
         self.input = TrainData()
+        self.vital_override = False
+        self.operating_mode = False
         self.authority = 0
         self.light_state_internal = False
         self.light_state_external = False
@@ -52,20 +59,18 @@ class Control():
         self.ebrakeCommand = False
         self.brakeCommand = False
         self.current_speed = 0
-        self.speed_limit = 100
+        self.stationStop = False
+        self.speed_limit = 15 
         self.temperature = 0
         self.k_p = 24e3
         self.k_i = 100
-        self.pid = PID(self.k_p, self.k_i, 0, setpoint=self.commanded_speed) # initialize pid with fixed values
+        self.pid = PID(self.k_p, self.k_i, 0, setpoint=0) # initialize pid with fixed values
         self.pid.output_limits = (0, 120000) # clamp at max power output specified in datasheet 120kW
         self.power = 0.0
         self.station_audio = ["shadyside_herron.mp3", "herron_swissvale.mp3", 
                               "swissvale_penn.mp3", "penn_steelplaza.mp3", 
                               "steelplaza_first.mp3","first_stationSquare.mp3", 
                               "stationSquare_southHills.mp3"]
-        self.station_names = ["Shadyside", "Herron Ave.", "Swissvale", 
-                              "Penn Station", "Steel Plaza", "First Ave",
-                              "Station Square", "South Hills Junction"]
         
     def initializePID(self, kp_val, ki_val):
         self.k_p = kp_val
@@ -73,14 +78,6 @@ class Control():
         self.pid = PID(self.k_p, self.k_i, 0, setpoint=self.commanded_speed)
         self.pid.output_limits = (0, 120000) # clamp at max power output specified in datasheet 120kW
 
-    # need to confirm what data type authority will be
-    def setAuthority(self, authority=None):
-        if(authority==None):
-            self.authority = self.input.getAuthority()
-            return
-        
-        self.authority = authority
-    
     def setInternalLights(self, light_state):
         self.light_state_internal = light_state
 
@@ -114,13 +111,13 @@ class Control():
         self.output.setRightDoorState(self.door_state_right)
 
     def setSpeed(self, commanded_speed=None):
-        if(commanded_speed==None):
+        if(commanded_speed==None and self.operating_mode == True):
             speed = self.input.getCommandedSpeed()
-            if(speed != None):
-                self.commanded_speed = speed
+            if(speed != None and self.limitSpeed(speed) == False):
+                self.commanded_speed = speed 
 
-        else:
-            self.commanded_speed = commanded_speed
+        elif(commanded_speed != None and self.limitSpeed(commanded_speed) == False):
+            self.commanded_speed = commanded_speed 
             
     # can remove after testing
     def setCurrentSpeed(self, current_speed=None):
@@ -138,11 +135,14 @@ class Control():
         self.output.setTemperatureValue(self.temperature)
 
     # need to refactor to take in next station data from train model
-    def announceStation(self, start, file_idx):
+    def announceStation(self, start):
+        station = self.input.getStationName()
         self.output.setAnnounceState(start)
-        mixer.music.load("audio/" +  self.station_audio[file_idx])
-        if(start) : mixer.music.play()
-        if(not start) : mixer.music.stop()
+        
+        if station != None and station != "":
+            mixer.music.load("audio/" + station)
+            if(start) : mixer.music.play()
+            if(not start) : mixer.music.stop()
 
     def deployEbrake(self, deploy=None):
         if deploy != None:
@@ -157,21 +157,37 @@ class Control():
     # TODO: implement speed limit
     def limitSpeed(self, speed):
         speed_limit = self.input.getSpeedLimit()
-        if(speed > speed_limit):
+        if(speed_limit != None and speed > speed_limit):
+            #  print("\nSpeed limit: ", speed_limit * 2.3694)
+            self.vital_override = True  
+            self.deployServiceBrake(True)
             return False
         
-        else: return True
-
-    def getSpeedLimit(self):
-        limit = self.input.getSpeedLimit()
-        if limit != None:
-            print("\nSpeed Limit: %5.2f" % limit)
+        else:
+            self.vital_override = False 
+            return True
 
     # TODO: implement authority
     def checkAuthority(self):
-        if self.authority == 0:
-            self.deployEbrake(self)
-    
+        if self.input.getAuthority() != None:
+            stop = self.input.getStationStop()
+            if stop == True:
+                self.announceStation(True) # announce when approaching a station
+                self.stationStop = True
+            self.authority = self.input.getAuthority() 
+        
+        self.calculateBrakingDistance()
+        
+        if self.stationStop  == True and self.current_speed == 0:
+            self.station_procedure()
+
+        underground = self.input.getUnderground()
+        if underground == "YES":
+            self.setExternalLights(True)
+
+        elif underground == "NO":
+            self.setExternalLights(False)
+        
     def set_kp_ki(kp_val, ki_val, self):
         self.k_p = kp_val
         self.k_i = ki_val
@@ -180,13 +196,13 @@ class Control():
         return self.k_p, self.k_i
 
     def getPowerOutput(self, commanded_speed=None):
-        if self.ebrakeCommand == True or self.brakeCommand == True:
+        if self.ebrakeCommand == True or self.brakeCommand == True or self.vital_override == True:
             self.output.setPower(0.0)
+            self.power = 0.0
             return self.power
         
-        if commanded_speed == None and self.input.getCommandedSpeed() != None:
+        if self.operating_mode == True and self.input.getCommandedSpeed() != None:
             self.pid.setpoint = self.input.getCommandedSpeed()
-            self.current_speed = self.input.getCurrentSpeed()
 
         elif commanded_speed != None:
             self.commanded_speed = commanded_speed
@@ -194,7 +210,79 @@ class Control():
 
         self.power = self.pid(self.current_speed)
         self.output.setPower(self.power)
+
         return self.power
+
+    def checkFailures(self):
+        failures = self.input.getFailures()
+        fail = False
+
+        # check failures and corresponding pin for indicator
+        for failure, p in failures:
+            if failure:
+                self.vital_override = True
+                fail = True
+            self.failure_lights(failure, p)
+ 
+        if(fail == False):
+            self.vital_override = False
+
+        elif(fail == True):
+            self.vital_override = True
+
+        self.deployEbrake(fail)
+
+    def failure_lights(self,failure, pin):
+        if failure: GPIO.output(pin, GPIO.HIGH)
+        if not failure: GPIO.output(pin, GPIO.LOW)
+    
+    def calculateBrakingDistance(self):
+        # d = v^2 * k (arbitrary proportional constant under system conditions
+        distance = (self.current_speed ** 2) * 1.2 
+    
+        # if minimum safe distance is < 90% of authority, override manual commands and deploy service brake
+        if distance >= self.authority *.8:
+            self.vital_override = True
+            self.deployServiceBrake(True)
+        else:
+            self.vital_override = False
+
+    def auto_manual_switch(self):
+        if GPIO.input(27) == GPIO.HIGH:
+            self.operating_mode = True 
+
+        if GPIO.input(27) == GPIO.LOW:
+            self.operating_mode = False
+    
+    def station_procedure(self):
+        side = self.input.getStationSide()   
+
+        self.vital_override = True
+        self.deployServiceBrake(True)
+        # open doors
+        self.stationSetDoors(side)  
+        # dwell for 30 seconds
+        sleep(5)
+        # close doors
+        self.stationSetDoors(side)
+        # depart
+        self.deployServiceBrake(False)
+        self.vital_override = False
+        self.stationStop = False
+
+    def stationSetDoors(self, side):
+        if side == "Left":
+            self.setLeftDoor(not self.door_state_left)
+
+        elif side == "Right":
+            self.setRightDoor(not self.door_state_right)
+
+        elif side == "Left/Right":
+            self.setLeftDoor(not self.door_state_left)
+            self.setRightDoor(not self.door_state_right)
+
+        else:
+            return
 
     # used for server interface testing to send dummy data to a client acting as train model
     def sendRandom(self):
