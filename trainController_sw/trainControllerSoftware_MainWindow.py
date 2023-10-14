@@ -12,6 +12,9 @@
 
 import sys
 import time
+
+sys.path.append("../SystemSignals/")
+
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
@@ -21,7 +24,7 @@ from PyQt5.QtCore import QTimer
 from functools import partial
 from simple_pid import PID
 from PIController import PIController
-from signalSender import signalSender
+from Signals import Signals
 
 
 class Ui_TrainControllerSW_MainWindow(QWidget)          : 
@@ -1051,8 +1054,54 @@ class Ui_TrainControllerSW_MainWindow(QWidget)          :
         self.signals.nonVitalDictSignal.emit(self.nonVitalDict) 
  
 if __name__ == "__main__":
+    # Style sheet
+    styleSheet = """
+    QWidget {
+        background-color: #747c8a;
+    }
+
+    QPushButton {
+        background-color: #e8c33c;
+    }
+
+    QTableWidget {
+        background-color: #747c8a;
+    }
+
+    QListWidget {
+        background-color: #747c8a;
+    }
+
+    QTabWidget {
+        background-color: #858e9e;
+    }
+
+    QTabBar {
+        background-color: #7b8fb0;
+    }
+
+    QComboBox {
+        background-color: #7b8fb0;
+    }
+
+    QDoubleSpinBox {
+        background-color: #7b8fb0;
+    }
+
+    QCheckBox {
+        background-color: #858e9e; border : 2px solid #7b8fb0;
+    }
+
+    QLCDNumber {
+        border : 2px solid #7b8fb0;
+    }
+
+    """
     import sys
     app                                                 = QtWidgets.QApplication(sys.argv)
-    ui                                                  = Ui_TrainControllerSW_MainWindow()
+    signals    = Signals()
+    ui                                                  = Ui_TrainControllerSW_MainWindow(signals)
+    ui.setStyleSheet(styleSheet)
+    ui.show()
     
     sys.exit(app.exec_())
